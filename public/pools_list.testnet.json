@@ -1,0 +1,182 @@
+{
+  "name": "Pools list on testnet",
+  "logoURI": "https://s3.amazonaws.com/cdn-origin-etr.akc.org/wp-content/uploads/2017/11/29231450/Poodle-Standard-Gray-On-White-Standing.jpg",
+  "keywords": ["special tokens"],
+  "tags": {
+    "ProjectName": {
+      "name": "Project",
+      "description": "Tokens that are listed on Project"
+    }
+  },
+  "timestamp": "2021-06-12T00:00:00+00:00",
+  "base_token": {
+    "id": "tustless-hub",
+    "chain_id": "trstdev-1",
+    "token_address": "",
+    "symbol": "TRST",
+    "name": "Junox",
+    "decimals": 6,
+    "logoURI": "https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022",
+    "tags": ["native"],
+    "native": true,
+    "denom": "utrst"
+  },
+  "pools": [
+    {
+      "pool_id": "TRST-POOD",
+      "pool_assets": [
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "",
+          "symbol": "TRST",
+          "name": "Junox",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022",
+          "tags": ["native"],
+          "native": true,
+          "denom": "utrst"
+        },
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "juno1mnsus3ssrqp43l2l9xk44jvcakwmtr6r5uqqfa5eha692jd76y5q5fegyj",
+          "symbol": "POOD",
+          "name": "Poodle",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/polygon-matic-logo.svg?v=022",
+          "tags": ["memecoin"],
+          "native": false,
+          "denom": "upood"
+        }
+      ],
+      "swap_address": "juno1nsrl9z4mlt0ef4p3susm8hkyz6ep7z4kktc4rkfuj5lj2mtv4wysca05g7",
+      "staking_address": "juno1je7shq9eejdz94lmjpy2dg6kks9lk2fsawlyu08pgjachylawghq6vnh7a",
+      "rewards_tokens": []
+    },
+    {
+      "pool_id": "TRST-CRAB",
+      "pool_assets": [
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "",
+          "symbol": "TRST",
+          "name": "Junox",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022",
+          "tags": ["native"],
+          "native": true,
+          "denom": "utrst"
+        },
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "juno1x5mylzhf0l7erhwelrgx52uxc5fmnk5k0e3taljnqr2a7fqjghrq3jxz2t",
+          "symbol": "CRAB",
+          "name": "Crab",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/irisnet-iris-logo.svg?v=022",
+          "tags": ["memecoin"],
+          "native": false,
+          "denom": "ucrab"
+        }
+      ],
+      "swap_address": "juno1j4ezvp80mnn75hlngak35n6wwzemxqjxdncdxc5n9dfw6s0q080qyhh9zl",
+      "staking_address": "juno1k9lqf94dk8v0t5tcsxvjddjgy3ncr8w6nxe8k5p7wqpjzhedn3gsvw0q8k",
+      "rewards_tokens": [
+        {
+          "rewards_address": "juno1hnwa4n792a3t6nnxfezpks7u8mgjq8uvwd45pk6fu478qlxgrm0qwhvt4c",
+          "token_address": "",
+          "swap_address": "",
+          "symbol": "TRST",
+          "name": "Junox",
+          "logoURI": "https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022",
+          "native": true,
+          "denom": "utrst",
+          "decimals": 6
+        },
+        {
+          "rewards_address": "juno1qlq6uatzj9zecxwkq5pl2wee2xhuhqwj5xe4c5f4gh24axqwsr5s6dnvqk",
+          "token_address": "juno1x5mylzhf0l7erhwelrgx52uxc5fmnk5k0e3taljnqr2a7fqjghrq3jxz2t",
+          "swap_address": "juno1j4ezvp80mnn75hlngak35n6wwzemxqjxdncdxc5n9dfw6s0q080qyhh9zl",
+          "symbol": "CRAB",
+          "name": "Crab",
+          "logoURI": "https://cryptologos.cc/logos/irisnet-iris-logo.svg?v=022",
+          "native": false,
+          "denom": "ucrab",
+          "decimals": 6
+        }
+      ]
+    },
+    {
+      "pool_id": "TRST-DAO",
+      "pool_assets": [
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "",
+          "symbol": "TRST",
+          "name": "Junox",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022",
+          "tags": ["native"],
+          "native": true,
+          "denom": "utrst"
+        },
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "juno103ch5yuqrw03p9c7lg9czc2ng7d2qtd49heprergf6867atftncs9rclkh",
+          "symbol": "DAO",
+          "name": "DAO",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/torn-torn-logo.svg?v=022",
+          "tags": ["memecoin"],
+          "native": false,
+          "denom": "udao"
+        }
+      ],
+      "swap_address": "juno1ajwqdgnae4c8gcrcf7fcnwzqmx5emdazkuxzwhssq5qccs2u7desj4adma",
+      "staking_address": "juno1zm3e54zssvj67rq9sgeame2wc4aegkd9vsyfzvlwatjz47dus52qhrgrum",
+      "rewards_tokens": []
+    },
+    {
+      "pool_id": "TRST-DOG",
+      "pool_assets": [
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "",
+          "symbol": "TRST",
+          "name": "Junox",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022",
+          "tags": ["native"],
+          "native": true,
+          "denom": "utrst"
+        },
+        {
+          "id": "tustless-hub",
+          "chain_id": "trstdev-1",
+          "token_address": "juno1zhm3xqhvzz9z2envkdsarkx6g34t37terg366hap7uzfseyapqsqscp32r",
+          "symbol": "DOG",
+          "name": "DOG",
+          "decimals": 6,
+          "logoURI": "https://cryptologos.cc/logos/dogebonk-dobo-logo.svg?v=023",
+          "tags": ["memecoin"],
+          "native": false,
+          "denom": "udog"
+        }
+      ],
+      "swap_address": "juno1wv7naz8ezrsagps2s8dzuqq0f6h2fhw043x4jkykay4l0zvevqkq5fdf7m",
+      "staking_address": "",
+      "rewards_tokens": []
+    }
+  ],
+  "version": {
+    "major": 0,
+    "minor": 1,
+    "patch": 0
+  }
+}

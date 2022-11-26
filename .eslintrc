@@ -1,0 +1,17 @@
+{
+  "extends": ["next", "next/core-web-vitals"],
+  "plugins": ["testing-library"],
+  "rules": {
+    "import/no-duplicates": ["error"]
+  },
+  "overrides": [
+    // Only uses Testing Library lint rules in test files
+    {
+      "files": [
+        "**/__tests__/**/*.[jt]s?(x)",
+        "**/?(*.)+(spec|test).[jt]s?(x)"
+      ],
+      "extends": ["plugin:testing-library/react"]
+    }
+  ]
+}
