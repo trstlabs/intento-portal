@@ -1,4 +1,4 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 
 import {
   getToken1ForToken2Price,
@@ -17,7 +17,7 @@ type TokenToTokenPriceQueryArgs = {
   tokenA: TokenInfo
   tokenB: TokenInfo
   amount: number
-  client: CosmWasmClient
+  client: TrustlessChainClient
 }
 
 type TokenToTokenPriceQueryWithPoolsReturns = {

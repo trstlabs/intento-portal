@@ -1,4 +1,4 @@
-import { MsgExecuteContractEncodeObject } from '@cosmjs/cosmwasm-stargate'
+import { MsgExecuteContractEncodeObject } from 'trustlessjs'
 import { toUtf8 } from '@cosmjs/encoding'
 import { Coin } from '@cosmjs/launchpad'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'

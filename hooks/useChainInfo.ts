@@ -12,7 +12,7 @@ export const unsafelyReadChainInfoCache = () =>
 
 export const useChainInfo = () => {
   const { data, isLoading } = useQuery<ChainInfo>(
-    chainInfoQueryKey,
+    '@chain-info',
     async () => {
       const response = await fetch(process.env.NEXT_PUBLIC_CHAIN_INFO_URL)
       return await response.json()

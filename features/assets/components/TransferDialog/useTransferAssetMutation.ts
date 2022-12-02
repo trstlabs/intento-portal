@@ -1,4 +1,4 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 import {
   Coin,
   DeliverTxResponse,
@@ -31,7 +31,7 @@ const sendIbcTokens = (
   /** timeout in seconds */
   timeoutTimestamp: number | undefined,
   memo = '',
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 ): Promise<DeliverTxResponse> => {
   const timeoutTimestampNanoseconds = timeoutTimestamp
     ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)

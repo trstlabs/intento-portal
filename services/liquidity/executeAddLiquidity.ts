@@ -1,7 +1,7 @@
 import {
   MsgExecuteContractEncodeObject,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate'
+  TrustlessChainClient,
+} from 'trustlessjs'
 import { coin } from '@cosmjs/stargate'
 
 import { TokenInfo } from '../../queries/usePoolsListQuery'
@@ -23,7 +23,7 @@ type ExecuteAddLiquidityArgs = {
   maxTokenBAmount: number
   senderAddress: string
   swapAddress: string
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const executeAddLiquidity = async ({

@@ -8,7 +8,6 @@ export const BASE_TOKEN: TokenInfo = {
   name: 'Wasmswap',
   decimals: 6,
   logoURI: 'https://cryptologos.cc/logos/anyswap-any-logo.svg?v=022',
-  tags: ['native'],
   native: true,
   denom: 'utrst',
 }
@@ -22,7 +21,6 @@ export const CRAB_TOKEN: TokenInfo = {
   name: 'Crab',
   decimals: 6,
   logoURI: 'https://cryptologos.cc/logos/irisnet-iris-logo.svg?v=022',
-  tags: ['memecoin'],
   native: false,
   denom: 'ucrab',
 }
@@ -36,7 +34,6 @@ export const DAO_TOKEN: TokenInfo = {
   name: 'DAO',
   decimals: 6,
   logoURI: 'https://cryptologos.cc/logos/torn-torn-logo.svg?v=022',
-  tags: ['memecoin'],
   native: false,
   denom: 'udao',
 }
@@ -46,9 +43,7 @@ export const BASE_TOKEN_CRAB_POOL: PoolEntityType = {
   pool_assets: [BASE_TOKEN, CRAB_TOKEN],
   swap_address:
     'juno1nc5tatafv6eyq7llkr2gv50ff9e22mnf70qgjlv737ktmt4eswrq68ev2p',
-  staking_address:
-    'juno16y344e8ryydmeu2g8yyfznq79j7jfnar4p59ngpvaazcj83jzsmsnvh4g8',
-  rewards_tokens: [],
+
 }
 
 export const BASE_TOKEN_DAO_POOL: PoolEntityType = {
@@ -56,9 +51,7 @@ export const BASE_TOKEN_DAO_POOL: PoolEntityType = {
   pool_assets: [BASE_TOKEN, DAO_TOKEN],
   swap_address:
     'juno1hulx7cgvpfcvg83wk5h96sedqgn72n026w6nl47uht554xhvj9ns263mx9',
-  staking_address:
-    'juno1q23d30x94cm8ve243pxdc52m398r4l5ecgcfp8tud3vggcsq8s2qv7kt2z',
-  rewards_tokens: [],
+
 }
 
 export const CRAB_DAO_POOL: PoolEntityType = {
@@ -66,6 +59,5 @@ export const CRAB_DAO_POOL: PoolEntityType = {
   pool_assets: [CRAB_TOKEN, DAO_TOKEN],
   swap_address:
     'juno187zds75uenfxht2zqz7e0wxn3ushcawvf2ndrns6q63hgfn6ptqq7d7smp',
-  staking_address: '',
-  rewards_tokens: [],
+
 }

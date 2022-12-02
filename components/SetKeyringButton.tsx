@@ -1,12 +1,11 @@
 import { CSS } from '@stitches/react'
-import { useTokenBalance } from 'hooks/useTokenBalance'
-import { useBaseTokenInfo } from 'hooks/useTokenInfo'
+
 import {
   Button,
   Column,
   Copy,
   CopyTextTooltip,
-  formatTokenBalance,
+
   IconWrapper,
   Logout,
   media,
@@ -20,61 +19,48 @@ import React from 'react'
 import { useRecoilValue } from 'recoil'
 import { walletState } from 'state/atoms/walletAtoms'
 
-type ConnectedWalletButtonProps = { css?: CSS } & {
-  walletName?: string
+type SetKeyringButtonProps = { css?: CSS } & {
   onConnect: () => void
-  onDisconnect: () => void
+  onRemove: () => void
   connected: boolean
 }
 
-export const ConnectedWalletButton = ({
+
+export const SetKeyringButton = ({
   onConnect,
+  onRemove,
   connected,
-  onDisconnect,
-  walletName,
   ...props
-}: ConnectedWalletButtonProps) => {
-  const baseToken = useBaseTokenInfo()
-  const { balance } = useTokenBalance(baseToken?.symbol)
+}: SetKeyringButtonProps) => {
+
   const { address } = useRecoilValue(walletState)
 
-  if (!connected) {
+  if (connected && localStorage.getItem("vk" + address) == undefined) {
     return (
       <Column css={{ paddingBottom: '$6' }}>
         <Button onClick={onConnect} size="large" variant="primary" {...props}>
-          Connect Keplr
+          Set Keyring
         </Button>
       </Column>
     )
   }
 
+
+
   return (
-    <StyledWalletButton {...props} role="button">
-      <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Wallet />} />
-      <div data-content="">
-        <Text variant="link" color="body">
-          {walletName}
-        </Text>
-        <Text
-          variant="legend"
-          css={{
-            '-webkit-background-clip': 'text',
-            '-webkit-text-fill-color': 'transparent',
-            backgroundImage:
-              'linear-gradient(90.55deg, #103b64 1.35%, #144a7d 19.1%, #185996 37.37%, #1c68af 58.83%, #1c68af 75.84%, #1c68af 99.52%)',
-          }}
-        >
-          {formatTokenBalance(balance, { includeCommaSeparation: true })}{' '}
-          {baseToken?.symbol}
-        </Text>
-      </div>
+    <StyledKeyringButton {...props} role="button">
+      <Text variant="link" color="body">
+        Keyring Active
+      </Text>
+      <IconWrapper size="medium" css={{ color: '#FE8D9E' }} icon={<Wallet />} />
+
       <StyledDivForActions>
         <StyledDivForInlineActions>
           <CopyTextTooltip
-            label="Copy wallet address"
-            successLabel="Wallet address copied!"
-            ariaLabel="Copy wallet address"
-            value={address}
+            label="Copy viewing key"
+            successLabel="Viewing key copied!"
+            ariaLabel="Copy viewing key"
+            value={localStorage.getItem("vk" + address)}
           >
             {({ copied, ...bind }) => (
               <Button
@@ -86,19 +72,19 @@ export const ConnectedWalletButton = ({
             )}
           </CopyTextTooltip>
           <Tooltip
-            label="Disconnect your wallet"
-            aria-label="Disconnect your wallet"
+            label="Unpin ViewingKey"
+            aria-label="Unpin from browser instance"
           >
             <Button
+              onClick={onRemove}
               variant="ghost"
               size="small"
-              onClick={onDisconnect}
               icon={<IconWrapper icon={<Logout />} />}
             />
           </Tooltip>
         </StyledDivForInlineActions>
       </StyledDivForActions>
-    </StyledWalletButton>
+    </StyledKeyringButton>
   )
 }
 
@@ -124,7 +110,7 @@ const StyledDivForInlineActions = styled('div', {
   columnGap: '$space$2',
 })
 
-const StyledWalletButton = styled('div', {
+const StyledKeyringButton = styled('div', {
   position: 'relative',
   transition: 'background-color .1s ease-out, border .1s ease-out',
   display: 'flex',

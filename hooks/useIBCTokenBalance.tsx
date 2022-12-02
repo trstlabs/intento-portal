@@ -16,7 +16,7 @@ export const useIBCTokenBalance = (tokenSymbol) => {
       const { denom, decimals, chain_id, rpc } = ibcAsset
 
       await window.keplr.enable(chain_id)
-      const offlineSigner = await window.getOfflineSigner(chain_id)
+      const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
 
       const wasmChainClient = await SigningStargateClient.connectWithSigner(
         rpc,

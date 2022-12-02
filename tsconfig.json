@@ -23,6 +23,7 @@
     "noFallthroughCasesInSwitch": true, // Report errors for fallthrough cases in switch statement
     "baseUrl": ".",
     "jsx": "preserve",
+    "typeRoots": ["./node_modules/@types", "./types"],
     "paths": {
       "": ["./*"]
     }

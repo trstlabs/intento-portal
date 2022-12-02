@@ -1,4 +1,4 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 import {
   createExecuteMessage,
   createIncreaseAllowanceMessage,
@@ -10,7 +10,7 @@ type ExecuteRemoveLiquidityArgs = {
   senderAddress: string
   swapAddress: string
   lpTokenAddress: string
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const executeRemoveLiquidity = async ({

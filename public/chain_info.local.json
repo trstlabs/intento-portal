@@ -1,13 +1,12 @@
 {
-  "chainId": "testing",
-  "chainName": "TRST Local",
-  "rpc": "http://localhost:26657/",
-  "rest": "http://localhost:1317/",
+  "chainId": "trstdev-1",
+  "chainName": "Trustless Hub Testnet",
+  "rpc": "https://opengrpc.trustlesshub.com/",
+  "rest": "https://openapi.trustlesshub.com/",
   "stakeCurrency": {
     "coinDenom": "TRST",
     "coinMinimalDenom": "utrst",
-    "coinDecimals": 6,
-    "coinGeckoId": "trustless-hub"
+    "coinDecimals": 6
   },
   "bip44": {
     "coinType": 118
@@ -22,21 +21,16 @@
   },
   "currencies": [
     {
-      "coinDenom":"TRST",
-      "coinMinimalDenom":  "utrst",
+      "coinDenom": "TRST",
+      "coinMinimalDenom": "utrst",
       "coinDecimals": 6,
       "coinGeckoId": "trustless-hub"
-    },
-    {
-      "coinDenom": "COSM",
-      "coinMinimalDenom": "ucosm",
-      "coinDecimals": 6
     }
   ],
   "feeCurrencies": [
     {
-      "coinDenom":"TRST",
-      "coinMinimalDenom":  "utrst",
+      "coinDenom": "TRST",
+      "coinMinimalDenom": "utrst",
       "coinDecimals": 6,
       "coinGeckoId": "trustless-hub"
     }

@@ -1,4 +1,4 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 import { coin } from '@cosmjs/stargate'
 
 import { PoolEntityType, TokenInfo } from '../../queries/usePoolsListQuery'
@@ -16,7 +16,7 @@ type PassThroughTokenSwapArgs = {
   inputPool: PoolEntityType
   outputPool: PoolEntityType
   tokenA: TokenInfo
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const passThroughTokenSwap = async ({

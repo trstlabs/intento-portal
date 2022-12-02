@@ -1,14 +1,14 @@
 import { useQuery } from 'react-query'
 
-import { cosmWasmClientRouter } from '../util/cosmWasmClientRouter'
+import { trustlessChainClientRouter } from '../util/trustlessChainClientRouter'
 import { useChainInfo } from './useChainInfo'
 
-export const useCosmWasmClient = () => {
+export const useTrustlessChainClient = () => {
   const [chainInfo] = useChainInfo()
 
   const { data } = useQuery(
     '@cosmwasm-client',
-    () => cosmWasmClientRouter.connect(chainInfo.rpc),
+    () => trustlessChainClientRouter.connect(chainInfo.rpc, chainInfo.chainId),
     { enabled: Boolean(chainInfo?.rpc) }
   )
 

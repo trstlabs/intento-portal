@@ -1,4 +1,4 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { Key } from '@keplr-wallet/types'
 import { atom } from 'recoil'
@@ -81,7 +81,7 @@ function createWalletState<TClient = any, TState = {}>({
 }
 
 export const walletState = createWalletState<
-  SigningCosmWasmClient,
+  TrustlessChainClient,
   { key?: Key }
 >({
   key: 'internal-wallet',

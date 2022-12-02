@@ -1,4 +1,4 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 import { coin } from '@cosmjs/stargate'
 
 import { TokenInfo } from '../../queries/usePoolsListQuery'
@@ -16,7 +16,7 @@ type DirectTokenSwapArgs = {
   senderAddress: string
   swapAddress: string
   tokenA: TokenInfo
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const directTokenSwap = async ({

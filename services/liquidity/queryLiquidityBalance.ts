@@ -1,10 +1,10 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 import { protectAgainstNaN } from 'junoblocks'
 
 type QueryLiquidityBalanceArgs = {
   address: string
   tokenAddress: string
-  client: CosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const queryLiquidityBalance = async ({
@@ -13,7 +13,7 @@ export const queryLiquidityBalance = async ({
   address,
 }: QueryLiquidityBalanceArgs) => {
   try {
-    const query = await client.queryContractSmart(tokenAddress, {
+    const query = await client.query.compute.queryContractPrivateState(tokenAddress, {
       balance: { address },
     })
 
