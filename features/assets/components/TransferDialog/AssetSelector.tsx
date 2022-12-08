@@ -106,7 +106,7 @@ export const AssetSelector = ({
 
 const StyledDivForWrapper = styled('div', {
   backgroundColor: '$colors$dark10',
-  borderRadius: '$1',
+  borderRadius: '$2',
 })
 
 const StyledButtonForWrapper = styled(ButtonForWrapper, {

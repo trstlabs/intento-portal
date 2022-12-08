@@ -4,7 +4,7 @@ import { useQueryMatchingPoolsForSwap } from 'queries/useQueryMatchingPoolForSwa
 import { useQuery } from 'react-query'
 import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from 'util/constants'
 
-import { useCosmWasmClient } from '../../../hooks/useCosmWasmClient'
+import { useTrustlessChainClient } from '../../../hooks/useTrustlessChainClient'
 import { tokenToTokenPriceQueryWithPools } from '../../../queries/tokenToTokenPriceQuery'
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
 
@@ -23,7 +23,7 @@ export const useTokenToTokenPriceQuery = ({
   enabled = true,
   refetchInBackground,
 }: UseTokenPairsPricesArgs) => {
-  const client = useCosmWasmClient()
+  const client = useTrustlessChainClient()
 
   const tokenA = useTokenInfo(tokenASymbol)
   const tokenB = useTokenInfo(tokenBSymbol)

@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useQueries } from 'react-query'
 import { useRecoilValue } from 'recoil'
 
-import { useCosmWasmClient } from '../hooks/useCosmWasmClient'
+import { useTrustlessChainClient } from '../hooks/useTrustlessChainClient'
 import { walletState } from '../state/atoms/walletAtoms'
 import {
   __POOL_REWARDS_ENABLED__,
@@ -11,11 +11,7 @@ import {
 } from '../util/constants'
 import { calcPoolTokenDollarValue } from '../util/conversion'
 import { queryMyLiquidity } from './queryMyLiquidity'
-import {
-  queryRewardsContracts,
-  SerializedRewardsContract,
-} from './queryRewardsContracts'
-import { queryStakedLiquidity } from './queryStakedLiquidity'
+
 import { querySwapInfo, SwapInfoResponse } from './querySwapInfo'
 import { useGetTokenDollarValueQuery } from './useGetTokenDollarValueQuery'
 import { PoolEntityType, usePoolsListQuery } from './usePoolsListQuery'
@@ -34,21 +30,14 @@ export type PoolState = {
 
 export type PoolLiquidityState = {
   available: PoolState
-  staked: PoolState
+
 
   providedTotal: PoolTokenValue
 
   reserves: {
     total: ReserveType
     provided: ReserveType
-    totalStaked: ReserveType
-    providedStaked: ReserveType
     totalProvided: ReserveType
-  }
-
-  rewards: {
-    annualYieldPercentageReturn: number
-    contracts?: Array<SerializedRewardsContract>
   }
 }
 
@@ -70,7 +59,7 @@ export const useQueryMultiplePoolsLiquidity = ({
     useGetTokenDollarValueQuery()
 
   const { address, client: signingClient } = useRecoilValue(walletState)
-  const client = useCosmWasmClient()
+  const client = useTrustlessChainClient()
 
   const context = {
     client,
@@ -95,19 +84,19 @@ export const useQueryMultiplePoolsLiquidity = ({
         address,
       })
 
-    const {
-      providedStakedAmountInMicroDenom,
-      totalStakedAmountInMicroDenom,
-      totalStakedReserve,
-      providedStakedReserve,
-    } = await queryStakedLiquidity({
-      context,
-      address,
-      stakingAddress: pool.staking_address,
-      totalReserve,
-      swap,
-    })
-
+    /*  const {
+        providedStakedAmountInMicroDenom,
+        totalStakedAmountInMicroDenom,
+        totalStakedReserve,
+        providedStakedReserve,
+      } = await queryStakedLiquidity({
+        context,
+        address,
+        stakingAddress: pool.staking_address,
+        totalReserve,
+        swap,
+      })
+  */
     const tokenADollarPrice = await getTokenDollarValue({
       tokenInfo: tokenA,
       tokenAmountInDenom: 1,
@@ -125,7 +114,7 @@ export const useQueryMultiplePoolsLiquidity = ({
       }
     }
 
-    const [totalLiquidity, providedLiquidity, totalStaked, providedStaked] = [
+    const [totalLiquidity, providedLiquidity, /*totalStaked, providedStaked*/] = [
       /* calc total liquidity dollar value */
       getPoolTokensValue({
         tokenAmountInMicroDenom: swap.lp_token_supply,
@@ -134,59 +123,28 @@ export const useQueryMultiplePoolsLiquidity = ({
       getPoolTokensValue({
         tokenAmountInMicroDenom: providedLiquidityInMicroDenom,
       }),
-      /* calc total staked liquidity dollar value */
-      getPoolTokensValue({
-        tokenAmountInMicroDenom: totalStakedAmountInMicroDenom,
-      }),
-      /* calc provided liquidity dollar value */
-      getPoolTokensValue({
-        tokenAmountInMicroDenom: providedStakedAmountInMicroDenom,
-      }),
+
     ]
-
-    let annualYieldPercentageReturn = 0
-    let rewardsContracts: Array<SerializedRewardsContract> | undefined
-
-    const shouldQueryRewardsContracts = pool.rewards_tokens?.length > 0
-    if (shouldQueryRewardsContracts) {
-      rewardsContracts = await queryRewardsContracts({
-        swapAddress: pool.swap_address,
-        rewardsTokens: pool.rewards_tokens,
-        context,
-      })
-      annualYieldPercentageReturn = calculateRewardsAnnualYieldRate({
-        rewardsContracts,
-        totalStakedDollarValue: totalStaked.dollarValue || 1,
-      })
-    }
 
     const liquidity = {
       available: {
         total: totalLiquidity,
         provided: providedLiquidity,
       },
-      staked: {
-        total: totalStaked,
-        provided: providedStaked,
-      },
+
       providedTotal: {
-        tokenAmount: providedLiquidity.tokenAmount + providedStaked.tokenAmount,
-        dollarValue: providedLiquidity.dollarValue + providedStaked.dollarValue,
+        tokenAmount: providedLiquidity.tokenAmount,
+        dollarValue: providedLiquidity.dollarValue
       },
       reserves: {
         total: totalReserve,
         provided: providedReserve,
-        totalStaked: totalStakedReserve,
-        providedStaked: providedStakedReserve,
         totalProvided: [
-          providedReserve[0] + providedStakedReserve[0],
-          providedReserve[1] + providedStakedReserve[1],
+          providedReserve[0],
+          providedReserve[1],
         ] as ReserveType,
       },
-      rewards: {
-        annualYieldPercentageReturn,
-        contracts: rewardsContracts,
-      },
+
     }
 
     return {
@@ -229,6 +187,7 @@ export const useQueryPoolLiquidity = ({ poolId }) => {
   })
 
   const persistedData = usePersistance(poolResponse?.data)
+  console.log(persistedData)
 
   return [
     persistedData,

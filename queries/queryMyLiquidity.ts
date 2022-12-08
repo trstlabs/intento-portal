@@ -13,7 +13,8 @@ export async function queryMyLiquidity({ swap, address, context: { client } }) {
   /* provide dollar value for reserves as well */
   const totalReserve: [number, number] = [
     protectAgainstNaN(swap.token1_reserve),
-    protectAgainstNaN(swap.token2_reserve),
+    
+    (swap.token2_reserve),
   ]
 
   const providedReserve: [number, number] = [

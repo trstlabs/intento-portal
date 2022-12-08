@@ -3,7 +3,7 @@ import { SVGProps } from 'react'
 export const LogoBrighter = (props: SVGProps<SVGSVGElement>) => {
   return (
     <svg
-      width="370"
+      width="37"
       height="26"
       viewBox="0 0 37 26"
       fill="none"

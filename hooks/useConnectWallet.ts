@@ -1,7 +1,8 @@
 import {
-  createWasmAminoConverters,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate'
+  // createWasmAminoConverters,
+  TrustlessChainClient,
+  TxResultCode
+} from 'trustlessjs'
 import {
   AminoTypes,
   createIbcAminoConverters,
@@ -22,7 +23,7 @@ export const useConnectWallet = (
   const [chainInfo] = useChainInfo()
 
   const mutation = useMutation(async () => {
-    if (window && !window?.keplr) {
+    if (!window?.keplr) {
       alert('Please install Keplr extension and refresh the page.')
       return
     }
@@ -38,36 +39,29 @@ export const useConnectWallet = (
       await window.keplr.experimentalSuggestChain(chainInfo)
       await window.keplr.enable(chainInfo.chainId)
 
-      const offlineSigner = await window.getOfflineSignerAuto(chainInfo.chainId)
-      const wasmChainClient = await SigningCosmWasmClient.connectWithSigner(
-        chainInfo.rpc,
-        offlineSigner,
-        {
-          gasPrice: GasPrice.fromString(GAS_PRICE),
-          /*
-           * passing ibc amino types for all the amino signers (eg ledger, wallet connect)
-           * to enable ibc & wasm transactions
-           * */
-          aminoTypes: new AminoTypes(
-            Object.assign(
-              createIbcAminoConverters(),
-              createWasmAminoConverters()
-            )
-          ),
-        }
+      const offlineSigner = await window.keplr.getOfflineSignerAuto(chainInfo.chainId)
+      const [{ address }] = await offlineSigner.getAccounts()
+      let utils = window.keplr.getEnigmaUtils(chainInfo.chainId)
+      const trstChainClient = await TrustlessChainClient.create({
+        grpcWebUrl: chainInfo.rpc,
+        wallet: offlineSigner,
+        chainId: chainInfo.chainId,
+        encryptionUtils: utils,
+        walletAddress: address
+      }
       )
 
-      const [{ address }] = await offlineSigner.getAccounts()
       const key = await window.keplr.getKey(chainInfo.chainId)
 
       /* successfully update the wallet state */
       setWalletState({
         key,
         address,
-        client: wasmChainClient,
+        client: trstChainClient,
         status: WalletStatusType.connected,
       })
     } catch (e) {
+
       /* set the error state */
       setWalletState({
         key: null,

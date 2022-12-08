@@ -1,6 +1,9 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient, } from 'trustlessjs'
 import { coin } from '@cosmjs/stargate'
-
+import {
+  toBase64, toHex,
+  toUtf8,
+} from "@cosmjs/encoding";
 import { TokenInfo } from '../../queries/usePoolsListQuery'
 import {
   createExecuteMessage,
@@ -16,7 +19,7 @@ type DirectTokenSwapArgs = {
   senderAddress: string
   swapAddress: string
   tokenA: TokenInfo
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const directTokenSwap = async ({
@@ -31,15 +34,37 @@ export const directTokenSwap = async ({
 }: DirectTokenSwapArgs) => {
   const minToken = Math.floor(price * (1 - slippage))
 
+
   const swapMessage = {
-    swap: {
-      input_token: swapDirection === 'tokenAtoTokenB' ? 'Token1' : 'Token2',
-      input_amount: `${tokenAmount}`,
-      min_output: `${minToken}`,
+    swap2: {
+      input_token: swapDirection === 'tokenAtoTokenB' ? '0' : '1',
+      input_token_amount: `${tokenAmount}`,
+      min_token: `${minToken}`,
     },
   }
 
   if (!tokenA.native) {
+    const tokenMessage = {
+      send: {
+        recipient: swapAddress,
+        recipient_code_hash: process.env.NEXT_PUBLIC_SWAPPAIR_CODE_HASH,
+        amount: swapMessage.swap2.input_token_amount,
+        msg: toBase64(
+          toUtf8(
+            JSON.stringify(
+              {
+                swap2: {
+                  input_token: swapDirection === 'tokenAtoTokenB' ? '0' : '1',
+                  input_token_amount: `${tokenAmount}`,
+                  min_token: `${minToken}`,
+                },
+              }
+            )
+          )
+        ),
+      }
+    }
+
     const increaseAllowanceMessage = createIncreaseAllowanceMessage({
       senderAddress,
       tokenAmount,
@@ -49,25 +74,30 @@ export const directTokenSwap = async ({
 
     const executeMessage = createExecuteMessage({
       senderAddress,
-      contractAddress: swapAddress,
-      message: swapMessage,
+      contractAddress: tokenA.token_address,
+      codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH,
+      message: tokenMessage,
     })
+    let result = await client.signAndBroadcast([executeMessage, increaseAllowanceMessage
+    ]
+    )
 
     return validateTransactionSuccess(
-      await client.signAndBroadcast(
-        senderAddress,
-        [increaseAllowanceMessage, executeMessage],
-        'auto'
-      )
+      result
     )
   }
-
-  return await client.execute(
-    senderAddress,
-    swapAddress,
-    swapMessage,
-    'auto',
-    undefined,
-    [coin(tokenAmount, tokenA.denom)]
+  let result = await client.tx.compute.executeContract({
+    sender: senderAddress,
+    contract: swapAddress,
+    codeHash: process.env.NEXT_PUBLIC_SWAPPAIR_CODE_HASH,
+    msg: swapMessage,
+    funds: [coin(tokenAmount, tokenA.denom)],
+  }, {
+    gasLimit: +process.env.NEXT_PUBLIC_GAS_LIMIT_MORE
+  })
+  console.log(result)
+  return validateTransactionSuccess(
+    result
   )
+
 }

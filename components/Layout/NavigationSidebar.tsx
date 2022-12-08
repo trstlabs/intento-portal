@@ -29,11 +29,13 @@ import React, { ReactNode, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
+import { useSetKeyring } from '../../hooks/useSetKeyring'
 import { Analytics } from '../../icons/Analytics'
 import { Dollar } from '../../icons/Dollar'
 import { SwapIcon } from '../../icons/Swap'
 import { TransferIcon } from '../../icons/Transfer'
 import { ConnectedWalletButton } from '../ConnectedWalletButton'
+import { SetKeyringButton } from '../SetKeyringButton'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -42,7 +44,9 @@ type NavigationSidebarProps = {
 
 export function NavigationSidebar(_: NavigationSidebarProps) {
   const { mutate: connectWallet } = useConnectWallet()
-  const [{ key, address, status }, setWalletState] = useRecoilState(walletState)
+
+  const [{ key, address, status, client }, setWalletState] = useRecoilState(walletState)
+
 
   const themeController = useControlTheme()
 
@@ -57,6 +61,10 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       client: null,
     })
   }
+  function remove() {
+    localStorage.removeItem("vk" + address);
+    location.reload()
+  }
 
   const walletButton = (
     <ConnectedWalletButton
@@ -66,6 +74,17 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       onDisconnect={resetWalletConnection}
       css={{ marginBottom: '$8' }}
     />
+  )
+
+  const keyringButton = (
+    <SetKeyringButton
+      connected={Boolean(key?.name)}
+      onConnect={() => useSetKeyring(address, client)}
+      css={{ marginBottom: '$8' }}
+      onRemove={() => remove()
+      }
+    />
+
   )
 
   const { pathname } = useRouter()
@@ -78,8 +97,19 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={<SwapIcon />}
+          iconLeft={<TransferIcon />}
           selected={getIsLinkActive('/')}
+        >
+          <Inline css={{ paddingLeft: '$4' }}>Dashboard</Inline>
+        </Button>
+      </Link>
+      <Link href="/swap" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<SwapIcon />}
+          selected={getIsLinkActive('/swap')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Swap</Inline>
         </Button>
@@ -132,9 +162,8 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
       <Link
-        href={`${process.env.NEXT_PUBLIC_KADO_LINK_URL}${
-          status === WalletStatusType.connected ? `&onToAddress=${address}` : ''
-        }`}
+        href={`${process.env.NEXT_PUBLIC_KADO_LINK_URL}${status === WalletStatusType.connected ? `&onToAddress=${address}` : ''
+          }`}
         target="__blank"
         passHref
       >
@@ -196,6 +225,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           {isOpen && (
             <Column css={{ padding: '$12 $12 0' }}>
               {walletButton}
+              {keyringButton}
               {menuLinks}
             </Column>
           )}
@@ -212,7 +242,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <StyledDivForLogo as="a">
             <Logo data-logo="" width="60px" height="80px" />
             <div data-logo-label="">
-              <LogoText  />
+              <LogoText />
               <Text
                 variant="caption"
                 color="primary"
@@ -225,6 +255,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Link>
 
         {walletButton}
+        {keyringButton}
         {menuLinks}
       </StyledMenuContainer>
       <Column>
@@ -351,7 +382,7 @@ const StyledMenuContainer = styled('div', {
 
 const StyledListForLinks = styled('div', {
   display: 'flex',
-  rowGap: '$space$2',
+  rowGap: '$space$4',
   flexDirection: 'column',
 })
 

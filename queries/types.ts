@@ -1,8 +1,8 @@
-import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { TrustlessChainClient } from 'trustlessjs'
 
 import { useGetTokenDollarValueQuery } from './useGetTokenDollarValueQuery'
 
 export type InternalQueryContext = {
-  client: CosmWasmClient
+  client: TrustlessChainClient
   getTokenDollarValue: ReturnType<typeof useGetTokenDollarValueQuery>[0]
 }

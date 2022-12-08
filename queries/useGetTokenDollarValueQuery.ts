@@ -1,6 +1,6 @@
 import { protectAgainstNaN } from 'junoblocks'
 
-import { useCosmWasmClient } from '../hooks/useCosmWasmClient'
+import { useTrustlessChainClient } from '../hooks/useTrustlessChainClient'
 import { useTokenDollarValue } from '../hooks/useTokenDollarValue'
 import { useBaseTokenInfo } from '../hooks/useTokenInfo'
 import { tokenToTokenPriceQueryWithPools } from './tokenToTokenPriceQuery'
@@ -12,7 +12,7 @@ import { useGetQueryMatchingPoolForSwap } from './useQueryMatchingPoolForSwap'
  * */
 export const useGetTokenDollarValueQuery = () => {
   const tokenA = useBaseTokenInfo()
-  const client = useCosmWasmClient()
+  const client = useTrustlessChainClient()
   const [tokenADollarPrice, fetchingDollarPrice] = useTokenDollarValue(
     tokenA?.symbol
   )

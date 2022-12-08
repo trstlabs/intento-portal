@@ -8,7 +8,6 @@ export type TokenInfo = {
   name: string
   decimals: number
   logoURI: string
-  tags: string[]
   denom: string
   native: boolean
 }
@@ -21,8 +20,8 @@ export type PoolEntityType = {
   pool_id: string
   pool_assets: [TokenInfo, TokenInfo]
   swap_address: string
-  staking_address: string
-  rewards_tokens: Array<TokenInfoWithReward>
+  //staking_address: string
+  //rewards_tokens: Array<TokenInfoWithReward>
 }
 
 type PoolsListQueryResponse = {

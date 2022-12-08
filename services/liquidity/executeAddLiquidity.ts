@@ -1,7 +1,6 @@
 import {
-  MsgExecuteContractEncodeObject,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate'
+  TrustlessChainClient,
+} from 'trustlessjs'
 import { coin } from '@cosmjs/stargate'
 
 import { TokenInfo } from '../../queries/usePoolsListQuery'
@@ -23,7 +22,7 @@ type ExecuteAddLiquidityArgs = {
   maxTokenBAmount: number
   senderAddress: string
   swapAddress: string
-  client: SigningCosmWasmClient
+  client: TrustlessChainClient
 }
 
 export const executeAddLiquidity = async ({
@@ -39,12 +38,11 @@ export const executeAddLiquidity = async ({
     add_liquidity: {
       token1_amount: `${tokenAAmount}`,
       max_token2: `${maxTokenBAmount}`,
-      min_liquidity: `${0}`,
     },
   }
 
   if (!tokenA.native || !tokenB.native) {
-    const increaseAllowanceMessages: Array<MsgExecuteContractEncodeObject> = []
+    const increaseAllowanceMessages = []
 
     /* increase allowance for each non-native token */
     if (!tokenA.native) {
@@ -81,9 +79,8 @@ export const executeAddLiquidity = async ({
 
     return validateTransactionSuccess(
       await client.signAndBroadcast(
-        senderAddress,
         [...increaseAllowanceMessages, executeAddLiquidityMessage],
-        'auto'
+
       )
     )
   }
@@ -93,12 +90,17 @@ export const executeAddLiquidity = async ({
     coin(maxTokenBAmount, tokenB.denom),
   ].sort((a, b) => (a.denom > b.denom ? 1 : -1))
 
-  return await client.execute(
-    senderAddress,
-    swapAddress,
-    addLiquidityMessage,
-    'auto',
-    undefined,
-    funds
-  )
+  return await client.tx.compute.executeContract({
+    sender: senderAddress,
+    contract: swapAddress,
+    codeHash: process.env.NEXT_PUBLIC_SWAPPAIR_CODE_HASH,
+    msg: addLiquidityMessage,
+    funds,
+
+  }, {
+    gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
+
+  })
+
 }
+

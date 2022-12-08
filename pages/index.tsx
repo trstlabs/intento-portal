@@ -1,6 +1,7 @@
 import { AppLayout, PageHeader } from 'components'
 import { TokenSwapModule } from 'features/swap'
 import { styled } from 'junoblocks'
+
 import React from 'react'
 
 import { APP_NAME } from '../util/constants'
@@ -17,12 +18,13 @@ export default function Home() {
     <AppLayout>
       <StyledContainer>
         <PageHeader
-          title="Swap"
-          subtitle={`Swap between your favorite assets on ${APP_NAME}.`}
+          title="Dashboard"
+          subtitle={`Dashboard to view your personal contracts and assets ${APP_NAME}.`}
         />
-        <TokenSwapModule
-          initialTokenPair={getInitialTokenPairFromSearchParams()}
-        />
+        {/* Stats of the chain  */}
+        {/* query contract info -> creator = user. List contracts + AutoExecution info here  */}
+        {/* query TIP20 contract balances for each asset listed. List balances here  */}
+
       </StyledContainer>
     </AppLayout>
   )

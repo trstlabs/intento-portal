@@ -14,13 +14,13 @@
   "dependencies": {
     "@cosmjs/amino": "0.28.10",
     "@cosmjs/cosmwasm": "0.25.6",
-    "@cosmjs/cosmwasm-stargate": "0.28.10",
     "@cosmjs/crypto": "0.28.10",
     "@cosmjs/encoding": "0.28.10",
     "@cosmjs/launchpad": "0.27.1",
     "@cosmjs/math": "0.28.10",
     "@cosmjs/proto-signing": "0.28.10",
     "@cosmjs/stargate": "0.28.10",
+    "@keplr-wallet/types": "^0.11.17",
     "@next/bundle-analyzer": "^12.1.0",
     "@react-spring/web": "^9.4.2",
     "@stitches/react": "^1.2.6",
@@ -40,10 +40,10 @@
     "react-query": "^3.39.1",
     "react-use": "^17.4.0",
     "recoil": "^0.7.4",
-    "sass": "^1.45.0"
+    "sass": "^1.45.0",
+    "trustlessjs": "1.2.3.alpha-3"
   },
   "devDependencies": {
-    "@keplr-wallet/types": "^0.9.9",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.2.1",

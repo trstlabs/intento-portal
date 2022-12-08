@@ -1,3 +1,6 @@
+//
+/*
+
 import { useChainInfo } from 'hooks/useChainInfo'
 import { useQuery } from 'react-query'
 import { getUnstakingDuration } from 'services/staking'
@@ -7,7 +10,7 @@ import {
   PoolEntityType,
   usePoolFromListQueryById,
 } from '../../../queries/usePoolsListQuery'
-import { cosmWasmClientRouter } from '../../../util/cosmWasmClientRouter'
+import { TrustlessChainClientRouter } from '../../../util/TrustlessChainClientRouter'
 
 type UseUnstakingDurationArgs = {
   poolId: PoolEntityType['pool_id']
@@ -20,7 +23,7 @@ export const useUnstakingDuration = ({ poolId }: UseUnstakingDurationArgs) => {
   const { data = 0, isLoading } = useQuery(
     `unstakingDuration/${poolId}`,
     async () => {
-      const client = await cosmWasmClientRouter.connect(chainInfo.rpc)
+      const client = await TrustlessChainClientRouter.connect(chainInfo.rpc)
       return getUnstakingDuration(pool?.staking_address, client)
     },
     {
@@ -33,4 +36,4 @@ export const useUnstakingDuration = ({ poolId }: UseUnstakingDurationArgs) => {
   )
 
   return [data, isLoading] as const
-}
+}*/

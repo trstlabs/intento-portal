@@ -1,6 +1,6 @@
-import { MsgExecuteContractEncodeObject } from '@cosmjs/cosmwasm-stargate'
+import { MsgExecuteContract, Msg } from 'trustlessjs'
 import { toUtf8 } from '@cosmjs/encoding'
-import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
+
 
 type CreateIncreaseAllowanceMessageArgs = {
   senderAddress: string
@@ -14,9 +14,8 @@ export const createIncreaseAllowanceMessage = ({
   tokenAmount,
   tokenAddress,
   swapAddress,
-}: CreateIncreaseAllowanceMessageArgs): MsgExecuteContractEncodeObject => ({
-  typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-  value: MsgExecuteContract.fromPartial({
+}: CreateIncreaseAllowanceMessageArgs): Msg => {
+  return new MsgExecuteContract({
     sender: senderAddress,
     contract: tokenAddress,
     msg: toUtf8(
@@ -28,5 +27,5 @@ export const createIncreaseAllowanceMessage = ({
       })
     ),
     funds: [],
-  }),
-})
+  })
+}
