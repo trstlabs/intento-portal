@@ -50,7 +50,7 @@ export const ConnectedWalletButton = ({
 
   return (
     <StyledWalletButton {...props} role="button">
-      <IconWrapper size="medium" css={{ color: '#FE8D9E' }} icon={<Wallet />} />
+      <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Wallet />} />
       <div data-content="">
         <Text variant="link" color="body">
           {walletName}
@@ -61,7 +61,7 @@ export const ConnectedWalletButton = ({
             '-webkit-background-clip': 'text',
             '-webkit-text-fill-color': 'transparent',
             backgroundImage:
-              'linear-gradient(90.55deg, #FE9C9E 1.35%, #FA2995 19.1%, #EA1EE9 37.37%, #287CF4 58.83%, #4CA7F2 75.84%, #31DAE2 99.52%)',
+              'linear-gradient(90.55deg, #103b64 1.35%, #144a7d 19.1%, #185996 37.37%, #1c68af 58.83%, #1c68af 75.84%, #1c68af 99.52%)',
           }}
         >
           {formatTokenBalance(balance, { includeCommaSeparation: true })}{' '}

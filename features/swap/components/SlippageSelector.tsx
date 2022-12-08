@@ -79,10 +79,10 @@ const StyledDivForSelector = styled('button', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  columnGap: '$space$4',
+  columnGap: '$space$6',
   padding: '$6 $13',
   userSelect: 'none',
-  borderRadius: '$2',
+  borderRadius: '$4',
   transition: 'background-color .1s ease-out',
 
   '&:hover': {
@@ -112,7 +112,7 @@ const StyledDivForPopover = styled('div', {
   width: '284px',
   bottom: 'calc(100% + $space$2)',
   left: 0,
-  borderRadius: '$1',
+  borderRadius: '$2',
   display: 'flex',
   flexDirection: 'column',
   rowGap: '13px',
@@ -126,7 +126,7 @@ const StyledDivForSlippageList = styled('div', {
 })
 
 const StyledButton = styled('button', {
-  borderRadius: '$1',
+  borderRadius: '$2',
   padding: '$4 $8',
   color: '$textColors$secondary',
   transition: 'background-color .1s ease-out',

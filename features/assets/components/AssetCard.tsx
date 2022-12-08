@@ -157,8 +157,8 @@ const StyledElementForCard = styled('div', {
     kind: {
       wrapper: {
         background: '$colors$dark10',
-        borderRadius: '$2',
-        padding: '$9 $12',
+        borderRadius: '18px',
+        padding: '$12 $16',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',

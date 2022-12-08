@@ -17,7 +17,7 @@ import {
   __POOL_STAKING_ENABLED__,
 } from 'util/constants'
 
-import { SerializedRewardsContract } from '../../../queries/queryRewardsContracts'
+// import { SerializedRewardsContract } from '../../../queries/queryRewardsContracts'
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
 import { PoolTokenValue } from '../../../queries/useQueryPools'
 import { formatCompactNumber } from '../../../util/formatCompactNumber'
@@ -30,8 +30,8 @@ type LiquidityBreakdownProps = {
   tokenB: TokenInfo
   poolId: string
   totalLiquidity: PoolTokenValue
-  yieldPercentageReturn: number
-  rewardsContracts: Array<SerializedRewardsContract>
+ // yieldPercentageReturn: number
+  // rewardsContracts: Array<SerializedRewardsContract>
   size: 'large' | 'small'
   lpFee?: number
   protocolFee?: number
@@ -96,8 +96,7 @@ export const LiquidityBreakdown = ({
   tokenB,
   poolId,
   totalLiquidity,
-  yieldPercentageReturn,
-  rewardsContracts,
+  // yieldPercentageReturn,
   lpFee,
   protocolFee,
   size = 'large',
@@ -127,9 +126,9 @@ export const LiquidityBreakdown = ({
     totalLiquidity?.dollarValue
   )
 
-  const formattedYieldPercentageReturn = dollarValueFormatter(
-    yieldPercentageReturn ?? 0
-  )
+  // const formattedYieldPercentageReturn = dollarValueFormatter(
+  //   yieldPercentageReturn ?? 0
+  // )
 
   const priceBreakdown = isPriceLoading
     ? ''
@@ -146,7 +145,7 @@ export const LiquidityBreakdown = ({
         <Inline
           css={{
             backgroundColor: '$colors$dark10',
-            borderRadius: '$2',
+            borderRadius: '$4',
             marginBottom: '$14',
           }}
         >
@@ -183,12 +182,12 @@ export const LiquidityBreakdown = ({
               <Divider />
             </Column>
             <Inline justifyContent={'space-between'} align="center">
-              <Column gap={4} align="flex-start" justifyContent="space-between">
+              {/* <Column gap={4} align="flex-start" justifyContent="space-between">
                 <Text variant="legend" color="secondary" align="right">
                   Bonding Reward
                 </Text>
                 <AprPill value={formattedYieldPercentageReturn} />
-              </Column>
+              </Column> */}
               <Column gap={4} align="flex-start" justifyContent="flex-start">
                 <Text variant="legend" color="secondary" align="left">
                   Swap Fee
@@ -198,7 +197,7 @@ export const LiquidityBreakdown = ({
                   <SwapFee lpFee={lpFee} protocolFee={protocolFee} />
                 </Inline>
               </Column>
-              {__POOL_REWARDS_ENABLED__ &&
+              {/* {__POOL_REWARDS_ENABLED__ &&
                 rewardsContracts &&
                 rewardsContracts.length > 0 && (
                   <Column gap={6} align="center">
@@ -216,7 +215,7 @@ export const LiquidityBreakdown = ({
                       ))}
                     </StyledDivForTokenLogos>
                   </Column>
-                )}
+                )} */}
             </Inline>
           </Column>
         </Inline>
@@ -269,13 +268,13 @@ export const LiquidityBreakdown = ({
             </Inline>
           </Column>
 
-          <Column gap={4} align="center" justifyContent="space-between">
+          {/* <Column gap={4} align="center" justifyContent="space-between">
             <Text variant="legend" color="secondary" align="right">
               Bonding Reward
             </Text>
             <AprPill value={formattedYieldPercentageReturn} />
-          </Column>
-          {__POOL_REWARDS_ENABLED__ &&
+          </Column> */}
+          {/* {__POOL_REWARDS_ENABLED__ &&
             rewardsContracts &&
             rewardsContracts.length > 0 && (
               <Column gap={8} align="center" justifyContent="center">
@@ -293,7 +292,7 @@ export const LiquidityBreakdown = ({
                   ))}
                 </StyledDivForTokenLogos>
               </Column>
-            )}
+            )} */}
         </TotalInfoRow>
       </>
     </>
@@ -311,7 +310,7 @@ function TotalInfoRow({ children }) {
           display: 'flex',
           justifyContent: 'space-between',
           backgroundColor: '$colors$dark10',
-          borderRadius: '$2',
+          borderRadius: '$4',
           marginBottom: '$14',
         }}
       >

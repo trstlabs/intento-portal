@@ -83,7 +83,7 @@ export const useTokenSwap = ({
         const swapAddress =
           poolForDirectTokenAToTokenBSwap?.swap_address ??
           poolForDirectTokenBToTokenASwap?.swap_address
-
+        console.log(address)
         return await directTokenSwap({
           tokenAmount,
           price,

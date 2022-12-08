@@ -1,4 +1,4 @@
-import { createWasmAminoConverters } from '@cosmjs/cosmwasm-stargate'
+//import { AminoConverters } from 'trustlessjs'
 import {
   AminoTypes,
   createIbcAminoConverters,
@@ -53,7 +53,7 @@ export const useConnectIBCWallet = (
       const { chain_id, rpc } = assetInfo
 
       await window.keplr.enable(chain_id)
-      const offlineSigner = await window.getOfflineSignerAuto(chain_id)
+      const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
 
       const wasmChainClient = await SigningStargateClient.connectWithSigner(
         rpc,
@@ -67,7 +67,7 @@ export const useConnectIBCWallet = (
           aminoTypes: new AminoTypes(
             Object.assign(
               createIbcAminoConverters(),
-              createWasmAminoConverters()
+              //createWasmAminoConverters()
             )
           ),
         }

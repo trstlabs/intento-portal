@@ -123,7 +123,7 @@ const StyledDivForColumn = styled('div', {
     kind: {
       content: {},
       value: {
-        borderRadius: '$1',
+        borderRadius: '$2',
         transition: 'background-color .1s ease-out',
         backgroundColor: '$colors$dark10',
         '&:hover': {

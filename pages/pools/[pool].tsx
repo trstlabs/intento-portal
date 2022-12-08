@@ -9,7 +9,7 @@ import {
   UnbondingLiquidityStatusList,
 } from 'features/liquidity'
 import { useRefetchQueries } from 'hooks/useRefetchQueries'
-import { useClaimRewards, usePendingRewards } from 'hooks/useRewardsQueries'
+// import { useClaimRewards, usePendingRewards } from 'hooks/useRewardsQueries'
 import {
   Button,
   ChevronIcon,
@@ -54,76 +54,76 @@ export default function Pool() {
   const isMobile = useMedia('sm')
   const [pool, isLoading, isError] = useQueryPoolLiquidity({ poolId })
 
-  const [pendingRewards] = usePendingRewards({
-    pool,
-  })
+  // const [pendingRewards] = usePendingRewards({
+  //   pool,
+  // })
 
   const isLoadingInitial = isLoading && !pool
 
-  const supportsIncentives = Boolean(
-    __POOL_STAKING_ENABLED__ &&
-      __POOL_REWARDS_ENABLED__ &&
-      pool?.staking_address
-  )
+  // const supportsIncentives = Boolean(
+  //   __POOL_STAKING_ENABLED__ &&
+  //     __POOL_REWARDS_ENABLED__ &&
+  //     pool?.staking_address
+  // )
 
   const refetchQueries = useRefetchQueries(['@liquidity', 'pendingRewards'])
 
-  const { mutate: mutateClaimRewards, isLoading: isClaimingRewards } =
-    useClaimRewards({
-      pool,
-      onSuccess() {
-        refetchQueries()
+  // const { mutate: mutateClaimRewards, isLoading: isClaimingRewards } =
+  //   useClaimRewards({
+  //     pool,
+  //     onSuccess() {
+  //       refetchQueries()
 
-        toast.custom((t) => (
-          <Toast
-            icon={<IconWrapper icon={<Valid />} color="valid" />}
-            title="Rewards were successfully claimed!"
-            onClose={() => toast.dismiss(t.id)}
-          />
-        ))
-      },
-      onError(e) {
-        console.error(e)
+  //       toast.custom((t) => (
+  //         <Toast
+  //           icon={<IconWrapper icon={<Valid />} color="valid" />}
+  //           title="Rewards were successfully claimed!"
+  //           onClose={() => toast.dismiss(t.id)}
+  //         />
+  //       ))
+  //     },
+  //     onError(e) {
+  //       console.error(e)
 
-        toast.custom((t) => (
-          <Toast
-            icon={<IconWrapper icon={<Error />} color="error" />}
-            title={"Couldn't claim your rewards"}
-            body={formatSdkErrorMessage(e)}
-            buttons={
-              <Button
-                as="a"
-                variant="ghost"
-                href={process.env.NEXT_PUBLIC_FEEDBACK_LINK}
-                target="__blank"
-                iconRight={<UpRightArrow />}
-              >
-                Provide feedback
-              </Button>
-            }
-            onClose={() => toast.dismiss(t.id)}
-          />
-        ))
-      },
-    })
+  //       toast.custom((t) => (
+  //         <Toast
+  //           icon={<IconWrapper icon={<Error />} color="error" />}
+  //           title={"Couldn't claim your rewards"}
+  //           body={formatSdkErrorMessage(e)}
+  //           buttons={
+  //             <Button
+  //               as="a"
+  //               variant="ghost"
+  //               href={process.env.NEXT_PUBLIC_FEEDBACK_LINK}
+  //               target="__blank"
+  //               iconRight={<UpRightArrow />}
+  //             >
+  //               Provide feedback
+  //             </Button>
+  //           }
+  //           onClose={() => toast.dismiss(t.id)}
+  //         />
+  //       ))
+  //     },
+  //   })
 
-  if (!pool || !poolId) {
-    return (
-      <Inline
-        align="center"
-        justifyContent="center"
-        css={{ padding: '$10', height: '100vh' }}
-      >
-        {isError ? (
-          <Text variant="header">
-            {"Oops, we've messed up. Please try again later."}
-          </Text>
-        ) : (
-          <Spinner color="primary" />
-        )}
-      </Inline>
-    )
-  }
+  // if (!pool || !poolId) {
+  //   return (
+  //     <Inline
+  //       align="center"
+  //       justifyContent="center"
+  //       css={{ padding: '$10', height: '100vh' }}
+  //     >
+  //       {isError ? (
+  //         <Text variant="header">
+  //           {"Oops, we've messed up. Please try again later."}
+  //         </Text>
+  //       ) : (
+  //         <Spinner color="primary" />
+  //       )}
+  //     </Inline>
+  //   )
+  // }
 
   const [tokenA, tokenB] = pool.pool_assets
 
@@ -182,12 +182,12 @@ export default function Pool() {
               tokenA={tokenA}
               tokenB={tokenB}
               totalLiquidity={pool.liquidity.available.total}
-              yieldPercentageReturn={
-                pool.liquidity.rewards.annualYieldPercentageReturn
-              }
+              // yieldPercentageReturn={
+              //   pool.liquidity.rewards.annualYieldPercentageReturn
+              // }
               lpFee={pool.swap_info.lp_fee_percent}
               protocolFee={pool.swap_info.protocol_fee_percent}
-              rewardsContracts={pool.liquidity.rewards.contracts}
+              // rewardsContracts={pool.liquidity.rewards.contracts}
               size={isMobile ? 'small' : 'large'}
             />
             <>
@@ -198,14 +198,14 @@ export default function Pool() {
                   <ManageLiquidityCard
                     providedLiquidityReserve={pool.liquidity.reserves.provided}
                     providedLiquidity={pool.liquidity.available.provided}
-                    stakedLiquidityReserve={
-                      pool.liquidity.reserves.providedStaked
-                    }
+                    // stakedLiquidityReserve={
+                    //   pool.liquidity.reserves.providedStaked
+                    // }
                     providedTotalLiquidity={pool.liquidity.providedTotal}
-                    stakedLiquidity={pool.liquidity.staked}
+                    // stakedLiquidity={pool.liquidity.staked}
                     tokenASymbol={tokenA.symbol}
                     tokenBSymbol={tokenB.symbol}
-                    supportsIncentives={supportsIncentives}
+                    // supportsIncentives={supportsIncentives}
                     onClick={() =>
                       setManageLiquidityDialogState({
                         isShowing: true,
@@ -214,24 +214,24 @@ export default function Pool() {
                     }
                   />
                 </Column>
-                <Column css={{ flexBasis: '0px', flexGrow: 1, flexShrink: 1 }}>
+                {/* <Column css={{ flexBasis: '0px', flexGrow: 1, flexShrink: 1 }}>
                   <ManageBondedLiquidityCard
                     onClick={() => setIsBondingDialogShowing(true)}
                     providedLiquidity={pool.liquidity.available.provided}
-                    stakedLiquidity={pool.liquidity.staked.provided}
-                    yieldPercentageReturn={
-                      pool.liquidity.rewards.annualYieldPercentageReturn
-                    }
+                    // stakedLiquidity={pool.liquidity.staked.provided}
+                    // yieldPercentageReturn={
+                    //   pool.liquidity.rewards.annualYieldPercentageReturn
+                    // }
                     supportsIncentives={supportsIncentives}
                   />
-                </Column>
+                </Column> */}
               </StyledDivForCards>
-              <Column css={{ marginTop: '$6' }}>
+              {/* <Column css={{ marginTop: '$6' }}>
                 <LiquidityRewardsCard
                   onClick={mutateClaimRewards}
-                  hasBondedLiquidity={
-                    pool.liquidity.staked.provided.tokenAmount > 0
-                  }
+                  // hasBondedLiquidity={
+                  //   pool.liquidity.staked.provided.tokenAmount > 0
+                  // }
                   hasProvidedLiquidity={
                     pool.liquidity.available.provided.tokenAmount > 0
                   }
@@ -239,17 +239,17 @@ export default function Pool() {
                   loading={isClaimingRewards}
                   supportsIncentives={supportsIncentives}
                 />
-              </Column>
+              </Column> */}
             </>
             <>
-              {supportsIncentives && (
+              {/* {supportsIncentives && (
                 <UnbondingLiquidityStatusList
                   poolId={poolId as string}
                   tokenA={tokenA}
                   tokenB={tokenB}
                   size={isMobile ? 'small' : 'large'}
                 />
-              )}
+              )} */}
             </>
           </>
         )}
