@@ -301,7 +301,7 @@ const selectedVariantForInputWrapper = {
 }
 
 const StyledDivForContainer = styled('div', {
-  borderRadius: '$2',
+  borderRadius: '$4',
   transition: 'box-shadow .1s ease-out',
   variants: {
     selected: selectedVariantForInputWrapper,
@@ -309,7 +309,7 @@ const StyledDivForContainer = styled('div', {
 })
 
 const StyledInlineForInputWrapper = styled('div', {
-  borderRadius: '$2',
+  borderRadius: '$4',
   transition: 'box-shadow .1s ease-out',
   display: 'flex',
   alignItems: 'center',

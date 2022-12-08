@@ -1,5 +1,4 @@
-import { TrustlessChainClient } from 'trustlessjs'
-import { Coin } from '@cosmjs/launchpad'
+import { TrustlessChainClient, TxResultCode } from 'trustlessjs'
 
 export type Expiration =
   | { readonly at_height: number }
@@ -53,25 +52,32 @@ export interface CW20Contract {
 export const CW20 = (client: TrustlessChainClient): CW20Contract => {
   const use = (contractAddress: string): CW20Instance => {
     const balance = async (address: string): Promise<string> => {
-      const result = await client.query.compute.queryContractPrivateState(contractAddress, {
-        balance: { address },
+      const result = await client.query.compute.queryContractPrivateState({
+        contractAddress, codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH, query: {
+          balance: { address, key: localStorage.getItem("vk" + address) },
+        },
       })
-      return result.balance
+      console.log(result)
+      return result.amount
     }
 
     const allowance = async (
       owner: string,
       spender: string
     ): Promise<AllowanceResponse> => {
-      return client.query.compute.queryContractPrivateState(contractAddress, {
-        allowance: { owner, spender },
+      return client.query.compute.queryContractPrivateState({
+        contractAddress, codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH, query: {
+          allowance: {
+            owner, spender, key: localStorage.getItem("vk" + owner)
+          }
+        }
       })
     }
 
 
 
     const tokenInfo = async (): Promise<CW20TokenInfo> => {
-      return client.query.compute.queryContractPrivateState(contractAddress, { token_info: {} })
+      return client.query.compute.queryContractPrivateState({ contractAddress, codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH, query: { token_info: {} } })
     }
 
 
@@ -80,15 +86,31 @@ export const CW20 = (client: TrustlessChainClient): CW20Contract => {
       spender: string,
       amount: string
     ): Promise<string> => {
-      const result = await client.execute(
+      // const result = await client.execute(
+      //   sender,
+      //   contractAddress,
+      //   {
+      //     increase_allowance: { spender, amount },
+      //   },
+      //   'auto'
+      // )
+      let resp = await client.tx.compute.executeContract({
         sender,
-        contractAddress,
-        {
-          increase_allowance: { spender, amount },
+        contract: contractAddress,
+        codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH,
+        msg: {
+          increase_allowance: {
+            spender, amount
+          },
         },
-        'auto'
-      )
-      return result.transactionHash
+
+      }, {
+        gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
+      })
+      if (resp.code !== TxResultCode.Success) {
+        console.error(resp.rawLog);
+      }
+      return resp.transactionHash
     }
 
     const decreaseAllowance = async (
@@ -96,15 +118,31 @@ export const CW20 = (client: TrustlessChainClient): CW20Contract => {
       spender: string,
       amount: string
     ): Promise<string> => {
-      const result = await client.execute(
+      // const result = await client.execute(
+      //   sender,
+      //   contractAddress,
+      //   {
+      //     decrease_allowance: { spender, amount },
+      //   },
+      //   'auto'
+      // )
+      let resp = await client.tx.compute.executeContract({
         sender,
-        contractAddress,
-        {
-          decrease_allowance: { spender, amount },
+        contract: contractAddress,
+        codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH,
+        msg: {
+          decrease_allowance: {
+            spender, amount
+          },
         },
-        'auto'
-      )
-      return result.transactionHash
+
+      }, {
+        gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
+      })
+      if (resp.code !== TxResultCode.Success) {
+        console.error(resp.rawLog);
+      }
+      return resp.transactionHash
     }
 
     return {

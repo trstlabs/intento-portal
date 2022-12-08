@@ -36,7 +36,7 @@ async function fetchTokenBalance({
    * if this is a native asset or an ibc asset that has trst_denom
    *  */
   if (native) {
-    const resp = await client.query.bank.balance({address, denom})
+    const resp = await client.query.bank.balance({ address, denom })
     const amount = resp ? Number(resp.balance.amount) : 0
     return convertMicroDenomToDenom(amount, decimals)
   }
@@ -45,7 +45,8 @@ async function fetchTokenBalance({
    * everything else
    *  */
   if (token_address) {
-    const balance = await CW20(client).use(token_address).balance(address, )
+    const balance = await CW20(client).use(token_address).balance(address, localStorage.getItem("vk" + address))
+
     return convertMicroDenomToDenom(Number(balance), decimals)
   }
 
@@ -127,8 +128,8 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
     {
       enabled: Boolean(
         status === WalletStatusType.connected &&
-          tokenSymbols?.length &&
-          tokenList?.tokens
+        tokenSymbols?.length &&
+        tokenList?.tokens
       ),
 
       refetchOnMount: 'always',

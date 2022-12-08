@@ -31,19 +31,15 @@ export const executeRemoveLiquidity = async ({
     senderAddress,
     contractAddress: swapAddress,
     message: {
-      remove_liquidity: {
+      withdrawal_liquidity: {
         amount: `${tokenAmount}`,
-        min_token1: `${0}`,
-        min_token2: `${0}`,
       },
     },
   })
 
   return validateTransactionSuccess(
     await client.signAndBroadcast(
-      senderAddress,
       [increaseAllowanceMessage, executeMessage],
-      'auto'
     )
   )
 }

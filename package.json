@@ -41,7 +41,7 @@
     "react-use": "^17.4.0",
     "recoil": "^0.7.4",
     "sass": "^1.45.0",
-    "trustlessjs": "1.2.3.alpha-2"
+    "trustlessjs": "1.2.3.alpha-3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",

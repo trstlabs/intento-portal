@@ -116,5 +116,5 @@ export const AssetsList = ({ onActionClick }) => {
 
 const StyledGrid = styled('div', {
   display: 'grid',
-  rowGap: '$space$4',
+  rowGap: '$space$8',
 })

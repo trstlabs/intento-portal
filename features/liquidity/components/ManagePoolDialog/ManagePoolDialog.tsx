@@ -41,6 +41,7 @@ export const ManagePoolDialog = ({
   onRequestClose,
   poolId,
 }: ManagePoolDialogProps) => {
+  console.log(poolId)
   const [pool] = useQueryPoolLiquidity({ poolId })
   const {
     pool_assets: [tokenA, tokenB],

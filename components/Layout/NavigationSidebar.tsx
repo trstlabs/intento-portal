@@ -61,6 +61,10 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       client: null,
     })
   }
+  function remove() {
+    localStorage.removeItem("vk" + address);
+    location.reload()
+  }
 
   const walletButton = (
     <ConnectedWalletButton
@@ -73,13 +77,14 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   )
 
   const keyringButton = (
-   <SetKeyringButton
+    <SetKeyringButton
       connected={Boolean(key?.name)}
       onConnect={() => useSetKeyring(address, client)}
       css={{ marginBottom: '$8' }}
-      onRemove={()=>localStorage.removeItem("vk"+address)}
+      onRemove={() => remove()
+      }
     />
-  
+
   )
 
   const { pathname } = useRouter()
@@ -120,7 +125,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
         </Button>
       </Link>
-      {/* <Link href="/pools" passHref>
+      <Link href="/pools" passHref>
         <Button
           as="a"
           variant="menu"
@@ -130,7 +135,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           <Inline css={{ paddingLeft: '$4' }}>Pools</Inline>
         </Button>
-      </Link> */}
+      </Link>
       <Inline css={{ paddingBottom: '$6' }} />
       <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
@@ -377,7 +382,7 @@ const StyledMenuContainer = styled('div', {
 
 const StyledListForLinks = styled('div', {
   display: 'flex',
-  rowGap: '$space$2',
+  rowGap: '$space$4',
   flexDirection: 'column',
 })
 

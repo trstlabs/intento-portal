@@ -85,7 +85,7 @@
         {
           "id": "",
           "chain_id": "trstdev-1",
-          "token_address": "",
+          "token_address": "trust1ym5m5dw7pttft5w430nxx6uat8f84ck45zkwrt",
           "symbol": "TTRST",
           "name": "TRST (TIP20)",
           "decimals": 6,

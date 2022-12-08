@@ -108,18 +108,18 @@ export default function Pools() {
                     liquidity,
                     pool_id,
                     pool_assets: [tokenA, tokenB],
-                    rewards_tokens,
+                    // rewards_tokens,
                   }) => (
                     <PoolCard
                       key={pool_id}
                       tokenASymbol={tokenA.symbol}
                       poolId={pool_id}
-                      rewardsTokens={rewards_tokens}
+                      // rewardsTokens={rewards_tokens}
                       tokenBSymbol={tokenB.symbol}
                       providedTotalLiquidity={liquidity.providedTotal}
-                      stakedLiquidity={liquidity.staked}
+                      // stakedLiquidity={liquidity.staked}
                       availableLiquidity={liquidity.available}
-                      aprValue={liquidity.rewards.annualYieldPercentageReturn}
+                    // aprValue={liquidity.rewards.annualYieldPercentageReturn}
                     />
                   )
                 )}
@@ -152,9 +152,9 @@ export default function Pools() {
                   poolId={pool_id}
                   tokenBSymbol={tokenB.symbol}
                   providedTotalLiquidity={liquidity.providedTotal}
-                  stakedLiquidity={liquidity.staked}
+                  // stakedLiquidity={liquidity.staked}
                   availableLiquidity={liquidity.available}
-                  aprValue={liquidity.rewards.annualYieldPercentageReturn}
+                  // aprValue={liquidity.rewards.annualYieldPercentageReturn}
                 />
               )
             )}

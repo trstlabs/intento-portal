@@ -36,10 +36,10 @@ export const passThroughTokenSwap = async ({
 
   const swapMessage = {
     pass_through_swap: {
-      output_min_token: `${minOutputToken}`,
+      min_token: `${minOutputToken}`,
       input_token,
       input_token_amount: `${tokenAmount}`,
-      output_amm_address: outputPool.swap_address,
+      output_address: outputPool.swap_address,
     },
   }
 
@@ -59,19 +59,22 @@ export const passThroughTokenSwap = async ({
 
     return validateTransactionSuccess(
       await client.signAndBroadcast(
-        senderAddress,
         [increaseAllowanceMessage, executeMessage],
-        'auto'
+
       )
     )
   }
 
-  return await client.execute(
-    senderAddress,
-    inputPool.swap_address,
-    swapMessage,
-    'auto',
-    undefined,
-    [coin(tokenAmount, tokenA.denom)]
-  )
+  return await client.tx.compute.executeContract({
+    sender: senderAddress,
+    contract: inputPool.swap_address,
+    codeHash: process.env.NEXT_PUBLIC_SWAPPAIR_CODE_HASH,
+    msg: swapMessage,
+    funds: [coin(tokenAmount, tokenA.denom)]
+
+  }, {
+    gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
+
+  })
+
 }

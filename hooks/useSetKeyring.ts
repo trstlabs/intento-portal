@@ -11,7 +11,7 @@ export const useSetKeyring = async (
   client: TrustlessChainClient,
 ) => {
   //const { address, client } = useRecoilValue(walletState)
-  if (!client){
+  if (!client) {
     console.log("sadgfsadf")
   }
   try {
@@ -29,7 +29,7 @@ export const useSetKeyring = async (
       vk = prompt(
         `Please specify a viewing key for this address to continue.`
       )
-
+        console.log(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
       let resp = await client.tx.compute.executeContract({
         sender: address,
         contract: process.env.NEXT_PUBLIC_KEYRING_ADDR,
@@ -41,15 +41,14 @@ export const useSetKeyring = async (
         },
 
       }, {
-        gasLimit: 150_000
+        gasLimit: +process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM
       })
       console.log(resp)
       if (resp.code !== TxResultCode.Success) {
         console.error(resp.rawLog);
-        alert("Setting viewing key failed")
-       
-
-      }
+        alert("Broadcasting viewing key failed");
+        return;
+      };
       localStorage.setItem("vk" + address, vk);
       location.reload()
     }

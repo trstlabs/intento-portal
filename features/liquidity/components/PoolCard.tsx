@@ -19,12 +19,12 @@ import { formatCompactNumber } from 'util/formatCompactNumber'
 type PoolCardProps = {
   poolId: string
   providedTotalLiquidity: PoolTokenValue
-  stakedLiquidity: PoolState
+  // stakedLiquidity: PoolState
   availableLiquidity: PoolState
   tokenASymbol: string
   tokenBSymbol: string
-  aprValue: number
-  rewardsTokens?: PoolEntityType['rewards_tokens']
+  //aprValue: number
+  // rewardsTokens?: PoolEntityType['rewards_tokens']
 }
 
 export const PoolCard = ({
@@ -32,17 +32,17 @@ export const PoolCard = ({
   tokenASymbol,
   tokenBSymbol,
   providedTotalLiquidity,
-  stakedLiquidity,
+  // stakedLiquidity,
   availableLiquidity,
-  rewardsTokens,
-  aprValue,
+  // rewardsTokens,
+  //aprValue,
 }: PoolCardProps) => {
   const tokenA = useTokenInfo(tokenASymbol)
   const tokenB = useTokenInfo(tokenBSymbol)
 
   const hasProvidedLiquidity = Boolean(providedTotalLiquidity.tokenAmount)
 
-  const stakedTokenBalanceDollarValue = stakedLiquidity.provided.dollarValue
+  // const stakedTokenBalanceDollarValue = stakedLiquidity.provided.dollarValue
 
   const providedLiquidityDollarValueFormatted = hasProvidedLiquidity
     ? formatCompactNumber(providedTotalLiquidity.dollarValue)
@@ -97,7 +97,7 @@ export const PoolCard = ({
               )}
             </Text>
           </Column>
-          <Inline justifyContent="space-between" css={{ padding: '$14 0' }}>
+          {/* <Inline justifyContent="space-between" css={{ padding: '$14 0' }}>
             <StyledDivForStatsColumn align="left">
               <Text
                 variant="legend"
@@ -144,7 +144,7 @@ export const PoolCard = ({
                 {dollarValueFormatterWithDecimals(aprValue ?? 0)}%
               </Text>
             </StyledDivForStatsColumn>
-          </Inline>
+          </Inline> */}
         </CardContent>
       </Card>
     </Link>

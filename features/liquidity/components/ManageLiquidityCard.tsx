@@ -17,11 +17,11 @@ import { PoolState, PoolTokenValue, ReserveType } from 'queries/useQueryPools'
 import { UnderlyingAssetRow } from './UnderlyingAssetRow'
 
 type ManageLiquidityCardProps = {
-  stakedLiquidity: PoolState
+  // stakedLiquidity: PoolState
   providedLiquidity: PoolTokenValue
   providedTotalLiquidity: PoolTokenValue
   providedLiquidityReserve: ReserveType
-  stakedLiquidityReserve: ReserveType
+  // stakedLiquidityReserve: ReserveType
   onClick: () => void
   tokenASymbol: string
   tokenBSymbol: string
@@ -31,10 +31,10 @@ type ManageLiquidityCardProps = {
 export const ManageLiquidityCard = ({
   onClick,
   providedLiquidityReserve,
-  stakedLiquidityReserve,
+  // stakedLiquidityReserve,
   providedTotalLiquidity,
   providedLiquidity,
-  stakedLiquidity,
+  // stakedLiquidity,
   tokenASymbol,
   tokenBSymbol,
   supportsIncentives,
@@ -44,17 +44,17 @@ export const ManageLiquidityCard = ({
 
   const [refForCard, cardInteractionState] = useSubscribeInteractions()
 
-  const didBondLiquidity = stakedLiquidity?.provided.tokenAmount > 0
+  // const didBondLiquidity = stakedLiquidity?.provided.tokenAmount > 0
   const didProvideLiquidity =
-    providedLiquidityReserve?.[0] > 0 || didBondLiquidity
+    providedLiquidityReserve?.[0] > 0 
 
   const tokenAReserve = convertMicroDenomToDenom(
-    providedLiquidityReserve?.[0] + stakedLiquidityReserve?.[0],
+    providedLiquidityReserve?.[0],
     tokenA.decimals
   )
 
   const tokenBReserve = convertMicroDenomToDenom(
-    providedLiquidityReserve?.[1] + stakedLiquidityReserve?.[1],
+    providedLiquidityReserve?.[1],
     tokenB.decimals
   )
 
@@ -69,7 +69,7 @@ export const ManageLiquidityCard = ({
       tabIndex={-1}
       role="button"
       variant={
-        didProvideLiquidity || didBondLiquidity ? 'primary' : 'secondary'
+        didProvideLiquidity ? 'primary' : 'secondary'
       }
       onClick={onClick}
     >

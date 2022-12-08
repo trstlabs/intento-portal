@@ -187,6 +187,7 @@ export const useQueryPoolLiquidity = ({ poolId }) => {
   })
 
   const persistedData = usePersistance(poolResponse?.data)
+  console.log(persistedData)
 
   return [
     persistedData,

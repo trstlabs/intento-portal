@@ -1,13 +1,13 @@
 {
-  "name": "testnet pools list",
+  "name": "localnet pools list",
   "logoURI": "https://s3.amazonaws.com/cdn-origin-etr.akc.org/wp-content/uploads/2017/11/29231450/Poodle-Standard-Gray-On-White-Standing.jpg",
   "keywords": [
     "special pools"
   ],
   "tags": {
     "ProjectName": {
-      "name": "testnet",
-      "description": "Pools that are listed on testnet"
+      "name": "localnet",
+      "description": "Pools that are listed on localnet"
     }
   },
   "base_token": {
@@ -85,7 +85,7 @@
         {
           "id": "",
           "chain_id": "trstdev-1",
-          "token_address": "",
+          "token_address": "trust1ym5m5dw7pttft5w430nxx6uat8f84ck45zkwrt",
           "symbol": "TTRST",
           "name": "TRST (TIP20)",
           "decimals": 6,

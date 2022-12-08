@@ -111,6 +111,6 @@ export const TokenSwapModule = ({ initialTokenPair }: TokenSwapModuleProps) => {
 }
 
 const StyledDivForWrapper = styled('div', {
-  borderRadius: '8px',
+  borderRadius: '16px',
   backgroundColor: '$colors$dark10',
 })

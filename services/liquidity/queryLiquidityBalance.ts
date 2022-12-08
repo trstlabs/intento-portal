@@ -13,11 +13,13 @@ export const queryLiquidityBalance = async ({
   address,
 }: QueryLiquidityBalanceArgs) => {
   try {
-    const query = await client.query.compute.queryContractPrivateState(tokenAddress, {
-      balance: { address },
+    const query = await client.query.compute.queryContractPrivateState({
+      contractAddress:tokenAddress, codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH, query: {
+        balance: { address, key: localStorage.getItem("vk" + address) },
+      },
     })
 
-    return protectAgainstNaN(Number(query.balance))
+    return protectAgainstNaN(Number(query.amount))
   } catch (e) {
     console.error('Cannot get liquidity balance:', e)
   }

@@ -1,0 +1,24 @@
+version: "3.9"
+services:
+  localtrst:
+    image: "trstlabs/localtrst:latest"
+    ports:
+      - "26657:26657"
+      - "26656:26656"
+      - "9090:9090"
+      - "9091:9091"
+      - "1317:1317"
+      # faucet
+      - "5000:5000"
+    environment:
+      - CHAINID=trstdev-1
+      - LOG_LEVEL=info
+      - http_proxy
+      - https_proxy
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:26657"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
