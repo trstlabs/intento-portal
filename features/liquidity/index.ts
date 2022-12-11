@@ -1,4 +1,4 @@
-export { BondLiquidityDialog } from './components/BondLiquidityDialog'
+//export { BondLiquidityDialog } from './components/BondLiquidityDialog'
 export { ButtonWithDropdownForSorting } from './components/ButtonWithDropdownForSorting'
 export { LiquidityBreakdown } from './components/LiquidityBreakdown'
 export { LiquidityHeader } from './components/LiquidityHeader'

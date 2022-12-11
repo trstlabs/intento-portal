@@ -163,9 +163,9 @@ export const getContractInfo = async (
   try {
     if (!contractAddress || !client) {
       throw new Error(
-        `No code or rpcEndpoint was provided: ${JSON.stringify({
+        `No contractAddress or rpcEndpoint was provided: ${JSON.stringify({
           contractAddress,
-          client,
+         
         })}`
       )
     }

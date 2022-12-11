@@ -78,9 +78,9 @@ export const PoolCard = ({
             </StyledTextForTokenNames>
           </Column>
         </CardContent>
-        <Divider offsetTop="$16" offsetBottom="$12" />
+        <Divider offsetTop="$10" offsetBottom="$5" />
         <CardContent size="medium">
-          <Column gap={3}>
+          <Column gap={5}  css={{ paddingBottom: '$8' }}>
             <Text variant="legend" color="secondary">
               Total liquidity
             </Text>

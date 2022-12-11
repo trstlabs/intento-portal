@@ -1,9 +1,9 @@
-import { queryLiquidityBalance } from '../services/liquidity'
 import { protectAgainstNaN } from '../util/conversion'
+import { queryTokenBalance } from '../services/liquidity'
 
 export async function queryMyLiquidity({ swap, address, context: { client } }) {
   const providedLiquidityInMicroDenom = address
-    ? await queryLiquidityBalance({
+    ? await queryTokenBalance({
         tokenAddress: swap.lp_token_address,
         client,
         address,

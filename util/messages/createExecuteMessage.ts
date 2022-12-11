@@ -24,7 +24,7 @@ export const createExecuteMessage = ({
     sender: senderAddress,
     contract: contractAddress,
     codeHash,
-    msg: toUtf8(JSON.stringify(message)),
+    msg: message,
     funds,
   })
 }

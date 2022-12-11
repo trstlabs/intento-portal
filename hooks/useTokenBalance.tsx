@@ -8,7 +8,7 @@ import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
 import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
-import { IBCAssetInfo, useIBCAssetList } from './useIbcAssetList'
+import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
 import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
 

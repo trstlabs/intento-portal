@@ -106,6 +106,34 @@
         }
       ],
       "swap_address": "trust1vs2vuks65rq7xj78mwtvn7vvnm2gn7adax86ef"
+    },
+    {
+      "pool_id": "TTRST-TOSMO",
+      "pool_assets": [
+        {
+          "id": "",
+          "chain_id": "trstdev-1",
+          "token_address": "trust1ym5m5dw7pttft5w430nxx6uat8f84ck45zkwrt",
+          "symbol": "TTRST",
+          "name": "TRST (TIP20)",
+          "decimals": 6,
+          "logoURI": "https://www.trustlesshub.com/img/brand/icon.png",
+          "native": false,
+          "denom": "uttrst"
+        },
+        {
+          "id": "",
+          "chain_id": "trstdev-1",
+          "token_address": "trust1gv07846a3867ezn3uqkk082c5ftke7hpkzxfnr",
+          "symbol": "TOSMO",
+          "name": "OSMO (TIP20)",
+          "decimals": 6,
+          "logoURI": "https://app.osmosis.zone/_next/image?url=%2Ftokens%2Fosmo.svg&w=128&q=75",
+          "native": false,
+          "denom": "utosmo"
+        }
+      ],
+      "swap_address": "trust1vs2vuks65rq7xj78mwtvn7vvnm2gn7adax86ef"
     }
   ],
   "version": {

@@ -22,6 +22,8 @@ import {
   UpRightArrow,
   useControlTheme,
   useMedia,
+  WalletIcon,
+  
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -97,7 +99,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={<TransferIcon />}
+          iconLeft={<WalletIcon />}
           selected={getIsLinkActive('/')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Dashboard</Inline>

@@ -15,6 +15,7 @@ export const useTokenList = () => {
   const { data } = useQuery<TokenList>(
     '@token-list',
     () => {
+      
       const tokenMapBySymbol = new Map()
       /* serialize pool assets */
       poolsListResponse.pools.forEach(({ pool_assets }) => {

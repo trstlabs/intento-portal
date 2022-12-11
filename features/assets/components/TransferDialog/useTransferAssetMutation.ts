@@ -1,12 +1,11 @@
-import { TrustlessChainClient } from 'trustlessjs'
+import { TrustlessChainClient,MsgTransfer, Tx } from 'trustlessjs'
 import {
   Coin,
   DeliverTxResponse,
-  MsgTransferEncodeObject,
 } from '@cosmjs/stargate'
-import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx'
-import { Height } from 'cosmjs-types/ibc/core/client/v1/client'
-import { IBCAssetInfo } from 'hooks/useIbcAssetList'
+// import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx'
+import { Height } from 'trustlessjs'
+import { IBCAssetInfo } from 'hooks/useIBCAssetList'
 import Long from 'long'
 import { useMutation } from 'react-query'
 import { useRecoilValue } from 'recoil'
@@ -21,6 +20,35 @@ type UseTransferAssetMutationArgs = {
   tokenInfo: IBCAssetInfo
 } & Parameters<typeof useMutation>[2]
 
+// const sendIbcTokens = (
+//   senderAddress: string,
+//   recipientAddress: string,
+//   transferAmount: Coin,
+//   sourcePort: string,
+//   sourceChannel: string,
+//   timeoutHeight: Height | undefined,
+//   /** timeout in seconds */
+//   timeoutTimestamp: number | undefined,
+//   memo = '',
+//   client: TrustlessChainClient
+// ): Promise<DeliverTxResponse> => {
+//   const timeoutTimestampNanoseconds = timeoutTimestamp
+//     ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
+//     : undefined
+//   const transferMsg = MsgTransfer.fromPartial({
+
+//       sourcePort: sourcePort,
+//       sourceChannel: sourceChannel,
+//       sender: senderAddress,
+//       receiver: recipientAddress,
+//       token: transferAmount,
+//       timeoutHeight: timeoutHeight,
+//       timeoutTimestamp: timeoutTimestampNanoseconds,
+
+//   })
+//   return client.signAndBroadcast([transferMsg])
+// }
+
 const sendIbcTokens = (
   senderAddress: string,
   recipientAddress: string,
@@ -32,23 +60,22 @@ const sendIbcTokens = (
   timeoutTimestamp: number | undefined,
   memo = '',
   client: TrustlessChainClient
-): Promise<DeliverTxResponse> => {
-  const timeoutTimestampNanoseconds = timeoutTimestamp
-    ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
-    : undefined
-  const transferMsg: MsgTransferEncodeObject = {
-    typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
-    value: MsgTransfer.fromPartial({
+): Promise<Tx> => {
+  // const timeoutTimestampNanoseconds = timeoutTimestamp
+  //   ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
+  //   : undefined
+  const transferMsg = new MsgTransfer({
+
       sourcePort: sourcePort,
       sourceChannel: sourceChannel,
       sender: senderAddress,
       receiver: recipientAddress,
       token: transferAmount,
       timeoutHeight: timeoutHeight,
-      timeoutTimestamp: timeoutTimestampNanoseconds,
-    }),
-  }
-  return client.signAndBroadcast(senderAddress, [transferMsg], 'auto', memo)
+      timeoutTimestampSec: timeoutTimestamp.toString(),
+
+  })
+  return client.signAndBroadcast([transferMsg])
 }
 
 export const useTransferAssetMutation = ({

@@ -29,14 +29,14 @@ import {
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
-import { useContractInfos } from 'hooks/useContractInfo'
-import { ContractCard } from '../features/contracts/components/ContractCard'
-import { ContractInfosWithAcc } from '../features/contracts/hooks/useSortContracts'
+import { useContractInfosMulti } from 'hooks/useContractInfo'
+import { ContractCard } from '../../features/contracts/components/ContractCard'
+import { ContractInfosWithAcc } from '../../features/contracts/hooks/useSortContracts'
 
-export default function Home() {
+export default function Contracts() {
 
-  const { address, key } = useRecoilValue(walletState)
-  const [contracts, isLoading] = useContractInfos(2)
+  const { address } = useRecoilValue(walletState)
+  const [contracts, isLoading] = useContractInfosMulti([2])
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
   const infoArgs: ContractInfosWithAcc = { infos: contracts, address }
@@ -53,10 +53,6 @@ export default function Home() {
 
   const shouldShowFetchingState = isLoading && isSorting && !contracts?.length;
   const shouldRenderContracts = Boolean(contracts?.length)
-  function remove() {
-    localStorage.removeItem("vk" + address);
-    location.reload()
-  }
 
   const pageHeaderContents = (
     <PageHeader
@@ -65,10 +61,32 @@ export default function Home() {
     />
   )
 
+  // if (!isLoading && isSorting) {
+  //   return (
+  //     <AppLayout>
+  //       {pageHeaderContents}
+  //       <Column
+  //         justifyContent="center"
+  //         align="center"
+  //         css={{ paddingTop: '$24' }}
+  //       >
+  //         <Inline gap={2}>
+  //           <ConnectIcon color="secondary" />
+  //           <Text variant="primary">
+  //             {
+  //               "Finding your contracts..."
+  //             }
+  //           </Text>
+  //         </Inline>
+  //       </Column>
+  //     </AppLayout>
+  //   )
+  // }
+
   return (
     <AppLayout>
       {pageHeaderContents}
-      <Card disabled variant="secondary"><><StyledDivForContractsGrid >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" text-center css={{ padding: '$24 $24 $24 $24' }}>
+      {/* <Card disabled variant="secondary"><><StyledDivForContractsGrid >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" text-center css={{ padding: '$24 $24 $24 $24' }}>
         {key.name}, Your Keychain Is All Set
       </Text>   <Inline  css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
         label="Copy viewing key"
@@ -97,7 +115,7 @@ export default function Home() {
           />
         </Tooltip></Inline></div> : <Text variant="header"  css={{ padding: '$12 $12 $12 $12' }}>
         {key.name}, Set a keyring to enjoy enhanced privacy
-      </Text>} <StyledPNG  css={{ padding: '$24 $5 $24 $24'  }} src="/keychain.png" /> </StyledDivForContractsGrid></></Card>
+      </Text>} <StyledPNG  css={{ padding: '$24 $5 $24 $24'  }} src="/keychain.png" /> </StyledDivForContractsGrid></></Card> */}
       {shouldShowFetchingState && (
         <>
           <Column
@@ -251,4 +269,5 @@ const StyledPNG = styled('img', {
   display: 'block',
   marginLeft: 'auto',
   marginRight: 'auto',
+  // width: '50%',
 })

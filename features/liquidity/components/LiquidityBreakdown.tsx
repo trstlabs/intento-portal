@@ -11,11 +11,13 @@ import {
   Text,
   Tooltip,
 } from 'junoblocks'
+import Link from 'next/link'
 import React from 'react'
 import {
   __POOL_REWARDS_ENABLED__,
   __POOL_STAKING_ENABLED__,
 } from 'util/constants'
+import { PoolsIcon } from '../../../icons'
 
 // import { SerializedRewardsContract } from '../../../queries/queryRewardsContracts'
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
@@ -30,7 +32,7 @@ type LiquidityBreakdownProps = {
   tokenB: TokenInfo
   poolId: string
   totalLiquidity: PoolTokenValue
- // yieldPercentageReturn: number
+  // yieldPercentageReturn: number
   // rewardsContracts: Array<SerializedRewardsContract>
   size: 'large' | 'small'
   lpFee?: number
@@ -46,7 +48,18 @@ type PoolHeaderProps = {
 const PoolHeader = ({ tokenA, tokenB, priceBreakdown }: PoolHeaderProps) => (
   <Inline justifyContent="space-between" css={{ padding: '$16 0 $14' }}>
     <Inline gap={6}>
-      <Text variant="header">All Pools</Text>
+      <Link href="/pools" passHref>
+        <Button
+          as="a"
+          variant="ghost"
+          size="large"
+          iconLeft={<PoolsIcon />}
+        
+        >
+          <Inline css={{ paddingLeft: '$4' }}>All Pools</Inline>
+        </Button>
+      </Link>
+     
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
 
       <Inline gap={8}>
@@ -84,7 +97,8 @@ const SwapFee = ({
   <>
     <Text variant="header">{`${protocolFee + lpFee}%`}</Text>
     <Tooltip
-      label={`${lpFee}% of Swap Fee goes to LP Providers (LP) and ${protocolFee}% goes to Raw DAO`}
+      // label={`${lpFee}% of Swap Fee goes to LP Providers (LP) and ${protocolFee}% goes to Raw DAO`}
+      label={`${lpFee}% of Swap Fee goes to LP Providers (LP)`}
     >
       <Button variant="ghost" size="small" icon={<InfoIcon />} />
     </Tooltip>
@@ -310,7 +324,7 @@ function TotalInfoRow({ children }) {
           display: 'flex',
           justifyContent: 'space-between',
           backgroundColor: '$colors$dark10',
-          borderRadius: '$4',
+          borderRadius: '$2',
           marginBottom: '$14',
         }}
       >

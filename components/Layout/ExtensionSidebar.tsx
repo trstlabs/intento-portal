@@ -24,7 +24,7 @@ export const ExtensionSidebar = () => {
       >
         Report an issue
       </Button>
-      <StyledSpringBottom src="/gears-light.png" />
+      <StyledPNGBottom src="/rocketportal.png" />
     </StyledDivForWrapper>
   )
 }
@@ -52,12 +52,12 @@ const StyledDivForTitleWrapper = styled('div', {
   columnGap: '$4',
 })
 
-const StyledSpringBottom = styled('img', {
+const StyledPNGBottom = styled('img', {
   position: 'absolute',
-  right: 0,
-  bottom: 0,
-  width: '125%',
-  maxWidth: '500px',
+  right: 20,
+  bottom: 40,
+  width: '75%',
+  maxWidth: '300px',
   zIndex: '$1',
   userSelect: 'none',
   userDrag: 'none',
