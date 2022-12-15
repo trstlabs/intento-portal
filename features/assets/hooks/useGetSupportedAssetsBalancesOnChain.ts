@@ -1,4 +1,4 @@
-import { useIBCAssetList } from 'hooks/useIbcAssetList'
+import { useIBCAssetList } from 'hooks/useIBCAssetList'
 import { useMultipleTokenBalance } from 'hooks/useTokenBalance'
 import { useMemo } from 'react'
 

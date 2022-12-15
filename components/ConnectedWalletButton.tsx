@@ -13,7 +13,7 @@ import {
   styled,
   Text,
   Tooltip,
-  Valid,
+  Valid, Connect,
   Wallet,
 } from 'junoblocks'
 import React from 'react'
@@ -50,7 +50,7 @@ export const ConnectedWalletButton = ({
 
   return (
     <StyledWalletButton {...props} role="button">
-      <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Wallet />} />
+      <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Connect />} />
       <div data-content="">
         <Text variant="link" color="body">
           {walletName}

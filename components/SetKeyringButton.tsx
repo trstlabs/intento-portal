@@ -49,10 +49,10 @@ export const SetKeyringButton = ({
 
   return (
     <StyledKeyringButton {...props} role="button">
-      <Text variant="link" color="body">
+      <Text variant="link"color="body">
         Keyring Active
       </Text>
-      <IconWrapper size="medium" css={{ color: '#4974a5' }} icon={<Wallet />} />
+     {/*  <IconWrapper size="medium" css={{ color: '#4974a5' }} icon={<Wallet />} /> */}
 
       <StyledDivForActions>
         <StyledDivForInlineActions>

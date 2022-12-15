@@ -6,12 +6,14 @@ import {
   Column,
   Discord,
   Divider,
+  DoubleArrowIcon,
   FeedbackIcon,
   Github,
   IconWrapper,
   Inline,
   media,
   MoonIcon,
+  SharesIcon,
   styled,
   Telegram,
   Text,
@@ -22,7 +24,6 @@ import {
   UpRightArrow,
   useControlTheme,
   useMedia,
-  WalletIcon,
   
 } from 'junoblocks'
 import Link from 'next/link'
@@ -99,10 +100,21 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={<WalletIcon />}
+          iconLeft={<SharesIcon />}
           selected={getIsLinkActive('/')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Dashboard</Inline>
+        </Button>
+      </Link>
+      <Link href="/send" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<TransferIcon />}
+          selected={getIsLinkActive('/send')}
+        >
+          <Inline css={{ paddingLeft: '$4' }}>Send</Inline>
         </Button>
       </Link>
       <Link href="/swap" passHref>
@@ -121,7 +133,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={<TransferIcon />}
+          iconLeft={< DoubleArrowIcon rotation="-90deg"/>}
           selected={getIsLinkActive('/transfer')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
@@ -130,6 +142,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       <Link href="/pools" passHref>
         <Button
           as="a"
+          // disabled="true"
           variant="menu"
           size="large"
           iconLeft={<PoolsIcon />}

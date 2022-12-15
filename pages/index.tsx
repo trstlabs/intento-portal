@@ -68,36 +68,40 @@ export default function Home() {
   return (
     <AppLayout>
       {pageHeaderContents}
-      <Card disabled variant="secondary"><><StyledDivForContractsGrid >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" text-center css={{ padding: '$24 $24 $24 $24' }}>
+      {key ? <Card disabled variant="secondary"><><StyledDivForContractsGrid >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" css={{ padding: '$24 $24 $24 $24' }}>
         {key.name}, Your Keychain Is All Set
-      </Text>   <Inline  css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
+      </Text>   <Inline css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
         label="Copy viewing key"
         successLabel="Viewing key copied!"
         ariaLabel="Copy viewing key"
         value={localStorage.getItem("vk" + address)}
       >
-          {({ copied, ...bind }) => (
-            <Button 
+        {({ copied, ...bind }) => (
+          <Button
+            variant="ghost"
+            size="huge"
+            icon={<IconWrapper icon={copied ? <Valid /> : <Copy />} />}
+            {...bind}
+          />
+        )}
+      </CopyTextTooltip>
+          <Tooltip
+            label="Unpin ViewingKey"
+            aria-label="Unpin from browser instance"
+          >
+            <Button
+              onClick={remove}
               variant="ghost"
               size="huge"
-              icon={<IconWrapper icon={copied ? <Valid /> : <Copy />} />}
-              {...bind}
+              icon={<IconWrapper icon={<Logout />} />}
             />
-          )}
-        </CopyTextTooltip>
-        <Tooltip
-          label="Unpin ViewingKey"
-          aria-label="Unpin from browser instance"
-        >
-          <Button
-            onClick={remove}
-            variant="ghost" 
-            size="huge"
-            icon={<IconWrapper icon={<Logout />} />}
-          />
-        </Tooltip></Inline></div> : <Text variant="header"  css={{ padding: '$12 $12 $12 $12' }}>
+          </Tooltip></Inline></div> : <Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
         {key.name}, Set a keyring to enjoy enhanced privacy
-      </Text>} <StyledPNG  css={{ padding: '$24 $5 $24 $24'  }} src="/keychain.png" /> </StyledDivForContractsGrid></></Card>
+      </Text>} <StyledPNG css={{ padding: '$24 $5 $24 $24' }} src="/keychain.png" /> </StyledDivForContractsGrid></></Card> :
+       <Card disabled variant="secondary"><Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
+          Connect a wallet
+        </Text></Card> 
+      }
       {shouldShowFetchingState && (
         <>
           <Column

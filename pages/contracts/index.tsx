@@ -10,7 +10,6 @@ import {
   useSortContracts,
 } from 'features/contracts'
 import {
-  Card,
   Column,
   ConnectIcon,
   Inline,
@@ -18,13 +17,7 @@ import {
   Spinner,
   styled,
   Text,
-  Valid,
-  Copy,
-  CopyTextTooltip,
-  Button,
-  Tooltip,
-  IconWrapper,
-  Logout,
+
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
@@ -61,61 +54,10 @@ export default function Contracts() {
     />
   )
 
-  // if (!isLoading && isSorting) {
-  //   return (
-  //     <AppLayout>
-  //       {pageHeaderContents}
-  //       <Column
-  //         justifyContent="center"
-  //         align="center"
-  //         css={{ paddingTop: '$24' }}
-  //       >
-  //         <Inline gap={2}>
-  //           <ConnectIcon color="secondary" />
-  //           <Text variant="primary">
-  //             {
-  //               "Finding your contracts..."
-  //             }
-  //           </Text>
-  //         </Inline>
-  //       </Column>
-  //     </AppLayout>
-  //   )
-  // }
-
   return (
     <AppLayout>
       {pageHeaderContents}
-      {/* <Card disabled variant="secondary"><><StyledDivForContractsGrid >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" text-center css={{ padding: '$24 $24 $24 $24' }}>
-        {key.name}, Your Keychain Is All Set
-      </Text>   <Inline  css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
-        label="Copy viewing key"
-        successLabel="Viewing key copied!"
-        ariaLabel="Copy viewing key"
-        value={localStorage.getItem("vk" + address)}
-      >
-          {({ copied, ...bind }) => (
-            <Button 
-              variant="ghost"
-              size="huge"
-              icon={<IconWrapper icon={copied ? <Valid /> : <Copy />} />}
-              {...bind}
-            />
-          )}
-        </CopyTextTooltip>
-        <Tooltip
-          label="Unpin ViewingKey"
-          aria-label="Unpin from browser instance"
-        >
-          <Button
-            onClick={remove}
-            variant="ghost" 
-            size="huge"
-            icon={<IconWrapper icon={<Logout />} />}
-          />
-        </Tooltip></Inline></div> : <Text variant="header"  css={{ padding: '$12 $12 $12 $12' }}>
-        {key.name}, Set a keyring to enjoy enhanced privacy
-      </Text>} <StyledPNG  css={{ padding: '$24 $5 $24 $24'  }} src="/keychain.png" /> </StyledDivForContractsGrid></></Card> */}
+
       {shouldShowFetchingState && (
         <>
           <Column
@@ -256,18 +198,4 @@ const StyledDivForContractsGrid = styled('div', {
     gridTemplateColumns: '1fr',
     rowGap: '$8',
   },
-})
-
-
-const StyledPNG = styled('img', {
-  width: '75%',
-  maxWidth: '200px',
-  maxHeight: '400px',
-  zIndex: '$1',
-  userSelect: 'none',
-  userDrag: 'none',
-  display: 'block',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  // width: '50%',
 })

@@ -1,7 +1,7 @@
 {
   "tokens": [
     {
-      "id": "cosmos",
+      "id": "Cosmos Hub",
       "name": "Atom",
       "symbol": "ATOM",
       "chain_id": "cosmoshub-4",
@@ -14,7 +14,7 @@
       "logoURI": "https://cryptologos.cc/logos/cosmos-atom-logo.svg?v=014"
     },
     {
-      "id": "circleusd",
+      "id": "Circle Consumer Chain",
       "name": "USDC",
       "symbol": "USDC",
       "chain_id": "circle-1",
@@ -27,8 +27,8 @@
       "logoURI": "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=014"
     },
     {
-      "id": "circleusd",
-      "name": "axlWETH",
+      "id": "Axelar",
+      "name": "Axelar",
       "symbol": "WETH",
       "chain_id": "axelar-1",
       "rpc": "https://cosmoshub.validator.network:443",
