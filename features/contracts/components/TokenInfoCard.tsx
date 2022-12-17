@@ -46,10 +46,10 @@ export const TokenInfoCard = ({
     const tokenInfo = useTokenInfo(contractInfo.contractId.toUpperCase())
     const { tip20Info, isTip20Loading } = useTip20Info(contractAddress)
     console.log(tip20Info)
-    const denomBalance = convertMicroDenomToDenom(
+   /*  const denomBalance = convertMicroDenomToDenom(
         balance,
         tokenInfo.decimals
-    )
+    ) */
     // const tip20supply = convertMicroDenomToDenom(
     //     tip20Info.total_supply,
     //     tokenInfo.decimals

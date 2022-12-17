@@ -113,7 +113,7 @@ export default function Home() {
           </Column>
         </>
       )}
-      {!isLoading && isSorting && (<Column
+      {!isLoading && isSorting && address &&(<Column
         justifyContent="center"
         align="center"
         css={{ paddingTop: '$24' }}

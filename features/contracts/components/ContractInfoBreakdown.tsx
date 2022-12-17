@@ -6,7 +6,7 @@ import {
     Divider,
     dollarValueFormatter,
     ImageForTokenLogo,
-    InfoIcon,
+    InfoIcon,WalletIcon,
     Inline,
     Text,
     Tooltip,
@@ -17,7 +17,6 @@ import {
     __POOL_REWARDS_ENABLED__,
     __POOL_STAKING_ENABLED__,
 } from 'util/constants'
-import { PoolsIcon } from '../../../icons'
 import { ContractInfo, ContractInfoWithAddress } from 'trustlessjs'
 // import { SerializedRewardsContract } from '../../../queries/queryRewardsContracts'
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
@@ -226,7 +225,7 @@ const InfoHeader = ({ codeId, creator, contractId }: InfoHeaderProps) => (
                     as="a"
                     variant="ghost"
                     size="large"
-                    iconLeft={<PoolsIcon />}
+                    iconLeft={<WalletIcon />}
 
                 >
                     <Inline css={{ paddingLeft: '$4' }}>All Contracts</Inline>

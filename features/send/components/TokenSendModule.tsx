@@ -1,20 +1,18 @@
 import { useTokenList } from 'hooks/useTokenList'
-import { styled, useMedia, Card, Inline } from 'junoblocks'
+import { styled, useMedia, } from 'junoblocks'
 import { useEffect, useRef, useState } from 'react'
-// import { Stepper } from 'react-form-stepper'
+
 import { useRecoilState, useRecoilValue } from 'recoil'
 import {
   TransactionStatus,
   transactionStatusState,
 } from 'state/atoms/transactionAtoms'
 
-import { tokenSendAtom } from '../sendAtoms'
+
 import { RecipientInfo, RecipientList } from './RecipientList'
-import TimeSelector from './ScheduledSend'
+
 import { TokenSelector } from './TokenSelector'
 
-import { useTokenInfo } from 'hooks/useTokenInfo'
-import { useTokenSend } from '../hooks'
 
 type TokenSendModuleProps = {
   /* will be used if provided on first render instead of internal state */
@@ -28,14 +26,14 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
   const transactionStatus = useRecoilValue(transactionStatusState)
 
   const [tokenRecipientList, setTokenRecipientList] = useState([new RecipientInfo()])
-  const [step, setStep] = useState(1)
+  
   /* fetch token list and set initial state */
   const [tokenList, isTokenListLoading] = useTokenList()
   useEffect(() => {
     const shouldSetDefaultTokenState =
       !tokenSymbol && tokenList
     if (shouldSetDefaultTokenState) {
-      setTokenSendState(tokenList.base_token.symbol,
+      setTokenSendState("TTRST",
 
       )
     }
@@ -71,19 +69,13 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
           disabled={isUiDisabled}
           size={uiSize}
         />
-        {/* <Stepper style={{fontFamily: "Gotham HTF !important",}}
-          steps={[{ label: '' }, { label: 'When to send' }, { label: 'Overview' }]}
-          
-          styleConfig={styleConfig}
-          activeStep={2}
-        /> */}
+       
       </StyledDivForWrapper>
-      {step == 1 && (<div > <RecipientList recipients={tokenRecipientList} tokenSymbol={tokenSymbol}
-        onStepChange={(step) => setStep(step)}
+     <div > <RecipientList recipients={tokenRecipientList} tokenSymbol={tokenSymbol}
+       
         onRecipientsChange={((newRecipients) => setTokenRecipientList(newRecipients))}
         onRemoveRecipient={(recipient) => setTokenRecipientList(tokenRecipientList.filter(item => item !== recipient))}
-      /></div>)}
-      {step == 2 && (<div > <TimeSelector></TimeSelector>  </div>)}
+      /></div>
     </StyledDivForWrapper>
       {/* <TransactionAction isPriceLoading={isPriceLoading} size={uiSize} /> */}
     </>

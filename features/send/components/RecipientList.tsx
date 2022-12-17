@@ -4,9 +4,11 @@ import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, Divid
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import { useConnectWallet } from '../../../hooks/useConnectWallet';
 import { useTokenSend } from '../hooks';
+import { useScheduledTx } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
 import { useRecoilState, useRecoilValue } from 'recoil'
+import { ScheduleDialog, AutoExecData } from './ScheduleDialog';
 
 export class RecipientInfo {
   recipient: string;
@@ -21,7 +23,6 @@ type RecipientsInputProps = {
   tokenSymbol: string
   onRecipientsChange: (recipients: RecipientInfo[]) => void
   onRemoveRecipient: (recipient: RecipientInfo) => void
-  onStepChange: (step: number) => void
 } & HTMLProps<HTMLInputElement>
 
 export const RecipientList = ({
@@ -29,18 +30,27 @@ export const RecipientList = ({
   tokenSymbol,
   onRecipientsChange,
   onRemoveRecipient,
-  onStepChange,
-  ...inputProps
+  //...inputProps
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
 
   /* wallet state */
   const [requestedSend, setRequestedSend] = useState(false)
+  const [requestedSchedule, setRequestedSchedule] = useState(false)
+  //default time
+  let data = new AutoExecData()
+  data.duration = 14 * 86400000;
+  data.interval = 86400000;
+  // data.startTime =  0;
+
+  const [autoExecData, setAutoExecData] = useState(data)
   const { status } = useRecoilValue(walletState)
   const { mutate: connectWallet } = useConnectWallet()
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ tokenSymbol, recipientInfos: recipients, })
+  const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
+    useScheduledTx({ tokenSymbol, recipientInfos: recipients, autoExecData})
 
   useEffect(() => {
     if (inputRef.current) {
@@ -50,16 +60,36 @@ export const RecipientList = ({
 
   /* proceed with send*/
   useEffect(() => {
-    const shouldTriggerTransaction =
-      !isExecutingTransaction && requestedSend
-    if (shouldTriggerTransaction) {
+    const shouldTriggerDirectTx =
+      !isExecutingTransaction && requestedSend;
+    if (shouldTriggerDirectTx) {
       handleSend(undefined, { onSettled: () => setRequestedSend(false) })
     }
   }, [isExecutingTransaction, requestedSend, handleSend])
 
+  /* proceed with schedule*/
+  useEffect(() => {
+    const shouldTriggerScheduledTx =
+      !isExecutingSchedule && requestedSchedule;
+    if (shouldTriggerScheduledTx) {
+
+      handleSchedule(undefined, { onSettled: () => setRequestedSchedule(false) })
+    }
+  }, [isExecutingSchedule, requestedSchedule, handleSchedule])
+
   const handleSendButtonClick = () => {
     if (status === WalletStatusType.connected) {
       return setRequestedSend(true)
+    }
+
+    connectWallet(null)
+  }
+
+  const handleScheduleButtonClick = (execData: AutoExecData) => {
+    if (status === WalletStatusType.connected) {
+      setAutoExecData(execData)
+
+      return setRequestedSchedule(true)
     }
 
     connectWallet(null)
@@ -139,6 +169,11 @@ export const RecipientList = ({
       })
   }
 
+  const [
+    { isShowing: isScheduleDialogShowing, actionType },
+    setScheduleDialogState,
+  ] = useState({ isShowing: false, actionType: 'occurrence' as 'occurrence' | 'recurrence' })
+
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
     status !== WalletStatusType.connected || (recipients[0].recipient && recipients[0].recipient.length != 44) || (Number(recipients[0].amount) == 0)
@@ -178,7 +213,7 @@ export const RecipientList = ({
                       variant="caption">
                       Amount</Text>
                     <Text>  <StyledInput
-                      placeholder="0"
+                      placeholder="0" type="number"
                       value={recipient.amount}
                       onChange={handleChange(index, 'amount')}
                     /></Text></Row>
@@ -243,18 +278,23 @@ export const RecipientList = ({
           </CardContent>
         ))}
       </Card>
-      <Inline css={{ margin: '$4 $6 $12', padding: '$5 $5 $12', justifyContent: 'space-between' }}>
-        <Button
-          variant="branded"
+      <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
+        <Button css={{ marginRight: '$4' }}
+          variant="primary"
           size="large"
           disabled={shouldDisableSubmissionButton}
-          onClick={() => onStepChange(2)}
+          onClick={() =>
+            setScheduleDialogState({
+              isShowing: true,
+              actionType: 'recurrence',
+            })
+          }
         >
-          {isExecutingTransaction ? <Spinner instant /> : 'Schedule'}
+          {isExecutingTransaction ? <Spinner instant /> : 'Schedule Recurrence'}
         </Button>
 
         <Button
-          variant="primary"
+          variant="secondary"
           size="large"
           disabled={shouldDisableSubmissionButton}
           onClick={
@@ -266,7 +306,18 @@ export const RecipientList = ({
           {isExecutingTransaction ? <Spinner instant /> : 'Send'}
         </Button>
       </Inline>
-
+      <ScheduleDialog
+        execData={autoExecData}
+        isShowing={isScheduleDialogShowing}
+        initialActionType={actionType}
+        onRequestClose={() =>
+          setScheduleDialogState({
+            isShowing: false,
+            actionType: 'occurrence',
+          })
+        }
+        handleSchedule={(execData) => handleScheduleButtonClick(execData)}
+      />
     </div >)
 }
 
@@ -289,8 +340,10 @@ function Row({ children }) {
         ...baseCss,
         display: 'flex',
         justifyContent: 'start',
-        marginBottom: '$1',
+        marginBottom: '$3',
         columnGap: '$space$1',
+        // border: '1px solid $borderColors$default',
+        // borderRadius: '$2'
       }}
     >
       {children}

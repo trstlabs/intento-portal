@@ -106,7 +106,29 @@ export const executeDirectSend = async ({
         fromAddress: senderAddress,
         toAddress: recipientInfos[0].recipient,
         amount: [{ denom: token.denom, amount: recipientInfos[0].amount.toString() }],
-      
+
+      },
+      {
+        gasLimit: 30_000,
+        memo: recipientInfos[0].memo
+      },
+    )
+  }
+
+  //if one direct
+  if (!recipientInfos[1]) {
+    console.log(recipientInfos[0])
+    if (recipientInfos[0].channel_id != undefined) {
+      throw new Error(
+        `sending over ibc for native tokens is not enabled on Cosmoportal yet`
+      )
+    };
+    return await client.tx.bank.send(
+      {
+        fromAddress: senderAddress,
+        toAddress: recipientInfos[0].recipient,
+        amount: [{ denom: token.denom, amount: recipientInfos[0].amount.toString() }],
+
       },
       {
         gasLimit: 30_000,
@@ -118,6 +140,11 @@ export const executeDirectSend = async ({
   let totalAmount = 0
   let outputRecipients = [];
   recipientInfos.forEach(recipient => {
+    if (recipient.channel_id != undefined) {
+      throw new Error(
+        `sending over ibc for native tokens is not enabled on Cosmoportal yet`
+      )
+    };
     let outputRecipient = new Output()
     outputRecipient.address = recipient.recipient
     outputRecipient.coins[0].denom = token.denom
@@ -126,7 +153,7 @@ export const executeDirectSend = async ({
     outputRecipients.push(outputRecipient)
   });
 
-  prompt("In this transaction, the memo will be the first memo, "+recipientInfos[0].memo+ ", for all recipients")
+  prompt("In this transaction, the memo will be the first memo, " + recipientInfos[0].memo + ", for all recipients")
   return await client.tx.bank.multiSend(
     {
       inputs: [
@@ -161,6 +188,6 @@ export class RecipientInfo {
 export class RecipientInfoDirect {
   recipient: string;
   amount: string | number;
-  channel_id: string;
+  // channel_id: string;
   memo: string;
 }

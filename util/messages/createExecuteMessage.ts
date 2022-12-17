@@ -1,12 +1,12 @@
 import { Msg, MsgExecuteContract } from 'trustlessjs'
-import { toUtf8 } from '@cosmjs/encoding'
+
 import { Coin } from '@cosmjs/launchpad'
-import { CodeInfo } from 'trustlessjs/dist/protobuf/compute/v1beta1/types'
+
 
 
 type CreateExecuteMessageArgs = {
   senderAddress: string
-  message: Record<string, Record<string, string>>
+  message: Record<string, Record<string, any>>
   contractAddress: string
   funds?: Array<Coin>
   codeHash?: string,
