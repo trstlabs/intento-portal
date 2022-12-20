@@ -11,6 +11,8 @@ import {
     styled, Card,
     Text,
     Union,
+    Tooltip,
+    convertDenomToMicroDenom,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
@@ -48,8 +50,8 @@ export const ScheduleDialog = ({
 
 
     const [interval, setInterval] = useState(execData.interval);
-    const [funds, setFeeAmount] = useState(0.00);
-    const [recurrences, setRecurrence] = useState(0);
+    const [funds, setFeeAmount] = useState(null);
+    const [recurrences, setRecurrence] = useState(2);
     const isLoading = false;
 
     const [isOccurrence, setOccurrence] = useState(
@@ -66,7 +68,7 @@ export const ScheduleDialog = ({
     //     })
 
     const handleData = () => {
-        if (funds < recurrences * 0.2) {
+        if (funds < recurrences * 0.1) {
             toast.custom((t) => (
                 <Toast
                     icon={<IconWrapper icon={<Error />} color="error" />}
@@ -201,11 +203,11 @@ function RecurrenceContent({
 }) {
     const [displayInterval, setDisplayInterval] = useState("1 day");
     const [displayDuration, setDisplayDuration] = useState("2 weeks");
-    const [displayStartTime, setDisplayStartTime] = useState("upon confirmation");
+    const [displayStartTime, setDisplayStartTime] = useState("1 day");
     const [displayRecurrences, setDisplayRecurrences] = useState("2 times");
 
-    const timeLabels = ['1 week', '1 day', '7 days', '1 hour', '2 hours', '30 min', '2 weeks',]
-    const timeValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 7, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14]
+    const timeLabels = ['1 week', '1 day', '5 days', '1 hour', '2 hours', '30 min', '2 weeks',]
+    const timeValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 5, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14]
 
     const recurrenceLabels = ['1 time', '2 times', '5 times', '10 times', '25 times', '50 times']
     const recurrenceValues = [1, 2, 5, 10, 25, 50]
@@ -215,6 +217,7 @@ function RecurrenceContent({
         setDisplayInterval(label)
         setRecurrence(Math.floor(duration / value))
         handleDisplayRecurrence(Math.floor(duration / interval))
+
         //setDuration(value * duration)
     }
     function handleRemoveInterval() {
@@ -259,7 +262,7 @@ function RecurrenceContent({
     }
     function handleRemoveStartTime() {
         setStartTime();
-        setDisplayStartTime('upon confirmation')
+        setDisplayStartTime(displayInterval)
     }
     function handleRecurrences(label, value) {
         const val = interval * value
@@ -285,7 +288,7 @@ function RecurrenceContent({
     function handleDisplayRecurrence(value) {
         let displayRecs = value.toString() + ' times'
         if (value == 1) {
-            displayRecs+ ' time'
+            displayRecs + ' time'
         }
         setDisplayRecurrences(displayRecs)
 
@@ -312,21 +315,10 @@ function RecurrenceContent({
                             </div>
                         </Inline>
 
-                        <Inline justifyContent={'space-between'} align="center">
-                            <div className="chips">
-                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify a start time for execution (optional)</Text><ChipSelected label={"In " + displayStartTime} onClick={() => handleRemoveStartTime()} />
-                                {timeLabels.map((time, index) => (
-                                    <span key={"c" + index}>
-                                        {displayStartTime != time && (
-                                            <Chip label={"In " + time} onClick={() => handleStartTime(time, timeValues[index])} />
-                                        )}
-                                    </span>))}
 
-                            </div>
-                        </Inline>
                         <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
-                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Select until when to execute</Text><ChipSelected label={displayDuration + " after " + displayStartTime} onClick={() => handleRemoveDuration()} />
+                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Select until when to execute</Text>{displayStartTime != displayInterval ? <ChipSelected label={displayDuration + " after " + displayStartTime} onClick={() => handleRemoveDuration()} /> : <ChipSelected label={displayDuration} onClick={() => handleRemoveDuration()} />}
                                 {timeLabels.map((time, index) => (
                                     <span key={"b" + index}>
                                         {displayDuration != time && (
@@ -342,6 +334,18 @@ function RecurrenceContent({
                             Optional settings </Text>
                         <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
+                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify a start time for execution (optional)</Text><ChipSelected label={"In " + displayStartTime} onClick={() => handleRemoveStartTime()} />
+                                {timeLabels.map((time, index) => (
+                                    <span key={"c" + index}>
+                                        {displayStartTime != time && (
+                                            <Chip label={"In " + time} onClick={() => handleStartTime(time, timeValues[index])} />
+                                        )}
+                                    </span>))}
+
+                            </div>
+                        </Inline>
+                        <Inline justifyContent={'space-between'} align="center">
+                            <div className="chips">
                                 <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify amount of recurrences (optional)</Text><ChipSelected label={"For " + displayRecurrences} onClick={() => handleRemoveRecurrences()} />
                                 {recurrenceLabels.map((times, index) => (
                                     <span key={"c" + index}>
@@ -353,19 +357,25 @@ function RecurrenceContent({
                             </div>
                         </Inline>
 
+
                         <Column css={{ padding: '$8 0' }}>
-                            <DialogDivider offsetY="$4" /><Text align="center"
+                            <DialogDivider offsetY="$4" /><Tooltip
+                                label="Funds that are set aside for automatic execution. Remaining funds are refunded."
+                                aria-label="Fee Funds - TRST"
+                            ><Text align="center"
                                 variant="caption">
-                                Max Fee Funds - TRST</Text>
+                                    Fee Funds - TRST</Text></Tooltip>
+
+
                             <Inline> <StyledDivForLiquidityInputs>
 
-                           <Text><StyledInput step=".01"
+                                <Text><StyledInput step=".01"
                                     placeholder="0.00" type="number"
                                     value={funds}
-                                    onChange={({ target: { value } })=>handleMaxFee(value)}
-                                /></Text></StyledDivForLiquidityInputs></Inline>   { recurrences > 0 &&( <Text align="center"
+                                    onChange={({ target: { value } }) => handleMaxFee(value)}
+                                /></Text></StyledDivForLiquidityInputs></Inline>   {recurrences > 0 && (<Text align="center"
                                     variant="caption">
-                                Suggested funds for fees:  {recurrences * 0.1} TRST</Text>)} 
+                                    Suggested funds for fees:  {recurrences * 0.1} TRST</Text>)}
                         </Column>
                     </Column>
 

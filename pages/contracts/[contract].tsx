@@ -1,6 +1,6 @@
 import { AppLayout, NavigationSidebar } from 'components'
 import {
-  ContractInfoBreakdown, TokenInfoCard
+  ContractInfoBreakdown, TokenInfoCard, RecurringSendCard
 
 } from 'features/contracts'
 import { useRefetchQueries } from 'hooks/useRefetchQueries'
@@ -10,7 +10,7 @@ import {
   ChevronIcon,
   Column,
   Error,
-  IconWrapper,
+
   Inline,
   media,
   Spinner,
@@ -58,6 +58,7 @@ export default function Contract() {
   //let isLoading = true
   //if (contract) {
   const [contractInfo, isLoading] = useContractInfo(contract)
+
   //}
 
 
@@ -171,13 +172,18 @@ export default function Contract() {
               size={isMobile ? 'small' : 'large'}
             />
 
-            <Column css={{ flexBasis: '0px', flexGrow: 1, flexShrink: 1 }}>
+            {contractInfo.codeId == process.env.NEXT_PUBLIC_TIP20_CODE_ID && (<Column css={{ flexBasis: '0px', flexGrow: 1, flexShrink: 1 }}>
               <TokenInfoCard
                 contractAddress={contract}
                 contractInfo={contractInfo}
               />
-            </Column>
-
+            </Column>)}
+            {contractInfo.codeId == process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_ID && (<Column css={{ flexBasis: '0px', flexGrow: 1, flexShrink: 1 }}>
+              <RecurringSendCard
+                contractAddress={contract}
+                contractInfo={contractInfo}
+              />
+            </Column>)}
 
           </>
         )}

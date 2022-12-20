@@ -49,6 +49,7 @@ export const useSortContracts = ({ infoArgs, filter, sortBy }: UseSortContractsA
       // }
 
       // const providedLiquidityAmount = contract.liquidity.providedTotal.tokenAmount
+     
       const isFrom = (infoArgs.address == contract.ContractInfo.creator || infoArgs.address  == contract.ContractInfo.owner)
 
       const contractsBucket = isFrom ? myContracts : otherContracts

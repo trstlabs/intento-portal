@@ -29,7 +29,7 @@ import { ContractInfosWithAcc } from '../../features/contracts/hooks/useSortCont
 export default function Contracts() {
 
   const { address } = useRecoilValue(walletState)
-  const [contracts, isLoading] = useContractInfosMulti([2])
+  const [contracts, isLoading] = useContractInfosMulti([Number(process.env.NEXT_PUBLIC_TIP20_CODE_ID), Number(process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_ID), ])
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
   const infoArgs: ContractInfosWithAcc = { infos: contracts, address }
@@ -99,7 +99,7 @@ export default function Contracts() {
                   }) => (
                     <ContractCard
                       key={contractAddress}
-                      ContractInfo={ContractInfo}
+                      contractInfo={ContractInfo}
                       contractAddress={contractAddress}
                     />
                   )
@@ -139,7 +139,7 @@ export default function Contracts() {
           }) => (
             <ContractCard
               key={contractAddress}
-              ContractInfo={ContractInfo}
+              contractInfo={ContractInfo}
               contractAddress={contractAddress}
             />
           )

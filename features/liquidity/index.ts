@@ -8,7 +8,7 @@ export { ManageLiquidityCard } from './components/ManageLiquidityCard'
 export { ManagePoolDialog } from './components/ManagePoolDialog'
 export { PoolCard } from './components/PoolCard'
 export { StakingSummary } from './components/StakingSummary'
-export { UnbondingLiquidityCard } from './components/UnbondingLiquidityCard'
+export { UnbondingLiquidityCard, useRelativeTimestamp } from './components/UnbondingLiquidityCard'
 export { UnbondingLiquidityStatusList } from './components/UnbondingLiquidityStatusList'
 export {
   useGetPoolTokensDollarValue,

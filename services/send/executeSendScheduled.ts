@@ -1,5 +1,5 @@
 import {
-  TrustlessChainClient, 
+  TrustlessChainClient,
 } from 'trustlessjs'
 
 import { TokenInfo } from '../../queries/usePoolsListQuery'
@@ -46,8 +46,8 @@ export const executeScheduledSend = async ({
         recipient.channel_id = ''
       }
     });
-    let random = new Uint8Array(12);
-    random = crypto.getRandomValues(random);
+
+    let random = crypto.randomUUID();
 
     let allowanceForProxyContract = autoExecData.recurrences * totalRecurrenceAmount;
     let msg = {
@@ -62,6 +62,7 @@ export const executeScheduledSend = async ({
     };
     console.log(msg);
     let start_duration_at = 0
+
     if (autoExecData.startTime != 0) {
       start_duration_at = (Math.floor(Date.now() / 1000) + autoExecData.startTime);
     }
@@ -73,12 +74,15 @@ export const executeScheduledSend = async ({
         code_hash: process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_HASH,
         duration: autoExecData.duration + "ms",
         interval: autoExecData.interval + "ms",
-        contract_id: "CosmoRecurringSend RandomID: " + random,
+        contract_id: "CosmoRecurringSend ID: " + random.toString(),
         auto_msg: btoa(JSON.stringify({ auto_msg: {} })),
         msg: btoa(JSON.stringify(msg)),
         start_duration_at,
       }
     };
+    let fundAmount = convertDenomToMicroDenom(
+      autoExecData.funds,
+      6)
     console.log(transferMessage);
     const executeScheduledMessage = createExecuteMessage({
       message: transferMessage,
@@ -86,10 +90,8 @@ export const executeScheduledSend = async ({
       contractAddress: token.token_address,
       /* each native token needs to be added to the funds */
       funds: [{
-        denom: 'utrst', amount: convertDenomToMicroDenom(
-          autoExecData.funds,
-          6
-        ).toString()
+        denom: 'utrst', amount:
+          fundAmount.toString()
       }],
     })
 

@@ -30,8 +30,8 @@ import { ContractInfo, ContractInfoWithAddress } from 'trustlessjs'
 //   //aprValue: number
 //   // rewardsTokens?: ContractEntityType['rewards_tokens']
 // }
-/** ContractInfo stores a WASM contract instance */
-// export declare type ContractInfo = {
+/** contractInfo stores a WASM contract instance */
+// export declare type contractInfo = {
 //     codeId: string;
 //     creator: string;
 //     owner: string;
@@ -44,9 +44,9 @@ import { ContractInfo, ContractInfoWithAddress } from 'trustlessjs'
 //     endTime?: string;
 // };
 
-export declare type ContractInfoWithDetails = {
+export declare type contractInfoWithDetails = {
     contractAddress: string;
-    ContractInfo?: ContractInfo;
+    contractInfo?: ContractInfo;
     // balance: number;
     // isOwner: boolean;
 };
@@ -63,11 +63,11 @@ export const ContractCard = ({
     // execTime,
     // endTime,
     contractAddress,
-    ContractInfo,
+    contractInfo,
     // balance,
     // isOwner
 
-}: ContractInfoWithDetails) => {
+}: contractInfoWithDetails) => {
     // const hasProvidedLiquidity = Boolean(providedTotalLiquidity.tokenAmount)
 
     // const stakedTokenBalanceDollarValue = stakedLiquidity.provided.dollarValue
@@ -79,7 +79,7 @@ export const ContractCard = ({
     // const totalDollarValueLiquidityFormatted = formatCompactNumber(
     //     availableLiquidity.total.dollarValue
     // )
-    const isActive = ContractInfo.endTime && ContractInfo.endTime.seconds > ContractInfo.execTime.seconds;
+    const isActive = contractInfo.endTime && contractInfo.execTime && (contractInfo.endTime.seconds > contractInfo.execTime.seconds);
     return (
         <Link href={`/contracts/${contractAddress}`} passHref>
             <Card variant="secondary" active={isActive}>
@@ -97,18 +97,18 @@ export const ContractCard = ({
                                 alt={tokenB.symbol}
                             /> */}
                         </StyledDivForTokenLogos>
-                        {ContractInfo.contractId.length < 20 ? <StyledTextForTokenNames
+                        {contractInfo.contractId.length < 20 ? <StyledTextForTokenNames
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
                         >
-                            {ContractInfo.contractId}  {/*  <span /> {tokenB.symbol} */}
+                            {contractInfo.contractId} 
                         </StyledTextForTokenNames> : <StyledTextForTokenNames
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
                         >
-                            {ContractInfo.contractId.substring(0, 18) + ".."}  {/*  <span /> {tokenB.symbol} */}
+                            {contractInfo.contractId.substring(0, 18) + ".."}  
                         </StyledTextForTokenNames>}
                     </Column>
                 </CardContent>
@@ -122,12 +122,12 @@ export const ContractCard = ({
                             {isActive ? (
                                 <>
                                     <StyledSpanForHighlight>
-                                        ExecTime: {ContractInfo.execTime}{' '}
+                                        ExecTime: {contractInfo.execTime}{' '}
                                     </StyledSpanForHighlight>
-                                    EndTime {ContractInfo.endTime}
+                                    EndTime {contractInfo.endTime}
                                 </>
                             ) : (
-                                <>Creator: {ContractInfo.creator}</>
+                                <>Creator: {contractInfo.creator}</>
                             )}
                         </Text>
                     </Column>

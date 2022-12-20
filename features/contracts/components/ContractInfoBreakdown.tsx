@@ -1,4 +1,4 @@
-import { useTokenToTokenPrice } from 'features/swap'
+
 import {
     Button,
     ChevronIcon,
@@ -6,7 +6,7 @@ import {
     Divider,
     dollarValueFormatter,
     ImageForTokenLogo,
-    InfoIcon,WalletIcon,
+    InfoIcon, WalletIcon,
     Inline,
     Text,
     Tooltip,
@@ -18,11 +18,13 @@ import {
     __POOL_STAKING_ENABLED__,
 } from 'util/constants'
 import { ContractInfo, ContractInfoWithAddress } from 'trustlessjs'
-// import { SerializedRewardsContract } from '../../../queries/queryRewardsContracts'
-import { TokenInfo } from '../../../queries/usePoolsListQuery'
-import { PoolTokenValue } from '../../../queries/useQueryPools'
-import { formatCompactNumber } from '../../../util/formatCompactNumber'
-
+import { useRelativeTimestamp } from './../../liquidity/components/UnbondingLiquidityCard'
+import Long from 'long'
+import { Timestamp } from 'trustlessjs/dist/protobuf/google/protobuf/timestamp'
+import {
+    convertDenomToMicroDenom,
+    convertMicroDenomToDenom,
+} from 'util/conversion'
 
 type ContractInfoBreakdownProps = {
     contractInfo: ContractInfo,
@@ -37,7 +39,7 @@ type InfoHeaderProps = {
 }
 
 export const ContractInfoBreakdown = ({
-    contractInfo: ContractInfo,
+    contractInfo,
     contract,
     size = 'large',
 }: ContractInfoBreakdownProps) => {
@@ -46,9 +48,9 @@ export const ContractInfoBreakdown = ({
         return (
             <>
                 <InfoHeader
-                    codeId={ContractInfo.codeId}
-                    creator={ContractInfo.creator}
-                    contractId={ContractInfo.contractId}
+                    codeId={contractInfo.codeId}
+                    creator={contractInfo.creator}
+                    contractId={contractInfo.contractId}
                 />
                 <Inline
                     css={{
@@ -110,57 +112,82 @@ export const ContractInfoBreakdown = ({
     return (
         <>
             <InfoHeader
-                codeId={ContractInfo.codeId}
-                creator={ContractInfo.creator}
-                contractId={ContractInfo.contractId}
+                codeId={contractInfo.codeId}
+                creator={contractInfo.creator}
+                contractId={contractInfo.contractId}
             />
             <> <Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
-                        <Text variant="legend" color="secondary" align="left">
-                            Contract Address
-                        </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{contract} </Text>
-                        </Inline>
-                    </Column>
-                </Row> 
+                <Column gap={8} align="flex-start" justifyContent="flex-start">
+                    <Text variant="legend" color="secondary" align="left">
+                        Contract Address
+                    </Text>
+                    <Inline gap={2}>
+                        <Text variant="body">{contract} </Text>
+                    </Inline>
+                </Column>
+            </Row>
                 <Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
                         <Text variant="legend" color="secondary" align="left">
                             Creator
                         </Text>
                         <Inline gap={2}>
-                            <Text variant="body">{ContractInfo.owner} </Text>
+                            <Text variant="body">{contractInfo.owner} </Text>
                         </Inline>
-                    </Column>
-                </Row> <Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
                         <Text variant="legend" color="secondary" align="left">
                             Owner
                         </Text>
                         <Inline gap={2}>
-                            <Text variant="body">{ContractInfo.owner} </Text>
+                            <Text variant="body">{contractInfo.owner} </Text>
                         </Inline>
-                    </Column></Row>
-                {Number(ContractInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
+                    </Column>
+                </Row> 
+                {Number(contractInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
                     <Text variant="legend" color="secondary" align="left">
-                        Start Time
+                        End time
                     </Text>
                     <Inline gap={2}>
-                        <Text variant="body">{ContractInfo.startTime} </Text>
+                        <Text variant="body">{useRelativeTimestamp({ timestamp: Number(contractInfo.endTime.seconds) * 1000 })}</Text>
 
                     </Inline>
-                </Column>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
-                        <Text variant="legend" color="secondary" align="left">
-                            End Time
+                    {
+                        contractInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
+                            Start Time
                         </Text>
-                        <Inline gap={2}>
+                            <Inline gap={2}>
+                                <Text variant="body">{Number(contractInfo.startTime.seconds)}</Text>
 
-                            <Text variant="header">{ContractInfo.endTime} </Text>
-                        </Inline>
-                    </Column></Row>
+                            </Inline></>)
+                    }
+                    {
+                        contractInfo.interval && (<> <Text variant="legend" color="secondary" align="left">
+                            Interval
+                        </Text>
+                            <Inline gap={2}>
+                                <Text variant="body">{getDuration(Number(contractInfo.interval.seconds))}</Text>
+
+                            </Inline></>)
+                    }
+                </Column>
+                </Row>
                 )}
+
+
+                {contractInfo.execHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                    Execution History
+                </Text></Inline>
+                    {contractInfo.execHistory?.map(({ execFee, actualExecTime, scheduledExecTime }) => (
+                        <Column gap={2} align="flex-start" justifyContent="flex-start">
+
+                            <Column>
+                                <Text variant="body">At {useRelativeTimestamp({ timestamp: Number(scheduledExecTime.seconds) * 1000 })} </Text>
+                            </Column><Column>
+                                <Text variant="caption">Actual Time was {useRelativeTimestamp({ timestamp: Number(actualExecTime.seconds) * 1000 })}</Text> </Column><Column>
+                                <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
+                            </Column>
+
+                        </Column>
+                    ))}</Column></Row></>)}
                 {/*
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
                         <Text variant="legend" color="secondary" align="left">
@@ -218,7 +245,7 @@ function Row({ children }) {
 
 
 const InfoHeader = ({ codeId, creator, contractId }: InfoHeaderProps) => (
-    <Inline justifyContent="space-between" css={{ padding: '$16 0 $14' }}>
+    <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
         <Inline gap={6}>
             <Link href="/contracts" passHref>
                 <Button
@@ -245,11 +272,31 @@ const InfoHeader = ({ codeId, creator, contractId }: InfoHeaderProps) => (
                 </Inline>
             </Inline> */}
         </Inline>
-        <Text variant="legend" color="secondary" transform="lowercase">
+        {/*   <Text variant="legend" color="secondary" transform="lowercase">
             codeId: {codeId}
+        </Text> */}
+
+        {contractId.length < 20 ? <Text variant="legend" color="secondary" transform="lowercase">
+            Contract: {contractId}
         </Text>
-        <Text variant="legend" color="secondary" transform="lowercase">
-            contractId: {contractId}
-        </Text>
+            : <Text variant="legend" color="secondary" transform="lowercase">
+                Contract: {contractId.substring(0, 18) + ".."}
+            </Text>
+        }
+
     </Inline>
 )
+
+const getDuration = (seconds: number) => {
+    if ((seconds / 60 / 1000 / 24) > 1) {
+        return seconds / 60 + ' days'
+    }
+    else if ((seconds / 60 / 1000) > 1) {
+        return seconds / 60 + ' hours'
+    }
+    else if ((seconds / 60) > 1) {
+        return seconds / 60 + ' minutes'
+    }
+
+    return seconds + ' seconds'
+}

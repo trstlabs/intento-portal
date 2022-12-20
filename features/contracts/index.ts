@@ -1,4 +1,4 @@
-export { ContractInfosModule,ContractInfoBreakdown, TokenInfoCard } from './components'
+export { ContractInfosModule,ContractInfoBreakdown, TokenInfoCard, RecurringSendCard } from './components'
 
 export type { SortDirections, SortParameters } from './hooks/useSortContracts'
 export { useSortContracts } from './hooks/useSortContracts'

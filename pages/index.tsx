@@ -29,14 +29,14 @@ import {
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
-import { useContractInfos } from 'hooks/useContractInfo'
+import { useContractInfosMulti } from 'hooks/useContractInfo'
 import { ContractCard } from '../features/contracts/components/ContractCard'
 import { ContractInfosWithAcc } from '../features/contracts/hooks/useSortContracts'
 
 export default function Home() {
 
   const { address, key } = useRecoilValue(walletState)
-  const [contracts, isLoading] = useContractInfos(2)
+  const [contracts, isLoading] = useContractInfosMulti([Number(process.env.NEXT_PUBLIC_TIP20_CODE_ID), Number(process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_ID),])
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
   const infoArgs: ContractInfosWithAcc = { infos: contracts, address }
@@ -53,7 +53,8 @@ export default function Home() {
 
   const shouldShowFetchingState = isLoading && isSorting && !contracts?.length;
   const shouldRenderContracts = Boolean(contracts?.length)
-  function remove() {
+
+  function unpinKey() {
     localStorage.removeItem("vk" + address);
     location.reload()
   }
@@ -68,39 +69,41 @@ export default function Home() {
   return (
     <AppLayout>
       {pageHeaderContents}
-      {key ? <Card disabled variant="secondary"><><StyledDivForContractsGrid >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" css={{ padding: '$24 $24 $24 $24' }}>
+      {key ? <Card disabled variant="secondary"><><StyledDivForInfo >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
         {key.name}, Your Keychain Is All Set
-      </Text>   <Inline css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
-        label="Copy viewing key"
-        successLabel="Viewing key copied!"
-        ariaLabel="Copy viewing key"
-        value={localStorage.getItem("vk" + address)}
-      >
-        {({ copied, ...bind }) => (
-          <Button
-            variant="ghost"
-            size="huge"
-            icon={<IconWrapper icon={copied ? <Valid /> : <Copy />} />}
-            {...bind}
-          />
-        )}
-      </CopyTextTooltip>
+      </Text>  <Text variant="caption" css={{ padding: '$12 $12 $12 $12' }}>
+          Your keychain key is stored locally in your browser. You protect your data and can view private data with this keychain.
+        </Text>   <Inline css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
+          label="Copy viewing key"
+          successLabel="Viewing key copied!"
+          ariaLabel="Copy viewing key"
+          value={localStorage.getItem("vk" + address)}
+        >
+          {({ copied, ...bind }) => (
+            <Button
+              variant="ghost"
+              size="large"
+              icon={<IconWrapper size="big" icon={copied ? <Valid /> : <Copy />} />}
+              {...bind}
+            />
+          )}
+        </CopyTextTooltip>
           <Tooltip
             label="Unpin ViewingKey"
             aria-label="Unpin from browser instance"
           >
             <Button
-              onClick={remove}
-              variant="ghost"
-              size="huge"
-              icon={<IconWrapper icon={<Logout />} />}
+              onClick={unpinKey}
+              variant="menu"
+              size="large"
+              icon={<IconWrapper size="big" icon={<Logout />} />}
             />
           </Tooltip></Inline></div> : <Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
         {key.name}, Set a keyring to enjoy enhanced privacy
-      </Text>} <StyledPNG css={{ padding: '$24 $5 $24 $24' }} src="/keychain.png" /> </StyledDivForContractsGrid></></Card> :
-       <Card disabled variant="secondary"><Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
+      </Text>} <StyledPNG css={{ padding: '$24 $5 $12 $1' }} src="/keychain.png" /> </StyledDivForInfo></></Card> :
+        <Card disabled variant="secondary"><Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
           Connect a wallet
-        </Text></Card> 
+        </Text></Card>
       }
       {shouldShowFetchingState && (
         <>
@@ -113,7 +116,7 @@ export default function Home() {
           </Column>
         </>
       )}
-      {!isLoading && isSorting && address &&(<Column
+      {!isLoading && isSorting && address && (<Column
         justifyContent="center"
         align="center"
         css={{ paddingTop: '$24' }}
@@ -143,7 +146,7 @@ export default function Home() {
                   }) => (
                     <ContractCard
                       key={contractAddress}
-                      ContractInfo={ContractInfo}
+                      contractInfo={ContractInfo}
                       contractAddress={contractAddress}
                     />
                   )
@@ -183,7 +186,7 @@ export default function Home() {
           }) => (
             <ContractCard
               key={contractAddress}
-              ContractInfo={ContractInfo}
+              contractInfo={ContractInfo}
               contractAddress={contractAddress}
             />
           )
@@ -242,6 +245,14 @@ const StyledDivForContractsGrid = styled('div', {
     gridTemplateColumns: '1fr',
     rowGap: '$8',
   },
+})
+
+const StyledDivForInfo = styled('div', {
+  display: 'grid',
+  gridTemplateColumns: '1fr 1fr',
+  columnGap: '$3',
+  rowGap: '$8',
+
 })
 
 

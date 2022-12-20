@@ -1,5 +1,7 @@
 import { useTokenInfo, } from 'hooks/useTokenInfo'
-import { useContractBalance, useTip20Info } from 'hooks/useTip20Info'
+import { useContractBalance, useTip20Info, useTip20History } from 'hooks/useTip20Info'
+import dayjs, { Dayjs } from 'dayjs'
+import { maybePluralize } from 'util/maybePluralize'
 import {
     Button,
     Card,
@@ -18,6 +20,7 @@ import { ContractInfo } from 'trustlessjs'
 import { convertMicroDenomToDenom } from 'util/conversion'
 
 import { UnderlyingAssetRow } from '../../liquidity/components/UnderlyingAssetRow'
+import { useRelativeTimestamp } from '../../liquidity'
 type TokenInfoCardProps = {
     contractInfo: ContractInfo,
     contractAddress: any,
@@ -31,11 +34,14 @@ export const TokenInfoCard = ({
     // onClick,
 }: TokenInfoCardProps) => {
 
-    //const [{ key, address, client }] = useRecoilState(walletState)
 
-    const [refForCard, cardInteractionState] = useSubscribeInteractions()
+    //const [refForCard, cardInteractionState] = useSubscribeInteractions()
     //let balance = 0
     let { balance, isLoading } = useContractBalance(contractAddress)
+    let { tip20History, isTip20HistoryLoading } = useTip20History(contractAddress)
+
+    console.log(tip20History)
+
     // useEffect(() => {
     //     async function queryBalance() {
     //         balance = await queryTokenBalance({ tokenAddress: contractAddress, client, address })
@@ -45,24 +51,7 @@ export const TokenInfoCard = ({
 
     const tokenInfo = useTokenInfo(contractInfo.contractId.toUpperCase())
     const { tip20Info, isTip20Loading } = useTip20Info(contractAddress)
-    console.log(tip20Info)
-   /*  const denomBalance = convertMicroDenomToDenom(
-        balance,
-        tokenInfo.decimals
-    ) */
-    // const tip20supply = convertMicroDenomToDenom(
-    //     tip20Info.total_supply,
-    //     tokenInfo.decimals
-    //   )
-    //   const tokenAReserve = convertMicroDenomToDenom(
-    //     providedLiquidityReserve?.[0],
-    //     tokenA.decimals
-    //   )
 
-    //   const tokenBReserve = convertMicroDenomToDenom(
-    //     providedLiquidityReserve?.[1],
-    //     tokenB.decimals
-    //   )
 
     //   const providedLiquidityDollarValue = dollarValueFormatterWithDecimals(
     //     protectAgainstNaN(providedTotalLiquidity?.dollarValue) || '0.00',
@@ -71,7 +60,7 @@ export const TokenInfoCard = ({
 
     return (
         <Card
-            ref={refForCard}
+            //ref={refForCard}
             tabIndex={-1}
             role="button"
             variant={
@@ -86,55 +75,126 @@ export const TokenInfoCard = ({
                 <Text variant="hero">{contractInfo.contractId} </Text>
             </CardContent>
             <Divider offsetTop="$14" offsetBottom="$12" />
-            {tokenInfo && !isTip20Loading && (<CardContent>
-                <Text variant="legend" color="secondary" css={{ paddingBottom: '$12' }}>
-                    Underlying balance
-                </Text>
-                <Column gap={6} css={{ paddingBottom: '$16' }}>
-                    <UnderlyingAssetRow tokenInfo={tokenInfo} tokenAmount={convertMicroDenomToDenom(
-                        balance,
-                        tokenInfo.decimals
-                    )} />
-                     <Text variant="legend" color="secondary" css={{ paddingBottom: '$12' }}>
-                    Total Supply
-                </Text>
-                    <UnderlyingAssetRow tokenInfo={tokenInfo} tokenAmount={convertMicroDenomToDenom(tip20Info.total_supply,
-                        tokenInfo.decimals)} />
 
-                </Column>
-                {/* <Inline css={{ paddingBottom: '$12' }}>
-                    {balance != 0 && (
-                        <Button
-                            variant="secondary"
-                            size="large"
-                            state={cardInteractionState}
-                            css={{ width: '100%' }}
-                        // onClick={(e) => {
-                        //     e.stopPropagation()
-                        //     onClick?.()
-                        // }}
-                        >
-                            Manage Liquidity
-                        </Button>
-                    )}
-                    {balance == 0 && (
-                        <Button
-                            variant="primary"
-                            size="large"
-                            state={cardInteractionState}
-                            css={{ width: '100%' }}
-                        // onClick={(e) => {
-                        //     e.stopPropagation()
-                        //     onClick?.()
-                        // }}
-                        >
-                            Add Liquidity
-                        </Button>
-                    )}
-                </Inline> */}
-            </CardContent>)}
-        </Card>
+            {
+                tokenInfo && !isTip20Loading && (<CardContent>
+                    <Text variant="legend" color="secondary" css={{ paddingBottom: '$5' }}>
+                        Underlying balance
+                    </Text>
+                    <Column gap={6} css={{ paddingBottom: '$16' }}>
+                        <UnderlyingAssetRow tokenInfo={tokenInfo} tokenAmount={convertMicroDenomToDenom(
+                            balance,
+                            tokenInfo.decimals
+                        )} />
+                        {tip20Info && (tip20Info.total_supply != null) && (<> <Text variant="legend" color="secondary" css={{ paddingTop: '$5' }}>
+                            Total Supply
+                        </Text>
+                            <UnderlyingAssetRow tokenInfo={tokenInfo} tokenAmount={convertMicroDenomToDenom(tip20Info.total_supply,
+                                tokenInfo.decimals)} /></>)}
+
+                    </Column>
+
+                </CardContent>
+
+
+                )
+            }
+            <Divider offsetTop="$14" offsetBottom="$12" />
+            {tip20History && !isTip20HistoryLoading && (<> <CardContent><Text variant="legend" color="secondary" css={{ paddingBottom: '$5' }}>
+                Your History
+            </Text> </CardContent>
+                <CardContent>
+
+                    {tip20History.txs?.map(({ id, action, amount, memo, block_time }) => (
+
+                        <Card css={{ margin: '$8 $1 $2', padding: '$8 $6 $4' }}>
+                            <> <Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                TX ID: {id}
+                            </Text>
+                                {memo && <Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                    Memo: {memo}
+                                </Text>}
+                                <Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                    Execution Time: {relativeTime(Number(block_time) / 1000/1000)}
+                                </Text>
+                                {action.transfer && (<Column><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                    Action: Transfer
+                                </Text><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        From: {action.transfer.from}
+                                    </Text><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        Recipient: {action.transfer.recipient}
+
+                                    </Text></Column>)}
+                                {action.ibc_transfer && (<Column><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                    Action: IBC Transfer
+                                </Text><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        From: {action.transfer.from}
+                                    </Text><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        Info: {memo}
+                                    </Text></Column>)}
+                                {action.instantiate && (<Column><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                    Action: Instantiate (With Allowance)
+                                </Text><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        From: {action.instantiate.owner}
+                                    </Text>
+                                    <Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        Created Contract: {action.instantiate.contract_address}
+                                    </Text><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
+                                        Given contract allowance:  <UnderlyingAssetRow tokenInfo={tokenInfo} tokenAmount={convertMicroDenomToDenom(amount,
+                                            tokenInfo.decimals)} />
+                                    </Text></Column>)}
+                                <Divider offsetTop="$8" offsetBottom="$6" />
+                                <UnderlyingAssetRow tokenInfo={tokenInfo} tokenAmount={convertMicroDenomToDenom(amount,
+                                    tokenInfo.decimals)} />
+                            </>
+                        </Card>
+
+                    ))} </CardContent>
+            </>)
+            }
+
+        </Card >
 
     )
 
+}
+
+const relativeTime = (timestamp) => {
+    /* parse the actual dates */
+    const date = dayjs(timestamp)
+    console.log(date)
+    const now = dayjs()
+
+    const hoursLeft = date.diff(now, 'hours')
+
+    /* more than a day */
+    if (hoursLeft > 24) {
+        const daysLeft = date.diff(now, 'days')
+        const hoursLeftAfterDays = Math.round(24 * ((hoursLeft / 24) % 1.0))
+
+        return `${hoursLeftAfterDays > 0
+            ? `${maybePluralize(daysLeft, 'day')} and `
+            : ''
+            } ${maybePluralize(hoursLeftAfterDays, 'hour')}`
+    }
+
+    /* less than 24 hours left but not less than an hour */
+    if (hoursLeft < 24 && hoursLeft > 1) {
+        return maybePluralize(hoursLeft, 'hour')
+    }
+
+    const minsLeft = date.diff(now, 'minutes')
+
+    if (minsLeft > 0) {
+        /* less than an hour */
+        return maybePluralize(minsLeft, 'minute')
+    }
+
+    const secondsLeft = date.diff(now, 'seconds')
+
+    if (secondsLeft > 0) {
+        return 'less than a minute'
+    }
+    
+    return date.toDate().toLocaleString()
 }

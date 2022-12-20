@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 import { ContractInfoWithAddress, QueryContractsByCodeResponse } from 'trustlessjs'
 
 
-import { getContractInfo, getContractInfos } from '../services/swap'
+import { getContractInfo, getContractInfos } from '../services/contracts'
 import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
 import { useTrustlessChainClient } from './useTrustlessChainClient'
 
@@ -19,7 +19,7 @@ export const useContractInfo = (contract) => {
             return infoObject.ContractInfo
         },
         {
-            //enabled: Boolean(contract == ''),
+            enabled: Boolean(client && contract),
             refetchOnMount: 'always',
             refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
             refetchIntervalInBackground: true,
@@ -39,17 +39,15 @@ export const useContractInfos = (codeId: number) => {
             return infoList.contractInfos
         },
         {
-            enabled: Boolean(codeId != 0),
+            enabled: Boolean(codeId != 0 && client),
             refetchOnMount: 'always',
             refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
             refetchIntervalInBackground: true,
         },
     )
-    if (!isLoading) {
-        return [data, isLoading] as const
-    } else {
-        return [data, isLoading] as const
-    }
+
+    return [data, isLoading] as const
+
 
 }
 
@@ -57,27 +55,28 @@ export const useContractInfos = (codeId: number) => {
 
 export const useContractInfosMulti = (codeIds: Array<number>) => {
     const client = useTrustlessChainClient()
-    let contracts: ContractInfoWithAddress[]
-    const {  isLoading } = useQuery(
+
+    const { data, isLoading } = useQuery(
         ['codeIds', codeIds],
         async () => {
+            let contracts = []
             for (let codeId of codeIds) {
                 let infoList = await getContractInfos(codeId, client)
-                contracts.concat(infoList.contractInfos)
+                console.log(infoList)
+                contracts = contracts.concat(infoList.contractInfos)
                 //return infoList.contractInfos
             }
+            return contracts
         },
         {
-            enabled: Boolean(codeIds.length != 0),
+            enabled: Boolean(codeIds[0] != 0 && client),
             refetchOnMount: 'always',
             refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
-            refetchIntervalInBackground: true,
+            refetchIntervalInBackground: false,
         },
     )
-    if (!isLoading) {
-        return [contracts, isLoading] as const
-    } else {
-        return [contracts, isLoading] as const
-    }
+    console.log(data)
+    return [data, isLoading] as const
+
 
 }

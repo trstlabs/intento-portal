@@ -82,7 +82,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
       }
     },
     {
-      enabled: Boolean(tokenSymbol && status === WalletStatusType.connected),
+      enabled: Boolean(tokenSymbol && status === WalletStatusType.connected && client),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
