@@ -50,7 +50,7 @@ export const RecipientList = ({
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ tokenSymbol, recipientInfos: recipients, })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
-    useScheduledTx({ tokenSymbol, recipientInfos: recipients, autoExecData})
+    useScheduledTx({ tokenSymbol, recipientInfos: recipients, autoExecData })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -172,7 +172,7 @@ export const RecipientList = ({
   const [
     { isShowing: isScheduleDialogShowing, actionType },
     setScheduleDialogState,
-  ] = useState({ isShowing: false, actionType: 'occurrence' as 'occurrence' | 'recurrence' })
+  ] = useState({ isShowing: false, actionType: 'recurrence' as 'recurrence' | "occurrence" })
 
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
@@ -254,9 +254,9 @@ export const RecipientList = ({
           </div>))
         }
       </Card>
-      <Card css={{ margin: '$6', }} variant="secondary" disabled >
-        <CardContent size="large" css={{ padding: '$4', marginTop: '$4', }}>
-          <Text align="center"
+      {recipients[0].recipient && recipients[0].recipient.length == 44 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+        <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
+          <Text align="left"
             variant="header">
             Recipients</Text>
 
@@ -268,16 +268,16 @@ export const RecipientList = ({
 
           <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
             <div key={index}>      <Text>
-              {(recipient.amount != "" || recipient.recipient != "") && (<ul>
-                <li>Recipient: <span >{recipient.recipient}</span></li>
-                <li>Amount: <span > {recipient.amount}</span></li>
-                <li>Channel ID: <span >{recipient.channel_id}</span></li>
-                <li>Memo: <span >{recipient.memo}</span></li>
+              {(recipient.amount != 0) && (<ul>
+                <Text>Recipient {index + 1}: <i >{recipient.recipient}</i></Text>
+                <Text>Amount: <i > {recipient.amount}</i></Text>
+                {recipient.channel_id && (<Text>Channel ID: <i >{recipient.channel_id}</i></Text>)}
+                {recipient.memo && (<Text>Memo: <i >{recipient.memo}</i></Text>)}
               </ul>)}</Text>
             </div>
           </CardContent>
         ))}
-      </Card>
+      </Card>)}
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
         <Button css={{ marginRight: '$4' }}
           variant="primary"
@@ -307,13 +307,14 @@ export const RecipientList = ({
         </Button>
       </Inline>
       <ScheduleDialog
+        label="Recurring Send"
         execData={autoExecData}
         isShowing={isScheduleDialogShowing}
         initialActionType={actionType}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,
-            actionType: 'occurrence',
+            actionType: 'recurrence',
           })
         }
         handleSchedule={(execData) => handleScheduleButtonClick(execData)}

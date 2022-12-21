@@ -8,52 +8,48 @@ import {
   validateTransactionSuccess,
 } from '../../util/messages'
 import { convertDenomToMicroDenom } from 'util/conversion'
-import { RecipientInfo } from './executeSendDirect'
 
-type ExecuteScheduledSendArgs = {
-  token: TokenInfo
+
+type ExecuteCostAverageArgs = {
+  swapDirection: 'tokenAtoTokenB' | 'tokenBtoTokenA'
+  tokenAmount: number
+  price: number
+  slippage: number
   senderAddress: string
-  recipientInfos: RecipientInfo[]
+  swapAddress: string
+  tokenA: TokenInfo
   autoExecData: AutoExecData
   client: TrustlessChainClient
 }
 
-export const executeScheduledSend = async ({
-  token,
-  client,
-  recipientInfos,
+export const executeCostAverage = async ({
+  tokenA,
+  swapDirection,
+  swapAddress,
+  slippage,
+  price,
+  tokenAmount,
   autoExecData,
   senderAddress,
-}: ExecuteScheduledSendArgs): Promise<any> => {
-
+  client,
+}: ExecuteCostAverageArgs): Promise<any> => {
+  const minToken = Math.floor(price * (1 - slippage))
 
   //if token
-  if (!token.native) {
+  if (!tokenA.native) {
 
     let totalRecurrenceAmount = 0
-    let scheduledRecipients = [];
-    recipientInfos.forEach(recipient => {
-
-      let scheduledRecipient = new RecipientInfoForContract()
-      scheduledRecipient.recipient = recipient.recipient
-      scheduledRecipient.recurrence_amount = recipient.amount.toString()
-      if (recipient.memo != undefined) {
-        scheduledRecipient.memo = recipient.memo
-      }
-      scheduledRecipients.push(scheduledRecipient)
-      totalRecurrenceAmount = totalRecurrenceAmount + Number(recipient.amount);
-      if (recipient.channel_id == undefined) {
-        recipient.channel_id = ''
-      }
-    });
 
     let random = crypto.randomUUID();
 
     let allowanceForProxyContract = autoExecData.recurrences * totalRecurrenceAmount;
     let msg = {
       owner: senderAddress,
-      recipient_info: scheduledRecipients,
-      token_code_hash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH,
+      input_token: swapDirection === 'tokenAtoTokenB' ? '0' : '1',
+      input_token_amount: `${tokenAmount}`,
+      input_token_contract: tokenA.token_address,
+      input_token_hash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH,
+      return_min_token: `${minToken}`,
       timeout: '60',
       keyring: {
         contract: process.env.NEXT_PUBLIC_KEYRING_ADDR,
@@ -70,11 +66,11 @@ export const executeScheduledSend = async ({
     let transferMessage = {
       instantiate_with_allowance: {
         max_allowance: allowanceForProxyContract.toString(),
-        code_id: Number(process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_ID),
-        code_hash: process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_HASH,
+        code_id: Number(process.env.NEXT_PUBLIC_RECURRINGSWAP_CODE_ID),
+        code_hash: process.env.NEXT_PUBLIC_RECURRINGSWAP_CODE_HASH,
         duration: autoExecData.duration + "ms",
         interval: autoExecData.interval + "ms",
-        contract_id: "CosmoRecurringSend ID: " + random.toString(),
+        contract_id: "CosmoCostAverage ID: " + random.toString(),
         auto_msg: btoa(JSON.stringify({ auto_msg: {} })),
         msg: btoa(JSON.stringify(msg)),
         start_duration_at,
@@ -87,7 +83,7 @@ export const executeScheduledSend = async ({
     const executeScheduledMessage = createExecuteMessage({
       message: transferMessage,
       senderAddress,
-      contractAddress: token.token_address,
+      contractAddress: tokenA.token_address,
       /* each native token needs to be added to the funds */
       funds: [{
         denom: 'utrst', amount:
@@ -107,13 +103,6 @@ export const executeScheduledSend = async ({
     `native token sending is not integrated (yet)`
   )
 
-}
-
-export class RecipientInfoForContract {
-  recipient: string;
-  recurrence_amount: string;
-  channel_id: string;
-  memo: string;
 }
 
 export class AutoExecData {

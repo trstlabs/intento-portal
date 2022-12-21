@@ -102,7 +102,7 @@ echo "ETH address: '$eth_addr'"
 echo "Deploying ATOM..."
 
 export TX_HASH=$(
-    docker exec localtrst-localtrst-1 trstd tx compute instantiate $token_code_id '{"admin": "'$deployer_address'", "symbol": "TATOM", "decimals": 18, "initial_balances": [{"address": "'$deployer_address'", "amount": "100000000000000000000000"}], "prng_seed": "YWE=", "name": "test", "config":{"public_total_supply":true,"enable_deposit":true,"enable_redeem":true}, "keyring": {"contract": '$keyring_contract', "code_hash":'$keyring_code_hash'}}' --from $deployer_name -b block   --gas 3000000 --fees 500utrst --gas 1500000 --contract_id TATOM -b block -y |
+    docker exec localtrst-localtrst-1 trstd tx compute instantiate $token_code_id '{"admin": "'$deployer_address'", "symbol": "TATOM", "decimals": 18, "initial_balances": [{"address": "'$deployer_address'", "amount": "10000000000000000000000"}], "prng_seed": "YWE=", "name": "test", "config":{"public_total_supply":true,"enable_deposit":true,"enable_redeem":true}, "keyring": {"contract": '$keyring_contract', "code_hash":'$keyring_code_hash'}}' --from $deployer_name -b block   --gas 3000000 --fees 500utrst --gas 1500000 --contract_id TATOM -b block -y |
     jq -r .txhash
 )
 wait_for_tx "$TX_HASH" "Waiting for tx to finish on-chain..."
@@ -115,7 +115,7 @@ echo "ATOM address: '$atom_addr'"
 echo "Deploying TRST..."
 
 export TX_HASH=$(
-    docker exec localtrst-localtrst-1 trstd tx compute instantiate $token_code_id '{"admin": "'$deployer_address'", "symbol": "TTRST", "decimals": 6, "initial_balances": [{"address": "'$deployer_address'", "amount": "200000000000000000000000"}], "prng_seed": "YWE=", "name": "test","config":{"public_total_supply":true,"enable_deposit":true,"enable_redeem":true}, "keyring": {"contract": '$keyring_contract', "code_hash":'$keyring_code_hash'}}' --from $deployer_name -b block   --gas 3000000 --fees 500utrst --gas 1500000 --contract_id TTRST -b block -y |
+    docker exec localtrst-localtrst-1 trstd tx compute instantiate $token_code_id '{"admin": "'$deployer_address'", "symbol": "TTRST", "decimals": 6, "initial_balances": [{"address": "'$deployer_address'", "amount": "100000000000000000000000"}], "prng_seed": "YWE=", "name": "test","config":{"public_total_supply":true,"enable_deposit":true,"enable_redeem":true}, "keyring": {"contract": '$keyring_contract', "code_hash":'$keyring_code_hash'}}' --from $deployer_name -b block   --gas 3000000 --fees 500utrst --gas 1500000 --contract_id TTRST -b block -y |
     jq -r .txhash
 )
 wait_for_tx "$TX_HASH" "Waiting for tx to finish on-chain..."
@@ -127,7 +127,7 @@ echo "TTRST address: '$trst_addr'"
 echo "Deploying TOSMO..."
 
 export TX_HASH=$(
-    docker exec localtrst-localtrst-1 trstd tx compute instantiate $token_code_id '{"admin": "'$deployer_address'", "symbol": "TOSMO", "decimals": 8, "initial_balances": [{"address": "'$deployer_address'", "amount": "10000000000000"}], "prng_seed": "YWE=", "name": "test","config":{"public_total_supply":true,"enable_deposit":true,"enable_redeem":true},  "keyring": {"contract": '$keyring_contract', "code_hash":'$keyring_code_hash' }}' --from $deployer_name -b block   --gas 3000000 --fees 500utrst --gas 1500000 --contract_id TOSMO -b block -y |
+    docker exec localtrst-localtrst-1 trstd tx compute instantiate $token_code_id '{"admin": "'$deployer_address'", "symbol": "TOSMO", "decimals": 8, "initial_balances": [{"address": "'$deployer_address'", "amount": "1000000000000000"}], "prng_seed": "YWE=", "name": "test","config":{"public_total_supply":true,"enable_deposit":true,"enable_redeem":true},  "keyring": {"contract": '$keyring_contract', "code_hash":'$keyring_code_hash' }}' --from $deployer_name -b block   --gas 3000000 --fees 500utrst --gas 1500000 --contract_id TOSMO -b block -y |
     jq -r .txhash
 )
 wait_for_tx "$TX_HASH" "Waiting for tx to finish on-chain..."

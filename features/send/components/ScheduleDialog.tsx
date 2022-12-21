@@ -31,6 +31,7 @@ export class AutoExecData {
 
 type ScheduleDialogProps = {
     isShowing: boolean
+    label: String
     execData: AutoExecData
     initialActionType: 'occurrence' | 'recurrence'
     onRequestClose: () => void
@@ -39,6 +40,7 @@ type ScheduleDialogProps = {
 
 export const ScheduleDialog = ({
     isShowing,
+    label,
     execData,
     initialActionType,
     onRequestClose,
@@ -102,7 +104,7 @@ export const ScheduleDialog = ({
     return (
         <Dialog isShowing={isShowing} onRequestClose={onRequestClose}>
             <DialogHeader paddingBottom={canSchedule ? '$8' : '$12'}>
-                <Text variant="header">Schedule Execution</Text>
+                <Text variant="header">Schedule {label}</Text>
             </DialogHeader>
 
             {canSchedule && (
@@ -122,7 +124,7 @@ export const ScheduleDialog = ({
 
             <DialogContent>
                 <Text variant="body" css={{ paddingBottom: '$2' }}>
-                    Set the {isOccurrence ? 'occurrence' : 'recurrence'}
+                Set the {isOccurrence ? 'occurrence' : 'recurrence'}.  Schedule time-based actions easily with just one click.
                 </Text>
             </DialogContent>
 
@@ -179,7 +181,7 @@ export const ScheduleDialog = ({
                         {isLoading ? (
                             <Spinner instant={true} size={16} />
                         ) : (
-                            <>Schedule {isOccurrence ? 'One-Time' : 'Recurring'} AutoExecution</>
+                            <>Schedule {label}</>
                         )}
                     </Button>
                 }

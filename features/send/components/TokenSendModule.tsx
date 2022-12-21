@@ -107,5 +107,5 @@ const ConnectorStyleProps = {
 
 const StyledDivForWrapper = styled('div', {
   borderRadius: '16px',
-  backgroundColor: '$colors$dark10',
+  backgroundColor: '$backgroundColors$base !important',
 })

@@ -115,7 +115,7 @@ const StyledDivForPopover = styled('div', {
   borderRadius: '$2',
   display: 'flex',
   flexDirection: 'column',
-  rowGap: '13px',
+  rowGap: '12px',
   border: '1px solid $borderColors$default',
 })
 
