@@ -11,19 +11,19 @@ import {
 import React from 'react'
 import { getPropsForInteractiveElement } from 'util/getPropsForInteractiveElement'
 
-type SelectorToggleProps = {
+type TokenSelectorToggleProps = {
   isSelecting: boolean
   onToggle: () => void
   tokenSymbol: string
   availableAmount: number
 }
 
-export const SelectorToggle = ({
+export const TokenSelectorToggle = ({
   isSelecting,
   onToggle,
   availableAmount,
   tokenSymbol,
-}: SelectorToggleProps) => {
+}: TokenSelectorToggleProps) => {
   const { logoURI } = useTokenInfo(tokenSymbol) || {}
 
   const formattedAvailableAmount = formatTokenBalance(availableAmount, {

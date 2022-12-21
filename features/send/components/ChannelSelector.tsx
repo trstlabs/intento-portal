@@ -32,7 +32,7 @@ export const ChannelSelector = ({
   const wrapperRef = useRef<HTMLDivElement>()
   const inputRef = useRef<HTMLInputElement>()
 
-  const [isTokenListShowing, setTokenListShowing] = useState(false)
+  const [isChannelListShowing, setChannelListShowing] = useState(false)
 
 
   const [chainLogoURI, setChainLogoURI] = useState('')
@@ -44,11 +44,11 @@ export const ChannelSelector = ({
     setChainName(name)
     onChange({ channel: selectedChannel })
     
-    setTokenListShowing(false)
+    setChannelListShowing(false)
   }
 
   useOnClickOutside([wrapperRef], () => {
-    setTokenListShowing(false)
+    setChannelListShowing(false)
   })
 
   if (size === 'small') {
@@ -56,22 +56,22 @@ export const ChannelSelector = ({
       <StyledDivForContainer
         ref={wrapperRef}
       >
-        {!isTokenListShowing && (
+        {!isChannelListShowing && (
           <Inline css={{ padding: '$6 $4', display: 'grid' }}>
             <ChannelSelectorToggle
               channel={channel}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
-              isSelecting={isTokenListShowing}
+              isSelecting={isChannelListShowing}
               onToggle={
                 !disabled
-                  ? () => setTokenListShowing((isShowing) => !isShowing)
+                  ? () => setChannelListShowing((isShowing) => !isShowing)
                   : undefined
               }
             />
           </Inline>
         )}
-        {isTokenListShowing && (
+        {isChannelListShowing && (
           <ChannelOptionsList
             activeChannel={channel}
             onSelect={(slct) => handleSelectChannel(slct.channel,slct.logoURI,slct.name)}
@@ -92,15 +92,15 @@ export const ChannelSelector = ({
       <StyledDivForWrapper>
         <StyledDivForSelector>
          
-          {!isTokenListShowing && (
+          {!isChannelListShowing && (
             <ChannelSelectorToggle
               channel={channel}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
-              isSelecting={isTokenListShowing}
+              isSelecting={isChannelListShowing}
               onToggle={
                 !disabled
-                  ? () => setTokenListShowing((isShowing) => !isShowing)
+                  ? () => setChannelListShowing((isShowing) => !isShowing)
                   : undefined
               }
             />
@@ -108,7 +108,7 @@ export const ChannelSelector = ({
          
         </StyledDivForSelector>
         <StyledDivForAmountWrapper>
-          {isTokenListShowing && (
+          {isChannelListShowing && (
             <Button css={{ padding: '$0 $0 $0' }}
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
@@ -121,8 +121,8 @@ export const ChannelSelector = ({
         <StyledDivForOverlay
           onClick={() => {
             if (!readOnly) {
-              if (isTokenListShowing) {
-                setTokenListShowing(false)
+              if (isChannelListShowing) {
+                setChannelListShowing(false)
               } else {
                 inputRef.current?.focus()
               }
@@ -130,7 +130,7 @@ export const ChannelSelector = ({
           }}
         />
       </StyledDivForWrapper>
-      {isTokenListShowing && (
+      {isChannelListShowing && (
         <ChannelOptionsList
           activeChannel={channel}
           onSelect={(slct) => handleSelectChannel(slct.channel,slct.logoURI,slct.name)}

@@ -152,7 +152,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
-      <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
+     {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"
           target="__blank"
@@ -175,7 +175,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           {process.env.NEXT_PUBLIC_PRICE_LINK_LABEL}
         </Button>
-      </Link>
+      </Link> 
       <Link
         href={`${process.env.NEXT_PUBLIC_KADO_LINK_URL}${status === WalletStatusType.connected ? `&onToAddress=${address}` : ''
           }`}
@@ -192,7 +192,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           {process.env.NEXT_PUBLIC_KADO_LINK_LABEL}
         </Button>
-      </Link>
+      </Link>*/}
     </StyledListForLinks>
   )
 

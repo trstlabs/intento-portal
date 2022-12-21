@@ -11,6 +11,7 @@ import {
 import React, { useEffect, useReducer } from 'react'
 import { TokenSwapModule } from 'features/swap'
 import { APP_NAME } from '../../util/constants'
+import { DexSelector } from '../../features/swap/components'
 
 function getInitialTokenPairFromSearchParams() {
   const params = new URLSearchParams(location.search)
@@ -31,8 +32,8 @@ export default function Swap() {
       <StyledContainer>
         <PageHeader
           title="Swap"
-          subtitle={`Swap between your favorite assets on ${APP_NAME}.`}
-        />
+          subtitle={`Swap between your favorite Cosmos assets on ${APP_NAME}.`}
+        /><DexSelector/>
         <TokenSwapModule
           initialTokenPair={getInitialTokenPairFromSearchParams()}
         />

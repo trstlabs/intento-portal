@@ -17,8 +17,8 @@ import { formatCurrency } from '../../../util/formatCompactNumber'
 import { ConvenienceBalanceButtons } from '../../swap/components/ConvenienceBalanceButtons'
 import { QueryInput } from '../../swap/components/QueryInput'
 import { SelectorInput } from '../../swap/components/SelectorInput'
-import { SelectorToggle } from '../../swap/components/SelectorToggle'
-import { TokenOptionsList } from '../../swap/components/TokenOptionsList'
+import { SelectorToggle } from '../../swap/components/TokenSelectorToggle'
+import { TokenOptionsList } from '../../swap/components/SelectorOptionsList'
 
 type ContractInfosProps = {
   readOnly?: boolean
