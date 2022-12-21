@@ -16,8 +16,9 @@ import { formatCurrency } from '../../../util/formatCompactNumber'
 import { ConvenienceBalanceButtons } from './ConvenienceBalanceButtons'
 import { QueryInput } from './QueryInput'
 import { SelectorInput } from './SelectorInput'
-import { SelectorToggle } from './SelectorToggle'
-import { TokenOptionsList } from './TokenOptionsList'
+import { TokenSelectorToggle } from './TokenSelectorToggle'
+import { DexSelectorToggle } from './DexSelectorToggle'
+import { TokenOptionsList } from './SelectorOptionsList'
 
 type TokenSelectorProps = {
   readOnly?: boolean
@@ -89,7 +90,7 @@ export const TokenSelector = ({
         )}
         {!isTokenListShowing && (
           <Inline css={{ padding: '$6 $4', display: 'grid' }}>
-            <SelectorToggle
+            <TokenSelectorToggle
               availableAmount={availableAmount}
               tokenSymbol={tokenSymbol}
               isSelecting={isTokenListShowing}
@@ -166,7 +167,7 @@ export const TokenSelector = ({
             />
           )}
           {!isTokenListShowing && (
-            <SelectorToggle
+            <TokenSelectorToggle
               availableAmount={availableAmount}
               tokenSymbol={tokenSymbol}
               isSelecting={isTokenListShowing}

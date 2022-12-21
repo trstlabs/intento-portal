@@ -1,49 +1,82 @@
 import { useQuery } from 'react-query'
+import { ContractInfoWithAddress, QueryContractsByCodeResponse } from 'trustlessjs'
 
-import { getContractInfo, getContractInfos } from '../services/swap'
+
+import { getContractInfo, getContractInfos } from '../services/contracts'
 import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
 import { useTrustlessChainClient } from './useTrustlessChainClient'
 
 
 
-export const useContractInfo = (contractAddress: string) => {
+export const useContractInfo = (contract) => {
     const client = useTrustlessChainClient()
     const { data, isLoading } = useQuery(
-        ['contractInfo', contractAddress],
+        ['contract', contract],
         async () => {
-            const infoObject = await getContractInfo(contractAddress, client)
 
-            return infoObject
+            const infoObject = await getContractInfo(contract, client)
+            console.log(infoObject.ContractInfo)
+            return infoObject.ContractInfo
         },
         {
-            enabled: Boolean(contractAddress != ''),
+            enabled: Boolean(client && contract),
             refetchOnMount: 'always',
             refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
             refetchIntervalInBackground: true,
         }
     )
-
     return [data, isLoading] as const
 }
 
 
-export const useContractInfos = (code: number) => {
+export const useContractInfos = (codeId: number) => {
     const client = useTrustlessChainClient()
     const { data, isLoading } = useQuery(
-        ['code', code],
+        ['codeId', codeId],
         async () => {
-            const infoList = await getContractInfos(code, client)
-
-            return infoList
+            const infoList = await getContractInfos(codeId, client)
+            console.log(infoList)
+            return infoList.contractInfos
         },
         {
-            enabled: Boolean(code != 0),
+            enabled: Boolean(codeId != 0 && client),
             refetchOnMount: 'always',
             refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
             refetchIntervalInBackground: true,
-        }
+        },
     )
 
     return [data, isLoading] as const
+
+
 }
 
+
+
+export const useContractInfosMulti = (codeIds: Array<number>) => {
+    const client = useTrustlessChainClient()
+
+    const { data, isLoading } = useQuery(
+        ['codeIds', codeIds],
+        async () => {
+            let contracts = []
+            for (let codeId of codeIds) {
+                let infoList = await getContractInfos(codeId, client)
+                console.log(infoList)
+                contracts = contracts.concat(infoList.contractInfos)
+                //return infoList.contractInfos
+            }
+            return contracts
+        },
+        {
+            enabled: Boolean(codeIds[0] != 0 && client),
+            refetchOnMount: 'always',
+            refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+            refetchIntervalInBackground: false,
+        },
+    )
+    console.log(data)
+    return [data, isLoading] as const
+
+
+}

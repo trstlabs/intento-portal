@@ -38,7 +38,8 @@ export const executeAddLiquidity = async ({
     add_liquidity: {
       token1_amount: `${tokenAAmount}`,
       max_token2: `${maxTokenBAmount}`,
-    },
+      min_liquidity: `${0}`,
+    }
   }
 
   if (!tokenA.native || !tokenB.native) {
@@ -80,7 +81,7 @@ export const executeAddLiquidity = async ({
     return validateTransactionSuccess(
       await client.signAndBroadcast(
         [...increaseAllowanceMessages, executeAddLiquidityMessage],
-
+        { gasLimit:  Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE)}
       )
     )
   }

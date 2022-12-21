@@ -10,6 +10,7 @@ export type TokenInfo = {
   logoURI: string
   denom: string
   native: boolean
+  channel?: string
 }
 
 export type TokenInfoWithReward = TokenInfo & {

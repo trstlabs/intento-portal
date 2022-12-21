@@ -1,9 +1,17 @@
-import { media, styled, useMedia } from 'junoblocks'
+import { media, styled, useControlTheme, useMedia } from 'junoblocks'
 import { APP_MAX_WIDTH, MAIN_PANE_MAX_WIDTH } from 'util/constants'
 
 import { ExtensionSidebar } from './ExtensionSidebar'
 import { FooterBar } from './FooterBar'
 import { NavigationSidebar } from './NavigationSidebar'
+
+import { useCallback } from "react";
+import type { Container, Engine } from "tsparticles-engine";
+import Particles from "react-particles";
+import { loadFull } from "tsparticles";
+import { useRecoilValue } from 'recoil'
+import { particleState } from '../../state/atoms/particlesAtoms'
+
 
 export const AppLayout = ({
   navigationSidebar = <NavigationSidebar />,
@@ -13,7 +21,21 @@ export const AppLayout = ({
 }) => {
   const isSmallScreen = useMedia('sm')
   const isMediumScreen = useMedia('md')
+  const themeController = useControlTheme()
+  let isConfetti = useRecoilValue(particleState)
+  
+  const particlesInit = useCallback(async (engine: Engine) => {
 
+    // you can initialize the tsParticles instance (engine) here, adding custom shapes or presets
+    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
+    // starting from v2 you can add only the features you need reducing the bundle size
+    await loadFull(engine);
+
+  }, []);
+
+  const particlesLoaded = useCallback(async (container: Container | undefined) => {
+    await console.log(container);
+  }, []);
   if (isSmallScreen) {
     return (
       <StyledWrapperForMobile>
@@ -31,13 +53,18 @@ export const AppLayout = ({
   }
 
   return (
-    <StyledWrapper>
+    <StyledWrapper>{isConfetti && (<Particles id="tsparticles" url={"/confetti.json"} init={particlesInit} loaded={particlesLoaded} />)}
       {navigationSidebar}
+      <StyledContainer >
+        <main>{!isConfetti && themeController.theme.name == "dark" && (<Particles
+        id="tsparticles" style={{ zIndex: -1 }}
+        init={particlesInit}
+        loaded={particlesLoaded}
+        url={"/stars_bg.json"} />)}
 
-      <StyledContainer>
-        <main>{children}</main>
+          <StyledChildren> {children}</StyledChildren></main>
       </StyledContainer>
-
+      
       {!isMediumScreen && extensionSidebar}
     </StyledWrapper>
   )
@@ -55,6 +82,14 @@ const StyledWrapper = styled('div', {
   [media.md]: {
     gridTemplateColumns: '15rem 1fr',
   },
+})
+
+
+const StyledChildren = styled('div', {
+  backgroundColor: '$backgroundColors$base !important',
+  position: 'relative',
+  zIndex: 1,
+  paddingLeft: '$12',
 })
 
 const StyledContainer = styled('div', {

@@ -1,4 +1,5 @@
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
+import { maybePluralize } from 'util/maybePluralize'
 import {
   usePoolPairTokenAmount,
   usePoolTokensDollarValue,
@@ -14,7 +15,7 @@ import {
   Text,
 } from 'junoblocks'
 import { useQuery } from 'react-query'
-import { maybePluralize } from 'util/maybePluralize'
+
 
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
 
@@ -136,12 +137,14 @@ export const UnbondingLiquidityCard = ({
   )
 }
 
-const useRelativeTimestamp = ({ timestamp }) => {
+export const useRelativeTimestamp = ({ timestamp }) => {
   return useQuery(
     `time/${timestamp}`,
     () => {
+
       /* parse the actual dates */
       const date = dayjs(timestamp)
+
       const now = dayjs()
 
       const hoursLeft = date.diff(now, 'hours')
@@ -153,9 +156,9 @@ const useRelativeTimestamp = ({ timestamp }) => {
 
         return `${
           hoursLeftAfterDays > 0
-            ? `${maybePluralize(hoursLeftAfterDays, 'hour')} and `
+            ? `${maybePluralize(daysLeft, 'day')} and `
             : ''
-        } ${maybePluralize(daysLeft, 'day')}`
+        } ${maybePluralize(hoursLeftAfterDays, 'hour')}`
       }
 
       /* less than 24 hours left but not less than an hour */
@@ -176,7 +179,7 @@ const useRelativeTimestamp = ({ timestamp }) => {
         return 'less than a minute'
       }
 
-      return 'now'
+      return date.toDate().toLocaleString()
     },
     {
       refetchIntervalInBackground: true,
@@ -184,3 +187,5 @@ const useRelativeTimestamp = ({ timestamp }) => {
     }
   ).data
 }
+
+
