@@ -46,7 +46,7 @@ export const AppWalletInfo = ({ css, depositing }: WalletInfoProps) => {
   return (
     <WalletInfo
       css={css}
-      label={`${depositing ? 'To ' : ''}${APP_NAME}`}
+      label={`${depositing ? 'To ' : ''} Trustless Hub`}
       icon={<IconWrapper color="secondary" size="big" icon={<Logo />} />}
       address={walletAddress}
     />

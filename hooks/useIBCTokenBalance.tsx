@@ -37,5 +37,5 @@ export const useIBCTokenBalance = (tokenSymbol) => {
     }
   )
 
-  return { balance, isLoading: isLoading }
+  return { balance, isLoading}
 }

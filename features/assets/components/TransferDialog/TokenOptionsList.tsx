@@ -1,5 +1,5 @@
 import { TokenSelectList } from 'components'
-import { useIBCAssetList } from 'hooks/useIbcAssetList'
+import { useIBCAssetList } from 'hooks/useIBCAssetList'
 
 export const TokenOptionsList = ({
   activeTokenSymbol,

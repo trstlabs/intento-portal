@@ -11,6 +11,11 @@ export const getTokenInfoFromTokenList = (
   tokenSymbol: string,
   tokensList: Array<TokenInfo>
 ): TokenInfo | undefined => tokensList?.find((x) => x.symbol === tokenSymbol)
+
+export const getNativeTokenInfoFromTokenList = (
+  denom: string,
+  tokensList: Array<TokenInfo>
+): TokenInfo | undefined => tokensList?.find((x) => x.denom === denom)
 /* /token selector functions */
 
 /* returns a selector for getting multiple tokens info at once */
@@ -43,4 +48,11 @@ export const useTokenInfo = (tokenSymbol: string) => {
 export const useBaseTokenInfo = () => {
   const [tokenList] = useTokenList()
   return useMemo(() => getBaseTokenFromTokenList(tokenList), [tokenList])
+}
+
+
+/* hook for token info retrieval based on `denom` */
+export const useNativeTokenInfo = (denom: string) => {
+  const [tokenList] = useTokenList()
+  return useMemo(() => getNativeTokenInfoFromTokenList(denom, tokenList?.tokens), [tokenList])
 }

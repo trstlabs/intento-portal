@@ -60,7 +60,7 @@ export const passThroughTokenSwap = async ({
     return validateTransactionSuccess(
       await client.signAndBroadcast(
         [increaseAllowanceMessage, executeMessage],
-
+        { gasLimit:  Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE)}
       )
     )
   }

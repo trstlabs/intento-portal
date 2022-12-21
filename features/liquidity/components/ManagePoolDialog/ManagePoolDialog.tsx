@@ -255,6 +255,7 @@ function RemoveLiquidityContent({
   onChangeLiquidity,
 }) {
   const [tokenAPrice] = useTokenDollarValue(tokenA.symbol)
+
   const percentageInputRef = useRef<HTMLInputElement>()
 
   useEffect(() => {

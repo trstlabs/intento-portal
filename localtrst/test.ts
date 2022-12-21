@@ -178,9 +178,9 @@ beforeAll(async () => {
         codeId: contracts.tip20.codeId,
         codeHash: contracts.tip20.codeHash,
         msg: {
-          name: "pTRST",
+          name: "TTRST",
           admin: accounts1[0].address,
-          symbol: "PTRST",
+          symbol: "TTRST",
           decimals: 6,
           initial_balances: [{ address: accounts1[0].address, amount: "1000" }],
           prng_seed: "eW8=",

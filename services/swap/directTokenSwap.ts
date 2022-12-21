@@ -79,11 +79,12 @@ export const directTokenSwap = async ({
       message: tokenMessage,
     })
     let result = await client.signAndBroadcast([executeMessage, increaseAllowanceMessage
-    ]
+    ],      { gasLimit:  Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE)}
     )
 
     return validateTransactionSuccess(
-      result
+      result,
+
     )
   }
   let result = await client.tx.compute.executeContract({
@@ -97,7 +98,7 @@ export const directTokenSwap = async ({
   })
   console.log(result)
   return validateTransactionSuccess(
-    result
+    result,
   )
 
 }

@@ -18,14 +18,13 @@ export const createIncreaseAllowanceMessage = ({
   return new MsgExecuteContract({
     sender: senderAddress,
     contract: tokenAddress,
-    msg: toUtf8(
-      JSON.stringify({
-        increase_allowance: {
-          amount: `${tokenAmount}`,
-          spender: `${swapAddress}`,
-        },
-      })
-    ),
+    msg: {
+      increase_allowance: {
+        amount: `${tokenAmount}`,
+        spender: `${swapAddress}`,
+      }
+    },
     funds: [],
-  })
+  }
+  )
 }

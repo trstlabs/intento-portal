@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { IBCAssetInfo, useIBCAssetList } from './useIbcAssetList'
+import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
 
 export const getIBCAssetInfoFromList = (
   assetSymbol: string,

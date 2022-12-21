@@ -10,7 +10,8 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { directTokenSwap, passThroughTokenSwap } from 'services/swap'
 import {
   TransactionStatus,
@@ -20,6 +21,7 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
+import { particleState } from '../../../state/atoms/particlesAtoms'
 import { formatCompactNumber } from '../../../util/formatCompactNumber'
 import { slippageAtom, tokenSwapAtom } from '../swapAtoms'
 import { useTokenToTokenPrice } from './useTokenToTokenPrice'
@@ -31,6 +33,8 @@ type UseTokenSwapArgs = {
   tokenAmount: number
 }
 
+
+
 export const useTokenSwap = ({
   tokenASymbol,
   tokenBSymbol,
@@ -41,6 +45,8 @@ export const useTokenSwap = ({
   const slippage = useRecoilValue(slippageAtom)
   const setTokenSwap = useSetRecoilState(tokenSwapAtom)
 
+  const [_, popConfetti] = useRecoilState(particleState)
+ 
   const tokenA = useTokenInfo(tokenASymbol)
   const tokenB = useTokenInfo(tokenBSymbol)
   const refetchQueries = useRefetchQueries(['tokenBalance'])
@@ -132,6 +138,10 @@ export const useTokenSwap = ({
           />
         ))
 
+
+        popConfetti(true)
+        setTimeout( () => popConfetti(false), 3000)
+
         setTokenSwap(([tokenA, tokenB]) => [
           {
             ...tokenA,
@@ -141,6 +151,7 @@ export const useTokenSwap = ({
         ])
 
         refetchQueries()
+
       },
       onError(e) {
         const errorMessage = formatSdkErrorMessage(e)
@@ -171,3 +182,5 @@ export const useTokenSwap = ({
     }
   )
 }
+
+

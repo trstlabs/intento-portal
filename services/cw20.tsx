@@ -74,8 +74,6 @@ export const CW20 = (client: TrustlessChainClient): CW20Contract => {
       })
     }
 
-
-
     const tokenInfo = async (): Promise<CW20TokenInfo> => {
       return client.query.compute.queryContractPrivateState({ contractAddress, codeHash: process.env.NEXT_PUBLIC_TIP20_CODE_HASH, query: { token_info: {} } })
     }

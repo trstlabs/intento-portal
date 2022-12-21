@@ -6,12 +6,14 @@ import {
   Column,
   Discord,
   Divider,
+  DoubleArrowIcon,
   FeedbackIcon,
   Github,
   IconWrapper,
   Inline,
   media,
   MoonIcon,
+  SharesIcon,
   styled,
   Telegram,
   Text,
@@ -22,6 +24,7 @@ import {
   UpRightArrow,
   useControlTheme,
   useMedia,
+  
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -97,10 +100,21 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={<TransferIcon />}
+          iconLeft={<SharesIcon />}
           selected={getIsLinkActive('/')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Dashboard</Inline>
+        </Button>
+      </Link>
+      <Link href="/send" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<TransferIcon />}
+          selected={getIsLinkActive('/send')}
+        >
+          <Inline css={{ paddingLeft: '$4' }}>Send</Inline>
         </Button>
       </Link>
       <Link href="/swap" passHref>
@@ -119,7 +133,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={<TransferIcon />}
+          iconLeft={< DoubleArrowIcon rotation="-90deg"/>}
           selected={getIsLinkActive('/transfer')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
@@ -128,6 +142,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       <Link href="/pools" passHref>
         <Button
           as="a"
+          // disabled="true"
           variant="menu"
           size="large"
           iconLeft={<PoolsIcon />}
@@ -137,7 +152,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
-      <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
+     {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"
           target="__blank"
@@ -160,7 +175,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           {process.env.NEXT_PUBLIC_PRICE_LINK_LABEL}
         </Button>
-      </Link>
+      </Link> 
       <Link
         href={`${process.env.NEXT_PUBLIC_KADO_LINK_URL}${status === WalletStatusType.connected ? `&onToAddress=${address}` : ''
           }`}
@@ -177,7 +192,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           {process.env.NEXT_PUBLIC_KADO_LINK_LABEL}
         </Button>
-      </Link>
+      </Link>*/}
     </StyledListForLinks>
   )
 
@@ -349,7 +364,6 @@ const StyledWrapper = styled('div', {
   flexDirection: 'column',
   justifyContent: 'space-between',
   padding: '0 $8',
-  backgroundColor: '$backgroundColors$base',
   overflow: 'auto',
   borderRight: '1px solid $borderColors$inactive',
   position: 'sticky',
@@ -374,6 +388,7 @@ const StyledWrapperForMobile = styled('div', {
 
 const StyledMenuContainer = styled('div', {
   display: 'flex',
+  backgroundColor: '$backgroundColors$base',
   flexDirection: 'column',
   position: 'relative',
   zIndex: '$2',

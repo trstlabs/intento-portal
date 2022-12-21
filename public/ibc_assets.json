@@ -1,7 +1,7 @@
 {
   "tokens": [
     {
-      "id": "cosmos",
+      "id": "Cosmos Hub",
       "name": "Atom",
       "symbol": "ATOM",
       "chain_id": "cosmoshub-4",
@@ -14,7 +14,7 @@
       "logoURI": "https://cryptologos.cc/logos/cosmos-atom-logo.svg?v=014"
     },
     {
-      "id": "circleusd",
+      "id": "Circle Consumer Chain",
       "name": "USDC",
       "symbol": "USDC",
       "chain_id": "circle-1",
@@ -24,8 +24,21 @@
       "channel": "channel-20",
       "trst_channel": "channel-7",
       "trst_denom": "ibc/test",
-      "logoURI": "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=014",
-      "external_deposit_uri": "http://localhost:3000"
+      "logoURI": "https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=014"
+    },
+    {
+      "id": "Axelar",
+      "name": "Axelar",
+      "symbol": "WETH",
+      "chain_id": "axelar-1",
+      "rpc": "https://cosmoshub.validator.network:443",
+      "denom": "uusdc",
+      "decimals": 6,
+      "channel": "channel-10000000",
+      "trst_channel": "channel-200000",
+      "trst_denom": "ibc/test",
+      "logoURI": "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=002",
+      "external_deposit_uri": "https://satellite.money/"
     }
   ]
 }
