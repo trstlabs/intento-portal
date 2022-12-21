@@ -45,7 +45,7 @@ export const useTokenSwap = ({
   const slippage = useRecoilValue(slippageAtom)
   const setTokenSwap = useSetRecoilState(tokenSwapAtom)
 
-  const [isConfetti, popConfetti] = useRecoilState(particleState)
+  const [_, popConfetti] = useRecoilState(particleState)
  
   const tokenA = useTokenInfo(tokenASymbol)
   const tokenB = useTokenInfo(tokenBSymbol)
@@ -140,7 +140,7 @@ export const useTokenSwap = ({
 
 
         popConfetti(true)
-        setTimeout( () => popConfetti(false), 5000)
+        setTimeout( () => popConfetti(false), 3000)
 
         setTokenSwap(([tokenA, tokenB]) => [
           {

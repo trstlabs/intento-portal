@@ -10,7 +10,7 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { AutoExecData, executeDirectSend, executeScheduledSend, RecipientInfo } from '../../../services/send'
 import {
     TransactionStatus,
@@ -22,6 +22,7 @@ import { useTokenToTokenPrice } from './useTokenToTokenPrice'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { executeCostAverage } from '../../../services/swap/executeCostAverage'
 import { slippageAtom, tokenSwapAtom } from '../swapAtoms'
+import { particleState } from '../../../state/atoms/particlesAtoms'
 
 type UseCostAveragingArgs = {
     tokenASymbol: string
@@ -40,8 +41,8 @@ export const useCostAveraging = ({
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const slippage = useRecoilValue(slippageAtom)
-    // const setTokenSwap = useSetRecoilState(tokenSwapAtom)
-
+    const [_, popConfetti] = useRecoilState(particleState)
+    
     const tokenA = useTokenInfo(tokenASymbol)
     const tokenB = useTokenInfo(tokenBSymbol)
     const refetchQueries = useRefetchQueries(['tokenBalance'])
@@ -60,7 +61,6 @@ export const useCostAveraging = ({
             }
 
             setTransactionState(TransactionStatus.EXECUTING)
-
             const tokenAmount = convertDenomToMicroDenom(
                 providedTokenAmount,
                 tokenA.decimals
@@ -131,7 +131,8 @@ export const useCostAveraging = ({
                         onClose={() => toast.dismiss(t.id)}
                     />
                 ))
-
+                popConfetti(true)
+                setTimeout( () => popConfetti(false), 3000)
                 refetchQueries()
             },
             onError(e) {

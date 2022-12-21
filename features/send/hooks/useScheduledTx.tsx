@@ -10,7 +10,7 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
 import { AutoExecData, executeDirectSend, executeScheduledSend, RecipientInfo } from '../../../services/send'
 import {
     TransactionStatus,
@@ -20,6 +20,7 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
+import { particleState } from '../../../state/atoms/particlesAtoms'
 
 type UseTokenSendArgs = {
     tokenSymbol: string
@@ -34,7 +35,7 @@ export const useScheduledTx = ({
 }: UseTokenSendArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
-
+    const [_, popConfetti] = useRecoilState(particleState)
     const token = useTokenInfo(tokenSymbol)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
@@ -94,7 +95,8 @@ export const useScheduledTx = ({
                         onClose={() => toast.dismiss(t.id)} 
                     />
                 ))
-
+                popConfetti(true)
+                setTimeout( () => popConfetti(false), 3000)
                 refetchQueries()
             },
             onError(e) {
