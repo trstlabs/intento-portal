@@ -127,13 +127,13 @@
           "token_address": "trust1gv07846a3867ezn3uqkk082c5ftke7hpkzxfnr",
           "symbol": "TOSMO",
           "name": "OSMO (TIP20)",
-          "decimals": 6,
+          "decimals": 8,
           "logoURI": "https://app.osmosis.zone/_next/image?url=%2Ftokens%2Fosmo.svg&w=128&q=75",
           "native": false,
           "denom": "utosmo"
-        }
+        } 
       ],
-      "swap_address": "trust1vs2vuks65rq7xj78mwtvn7vvnm2gn7adax86ef"
+      "swap_address": "trust19n7rdc3djhctsrnf2l042ugk0y9gml3tpax538"
     }
   ],
   "version": {

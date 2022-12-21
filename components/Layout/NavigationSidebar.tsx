@@ -364,7 +364,6 @@ const StyledWrapper = styled('div', {
   flexDirection: 'column',
   justifyContent: 'space-between',
   padding: '0 $8',
-  backgroundColor: '$backgroundColors$base',
   overflow: 'auto',
   borderRight: '1px solid $borderColors$inactive',
   position: 'sticky',
@@ -389,6 +388,7 @@ const StyledWrapperForMobile = styled('div', {
 
 const StyledMenuContainer = styled('div', {
   display: 'flex',
+  backgroundColor: '$backgroundColors$base',
   flexDirection: 'column',
   position: 'relative',
   zIndex: '$2',

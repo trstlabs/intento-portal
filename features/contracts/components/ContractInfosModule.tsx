@@ -41,43 +41,11 @@ export const ContractInfosModule = () => {
         // }
     }, [contractList])
 
-    //   const initialTokenPairValue = useRef(initialTokenPair).current
-    //   useEffect(
-    //     function setInitialTokenPairIfProvided() {
-    //       if (initialTokenPairValue) {
-    //         const [tokenASymbol, tokenBSymbol] = initialTokenPairValue
-    //         setTokenSwapState([
-    //           {
-    //             tokenSymbol: tokenASymbol,
-    //             amount: 0,
-    //           },
-    //           {
-    //             tokenSymbol: tokenBSymbol,
-    //             amount: 0,
-    //           },
-    //         ])
-    //       }
-    //     },
-    //     [initialTokenPairValue, setTokenSwapState]
-    //   )
     
     const isUiDisabled =
         transactionStatus === TransactionStatus.EXECUTING || isContractListLoading
     const uiSize = useMedia('sm') ? 'small' : 'large'
 
-    //   /* fetch token to token price */
-    //   const [{ price: tokenPrice }, isPriceLoading] = useTokenToTokenPrice({
-    //     tokenASymbol: tokenA?.tokenSymbol,
-    //     tokenBSymbol: tokenB?.tokenSymbol,
-    //     tokenAmount: tokenA?.amount || 0,
-    //   })
-
-    //   const handleSwapTokenPositions = () => {
-    //     setTokenSwapState([
-    //       tokenB ? { ...tokenB, amount: tokenPrice } : tokenB,
-    //       tokenA ? { ...tokenA, amount: tokenB.amount } : tokenA,
-    //     ])
-    //   }
 
     return (
         <>
@@ -90,23 +58,9 @@ export const ContractInfosModule = () => {
                     disabled={isUiDisabled}
                     size={uiSize}
                 />
-                {/* <TransactionTips
-          disabled={isUiDisabled}
-          onTokenSwaps={handleSwapTokenPositions}
-          size={uiSize}
-        />
-        <TokenSelector
-          readOnly
-          tokenSymbol={tokenB.tokenSymbol}
-          amount={tokenPrice}
-          onChange={(updatedTokenB) => {
-            setTokenSwapState([tokenA, updatedTokenB])
-          }}
-          disabled={isUiDisabled}
-          size={uiSize}
-        /> */}
+              
             </StyledDivForWrapper>
-            {/* <TransactionAction isPriceLoading={isPriceLoading} size={uiSize} /> */}
+
         </>
     )
 }

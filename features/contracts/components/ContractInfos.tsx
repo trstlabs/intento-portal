@@ -11,14 +11,8 @@ import {
 } from 'junoblocks'
 import { useContractInfos } from 'hooks/useContractInfo'
 import React, { useRef, useState } from 'react'
-import { useTokenDollarValue } from '../../../hooks/useTokenDollarValue'
-import { formatCurrency } from '../../../util/formatCompactNumber'
 
-import { ConvenienceBalanceButtons } from '../../swap/components/ConvenienceBalanceButtons'
 import { QueryInput } from '../../swap/components/QueryInput'
-import { SelectorInput } from '../../swap/components/SelectorInput'
-import { SelectorToggle } from '../../swap/components/TokenSelectorToggle'
-import { TokenOptionsList } from '../../swap/components/SelectorOptionsList'
 
 type ContractInfosProps = {
   readOnly?: boolean
@@ -276,7 +270,7 @@ const StyledDivForOverlay = styled('div', {
   width: '100%',
   height: '100%',
   zIndex: 0,
-  backgroundColor: '$colors$dark0',
+  backgroundColor: '$backgroundColors$base !important',
   transition: 'background-color .1s ease-out',
   variants: {
     interactive: {
