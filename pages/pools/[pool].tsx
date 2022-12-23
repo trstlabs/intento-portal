@@ -1,43 +1,34 @@
 import { AppLayout, NavigationSidebar } from 'components'
 import {
- // BondLiquidityDialog,
   LiquidityBreakdown,
-  LiquidityRewardsCard,
-  ManageBondedLiquidityCard,
   ManageLiquidityCard,
   ManagePoolDialog,
-  UnbondingLiquidityStatusList,
 } from 'features/liquidity'
-import { useRefetchQueries } from 'hooks/useRefetchQueries'
+
 // import { useClaimRewards, usePendingRewards } from 'hooks/useRewardsQueries'
 import {
   Button,
   ChevronIcon,
   Column,
-  Error,
-  IconWrapper,
   Inline,
   media,
   Spinner,
   styled,
   Text,
-  Toast,
-  UpRightArrow,
   useMedia,
-  Valid,
 } from 'junoblocks'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useQueryPoolLiquidity } from 'queries/useQueryPools'
 import React, { useState } from 'react'
-import { toast } from 'react-hot-toast'
+
 import {
   // __POOL_REWARDS_ENABLED__,
   // __POOL_STAKING_ENABLED__,
   APP_NAME,
 } from 'util/constants'
-import { formatSdkErrorMessage } from 'util/formatSdkErrorMessage'
+
 
 export default function Pool() {
   const {
@@ -49,7 +40,7 @@ export default function Pool() {
     setManageLiquidityDialogState,
   ] = useState({ isShowing: false, actionType: 'add' as 'add' | 'remove' })
 
-  const [isBondingDialogShowing, setIsBondingDialogShowing] = useState(false)
+ // const [isBondingDialogShowing, setIsBondingDialogShowing] = useState(false)
 
   const isMobile = useMedia('sm')
   const [pool, isLoading, isError] = useQueryPoolLiquidity({ poolId })

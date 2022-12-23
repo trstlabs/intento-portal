@@ -18,23 +18,21 @@ import {
   Telegram,
   Text,
   ToggleSwitch,
-  TreasuryIcon,
   Twitter,
   UnionIcon,
   UpRightArrow,
   useControlTheme,
   useMedia,
-  
+
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { ReactNode, useState } from 'react'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { TrustlessChainClient, TxResultCode } from 'trustlessjs'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
-import { useSetKeyring } from '../../hooks/useSetKeyring'
-import { Analytics } from '../../icons/Analytics'
-import { Dollar } from '../../icons/Dollar'
+// import { setKeyring } from '../../hooks/useSetKeyring'
 import { SwapIcon } from '../../icons/Swap'
 import { TransferIcon } from '../../icons/Transfer'
 import { ConnectedWalletButton } from '../ConnectedWalletButton'
@@ -45,11 +43,11 @@ type NavigationSidebarProps = {
   backButton?: ReactNode
 }
 
+
 export function NavigationSidebar(_: NavigationSidebarProps) {
   const { mutate: connectWallet } = useConnectWallet()
 
-  const [{ key, address, status, client }, setWalletState] = useRecoilState(walletState)
-
+  const [{ key, address, client }, setWalletState] = useRecoilState(walletState)
 
   const themeController = useControlTheme()
 
@@ -68,6 +66,9 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     localStorage.removeItem("vk" + address);
     location.reload()
   }
+  async function connectKeyring() {
+    setKeyring(address, client)
+  }
 
   const walletButton = (
     <ConnectedWalletButton
@@ -82,7 +83,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   const keyringButton = (
     <SetKeyringButton
       connected={Boolean(key?.name)}
-      onConnect={() => useSetKeyring(address, client)}
+      onConnect={() => connectKeyring()}
       css={{ marginBottom: '$8' }}
       onRemove={() => remove()
       }
@@ -133,7 +134,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           as="a"
           variant="menu"
           size="large"
-          iconLeft={< DoubleArrowIcon rotation="-90deg"/>}
+          iconLeft={< DoubleArrowIcon rotation="-90deg" />}
           selected={getIsLinkActive('/transfer')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
@@ -152,7 +153,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
-     {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
+      {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"
           target="__blank"
@@ -356,6 +357,63 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   )
 }
 
+
+
+async function setKeyring(address: string, client: TrustlessChainClient) {
+
+  if (!client) {
+    console.log("sadgfsadf")
+  }
+  try {
+
+    let vk = localStorage.getItem("vk" + address);
+    if (vk != undefined) {
+      try {
+        await client.query.compute.queryContractPrivateState({ contractAddress: process.env.NEXT_PUBLIC_KEYRING_ADDR, codeHash: process.env.NEXT_PUBLIC_KEYRING_CODE_HASH, query: { balance: { key: vk, address: address } } })
+      } catch (e) {
+        console.log(e)
+        localStorage.removeItem("vk" + address)
+        alert("Setting viewing key failed")
+      }
+    } else {
+      vk = prompt(
+        `Please specify a viewing key for this address to continue.`
+      )
+      console.log(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
+      let resp = await client.tx.compute.executeContract({
+        sender: address,
+        contract: process.env.NEXT_PUBLIC_KEYRING_ADDR,
+        codeHash: process.env.NEXT_PUBLIC_KEYRING_CODE_HASH,
+        msg: {
+          set_viewing_key: {
+            key: vk,
+          },
+        },
+
+      }, {
+        gasLimit: +process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM
+      })
+      console.log(resp)
+      if (resp.code !== TxResultCode.Success) {
+        console.error(resp.rawLog);
+        alert("Broadcasting viewing key failed");
+        return;
+      };
+      localStorage.setItem("vk" + address, vk);
+      location.reload()
+    }
+
+  } catch (e) {
+    console.log("Error setting keyring")
+    /* throw the error for the UI */
+    throw e
+  }
+
+
+}
+
+
+
 const StyledWrapper = styled('div', {
   flexBasis: '16.5rem',
   flexGrow: 0,
@@ -438,3 +496,4 @@ const buttonIconCss = {
     color: '$iconColors$tertiary',
   },
 }
+

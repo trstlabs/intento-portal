@@ -1,7 +1,7 @@
 import { TrustlessChainClient, } from 'trustlessjs'
 import { coin } from '@cosmjs/stargate'
 import {
-  toBase64, toHex,
+  toBase64,
   toUtf8,
 } from "@cosmjs/encoding";
 import { TokenInfo } from '../../queries/usePoolsListQuery'
@@ -79,7 +79,7 @@ export const directTokenSwap = async ({
       message: tokenMessage,
     })
     let result = await client.signAndBroadcast([executeMessage, increaseAllowanceMessage
-    ],      { gasLimit:  Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE)}
+    ], { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
     )
 
     return validateTransactionSuccess(

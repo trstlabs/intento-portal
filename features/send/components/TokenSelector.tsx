@@ -6,17 +6,12 @@ import {
   styled,
   Union,
   useOnClickOutside,
-  Text,
-  Column,
+
 } from 'junoblocks'
 import React, { useRef, useState } from 'react'
-import { useTokenDollarValue } from '../../../hooks/useTokenDollarValue'
-import { formatCurrency } from '../../../util/formatCompactNumber'
+
 import { QueryInput } from '../../swap/components/QueryInput'
 
-import { ConvenienceBalanceButtons } from './ConvenienceBalanceButtons'
-
-import { SelectorInput } from './SelectorInput'
 import { SelectorToggle } from './SelectorToggle'
 import { TokenOptionsList } from './TokenOptionsList'
 
@@ -44,7 +39,7 @@ export const TokenSelector = ({
   const { balance: availableAmount } = useTokenBalance(tokenSymbol)
   const [tokenSearchQuery, setTokenSearchQuery] = useState('')
   const [isInputForSearchFocused, setInputForSearchFocused] = useState(false)
-  const [isInputForAmountFocused, setInputForAmountFocused] = useState(false)
+  const [isInputForAmountFocused, _] = useState(false)
 
   const shouldShowConvenienceBalanceButtons = Boolean(
     !isTokenListShowing && tokenSymbol && !readOnly && availableAmount > 0
@@ -54,7 +49,7 @@ export const TokenSelector = ({
     onChange( selectedTokenSymbol)
     setTokenListShowing(false)
   }
-  const [tokenDollarValue] = useTokenDollarValue(tokenSymbol)
+ // const [tokenDollarValue] = useTokenDollarValue(tokenSymbol)
 
   useOnClickOutside([wrapperRef], () => {
     setTokenListShowing(false)

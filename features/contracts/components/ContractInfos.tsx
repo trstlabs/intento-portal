@@ -1,4 +1,3 @@
-import { useTokenBalance } from 'hooks/useTokenBalance'
 import {
   Button,
   IconWrapper,
@@ -6,10 +5,7 @@ import {
   styled,
   Union,
   useOnClickOutside,
-  Text,
-  Column,
 } from 'junoblocks'
-import { useContractInfos } from 'hooks/useContractInfo'
 import React, { useRef, useState } from 'react'
 
 import { QueryInput } from '../../swap/components/QueryInput'
@@ -17,31 +13,29 @@ import { QueryInput } from '../../swap/components/QueryInput'
 type ContractInfosProps = {
   readOnly?: boolean
   disabled?: boolean
-  codeId: number
+  // codeId: number
   onChange: (token: { codeId;  }) => void
   size?: 'small' | 'large'
 }
 
 export const ContractInfos = ({
   readOnly,
-  disabled,
-  codeId,
-  onChange,
+  // codeId,
   size = 'large',
 }: ContractInfosProps) => {
   const wrapperRef = useRef<HTMLDivElement>()
   const inputRef = useRef<HTMLInputElement>()
-  const infos = useContractInfos(codeId)
+  // const infos = useContractInfos(codeId)
   const [isContractListShowing, setContractListShowing] = useState(false)
 
   // const { balance: availableAmount } = useTokenBalance(tokenSymbol)
   const [tokenSearchQuery, setTokenSearchQuery] = useState('')
   const [isInputForSearchFocused, setInputForSearchFocused] = useState(false)
-  const [isInputForAmountFocused, setInputForAmountFocused] = useState(false)
+  const [isInputForAmountFocused, _] = useState(false)
 
-  const shouldShowConvenienceBalanceButtons = Boolean(
-    !isContractListShowing && infos && !readOnly
-  )
+  // const shouldShowConvenienceBalanceButtons = Boolean(
+  //   !isContractListShowing && infos && !readOnly
+  // )
 
   // const handleAmountChange = (amount) => onChange({ tokenSymbol, amount })
   // const handleSelectToken = (selectedTokenSymbol) => {
@@ -301,24 +295,3 @@ const StyledDivForContainer = styled('div', {
   },
 })
 
-const StyledInlineForInputWrapper = styled('div', {
-  borderRadius: '$4',
-  transition: 'box-shadow .1s ease-out',
-  display: 'flex',
-  alignItems: 'center',
-
-  variants: {
-    selected: selectedVariantForInputWrapper,
-
-    rendersButtons: {
-      true: {
-        justifyContent: 'space-between',
-        padding: '$10 $12',
-      },
-      false: {
-        justifyContent: 'flex-end',
-        padding: '$13 $12',
-      },
-    },
-  },
-})

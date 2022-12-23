@@ -11,7 +11,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { AutoExecData, executeDirectSend, executeScheduledSend, RecipientInfo } from '../../../services/send'
+import { AutoExecData, executeScheduledSend, RecipientInfo } from '../../../services/send'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -46,15 +46,16 @@ export const useScheduledTx = ({
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            let convertedInfos = [new RecipientInfo()]
+            let convertedInfos: RecipientInfo[] = recipientInfos;
             setTransactionState(TransactionStatus.EXECUTING)
-            
-            recipientInfos.forEach((recipient, index) => {
-                convertedInfos[index].recipient = recipient.recipient
-                convertedInfos[index].channel_id = recipient.channel_id
-                convertedInfos[index].memo = recipient.memo
+            console.log(recipientInfos)
+            console.log(convertedInfos)
+            recipientInfos.forEach((field, index) => {
+                convertedInfos[index].recipient = field.recipient
+                convertedInfos[index].channel_id = field.channel_id
+                convertedInfos[index].memo = field.memo
                 convertedInfos[index].amount = convertDenomToMicroDenom(
-                    recipient.amount,
+                    field.amount,
                     token.decimals
                 )
             })
@@ -73,8 +74,8 @@ export const useScheduledTx = ({
                 console.log(data)
                 let contractAddress = data.arrayLog.find(
                     (log) =>
-                      log.key == "contract_address"
-                  ).value;
+                        log.key == "contract_address"
+                ).value;
                 console.log(contractAddress)
                 toast.custom((t) => (
                     <Toast
@@ -83,20 +84,20 @@ export const useScheduledTx = ({
                         body={`Scheduled to send ${token.symbol} recurringly!} Your contract address for this is ${contractAddress}`}
                         buttons={
                             <Button
-                              as="a"
-                              variant="ghost"
-                              href={`/contracts/${contractAddress}`}
-                              target="__blank"
-                              iconRight={<UpRightArrow />}
+                                as="a"
+                                variant="ghost"
+                                href={`/contracts/${contractAddress}`}
+                                target="__blank"
+                                iconRight={<UpRightArrow />}
                             >
-                              Go to your contract
+                                Go to your contract
                             </Button>
-                          }
-                        onClose={() => toast.dismiss(t.id)} 
+                        }
+                        onClose={() => toast.dismiss(t.id)}
                     />
                 ))
                 popConfetti(true)
-                setTimeout( () => popConfetti(false), 3000)
+                setTimeout(() => popConfetti(false), 3000)
                 refetchQueries()
             },
             onError(e) {

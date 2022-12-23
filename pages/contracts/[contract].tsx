@@ -3,36 +3,25 @@ import {
   ContractInfoBreakdown, TokenInfoCard, RecurringSendCard
 
 } from 'features/contracts'
-import { useRefetchQueries } from 'hooks/useRefetchQueries'
-// import { useClaimRewards, usePendingRewards } from 'hooks/useRewardsQueries'
 import {
   Button,
   ChevronIcon,
   Column,
-  Error,
-
   Inline,
-  media,
   Spinner,
   styled,
   Text,
-  Toast,
-  UpRightArrow,
   useMedia,
-  Valid,
 } from 'junoblocks'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-// import { useQueryContractLiquidity } from 'queries/useQueryContracts'
-import React, { useState } from 'react'
-import { toast } from 'react-hot-toast'
+import React from 'react'
 import {
   // __POOL_REWARDS_ENABLED__,
   // __POOL_STAKING_ENABLED__,
   APP_NAME,
 } from 'util/constants'
-import { formatSdkErrorMessage } from 'util/formatSdkErrorMessage'
 import { useContractInfo } from '../../hooks/useContractInfo'
 
 export default function Contract() {
@@ -191,19 +180,6 @@ export default function Contract() {
     </>
   )
 }
-
-
-const StyledDivForCards = styled('div', {
-  display: 'flex',
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  gap: '$8',
-  alignItems: 'stretch',
-  [media.sm]: {
-    gridTemplateColumns: '1fr',
-    rowGap: '$8',
-  },
-})
 
 const StyledDivForSpinner = styled('div', {
   display: 'flex',

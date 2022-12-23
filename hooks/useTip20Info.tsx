@@ -1,5 +1,3 @@
-import { TrustlessChainClient } from 'trustlessjs'
-import { useMemo } from 'react'
 import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
 

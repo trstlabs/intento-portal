@@ -11,7 +11,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { AutoExecData, executeDirectSend, executeScheduledSend, RecipientInfo } from '../../../services/send'
+import { AutoExecData} from '../../../services/send'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -21,7 +21,7 @@ import { convertDenomToMicroDenom } from 'util/conversion'
 import { useTokenToTokenPrice } from './useTokenToTokenPrice'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { executeCostAverage } from '../../../services/swap/executeCostAverage'
-import { slippageAtom, tokenSwapAtom } from '../swapAtoms'
+import { slippageAtom } from '../swapAtoms'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 
 type UseCostAveragingArgs = {

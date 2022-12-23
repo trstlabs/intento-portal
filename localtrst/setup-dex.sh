@@ -63,6 +63,16 @@ router_code_id=$(trstd query compute list-codes | jq '.[-1]."id"')
 router_code_hash=$(trstd query compute list-codes | jq '.[-1]."code_hash"')
 echo "Stored router: '$router_code_id', '$router_code_hash'"
 
+trstd tx compute store "${wasm_path}/recurring_send_multi_ibc.wasm" --from "$deployer_name" --keyring-backend test --chain-id "$chain_id" --gas 3000000 --fees 500utrst -b block -y --contract-title 'Recurring Send Multi IBC' --contract-description 'This contract code is for sending recurring transactions to multiple addresses, even over IBC, with only 1-click. It is an extention to TIP20 contract code. Contract code available at github.com/trstlabs/' --duration 100s --interval 40s
+recurring_send_ibc_code_id=$( trstd query compute list-codes | jq '.[-1]."id"')
+recurring_send_ibc_code_hash=$( trstd query compute list-codes | jq '.[-1]."code_hash"')
+echo "Stored recurring send code: '$recurring_send_ibc_code_id', '$recurring_send_ibc_code_hash'"
+
+trstd tx compute store "${wasm_path}/recurring_swap.wasm" --from "$deployer_name" --keyring-backend test --chain-id "$chain_id" --gas 3000000 --fees 500utrst  -b block -y  --contract-title 'Recurring Swap - TIP20 extention' --contract-description 'This contract code is for recurring swaps. It is an extention to TIP20 contract code, and can be used in other contract codes. Contract code available at github.com/trstlabs/'  --duration 100s --interval 40s
+recurring_swap_code_id=$(trstd query compute list-codes | jq '.[-1]."id"')
+recurring_swap_code_hash=$(trstd query compute list-codes | jq '.[-1]."code_hash"')
+echo "Stored recurring swap code: '$recurring_swap_code_id', '$recurring_swap_code_hash'"
+
 echo "Deploying AMM factory..."
 
 export TX_HASH=$(

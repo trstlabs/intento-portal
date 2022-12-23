@@ -1,6 +1,4 @@
 import { MsgExecuteContract, Msg } from 'trustlessjs'
-import { toUtf8 } from '@cosmjs/encoding'
-
 
 type CreateIncreaseAllowanceMessageArgs = {
   senderAddress: string

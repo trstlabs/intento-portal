@@ -1,21 +1,15 @@
 import { AppLayout, PageHeader } from 'components'
 
 import {
-  Button,
-  Error,
-  IconWrapper,
   styled,
-  Toast,
-  UpRightArrow,
 } from 'junoblocks'
-import React, { useEffect, useReducer } from 'react'
+import React from 'react'
 import { TokenSendModule } from 'features/send'
-import { APP_NAME } from '../../util/constants'
 
 function getInitialTokenFromSearchParams() {
   const params = new URLSearchParams(location.search)
   const token = params.get('token')
-  return token? ([token] as const) : undefined
+  return token? (token as string) : undefined
 }
 
 const StyledContainer = styled('div', {

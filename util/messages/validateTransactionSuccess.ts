@@ -1,4 +1,3 @@
-import {  isDeliverTxFailure } from '@cosmjs/stargate'
 import { Tx } from 'trustlessjs'
 
 export function validateTransactionSuccess(result: Tx) {

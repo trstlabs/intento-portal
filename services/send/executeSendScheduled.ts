@@ -74,7 +74,7 @@ export const executeScheduledSend = async ({
         code_hash: process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_HASH,
         duration: autoExecData.duration + "ms",
         interval: autoExecData.interval + "ms",
-        contract_id: "CosmoRecurringSend ID: " + random.toString(),
+        contract_id: "CosmoRecurringSend (ID: " + random.toString()+")",
         auto_msg: btoa(JSON.stringify({ auto_msg: {} })),
         msg: btoa(JSON.stringify(msg)),
         start_duration_at,

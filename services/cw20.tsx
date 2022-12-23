@@ -57,7 +57,6 @@ export const CW20 = (client: TrustlessChainClient): CW20Contract => {
           balance: { address, key: localStorage.getItem("vk" + address) },
         },
       })
-      console.log(result)
       return result.amount
     }
 

@@ -1,17 +1,11 @@
-import { useIBCTokenBalance } from 'hooks/useIBCTokenBalance'
-import { useTokenBalance } from 'hooks/useTokenBalance'
 import {
   ButtonForWrapper,
-  Divider,
-  formatTokenBalance,
   ImageForTokenLogo,
-  Inline,
-  RejectIcon,
-  Spinner,
+
   styled,
   Text,
 } from 'junoblocks'
-import { ComponentPropsWithoutRef, useMemo } from 'react'
+import { ComponentPropsWithoutRef } from 'react'
 
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
@@ -57,7 +51,7 @@ export const ChannelSelectList = ({
 
   return (
     <>
-     
+
 
       <StyledDivForScrollContainer
         {...props}
@@ -95,14 +89,10 @@ export const ChannelSelectList = ({
             </StyledButtonForRow>
           )
         })}
-       
+
       </StyledDivForScrollContainer>
     </>
   )
-}
-
-function isQueryEmpty(query: string) {
-  return !query || !query.replace(new RegExp(' ', 'g'), '')
 }
 
 const StyledButtonForRow = styled(ButtonForWrapper, {

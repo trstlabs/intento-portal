@@ -1,8 +1,8 @@
-import { useTokenInfo } from 'hooks/useTokenInfo'
+
 import {
   ButtonForWrapper,
   Chevron,
-  formatTokenBalance,
+
   IconWrapper,
   ImageForTokenLogo,
   styled,

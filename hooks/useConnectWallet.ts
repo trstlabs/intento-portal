@@ -1,19 +1,15 @@
 import {
-  // createWasmAminoConverters,
+
   TrustlessChainClient,
-  TxResultCode
+
 } from 'trustlessjs'
-import {
-  AminoTypes,
-  createIbcAminoConverters,
-  GasPrice,
-} from '@cosmjs/stargate'
+
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { GAS_PRICE } from '../util/constants'
+
 import { useChainInfo } from './useChainInfo'
 
 export const useConnectWallet = (

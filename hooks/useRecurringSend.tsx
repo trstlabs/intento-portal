@@ -1,9 +1,6 @@
 import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
 import { convertMicroDenomToDenom } from 'util/conversion'
-
-import { useTrustlessChainClient } from './../hooks/useTrustlessChainClient'
-
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
 import { getRecipients, getRecurrenceAmount } from '../services/contracts'

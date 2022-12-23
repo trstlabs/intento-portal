@@ -1,12 +1,6 @@
 // import { ContractInfo } from 'queries/useQueryContracts'
 import { useMemo } from 'react'
-import { ContractInfo, ContractInfoWithAddress } from 'trustlessjs'
-
-import { useRecoilValue } from 'recoil'
-import { walletState } from 'state/atoms/walletAtoms'
-
-import { useTokenBalance } from '../../../hooks/useTokenBalance'
-
+import { ContractInfoWithAddress } from 'trustlessjs'
 
 export type SortParameters = 'exec_time' | 'alphabetical'
 export type SortDirections = 'asc' | 'desc'

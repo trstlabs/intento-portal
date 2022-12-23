@@ -1,10 +1,6 @@
 import { AppLayout, PageHeader } from 'components'
-import {
-  ButtonWithDropdownForSorting,
-
-} from 'features/contracts'
 import { useRecoilValue } from 'recoil'
-import {
+import {ButtonWithDropdownForSorting,
   SortDirections,
   SortParameters,
   useSortContracts,

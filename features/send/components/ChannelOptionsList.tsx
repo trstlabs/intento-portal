@@ -1,5 +1,4 @@
 import { ChannelSelectList, ChannelSelectListProps } from './ChannelSelectList'
-import { useTokenList } from 'hooks/useTokenList'
 import { useIBCAssetList } from 'hooks/useIBCAssetList'
 
 export const ChannelOptionsList = ({

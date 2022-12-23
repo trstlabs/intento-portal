@@ -1,26 +1,23 @@
 import { useTokenInfo, } from 'hooks/useTokenInfo'
 import { useContractBalance, useTip20Info, useTip20History } from 'hooks/useTip20Info'
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { maybePluralize } from 'util/maybePluralize'
 import {
-    Button,
+
     Card,
     CardContent,
     Column,
 
     Divider,
-
-    Inline,
-
     Text,
-    useSubscribeInteractions,
+
 } from 'junoblocks'
 
 import { ContractInfo } from 'trustlessjs'
 import { convertMicroDenomToDenom } from 'util/conversion'
 
 import { UnderlyingAssetRow } from '../../liquidity/components/UnderlyingAssetRow'
-import { useRelativeTimestamp } from '../../liquidity'
+
 type TokenInfoCardProps = {
     contractInfo: ContractInfo,
     contractAddress: any,
@@ -64,7 +61,7 @@ export const TokenInfoCard = ({
             tabIndex={-1}
             role="button"
             variant={
-                balance != 0 ? 'primary' : 'secondary'
+                !isLoading && balance != 0 ? 'primary' : 'secondary'
             }
         // onClick={onClick}
         >
@@ -115,7 +112,7 @@ export const TokenInfoCard = ({
                                     Memo: {memo}
                                 </Text>}
                                 <Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
-                                    Execution Time: {relativeTime(Number(block_time) / 1000/1000)}
+                                    Execution Time: {relativeTime(Number(block_time) / 1000 / 1000)}
                                 </Text>
                                 {action.transfer && (<Column><Text variant="legend" color="secondary" css={{ paddingBottom: '$4' }}>
                                     Action: Transfer
@@ -195,6 +192,6 @@ const relativeTime = (timestamp) => {
     if (secondsLeft > 0) {
         return 'less than a minute'
     }
-    
+
     return date.toDate().toLocaleString()
 }

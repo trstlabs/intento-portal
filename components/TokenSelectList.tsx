@@ -131,7 +131,7 @@ export const TokenSelectList = ({
                     <FetchBalanceTextForIbcTokenSymbol
                       tokenSymbol={tokenInfo.symbol}
                     /><Text css={{ paddingLeft: '$2' }} variant="caption" color="disabled">
-                      available' 
+                      available
                     </Text></>
                   )}
                 </Text>

@@ -2,7 +2,7 @@ import { useTokenList } from 'hooks/useTokenList'
 import { styled, useMedia, } from 'junoblocks'
 import { useEffect, useRef, useState } from 'react'
 
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import {
   TransactionStatus,
   transactionStatusState,

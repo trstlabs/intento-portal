@@ -5,7 +5,6 @@ import {
   Column,
   Copy,
   CopyTextTooltip,
-
   IconWrapper,
   Logout,
   media,
@@ -13,7 +12,6 @@ import {
   Text,
   Tooltip,
   Valid,
-  Wallet,
 } from 'junoblocks'
 import React from 'react'
 import { useRecoilValue } from 'recoil'

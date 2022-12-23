@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, Divider, CopyIcon, Button, styled, Text, useSubscribeInteractions, Column } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union,  CopyIcon, Button, styled, Text,  Column } from 'junoblocks'
 
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
@@ -7,7 +7,7 @@ import { useTokenSend } from '../hooks';
 import { useScheduledTx } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilValue } from 'recoil'
 import { ScheduleDialog, AutoExecData } from './ScheduleDialog';
 
 export class RecipientInfo {
@@ -176,7 +176,7 @@ export const RecipientList = ({
 
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
-    status !== WalletStatusType.connected || (recipients[0].recipient && recipients[0].recipient.length != 44) || (Number(recipients[0].amount) == 0)
+    status !== WalletStatusType.connected || (recipients[0].recipient && recipients[0].recipient.length < 44) || (Number(recipients[0].amount) == 0)
 
 
 
@@ -254,7 +254,7 @@ export const RecipientList = ({
           </div>))
         }
       </Card>
-      {recipients[0].recipient && recipients[0].recipient.length == 44 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+      {recipients[0].recipient && recipients[0].recipient.length >= 44 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
           <Text align="left"
             variant="header">
