@@ -11,7 +11,7 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
             style={{
             
               fontSize: 50,
-              fontFamily: "GothamHTF-Medium2,Gotham HTF",
+              fontFamily: "Inter",
               fontWeight: 500,
             }}
           >
@@ -38,39 +38,14 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
                 letterSpacing: 0,
               }}
             >
-              {"SMOPO"}
+              {"SMOPORTAL"}
             </tspan>
-            <tspan
-              x={271.95}
-              y={0}
-              style={{
-                letterSpacing: 0,
-              }}
-            >
-              {"R"}
-            </tspan>
-            <tspan
-              x={307.95}
-              y={0}
-              style={{
-                letterSpacing: "-.09em",
-              }}
-            >
-              {"T"}
-            </tspan>
-            <tspan x={335.85} y={0}>
-              {"AL"}
-            </tspan>
+          
           </text>
           <path
             className="cls-7"
             transform="rotate(-45 56.926 25.29)"
             d="M30.48 21.67h52.89v7.24H30.48z"
-          />
-          <path
-            className="cls-7"
-            transform="rotate(-45 249.895 25.29)"
-            d="M223.45 21.67h52.89v7.24h-52.89z"
           />
         </g>
       </g>  </svg>

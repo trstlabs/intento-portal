@@ -1,0 +1,2 @@
+export { AutomateModule } from './components'
+

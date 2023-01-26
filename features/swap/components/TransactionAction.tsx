@@ -6,6 +6,7 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ScheduleDialog, AutoExecData } from '../../send/components/ScheduleDialog'
 
+
 import { useTokenSwap, useSwapFee, useCostAveraging } from '../hooks'
 import { slippageAtom, tokenSwapAtom } from '../swapAtoms'
 import { SlippageSelector } from './SlippageSelector'
@@ -93,7 +94,7 @@ export const TransactionAction = ({
 
 
   const shouldDisableSubmissionButton =
-    isExecutingTransaction ||
+    isExecutingTransaction || isExecutingCostAverage 
     !tokenB.tokenSymbol ||
     !tokenA.tokenSymbol ||
     status !== WalletStatusType.connected ||
@@ -164,7 +165,7 @@ export const TransactionAction = ({
         onClick={() =>
           setScheduleDialogState({
             isShowing: true,
-            actionType: 'recurrence',
+            actionType: 'occurrence',
           })
         }
       >
@@ -208,6 +209,19 @@ export const TransactionAction = ({
         }
         handleSchedule={(execData) => handleScheduleButtonClick(execData)}
       />
+     {/*  <AdvScheduleDialog
+        label="Cost Averaging"
+        execData={autoExecData}
+        isShowing={isScheduleDialogShowing}
+        initialActionType={actionType}
+        onRequestClose={() =>
+          setScheduleDialogState({
+            isShowing: false,
+            actionType: 'occurrence',
+          })
+        }
+        handleSchedule={(execData) => handleAdvScheduleButtonClick(execData)}
+      /> */}
     </StyledDivForWrapper>
   )
 }

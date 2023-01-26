@@ -1,5 +1,5 @@
 import { useConnectWallet } from 'hooks/useConnectWallet'
-import { Logo, LogoText, PoolsIcon } from 'icons'
+import { Logo, LogoText, PoolsIcon , GearIcon} from 'icons'
 import {
   Button,
   ChevronIcon,
@@ -150,6 +150,17 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           selected={getIsLinkActive('/pools')}
         >
           <Inline css={{ paddingLeft: '$4' }}>Pools</Inline>
+        </Button>
+      </Link>
+      <Link href="/automate" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<GearIcon />}
+          selected={getIsLinkActive('/automate')}
+        >
+          <Inline css={{ paddingLeft: '$4' }}>Automate</Inline>
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />

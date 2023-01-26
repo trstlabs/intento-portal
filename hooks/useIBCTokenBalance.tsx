@@ -18,13 +18,13 @@ export const useIBCTokenBalance = (tokenSymbol) => {
       await window.keplr.enable(chain_id)
       const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
 
-      const wasmChainClient = await SigningStargateClient.connectWithSigner(
+      const chainClient = await SigningStargateClient.connectWithSigner(
         rpc,
         offlineSigner
       )
 
       const [{ address }] = await offlineSigner.getAccounts()
-      const coin = await wasmChainClient.getBalance(address, denom)
+      const coin = await chainClient.getBalance(address, denom)
 
       const amount = coin ? Number(coin.amount) : 0
       return convertMicroDenomToDenom(amount, decimals)

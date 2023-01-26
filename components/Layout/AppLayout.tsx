@@ -22,6 +22,7 @@ export const AppLayout = ({
   const isSmallScreen = useMedia('sm')
   const isMediumScreen = useMedia('md')
   const themeController = useControlTheme()
+
   let isConfetti = useRecoilValue(particleState)
   
   const particlesInit = useCallback(async (engine: Engine) => {

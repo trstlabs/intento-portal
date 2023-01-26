@@ -6,7 +6,7 @@ export function validateTransactionSuccess(result: Tx) {
       `Error when broadcasting tx ${result.transactionHash} at height ${result.height}. Code: ${result.code}; Raw log: ${result.rawLog}`
     )
   }
-  console.log(result)
+
 
   return result
 }

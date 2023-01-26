@@ -1,17 +1,25 @@
 //import { AminoConverters } from 'trustlessjs'
 import {
   AminoTypes,
+  createAuthzAminoConverters,
   createIbcAminoConverters,
+  defaultRegistryTypes as defaultStargateTypes,
   GasPrice,
   SigningStargateClient,
 } from '@cosmjs/stargate'
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
-
+import { ChainInfo } from '@keplr-wallet/types'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { GAS_PRICE } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
+import { useChainInfo } from './useChainInfo'
+import { MsgGrant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/tx'
+
+import { Registry } from '@cosmjs/proto-signing'
+
+
 
 /* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
@@ -50,12 +58,17 @@ export const useConnectIBCWallet = (
     }))
 
     try {
+
       const { chain_id, rpc } = assetInfo
 
-      await window.keplr.enable(chain_id)
-      const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
 
-      const wasmChainClient = await SigningStargateClient.connectWithSigner(
+      const customRegistry = new Registry(defaultStargateTypes);
+      customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
+      await window.keplr.enable(chain_id)
+
+      const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
+      //console.log(offlineSigner)
+      const ibcChainClient = await SigningStargateClient.connectWithSigner(
         rpc,
         offlineSigner,
         {
@@ -67,10 +80,13 @@ export const useConnectIBCWallet = (
           aminoTypes: new AminoTypes(
             Object.assign(
               createIbcAminoConverters(),
+              createAuthzAminoConverters(),
               //createWasmAminoConverters()
             )
           ),
-        }
+          registry: customRegistry,
+        },
+
       )
 
       const [{ address }] = await offlineSigner.getAccounts()
@@ -79,7 +95,7 @@ export const useConnectIBCWallet = (
       setWalletState({
         tokenSymbol,
         address,
-        client: wasmChainClient,
+        client: ibcChainClient,
         status: WalletStatusType.connected,
       })
     } catch (e) {
