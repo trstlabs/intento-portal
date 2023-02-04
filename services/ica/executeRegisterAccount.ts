@@ -2,10 +2,7 @@
 import {
   TrustlessChainClient,
 } from 'trustlessjs'
-import { useICAForUser } from '../../hooks/useICA'
-
 import {
-
   validateTransactionSuccess,
 } from '../../util/messages'
 import { getICA } from './data'
@@ -30,7 +27,7 @@ export const executeRegisterAccount = async ({
     { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
   )
   validateTransactionSuccess(tx)
-  await sleep(20000)
+  await sleep(30000)
   let acc = await getICA({ owner, connectionId, client })
   if (acc != "") {
     return acc

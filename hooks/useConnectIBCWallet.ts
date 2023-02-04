@@ -10,11 +10,9 @@ import {
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
-import { ChainInfo } from '@keplr-wallet/types'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { GAS_PRICE } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
-import { useChainInfo } from './useChainInfo'
 import { MsgGrant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/tx'
 
 import { Registry } from '@cosmjs/proto-signing'
@@ -88,7 +86,7 @@ export const useConnectIBCWallet = (
         },
 
       )
-
+    
       const [{ address }] = await offlineSigner.getAccounts()
 
       /* successfully update the wallet state */

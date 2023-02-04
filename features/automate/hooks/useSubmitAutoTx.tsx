@@ -25,7 +25,6 @@ type UseSubmitAutoTxArgs = {
 }
 
 export const useSubmitAutoTx = ({
-
     autoTxData,
 }: UseSubmitAutoTxArgs) => {
     const { client, address, status } = useRecoilValue(walletState)

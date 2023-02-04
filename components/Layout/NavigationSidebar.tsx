@@ -1,5 +1,5 @@
 import { useConnectWallet } from 'hooks/useConnectWallet'
-import { Logo, LogoText, PoolsIcon , GearIcon} from 'icons'
+import { Logo, LogoText, PoolsIcon, GearIcon } from 'icons'
 import {
   Button,
   ChevronIcon,
@@ -107,7 +107,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Inline css={{ paddingLeft: '$4' }}>Dashboard</Inline>
         </Button>
       </Link>
-      <Link href="/send" passHref>
+      {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && (<> <Link href="/send" passHref>
         <Button
           as="a"
           variant="menu"
@@ -118,41 +118,41 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Inline css={{ paddingLeft: '$4' }}>Send</Inline>
         </Button>
       </Link>
-      <Link href="/swap" passHref>
-        <Button
-          as="a"
-          variant="menu"
-          size="large"
-          iconLeft={<SwapIcon />}
-          selected={getIsLinkActive('/swap')}
-        >
-          <Inline css={{ paddingLeft: '$4' }}>Swap</Inline>
-        </Button>
-      </Link>
-      <Link href="/transfer" passHref>
-        <Button
-          as="a"
-          variant="menu"
-          size="large"
-          iconLeft={< DoubleArrowIcon rotation="-90deg" />}
-          selected={getIsLinkActive('/transfer')}
-        >
-          <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
-        </Button>
-      </Link>
-      <Link href="/pools" passHref>
-        <Button
-          as="a"
-          // disabled="true"
-          variant="menu"
-          size="large"
-          iconLeft={<PoolsIcon />}
-          selected={getIsLinkActive('/pools')}
-        >
-          <Inline css={{ paddingLeft: '$4' }}>Pools</Inline>
-        </Button>
-      </Link>
-      <Link href="/automate" passHref>
+        <Link href="/swap" passHref>
+          <Button
+            as="a"
+            variant="menu"
+            size="large"
+            iconLeft={<SwapIcon />}
+            selected={getIsLinkActive('/swap')}
+          >
+            <Inline css={{ paddingLeft: '$4' }}>Swap</Inline>
+          </Button>
+        </Link>
+        <Link href="/transfer" passHref>
+          <Button
+            as="a"
+            variant="menu"
+            size="large"
+            iconLeft={< DoubleArrowIcon rotation="-90deg" />}
+            selected={getIsLinkActive('/transfer')}
+          >
+            <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
+          </Button>
+        </Link>
+        <Link href="/pools" passHref>
+          <Button
+            as="a"
+            // disabled="true"
+            variant="menu"
+            size="large"
+            iconLeft={<PoolsIcon />}
+            selected={getIsLinkActive('/pools')}
+          >
+            <Inline css={{ paddingLeft: '$4' }}>Pools</Inline>
+          </Button>
+        </Link></>)}
+      {process.env.NEXT_PUBLIC_AUTO_TX_ENABLED == "true" && <Link href="/automate" passHref>
         <Button
           as="a"
           variant="menu"
@@ -162,7 +162,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           <Inline css={{ paddingLeft: '$4' }}>Automate</Inline>
         </Button>
-      </Link>
+      </Link>}
       <Inline css={{ paddingBottom: '$6' }} />
       {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
@@ -252,7 +252,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           {isOpen && (
             <Column css={{ padding: '$12 $12 0' }}>
               {walletButton}
-              {keyringButton}
+              {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && { keyringButton }}
               {menuLinks}
             </Column>
           )}
@@ -282,7 +282,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Link>
 
         {walletButton}
-        {keyringButton}
+        {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && { keyringButton }}
         {menuLinks}
       </StyledMenuContainer>
       <Column>

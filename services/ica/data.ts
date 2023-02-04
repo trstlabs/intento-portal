@@ -1,5 +1,7 @@
-import { SigningStargateClient } from '@cosmjs/stargate'
+import { QueryClient, setupAuthzExtension, SigningStargateClient } from '@cosmjs/stargate'
 import { TrustlessChainClient } from 'trustlessjs'
+import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import { Grant } from "cosmjs-types/cosmos/authz/v1beta1/authz";
 
 export interface ICAQueryInput {
     owner: string,
@@ -24,20 +26,40 @@ export const getICA = async ({
 export interface GrantQueryInput {
     grantee: string,
     granter: string,
+    rpc: string
     msgTypeUrl?: string,
-    client: TrustlessChainClient
 }
+
+export interface GrantQueryResponse {
+    grants: Grant[];
+    msgTypeUrl: string;
+}
+
 
 export const getGrants = async ({
     grantee,
     granter,
     msgTypeUrl,
-    client,
-}: GrantQueryInput) => {
-    try {
-        const response = await client.query.authz.grants({ grantee, granter, msgTypeUrl })
+    rpc,
 
-        return response.grants
+}: GrantQueryInput) => {
+    const tendermintClient = await Tendermint34Client.connect(rpc);
+    // Setup the query client
+    const queryClient = QueryClient.withExtensions(
+        tendermintClient,
+        setupAuthzExtension,
+
+    );
+
+    try {
+
+        // let response: GrantQueryResponse;
+        let resp = await queryClient.authz.grants(grantee, granter, msgTypeUrl)
+        //. response.grants = resp.grants
+
+        //console.log(response)
+        //response.msgTypeUrl = msgTypeUrl
+        return { grants: resp.grants, msgTypeUrl }
     } catch (e) {
         console.error('err(getGrants):', e)
     }
@@ -60,7 +82,7 @@ export const getBalanceForICA = async ({
 
         return response[0]
     } catch (e) {
-        console.error('err(getGrants):', e)
+        console.error('err(getBalanceForICA):', e)
     }
 }
 

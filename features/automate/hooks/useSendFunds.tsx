@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeCreateFeeGrant } from '../../../services/ica'
+import { executeSendFunds } from '../../../services/ica'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -19,38 +19,46 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
-import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
 
-type UseCreateFeeGrantParams = {
-    grantee: string
-    allowance: BasicAllowance
+import { Coin } from 'trustlessjs'
+
+
+type UseSendFundsParams = {
+    toAddress: string
+    coin?: Coin
 }
 
 
-export const useCreateFeeGrant = ({
-    grantee, allowance
-}: UseCreateFeeGrantParams
+export const useSendFunds = ({
+    toAddress, coin
+}: UseSendFundsParams
 ) => {
-    const { address, client, status } =
+  const { address, client, status } =
         useRecoilValue(ibcWalletState)
-
+ 
+    /*   const { address, client, status } =
+        useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
     return useMutation(
-        'createFeeGrant',
+        'SendFunds',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
+            if (coin.amount == "0") {
+                coin = undefined
+            }
 
-            return await executeCreateFeeGrant({
-                granter: address,
-                grantee,
-                allowance,
+            return await executeSendFunds({
                 client,
+                toAddress,
+                fromAddress: address,
+                coin,
+
             })
 
         },
@@ -67,7 +75,7 @@ export const useCreateFeeGrant = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops creating fee grant error!"
+                        title="Oops sending funds to Interchain Account!"
                         body={errorMessage}
                         buttons={
                             <Button

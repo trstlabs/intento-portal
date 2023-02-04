@@ -120,7 +120,7 @@ export const executeDirectSend = async ({
     console.log(recipientInfos[0])
     if (recipientInfos[0].channel_id != undefined) {
       throw new Error(
-        `sending over ibc for native tokens is not enabled on Cosmoportal yet`
+        `sending over ibc for native tokens is not enabled on TriggerPortal yet`
       )
     };
     return await client.tx.bank.send(
@@ -142,7 +142,7 @@ export const executeDirectSend = async ({
   recipientInfos.forEach(recipient => {
     if (recipient.channel_id != undefined) {
       throw new Error(
-        `sending over ibc for native tokens is not enabled on Cosmoportal yet`
+        `sending over ibc for native tokens is not enabled on TriggerPortal yet`
       )
     };
     let outputRecipient = new Output()

@@ -19,10 +19,11 @@ import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 // import { usePrevious } from 'react-use'
 // //import { Coin } from 'trustlessjs'
-import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
+// import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 // import { useFeeGrantAllowanceForUser, useGrantsForUser } from '../../../hooks/useICA'
-import { useCreateAuthzGrant } from '../hooks'
+import { useCreateAuthzGrant, useSendFunds } from '../hooks'
+//import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
 // import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
 
 export class AutoTxData {
@@ -32,8 +33,10 @@ export class AutoTxData {
     connectionId: string
     dependsOnTxIds: number[]
     msg: string
+    typeUrl?: string
     recurrences: number
     retries: number
+    withAuthZ: boolean
 }
 
 type SubmitAutoTxDialogProps = {
@@ -42,8 +45,7 @@ type SubmitAutoTxDialogProps = {
     chainSymbol: string
     icaAddr: string
     icaBalance: number | boolean
-    icaAuthzGrants: Grant[]
-    label: String
+    hasIcaAuthzGrant: boolean
     autoTxData: AutoTxData
     onRequestClose: () => void
     handleSubmitAutoTx: (data: AutoTxData) => void
@@ -51,10 +53,9 @@ type SubmitAutoTxDialogProps = {
 
 export const SubmitAutoTxDialog = ({
     isShowing,
-    label,
     icaAddr,
     icaBalance,
-    icaAuthzGrants,
+    hasIcaAuthzGrant,
     denom,
     chainSymbol,
     autoTxData,
@@ -66,7 +67,7 @@ export const SubmitAutoTxDialog = ({
     const [duration, setDuration] = useState(autoTxData.duration);
 
     const [interval, setInterval] = useState(autoTxData.interval);
-    const [funds, setFeeAmount] = useState(null);
+    //const [feeFunds, setFeeFundsAmount] = useState(null);
     const [recurrences, setRecurrence] = useState(2);
     const isLoading = false;
 
@@ -87,10 +88,9 @@ export const SubmitAutoTxDialog = ({
     function handleInterval(label, value) {
         setInterval(value);
         setDisplayInterval(label)
-        setRecurrence(Math.floor(duration / value))
-        handleDisplayRecurrence(Math.floor(duration / interval))
-
-        //setDuration(value * duration)
+        const recurrence = Math.floor(duration / value)
+        setRecurrence(recurrence)
+        handleDisplayRecurrence(recurrence)
     }
     function handleRemoveInterval() {
         setInterval(0);
@@ -100,8 +100,9 @@ export const SubmitAutoTxDialog = ({
         if (value > interval) {
             setDuration(value);
             setDisplayDuration(label)
-            setRecurrence(Math.floor(value / interval))
-            handleDisplayRecurrence(Math.floor(duration / interval))
+            const recurrence = Math.floor(value / interval)
+            setRecurrence(recurrence)
+            handleDisplayRecurrence(recurrence)
             return
         }
         toast.custom((t) => (
@@ -111,7 +112,6 @@ export const SubmitAutoTxDialog = ({
                 onClose={() => toast.dismiss(t.id)}
             />
         ))
-
     }
     function handleRemoveDuration() {
         setDuration(0);
@@ -120,8 +120,9 @@ export const SubmitAutoTxDialog = ({
     function handleStartTime(label, value) {
         setStartTime(value);
         setDisplayStartTime(label)
-        setRecurrence(Math.floor(duration / interval))
-        handleDisplayRecurrence(Math.floor(duration / interval))
+        const recurrence = Math.floor(duration / interval)
+        setRecurrence(recurrence)
+        handleDisplayRecurrence(recurrence)
     }
     function handleRemoveStartTime() {
         setStartTime(0);
@@ -147,6 +148,25 @@ export const SubmitAutoTxDialog = ({
     }
 
     const [feeFundsHostChain, setFeeFundsHostChain] = useState("0");
+    const [requestedSendFunds, setRequestedSendFunds] = useState(false)
+    const { mutate: handleSendFunds, isLoading: isExecutingSendFunds } =
+        useSendFunds({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+    useEffect(() => {
+        const shouldTriggerSendFunds =
+            !isExecutingSendFunds && requestedSendFunds;
+        if (shouldTriggerSendFunds) {
+            handleSendFunds(undefined, { onSettled: () => setRequestedSendFunds(false) })
+        }
+    }, [isExecutingSendFunds, requestedSendFunds, handleSendFunds])
+
+    const handleSendFundsClick = () => {
+        connectExternalWallet(null)
+        return setRequestedSendFunds(true)
+    }
+    const shouldDisableSendFundsButton =
+        !icaAddr ||
+        (autoTxData.msg && autoTxData.msg.length == 0)
+
     const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
     const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
         useCreateAuthzGrant({ grantee: icaAddr, msg: autoTxData.msg, expirationFromNow: autoTxData.duration, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
@@ -166,45 +186,9 @@ export const SubmitAutoTxDialog = ({
         !icaAddr ||
         (autoTxData.msg && autoTxData.msg.length == 0)
 
-    /*  const [icaFeeGrants, isIcaFeeLoading] = useFeeGrantAllowanceForUser(icaAddr)
-     const [feeGrantForPeriod, setFeeGrantForPeriod] = useState(0);
-     const [requestedFeeGrant, setRequestedCreateFeeGrant] = useState(false)
-     const { mutate: handleCreateFeeGrant, isLoading: isExecutingFeeGrant } =
-         useCreateFeeGrant({ grantee: icaAddr, allowance: setAllowanceParams() })
-     useEffect(() => {
-         const shouldTriggerFeeGrant =
-             !isExecutingFeeGrant && requestedFeeGrant;
-         if (shouldTriggerFeeGrant) {
-             handleCreateFeeGrant(undefined, { onSettled: () => setRequestedCreateFeeGrant(false) })
-         }
-     }, [isExecutingFeeGrant, requestedFeeGrant, handleCreateFeeGrant])
- 
-     const handleCreateFeeGrantClick = () => {
-         connectExternalWallet(null)
-         return setRequestedCreateFeeGrant(true)
-     }
-     const shouldDisableFeeGrantButton =
-         !icaAddr ||
-         (autoTxData.msg && autoTxData.msg.length == 0)
- 
- 
-    function setAllowanceParams() {
-         //  let period = autoTxData.duration
-         //  if (autoTxData.interval < autoTxData.duration) {
-         //      period = autoTxData.interval
-         //  } 
-         let amount = feeGrantForPeriod.toString()
-         let allowance = BasicAllowance.fromPartial({
-             // period: { seconds: (period / 1000).toString() },
-             //periodSpendLimit: [{ denom, amount }],
-             spendLimit: [{ denom, amount }],
- 
-         })
-         return allowance
-     } */
-    function handleMaxFee(input) {
-        setFeeAmount(input);
-    }
+    // function handleMaxFee(input) {
+    //     setFeeAmount(input);
+    // }
     function handleDisplayRecurrence(value) {
         let displayRecs = value.toString() + ' times'
         if (value == 1) {
@@ -214,33 +198,35 @@ export const SubmitAutoTxDialog = ({
 
     }
 
-    const canSchedule = startTime && duration && interval || duration
+
+    const canSchedule = duration > 0 && interval > 0
 
 
-    const handleData = () => {
-        if (funds < recurrences * 0.1) {
+    const handleData = (withAuthZ: boolean) => {
+        if (duration < interval || startTime > duration) {
             toast.custom((t) => (
                 <Toast
                     icon={<IconWrapper icon={<Error />} color="error" />}
-                    title={"Cannot execute specified recurrences with the selected fees, modify recurrences or set higher fund fees"}
+                    title={"Cannot execute specified recurrences with the selected duration: " + duration + "s, interval: " + interval + "s"}
                     onClose={() => toast.dismiss(t.id)}
                 />
             ))
         }
+
         console.log({ startTime, duration, interval, recurrences })
-        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msg: autoTxData.msg })
+        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msg: autoTxData.msg, withAuthZ })
     }
 
     return (
         <Dialog isShowing={isShowing} onRequestClose={onRequestClose}>
             <DialogHeader paddingBottom={canSchedule ? '$8' : '$12'}>
-                <Text variant="header">Schedule {label}</Text>
+                <Text variant="header">Automate Transaction</Text>
             </DialogHeader>
 
 
             <DialogContent>
                 <Text variant="body" css={{ paddingBottom: '$2' }}>
-                    Set the recurrence of the AutoTx.  Schedule time-based actions accross the interchain.
+                    Set the recurrence of the AutoTx.  Trigger time-based actions on IBC-enabled chains.
                 </Text>
             </DialogContent>
 
@@ -265,7 +251,7 @@ export const SubmitAutoTxDialog = ({
                         </Inline>
                         <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
-                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Select until when to execute</Text>{displayStartTime != displayInterval ? <ChipSelected label={displayDuration + " after " + displayStartTime} onClick={() => handleRemoveDuration()} /> : <ChipSelected label={displayDuration} onClick={() => handleRemoveDuration()} />}
+                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Select until when to trigger</Text>{displayStartTime != displayInterval ? <ChipSelected label={displayDuration + " after " + displayStartTime} onClick={() => handleRemoveDuration()} /> : <ChipSelected label={displayDuration} onClick={() => handleRemoveDuration()} />}
                                 {timeLabels.map((time, index) => (
                                     <span key={"b" + index}>
                                         {displayDuration != time && (
@@ -281,7 +267,7 @@ export const SubmitAutoTxDialog = ({
                             Optional settings </Text>
                         <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
-                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify a start time for execution (optional)</Text><ChipSelected label={"In " + displayStartTime} onClick={() => handleRemoveStartTime()} />
+                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify a start time for the trigger (optional)</Text><ChipSelected label={"In " + displayStartTime} onClick={() => handleRemoveStartTime()} />
                                 {timeLabels.map((time, index) => (
                                     <span key={"c" + index}>
                                         {displayStartTime != time && (
@@ -304,23 +290,33 @@ export const SubmitAutoTxDialog = ({
                         </Inline>    <DialogDivider offsetTop="$4" offsetBottom="$4" />
 
                         <Inline justifyContent={'space-between'} align="center">
-                            {icaBalance != 0 ? <Text variant="caption"> Optional: funds on top of balance of  {icaBalance} {chainSymbol}</Text> : <Text variant="caption"> Important: Fund ICA Balance with {chainSymbol}</Text>} <Text variant="legend"><StyledInput step=".01"
+                            {icaBalance != 0 ? <Text variant="caption"> Top up balance of  {icaBalance} {chainSymbol} (optional)</Text> : <Text variant="caption"> Important: Fund ICA Balance with {chainSymbol}</Text>} <Text variant="legend"><StyledInput step=".01"
                                 placeholder="0.00" type="number"
                                 value={feeFundsHostChain}
                                 onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
-                            /></Text>
-                            {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)}
-                            <Button css={{ marginRight: '$4' }}
+                            />{chainSymbol}</Text>
+
+                        </Inline>  {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
+                        {!isExecutingAuthzGrant && (<><Button css={{ marginTop: '$8', margin: '$2' }}
+                            variant="primary"
+                            size="small"
+                            disabled={shouldDisableAuthzGrantButton }
+                            onClick={() =>
+                                handleCreateAuthzGrantClick()
+                            }
+                        >
+                            {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Add Grant')}
+                        </Button>
+                            {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && !isExecutingSendFunds && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
                                 variant="primary"
                                 size="small"
-                                disabled={shouldDisableAuthzGrantButton}
+                                disabled={shouldDisableSendFundsButton}
                                 onClick={() =>
-                                    handleCreateAuthzGrantClick()
+                                    handleSendFundsClick()
                                 }
                             >
-                                {isExecutingAuthzGrant ? <Spinner instant /> : 'Add Grant For ICA'}
-                            </Button>
-                        </Inline>
+                                {isExecutingSendFunds && (<Spinner instant />)}  {('Send ' + feeFundsHostChain + " " + chainSymbol)}
+                            </Button>}</>)}
                         {/*  <Inline justifyContent={'space-between'} align="center">
                             <Text>  <StyledInput step=".01"
                                 placeholder="0.00" type="number"
@@ -389,16 +385,31 @@ export const SubmitAutoTxDialog = ({
                 confirmationButton={
                     <Button
                         variant="primary"
-                        onClick={isLoading ? undefined : handleData}
+                        onClick={() => isLoading ? undefined : handleData(false)}
                     >
                         {isLoading ? (
                             <Spinner instant={true} size={16} />
                         ) : (
-                            <>Schedule {label}</>
+                            <>Automate</>
                         )}
                     </Button>
-                }
-            />
+
+                }>
+                <Button
+                    disabled={!hasIcaAuthzGrant}
+                    variant="primary"
+                    onClick={() => isLoading ? undefined : handleData(true)}
+                >
+                    {isLoading ? (
+                        <Spinner instant={true} size={16} />
+                    ) : (
+                        <>Automate with Grant</>
+                    )}
+                </Button>
+            </DialogButtons>
+
+
+
         </Dialog>
     )
 }

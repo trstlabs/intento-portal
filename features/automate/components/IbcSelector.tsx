@@ -53,12 +53,12 @@ export const IbcSelector = ({
 
   if (size === 'small') {
     return (
-      <StyledDivForContainer
+      <StyledDivForContainer css={{ padding: '$24 $24', margin: '$24 $12 ' }}
         ref={wrapperRef}
       >
         {!isConnectionListShowing && (
-          <Inline css={{ padding: '$6 $4', display: 'grid' }}>
-            <IbcSelectorToggle
+          <Inline>
+            <IbcSelectorToggle 
               connection={connectionId}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
@@ -75,10 +75,10 @@ export const IbcSelector = ({
           <ConnectionOptionsList
             activeConnection={connectionId}
             onSelect={(slct) => handleSelectConnection(slct.connection, slct.logoURI, slct.name, slct.prefix, slct.denom, slct.symbol)}
-        css={{ padding: '$4 $6 $12' }}
+            css={{ padding: '$2 $3 $6' }}
 
 
-        visibleNumberOfTokensInViewport={4.5}
+            visibleNumberOfTokensInViewport={4.5}
           />
         )}
       </StyledDivForContainer>
@@ -134,7 +134,7 @@ export const IbcSelector = ({
         <ConnectionOptionsList
           activeConnection={connectionId}
           onSelect={(slct) => handleSelectConnection(slct.connection, slct.logoURI, slct.name, slct.prefix, slct.denom, slct.symbol)}
-          css={{ padding: '$4 $6 $4' }}
+          css={{ padding: '$2 $4 $2' }}
         />
       )}
     </StyledDivForContainer>
@@ -142,7 +142,7 @@ export const IbcSelector = ({
 }
 
 const StyledDivForWrapper = styled('div', {
-  padding: '$5 $15 $5 $7',
+  padding: '$4 $10 $4 $6',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',

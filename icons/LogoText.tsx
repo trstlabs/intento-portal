@@ -20,10 +20,10 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
                 letterSpacing: "-.02em",
               }}
             >
-              {"C"}
+              {"TRIGGERP"}
             </tspan>
             <tspan
-              x={35.9}
+              x={240.9}
               y={0}
               style={{
                 letterSpacing: 0,
@@ -32,20 +32,20 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
               {"O"}
             </tspan>
             <tspan
-              x={78.15}
+              x={280.15}
               y={0}
               style={{
                 letterSpacing: 0,
               }}
             >
-              {"SMOPORTAL"}
+              {"RTAL"}
             </tspan>
           
           </text>
           <path
             className="cls-7"
-            transform="rotate(-45 56.926 25.29)"
-            d="M30.48 21.67h52.89v7.24H30.48z"
+            transform="rotate(-45 125 -200)"
+            d="M33 50h53v7H33"
           />
         </g>
       </g>  </svg>

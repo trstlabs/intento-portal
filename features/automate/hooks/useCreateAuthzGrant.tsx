@@ -15,19 +15,19 @@ import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { ibcWalletState, walletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 
 import { Coin } from 'trustlessjs'
-import { GenericAuthorization } from 'trustlessjs/dist/tx/authz'
+
 
 type UseCreateAuthzGrantParams = {
     grantee: string
     msg: string
     coin?: Coin
-    expirationFromNow: number
+    expirationFromNow?: number
 }
 
 

@@ -1,16 +1,10 @@
 import { json } from "@codemirror/lang-json";
-import ReactCodeMirror, { ReactCodeMirrorProps } from "@uiw/react-codemirror";
+import ReactCodeMirror from "@uiw/react-codemirror";
 import React, { useState } from "react";
 import { Validator } from 'jsonschema';
-/* import { validateJSON } from "../utils/fileUtils"; */
-import { EditorState, EditorStateConfig, Extension, StateField } from '@codemirror/state';
+
 import {
-    Button,
-    IconWrapper,
-    Inline,
     styled,
-    Union,
-    useOnClickOutside,
     useControlTheme,
     Text
 } from 'junoblocks'

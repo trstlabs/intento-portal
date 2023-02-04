@@ -1,12 +1,13 @@
-import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Button, styled, Text, Column } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
-import { useSubmitAutoTx, useRegisterAccount, useCreateFeeGrant } from '../hooks';
+import { useSubmitAutoTx, useRegisterAccount } from '../hooks';
 import { IbcSelector } from './IbcSelector';
 import { SubmitAutoTxDialog, AutoTxData } from './SubmitAutoTxDialog';
 import { JsonCodeMirrorEditor } from './jsonMirror';
-import { useICAForUser, useFeeGrantAllowanceForUser, useGrantsForUser, useICATokenBalance } from '../../../hooks/useICA';
-import { PeriodicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant';
-import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet';
+import { useICAForUser, /* useFeeGrantAllowanceForUser,*/ useGrantsForUser, useICATokenBalance } from '../../../hooks/useICA';
+// import { PeriodicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant';
+// import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet';
+import { relativeTime } from '../../contracts/components/TokenInfoCard';
 
 
 
@@ -14,14 +15,14 @@ type AutoTxsInputProps = {
   autoTxDatas: AutoTxData[]
   connection: string
   onAutoTxChange: (autoTxDatas: AutoTxData[]) => void
-  onRemoveAutoTx: (autoTxData: AutoTxData) => void
+  /*   onRemoveAutoTx: (autoTxData: AutoTxData) => void */
 } & HTMLProps<HTMLInputElement>
 
 export const AutoTxList = ({
   autoTxDatas,
   //connection,
   onAutoTxChange,
-  onRemoveAutoTx,
+  /*   onRemoveAutoTx, */
   //...inputProps
 }: AutoTxsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
@@ -38,26 +39,19 @@ export const AutoTxList = ({
   //const { mutate: connectWallet } = useConnectWallet()
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
-  const [requestedAuthzGrant, setRequestedAuthzGrant] = useState(false)
+  //const [requestedAuthzGrant, setRequestedAuthzGrant] = useState(false)
+  // const [autoTxData, setAutoTxData] = useState(data)
 
-  //default time
-  let data = new AutoTxData()
-  data.duration = 14 * 86400000;
-  data.interval = 86400000;
-  data.msg = "{}"
+  //const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
 
-  const [autoTxData, setAutoTxData] = useState(data)
-
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
-
-  const [icaAddr, isIcaLoading] = useICAForUser(autoTxData.connectionId)
+  const [icaAddr, isIcaLoading] = useICAForUser(autoTxDatas[0].connectionId)
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(chainSymbol, icaAddr)
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr)
-  console.log(icaAuthzGrants)
-  /*  if (autoTxData.msg && autoTxData.msg.length > 10) {
-     const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, JSON.parse(autoTxData.msg["@type"]))
-     console.log(icaAuthzGrants)
-   } */
+
+
+  //if (autoTxData.msg && autoTxData.msg.length > 10) {
+  const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, chainSymbol, autoTxDatas[0])
+
+  ///} 
   /* 
     if (icaAddr && !isIcaLoading && chainSymbol) {
       
@@ -68,9 +62,9 @@ export const AutoTxList = ({
    */
 
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
-    useSubmitAutoTx({ autoTxData })
+    useSubmitAutoTx({ autoTxData: autoTxDatas[0] })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
-    useRegisterAccount({ connectionId: autoTxData.connectionId })
+    useRegisterAccount({ connectionId: autoTxDatas[0].connectionId })
 
 
   useEffect(() => {
@@ -96,8 +90,10 @@ export const AutoTxList = ({
 
 
 
-  const handleSubmitAutoTxButtonClick = (autoTxData: AutoTxData) => {
-    setAutoTxData(autoTxData)
+  const handleSubmitAutoTxButtonClick = (index: number, autoTxData: AutoTxData) => {
+    const newAutoTxs = [...autoTxDatas]
+    newAutoTxs[index] = autoTxData
+    onAutoTxChange(newAutoTxs)
     return setRequestedSubmitAutoTx(true)
   }
   const handleRegisterAccountClick = () => {
@@ -105,7 +101,7 @@ export const AutoTxList = ({
   }
 
 
-  const handleChangeMsg = (index: number, key: keyof AutoTxData) => (value: string) => {
+  const handleChangeMsg = (index: number) => (msg: string) => {
     if (!isJsonValid) {
 
       return
@@ -113,7 +109,8 @@ export const AutoTxList = ({
     const newAutoTxs = [...autoTxDatas]
     newAutoTxs[index] = {
       ...newAutoTxs[index],
-      [key]: value
+      msg,
+      typeUrl: JSON.parse(msg)["typeUrl"]
     }
     console.log(newAutoTxs)
     onAutoTxChange(newAutoTxs)
@@ -131,7 +128,7 @@ export const AutoTxList = ({
       //   autoTx.msg = newMsg
       // }
       newAutoTxs.push(autoTx)
-      setAutoTxData(autoTx)
+      onAutoTxChange(newAutoTxs)
     }
 
 
@@ -144,20 +141,20 @@ export const AutoTxList = ({
   }
 
   //  a function to handle clicks on the "+" button
-  function handleAddNewAutoTxData() {
-    // Create a new AutoTxData object
-    const newAutoTxs = [...autoTxDatas]
-    let newRecipient = new AutoTxData();
-    console.log(newAutoTxs.length)
-    if (newAutoTxs[newAutoTxs.length - 1].msg != "") {
-      // Add the new recipient to the autoTxDatas array
-      console.log("adding to", newAutoTxs[newAutoTxs.length - 1])
-      console.log(newAutoTxs)
-      newAutoTxs.push(newRecipient);
-      onAutoTxChange(newAutoTxs)
+  /*   function handleAddNewAutoTxData() {
+      // Create a new AutoTxData object
+      const newAutoTxs = [...autoTxDatas]
+      let newRecipient = new AutoTxData();
+      console.log(newAutoTxs.length)
+      if (newAutoTxs[newAutoTxs.length - 1].msg != "") {
+        // Add the new recipient to the autoTxDatas array
+        console.log("adding to", newAutoTxs[newAutoTxs.length - 1])
+        console.log(newAutoTxs)
+        newAutoTxs.push(newRecipient);
+        onAutoTxChange(newAutoTxs)
+      }
     }
-  }
-
+   */
   const setExample = (index: number, key: keyof AutoTxData, msg: string) => {
     if (!isJsonValid) {
       return
@@ -168,7 +165,8 @@ export const AutoTxList = ({
     const newAutoTxs = [...autoTxDatas]
     newAutoTxs[index] = {
       ...newAutoTxs[index],
-      [key]: newMsg
+      [key]: newMsg,
+      typeUrl: JSON.parse(newMsg)["typeUrl"]
     }
     console.log(newAutoTxs)
     onAutoTxChange(newAutoTxs)
@@ -219,10 +217,8 @@ export const AutoTxList = ({
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmissionButton =
-    isExecutingRegisterICA || !icaAddr ||
-    (autoTxDatas[0].msg && autoTxDatas[0].msg.length == 0 || !isJsonValid)
-
-
+    isExecutingRegisterICA || !icaAddr || !isJsonValid ||
+    (autoTxDatas[0].msg && autoTxDatas[0].msg.length == 0 && JSON.parse(autoTxDatas[0].msg)["typeUrl"].length < 5)
 
   return (
     <div >
@@ -232,9 +228,9 @@ export const AutoTxList = ({
 
             <Card variant="secondary" disabled css={{ padding: '$2' }}>
 
-              <CardContent size="medium" css={{ paddingTop: '$2' }}>
+              <CardContent size="medium" >
 
-                {index == 0 && (<Column><Row>
+                {index == 0 && (<Column ><Row>
 
                   <Text align="center"
                     variant="caption">
@@ -253,7 +249,7 @@ export const AutoTxList = ({
 
                   } </Column></Row>
                   {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
-                    <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: {icaAddr}</Text><Text variant="legend"> Balance: {icaBalance} {chainSymbol} </Text></>)}{!icaAuthzGrants ? <Text variant="legend"> {icaAuthzGrants} grants</Text> : <Text variant="legend"> No grants</Text>} </CardContent></Card>)} </Column>
+                    <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant:<Text variant="caption"> Has grant for message type '{icaAuthzGrants.msgTypeUrl}' that expires in {(relativeTime(icaAuthzGrants.grants[0].expiration.seconds.toNumber() * 1000))}</Text></Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)} </Column>
                 )}
                 <Column>
                   <Row><Text>Examples: </Text> <Button css={{ display: 'end', margin: '$2', }}
@@ -270,7 +266,7 @@ export const AutoTxList = ({
                   <Row>
                     <JsonCodeMirrorEditor
                       jsonValue={autoTxData.msg}
-                      onChange={handleChangeMsg(index, 'msg')}
+                      onChange={handleChangeMsg(index)}
                       onValidate={setIsJsonValid}
                     />
 
@@ -283,7 +279,7 @@ export const AutoTxList = ({
 
               </CardContent>
             </Card>
-            <Column >
+            {/* <Column >
               <Button css={{ display: 'end', margin: '$2', }}
                 icon={<IconWrapper icon={<PlusIcon />} />}
                 variant="ghost"
@@ -291,7 +287,7 @@ export const AutoTxList = ({
 
                 onClick={handleAddNewAutoTxData}
               />
-            </Column>
+            </Column> */}
           </div>))
         }
       </Card >
@@ -315,9 +311,25 @@ export const AutoTxList = ({
                 {autoTxData.connectionId && (<Text>Connection ID: <i >{autoTxData.connectionId}</i></Text>)}
 
               </ul>)}</Text>
+              <SubmitAutoTxDialog
+                denom={denom}
+                chainSymbol={chainSymbol}
+                icaBalance={icaBalance}
+                hasIcaAuthzGrant={icaAuthzGrants && autoTxDatas[0] && autoTxDatas[0].typeUrl == icaAuthzGrants.msgTypeUrl}
+                icaAddr={icaAddr}
+                autoTxData={autoTxDatas[0]}
+                isShowing={isSubmitAutoTxDialogShowing}
+                onRequestClose={() =>
+                  setSubmitAutoTxDialogState({
+                    isShowing: false,
+                  })
+                }
+                handleSubmitAutoTx={(autoTxData) => handleSubmitAutoTxButtonClick(index, autoTxData)} />
             </div>
           </CardContent>
         ))}
+
+
       </Card>)}
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
         <Button css={{ marginRight: '$4' }}
@@ -330,7 +342,7 @@ export const AutoTxList = ({
             })
           }
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Schedule'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Automate'}
         </Button>
 
         {/* <Button
@@ -346,22 +358,7 @@ export const AutoTxList = ({
           {isExecutingTransaction ? <Spinner instant /> : ' Create Grant'}
         </Button> */}
       </Inline>
-      <SubmitAutoTxDialog
-        label="ICA Automation"
-        denom={denom}
-        chainSymbol={chainSymbol}
-        icaBalance={icaBalance}
-        icaAuthzGrants={icaAuthzGrants}
-        icaAddr={icaAddr}
-        autoTxData={autoTxDatas[0]}
-        isShowing={isSubmitAutoTxDialogShowing}
-        onRequestClose={() =>
-          setSubmitAutoTxDialogState({
-            isShowing: false,
-          })
-        }
-        handleSubmitAutoTx={(autoTxData) => handleSubmitAutoTxButtonClick(autoTxData)}
-      />
+
     </div >)
 }
 
@@ -391,34 +388,40 @@ function Row({ children }) {
 
 
 const sendExample = JSON.stringify({
-  "@type": "/cosmos.bank.v1beta1.MsgSend",
-  "amount": [{
-    "amount": "69",
-    "denom": "utrst"
-  }],
-  "from_address": "trust1....",
-  "to_address": "trust1..."
+  "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
+  "value": {
+    "amount": [{
+      "amount": "70",
+      "denom": "utrst"
+    }],
+    "from_address": "trust1....",
+    "to_address": "trust1..."
+  }
 }, null, "\t")
 
 const stakeExample = JSON.stringify(
   {
-    "@type": "/cosmos.staking.v1beta1.MsgDelegate",
-    "amount": {
-      "amount": "69",
-      "denom": "utrst"
-    },
-    "delegator_address": "trust1....",
-    "validator_address": "trustvaloper1..."
+    "typeUrl": "/cosmos.staking.v1beta1.MsgDelegate",
+    "value": {
+      "amount": {
+        "amount": "70",
+        "denom": "utrst"
+      },
+      "delegator_address": "trust1....",
+      "validator_address": "trustvaloper1..."
+    }
   }, null, "\t")
 
 
 const unstakeExample = JSON.stringify(
   {
-    "@type": "/cosmos.staking.v1beta1.MsgUndelegate",
-    "amount": {
-      "amount": "69",
-      "denom": "utrst"
-    },
-    "delegator_address": "trust1....",
-    "validator_address": "trustvaloper1..."
+    "typeUrl": "/cosmos.staking.v1beta1.MsgUndelegate",
+    "value": {
+      "amount": {
+        "amount": "70",
+        "denom": "utrst"
+      },
+      "delegator_address": "trust1....",
+      "validator_address": "trustvaloper1..."
+    }
   }, null, "\t")

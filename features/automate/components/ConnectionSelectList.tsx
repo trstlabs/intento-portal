@@ -29,7 +29,7 @@ export class IBCInfo {
 export type ConnectionSelectListProps = {
   activeConnection?: string
   //todo refactor
-  connectionList: Array<Pick<TokenInfo, 'connection_id' | 'chain_id' | 'symbol' | 'logoURI' | 'name' | 'prefix' | 'denom' |'trst_denom' >>
+  connectionList: Array<Pick<TokenInfo, 'connection_id' | 'chain_id' | 'symbol' | 'logoURI' | 'name' | 'prefix' | 'denom' | 'trst_denom' | 'id'>>
   onSelect: (connectionInfo: IBCInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -65,8 +65,8 @@ export const ConnectionSelectList = ({
 
       <StyledDivForScrollContainer
         {...props}
-        css={{
-          height: `${visibleNumberOfTokensInViewport * 3.5}rem`,
+        css={{ 
+          height: `${visibleNumberOfTokensInViewport * 2.5}rem`,
           ...(props.css ? props.css : {}),
         }}
       >
@@ -92,7 +92,7 @@ export const ConnectionSelectList = ({
                 />
                 <div data-token-info="">
                   <Text variant="body" >
-                    {chainInfo.chain_id}
+                    {chainInfo.id}
                   </Text>
                 </div>
               </StyledDivForColumn>
@@ -123,7 +123,7 @@ const StyledDivForColumn = styled('div', {
   variants: {
     kind: {
       token: {
-        columnGap: '$space$6',
+        columnGap: '$space$2',
         gridTemplateColumns: '50px 1fr',
         alignItems: 'center',
       },

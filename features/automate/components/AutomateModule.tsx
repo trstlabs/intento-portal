@@ -1,4 +1,4 @@
-import { styled, useMedia, Text, Inline, Button } from 'junoblocks'
+import { styled } from 'junoblocks'
 import { useEffect, useRef, useState } from 'react'
 
 
@@ -14,8 +14,11 @@ type AutomateModuleProps = {
 export const AutomateModule = ({ initialChain }: AutomateModuleProps) => {
   /* connect to recoil */
   const [connection, setConnectionState] = useState('')
+  let data = new AutoTxData()
+  data.duration = 14 * 86400000;
+  data.interval = 86400000;
 
-  const [autoTxList, setAutoTxList] = useState([new AutoTxData()])
+  const [autoTxList, setAutoTxList] = useState([data])
 
   const initialConnection = useRef(initialChain).current
   useEffect(
@@ -38,7 +41,7 @@ export const AutomateModule = ({ initialChain }: AutomateModuleProps) => {
       <AutoTxList autoTxDatas={autoTxList} connection={connection}
 
         onAutoTxChange={((NewAutoTxs) => setAutoTxList(NewAutoTxs))}
-        onRemoveAutoTx={(autoTx) => setAutoTxList(autoTxList.filter(tx => tx !== autoTx))}
+       /*  onRemoveAutoTx={(autoTx) => setAutoTxList(autoTxList.filter(tx => tx !== autoTx))} */
       />
     </StyledDivForWrapper>
       {/* <TransactionAction isPriceLoading={isPriceLoading} size={uiSize} /> */}

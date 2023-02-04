@@ -76,7 +76,8 @@ const StyledDivForSelector = styled(ButtonForWrapper, {
   transition: 'background-color .1s ease-out',
   userSelect: 'none',
   whiteSpace: 'pre',
-
+  marginTop: '$12',
+  marginBottom: '$12',
   variants: {
     state: {
       selected: {
@@ -86,7 +87,7 @@ const StyledDivForSelector = styled(ButtonForWrapper, {
         minWidth: 231,
       },
       selecting: {
-        margin: '$space$1 0',
+        //margin: '$space$1 0',
         padding: '$space$6 $8',
         columnGap: '$space$4',
         gridTemplateColumns: '1fr $space$8',

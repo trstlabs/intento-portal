@@ -3,8 +3,8 @@ import { useRecoilValue } from 'recoil'
 
 import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
-import { getICA, getGrants, getFeeGrantAllowance, getBalanceForICA } from '../services/ica'
-import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
+import { getICA, getGrants, getFeeGrantAllowance, getBalanceForICA, AutoTxData } from '../services/ica'
+// import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
@@ -33,7 +33,7 @@ export const useICAForUser = (connectionId: string) => {
 
 
 }
-
+/* 
 export const useGetGrantForUser = (granter: string, msgTypeUrl: string) => {
   const { status, client } = useRecoilValue(walletState)
 
@@ -57,7 +57,7 @@ export const useGetGrantForUser = (granter: string, msgTypeUrl: string) => {
   return [data, isLoading] as const
 
 
-}
+} */
 
 
 export const useGetBalanceForICA = (ica: string) => {
@@ -93,7 +93,7 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
 
       await window.keplr.enable(chain_id)
       //const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
-
+     
       const chainClient = await SigningStargateClient.connect(
         rpc,
         //offlineSigner
@@ -119,21 +119,21 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
 
 
 
-export const useGrantsForUser = (granter: string, msgTypeUrl?: string) => {
-  //console.log(msgTypeUrl)
-  const { status, client } = useRecoilValue(walletState)
+export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxData?: AutoTxData) => {
 
+  const ibcAsset = useIBCAssetInfo(tokenSymbol)
+  const { status, client, address } = useRecoilValue(ibcWalletState)
   const { data, isLoading } = useQuery(
     ['granter', granter],
     async () => {
 
-      const resp: Grant[] = await getGrants({ grantee: client.address, granter, msgTypeUrl, client })
-
-      return resp
+      const { rpc } = ibcAsset
+      let url = JSON.parse(autoTxData.msg)["typeUrl"];
+      return await getGrants({ grantee: address, granter, msgTypeUrl: url.toString(), rpc })
 
     },
     {
-      enabled: Boolean(msgTypeUrl != "" && status === WalletStatusType.connected && client && client.address),
+      enabled: Boolean(autoTxData.msg != "" && autoTxData.msg != undefined && status === WalletStatusType.connected && client && address),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,

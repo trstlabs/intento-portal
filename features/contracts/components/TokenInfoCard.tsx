@@ -156,10 +156,10 @@ export const TokenInfoCard = ({
 
 }
 
-const relativeTime = (timestamp) => {
+export const relativeTime = (timestamp) => {
     /* parse the actual dates */
     const date = dayjs(timestamp)
-    console.log(date)
+    
     const now = dayjs()
 
     const hoursLeft = date.diff(now, 'hours')
