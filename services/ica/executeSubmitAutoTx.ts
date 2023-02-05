@@ -4,6 +4,7 @@ import {
   msgRegistry, Registry,
   TrustlessChainClient,
 } from 'trustlessjs'
+import { Coin } from 'trustlessjs/dist/protobuf/cosmos/base/v1beta1/coin'
 
 import {
 
@@ -71,7 +72,9 @@ export const executeSubmitAutoTx = async ({
      console.log(msg)
 
   }
- 
+
+  const dependsOnTxIds: number[] = [];
+  const feeFunds: Coin[] = [];
 
   console.log(msg.value.toString())
   return validateTransactionSuccess(
@@ -82,8 +85,8 @@ export const executeSubmitAutoTx = async ({
       interval,
       startAt: startAt.toString(),
       retries: 0,//autoTxData.retries,
-      dependsOnTxIds: [],//[3, 4],//autoTxData.dependsOnTxIds,
-      feeFunds: [],
+      dependsOnTxIds,
+      feeFunds,
     },
 
       { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
