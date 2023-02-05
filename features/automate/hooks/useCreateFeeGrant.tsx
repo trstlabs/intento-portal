@@ -58,7 +58,7 @@ export const useCreateFeeGrant = ({
             onSuccess(data) {
                 console.log(data)
                 popConfetti(true)
-                setTimeout(() => popConfetti(false), 3000)
+                setTimeout(() => popConfetti(false), 4000)
                 refetchQueries()
             },
             onError(e) {

@@ -297,16 +297,16 @@ export const SubmitAutoTxDialog = ({
                             />{chainSymbol}</Text>
 
                         </Inline>  {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
-                        {!isExecutingAuthzGrant && (<><Button css={{ marginTop: '$8', margin: '$2' }}
+                        {!isExecutingAuthzGrant && (<>{!hasIcaAuthzGrant && <Button css={{ marginTop: '$8', margin: '$2' }}
                             variant="primary"
                             size="small"
-                            disabled={shouldDisableAuthzGrantButton }
+                            disabled={shouldDisableAuthzGrantButton}
                             onClick={() =>
                                 handleCreateAuthzGrantClick()
                             }
                         >
                             {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Add Grant')}
-                        </Button>
+                        </Button>}
                             {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && !isExecutingSendFunds && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
                                 variant="primary"
                                 size="small"

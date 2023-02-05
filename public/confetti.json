@@ -1,9 +1,5 @@
 {
-    "background": {
-        "color": {
-            "value": "#000000"
-        }
-    },
+
     "fullScreen": {
         "enable": true
     },
