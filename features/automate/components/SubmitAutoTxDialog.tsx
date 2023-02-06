@@ -384,6 +384,7 @@ export const SubmitAutoTxDialog = ({
                 }
                 confirmationButton={
                     <Button
+                        disabled={icaBalance == 0}
                         variant="primary"
                         onClick={() => isLoading ? undefined : handleData(false)}
                     >

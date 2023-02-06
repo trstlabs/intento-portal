@@ -6,7 +6,7 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 
 import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
 import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
@@ -84,7 +84,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
     {
       enabled: Boolean(tokenSymbol && status === WalletStatusType.connected && client),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -133,7 +133,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
       ),
 
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
 
       onError(error) {

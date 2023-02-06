@@ -2,7 +2,7 @@ import { usePriceForOneToken } from 'features/swap'
 import { useQuery } from 'react-query'
 
 import { tokenDollarValueQuery } from '../queries/tokenDollarValueQuery'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { useGetMultipleIBCAssetInfo } from './useIBCAssetInfo'
 import {
   useBaseTokenInfo,
@@ -68,7 +68,7 @@ export const useTokenDollarValueQuery = (tokenSymbols?: Array<string>) => {
     {
       enabled: Boolean(tokenSymbols?.length),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )

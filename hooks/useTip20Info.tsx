@@ -4,7 +4,7 @@ import { useRecoilValue } from 'recoil'
 
 import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getTip20History } from '../services/contracts'
 
 export const useContractBalance = (contractAddress: string) => {
@@ -24,7 +24,7 @@ export const useContractBalance = (contractAddress: string) => {
     {
       enabled: Boolean(contractAddress && status === WalletStatusType.connected),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -44,7 +44,7 @@ export const useTip20Info = (contractAddress: string) => {
     {
       enabled: Boolean(client && contractAddress && status === WalletStatusType.connected),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -67,7 +67,7 @@ export const useTip20History = (contractAddress: string) => {
     {
       enabled: Boolean(client && contractAddress && status === WalletStatusType.connected),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )

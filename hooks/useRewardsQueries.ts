@@ -5,7 +5,7 @@ export {}
 // import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 // import {
 //   __POOL_REWARDS_ENABLED__,
-//   DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+//   DEFAULT_REFETCH_INTERVAL,
 // } from 'util/constants'
 // import { convertMicroDenomToDenom } from 'util/conversion'
 
@@ -69,7 +69,7 @@ export {}
 //           status === WalletStatusType.connected
 //       ),
 //       refetchOnMount: 'always',
-//       refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+//       refetchInterval: DEFAULT_REFETCH_INTERVAL,
 //       refetchIntervalInBackground: true,
 //     }
 //   )

@@ -1,13 +1,12 @@
 import { AppLayout, PageHeader } from 'components'
-
 import { useRecoilValue } from 'recoil'
 import {
-  SortDirections, ButtonWithDropdownForSorting,
+  ButtonWithDropdownForSorting,
+  SortDirections,
   SortParameters,
-  useSortAutoTxs
+  useSortAutoTxs,
 } from 'features/auto-txs'
 import {
-  Card,
   Column,
   ConnectIcon,
   Inline,
@@ -15,21 +14,23 @@ import {
   Spinner,
   styled,
   Text,
+
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
-import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
+import { AutoTxCard } from '../../features/auto-txs/components/AutoTxCard'
+import { InfoArgs } from '../../features/auto-txs/hooks/useSortAutoTxs'
 
 
-export default function Home() {
+export default function AutoTxs() {
 
-  const { address, key } = useRecoilValue(walletState)
+  const { address } = useRecoilValue(walletState)
   const [autoTxs, isLoading] = useAutoTxInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs = { infos: autoTxs, address }
+  const infoArgs: InfoArgs = { infos: autoTxs, address }
   const [myAutoTxs, allAutoTxs, isSorting] = useSortAutoTxs({
     infoArgs,
     sortBy: useMemo(
@@ -43,22 +44,18 @@ export default function Home() {
 
   const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
-  
+
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Look into your assets and interact with your personal triggers."
+      subtitle="Look into your assets and interact with your personal autoTxs."
     />
   )
 
   return (
     <AppLayout>
       {pageHeaderContents}
-      {!key &&
-        <Card disabled variant="secondary"><Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
-          Connect a wallet
-        </Text></Card>
-      }
+
       {shouldShowFetchingState && (
         <>
           <Column
@@ -70,7 +67,7 @@ export default function Home() {
           </Column>
         </>
       )}
-      {!isLoading && isSorting && address && (<Column
+      {!isLoading && isSorting && (<Column
         justifyContent="center"
         align="center"
         css={{ paddingTop: '$24' }}
@@ -79,7 +76,7 @@ export default function Home() {
           <ConnectIcon color="secondary" />
           <Text variant="primary">
             {
-              "Finding your triggers..."
+              "Finding your autoTxs..."
             }
           </Text>
         </Inline>
@@ -91,12 +88,11 @@ export default function Home() {
               <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
                 Your Personal AutoTxs
               </Text>
-
               <StyledDivForAutoTxsGrid>
                 {myAutoTxs.map(
                   (autoTxInfo) => (
                     <AutoTxCard
-                     // key={autoTxInfo.txId}
+                      key={autoTxInfo.txId}
                       autoTxInfo={autoTxInfo}
                       ownerAddress={autoTxInfo.owner}
                     />

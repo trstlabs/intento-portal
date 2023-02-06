@@ -4,7 +4,7 @@ import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
 import { Claim, getClaims } from 'services/staking'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from 'util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from 'util/constants'
 
 import { usePoolFromListQueryById } from '../../../queries/usePoolsListQuery'
 
@@ -48,7 +48,7 @@ export const useStakingClaims = ({ poolId }) => {
           pool?.staking_address && status === WalletStatusType.connected
         ),
         refetchOnMount: 'always',
-        refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+        refetchInterval: DEFAULT_REFETCH_INTERVAL,
         refetchIntervalInBackground: true,
       }
     )

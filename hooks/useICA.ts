@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
 
 import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getICA, getGrants, getFeeGrantAllowance, getBalanceForICA, AutoTxData } from '../services/ica'
 // import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { SigningStargateClient } from '@cosmjs/stargate'
@@ -24,7 +24,7 @@ export const useICAForUser = (connectionId: string) => {
     {
       enabled: Boolean(connectionId != "" && connectionId != undefined && status === WalletStatusType.connected && client && client.address),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     },
   )
@@ -49,7 +49,7 @@ export const useGetGrantForUser = (granter: string, msgTypeUrl: string) => {
     {
       enabled: Boolean(msgTypeUrl != "" && status === WalletStatusType.connected && client && client.address),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     },
   )
@@ -74,7 +74,7 @@ export const useGetBalanceForICA = (ica: string) => {
     {
       enabled: Boolean(status === WalletStatusType.connected && client),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     },
   )
@@ -109,7 +109,7 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
     {
       enabled: Boolean(nativeWalletAddress && ibcAsset),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     }
   )
@@ -135,7 +135,7 @@ export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxDat
     {
       enabled: Boolean(autoTxData.msg != "" && autoTxData.msg != undefined && status === WalletStatusType.connected && client && address),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     },
   )
@@ -161,7 +161,7 @@ export const useFeeGrantAllowanceForUser = (granter: string) => {
     {
       enabled: Boolean(granter != "" && status === WalletStatusType.connected && client && client.address),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     },
   )

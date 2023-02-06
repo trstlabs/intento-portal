@@ -7,7 +7,7 @@ import { useTrustlessChainClient } from '../hooks/useTrustlessChainClient'
 import { walletState } from '../state/atoms/walletAtoms'
 import {
   __POOL_REWARDS_ENABLED__,
-  DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+  DEFAULT_REFETCH_INTERVAL,
 } from '../util/constants'
 import { calcPoolTokenDollarValue } from '../util/conversion'
 import { queryMyLiquidity } from './queryMyLiquidity'
@@ -161,7 +161,7 @@ export const useQueryMultiplePoolsLiquidity = ({
 
       refetchOnMount: false as const,
       refetchInterval: refetchInBackground
-        ? DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL
+        ? DEFAULT_REFETCH_INTERVAL
         : undefined,
       refetchIntervalInBackground: refetchInBackground,
 

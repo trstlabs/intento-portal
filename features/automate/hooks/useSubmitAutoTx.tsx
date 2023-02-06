@@ -58,24 +58,24 @@ export const useSubmitAutoTx = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
-                        title="Scheduled contract execution successfully!"
-                        body={`Scheduled to send message recurringly!} The AutTX ID is ${autoTxID}`}
+                        title="Scheduled your automation!"
+                        body={`On-chain trigger created succesfully!} The AutoTX ID is ${autoTxID}`}
                         buttons={
                             <Button
                                 as="a"
                                 variant="ghost"
-                                href={`/contracts/${autoTxID}`}
+                                href={`/triggers/${autoTxID}`}
                                 target="__blank"
                                 iconRight={<UpRightArrow />}
                             >
-                                Go to your AutoTx
+                                Go to your trigger
                             </Button>
                         }
                         onClose={() => toast.dismiss(t.id)}
                     />
                 ))
                 popConfetti(true)
-                setTimeout(() => popConfetti(false), 4000)
+                
                 refetchQueries()
             },
             onError(e) {

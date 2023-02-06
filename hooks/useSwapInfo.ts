@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 
 import { usePoolsListQuery } from '../queries/usePoolsListQuery'
 import { getSwapInfo, InfoResponse } from '../services/swap'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { useTrustlessChainClient } from './useTrustlessChainClient'
 
 export type SwapInfo = Pick<
@@ -53,7 +53,7 @@ export const useSwapInfo = ({
       enabled: Boolean(poolsListResponse?.pools.length && client && poolId),
       refetchOnMount: false,
       refetchInterval: refetchInBackground
-        ? DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL
+        ? DEFAULT_REFETCH_INTERVAL
         : undefined,
       refetchIntervalInBackground: refetchInBackground,
     }
