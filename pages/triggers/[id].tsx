@@ -9,7 +9,6 @@ import {
   Inline,
   Spinner,
   styled,
-  Text,
   useMedia,
 } from 'junoblocks'
 import Head from 'next/head'
@@ -35,7 +34,7 @@ export default function AutoTx() {
   const [autoTxInfo, isLoading] = useAutoTxInfo(id)
 
 
-  if (!autoTxInfo && !id) {
+  if (isLoading || !autoTxInfo || !id) {
     return (
 
       <Inline
@@ -45,13 +44,13 @@ export default function AutoTx() {
       > <title>
           AutoTx
         </title>
-        {isLoading ? (
+       {/*  {isLoading && (
           <Text variant="header">
             {"Oops, we've messed up. Please try again later."}
           </Text>
-        ) : (
+        ) : ( */}
           <Spinner color="primary" />
-        )}
+   {/*      )} */}
       </Inline>
     )
   }
@@ -76,7 +75,7 @@ export default function AutoTx() {
         {APP_NAME && autoTxInfo != undefined && (
           <Head>
             <title>
-              {APP_NAME} — AutoTx {autoTxInfo.txId}
+              {APP_NAME} — Trigger {autoTxInfo.txId}
             </title>
           </Head>
         )}
@@ -95,7 +94,6 @@ export default function AutoTx() {
               autoTxInfo={autoTxInfo}
               size={isMobile ? 'small' : 'large'}
             />
-
           </>
         )}
       </AppLayout>

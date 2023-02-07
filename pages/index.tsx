@@ -43,7 +43,7 @@ export default function Home() {
 
   const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
-  
+
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
@@ -94,12 +94,12 @@ export default function Home() {
 
               <StyledDivForAutoTxsGrid>
                 {myAutoTxs.map(
-                  (autoTxInfo) => (
-                    <AutoTxCard
-                     // key={autoTxInfo.txId}
-                      autoTxInfo={autoTxInfo}
-                      ownerAddress={autoTxInfo.owner}
-                    />
+                  (autoTxInfo, index) => (
+                      <AutoTxCard
+                        key={index}
+                        //structuredClone does not work on ios
+                        autoTxInfo={structuredClone(autoTxInfo)}
+                      />
                   )
                 )}
               </StyledDivForAutoTxsGrid>
@@ -131,13 +131,11 @@ export default function Home() {
 
       <StyledDivForAutoTxsGrid>
         {allAutoTxs.map(
-          (
-            autoTxInfo,
-          ) => (
+          (autoTxInfo, index) => (
             <AutoTxCard
-              // key={autoTxInfo.txId}
-              autoTxInfo={autoTxInfo}
-              ownerAddress={autoTxInfo.owner}
+              key={index}
+              //structuredClone does not work on ios
+              autoTxInfo={structuredClone(autoTxInfo)}
             />
           )
         )}

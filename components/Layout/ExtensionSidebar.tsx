@@ -10,9 +10,8 @@ export const ExtensionSidebar = () => {
         <Text>This is a {__TEST_MODE__ ? 'testnet' : 'beta'} version</Text>
       </StyledDivForTitleWrapper>
       <Text css={{ padding: '$9 0 $11' }}>
-        This website is currently{' '}
-        {__TEST_MODE__ ? 'operates in testnet mode' : 'in beta'}. Please provide
-        feedback.
+        {process.env.NEXT_PUBLIC_SITE_TITLE} is currently{' '}
+        {__TEST_MODE__ ? 'operating in testnet mode' : 'in beta'}. 
       </Text>
       <Button
         as="a"
@@ -35,7 +34,7 @@ const StyledDivForWrapper = styled('div', {
   flexShrink: 0,
   zIndex: 1,
   position: 'sticky',
-  borderLeft: '1px solid $borderColors$inactive',
+  // borderLeft: '1px solid $borderColors$inactive',
   top: 0,
   right: 0,
   width: '100%',

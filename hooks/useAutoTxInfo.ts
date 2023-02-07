@@ -3,9 +3,6 @@ import { useRecoilValue } from 'recoil'
 import { getAutoTxInfo, getAutoTxInfos, getAutoTxInfosForOwner } from '../services/auto-ibc-tx'
 import { walletState } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-import { useTrustlessChainClient } from './useTrustlessChainClient'
-
-
 
 export const useAutoTxInfosForOwner = () => {
     const { client } =
@@ -28,7 +25,6 @@ export const useAutoTxInfosForOwner = () => {
     return [data, isLoading] as const
 }
 
-
 export const useAutoTxInfos = () => {
     const { client } =
         useRecoilValue(walletState)
@@ -38,7 +34,7 @@ export const useAutoTxInfos = () => {
         async () => {
 
             const resp = await getAutoTxInfos(client)
-            console.log("resp")
+            
             console.log(resp)
             return resp
         },
@@ -60,6 +56,7 @@ export const useAutoTxInfo = (id) => {
     const { data, isLoading } = useQuery(
         ['autoTxId', id],
         async () => {
+            console.log(id)
             const info = await getAutoTxInfo(id, client)
             console.log(info)
             return info.autoTxInfo

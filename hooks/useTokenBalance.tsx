@@ -7,8 +7,8 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
-import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
+import { useIBCAssetInfo } from './useIBCAssetInfo'
+import { IBCAssetInfo, /* useIBCAssetList */ } from './useIBCAssetList'
 import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
 
@@ -95,7 +95,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
 export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   const { address, status, client } = useRecoilValue(walletState)
   const [tokenList] = useTokenList()
-  const [ibcAssetsList] = useIBCAssetList()
+  // const [ibcAssetsList] = useIBCAssetList()
 
   const queryKey = useMemo(
     () => `multipleTokenBalances/${tokenSymbols?.join('+')}`,
@@ -113,7 +113,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
             token:
               getTokenInfoFromTokenList(tokenSymbol, tokenList.tokens) ||
               mapIbcTokenToNative(
-                getIBCAssetInfoFromList(tokenSymbol, ibcAssetsList?.tokens)
+                useIBCAssetInfo(tokenSymbol)
               ) ||
               {},
           })

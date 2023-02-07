@@ -1,7 +1,10 @@
+import { convertDenomToMicroDenom } from 'junoblocks'
 import {
+  Coin,
   // GeneratedType,
   // getMsgDecoderRegistry,
   msgRegistry, Registry,
+  toUtf8,
   TrustlessChainClient,
 } from 'trustlessjs'
 
@@ -45,13 +48,24 @@ export const executeSubmitAutoTx = async ({
 
   let duration = autoTxData.duration + "ms"
   let interval = autoTxData.interval + "ms"
+
   const masterRegistry = new Registry(msgRegistry);
 
   //let type = masterRegistry.lookupType((JSON.parse(autoTxData.msg)["typeUrl"]).toString())
   let value = JSON.parse(autoTxData.msg)["value"]
   console.log(value)
+
+  let typeUrl: string = JSON.parse(autoTxData.msg)["typeUrl"].toString()
+  if (typeUrl.startsWith("/cosmwasm")) {
+    let msg: string = JSON.stringify(value["msg"])
+    console.log(msg)
+    let msg2: Uint8Array = toUtf8(msg)
+    console.log(msg2)
+    value["msg"] = msg2
+  }
+
   const encodeObject = {
-    typeUrl: JSON.parse(autoTxData.msg)["typeUrl"].toString(),
+    typeUrl,
     value
   }
   //console.log(type)
@@ -65,11 +79,15 @@ export const executeSubmitAutoTx = async ({
         msgs: [msg],
         grantee: owner,
       }
-     
-    }
-     msg = masterRegistry.encodeAsAny(encodeObject2)
-     console.log(msg)
 
+    }
+    msg = masterRegistry.encodeAsAny(encodeObject2)
+    console.log(msg)
+
+  }
+  let feeFunds: Coin[] = [];
+  if (autoTxData.feeFunds > 0) {
+    feeFunds = [{ denom: "utrst", amount: convertDenomToMicroDenom(autoTxData.feeFunds, 6).toString() }]
   }
 
   console.log(msg.value.toString())
@@ -82,7 +100,7 @@ export const executeSubmitAutoTx = async ({
       startAt: startAt.toString(),
       // retries: 0,//autoTxData.retries,
       // dependsOnTxIds,
-      // feeFunds,
+      feeFunds,
     },
 
       { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
@@ -101,6 +119,7 @@ export class AutoTxData {
   msg: string
   retries: number
   withAuthZ: boolean
+  feeFunds?: number
 }
 /* 
 const atob: (b64: string) => string =

@@ -59,7 +59,7 @@ export const useConnectIBCWallet = (
 
       const { chain_id, rpc } = assetInfo
 
-
+      console.log(chain_id)
       const customRegistry = new Registry(defaultStargateTypes);
       customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
       await window.keplr.enable(chain_id)

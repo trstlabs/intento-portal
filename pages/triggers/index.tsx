@@ -90,12 +90,12 @@ export default function AutoTxs() {
               </Text>
               <StyledDivForAutoTxsGrid>
                 {myAutoTxs.map(
-                  (autoTxInfo) => (
+                  (autoTxInfo, index) => (
+                    <div key={index}>
                     <AutoTxCard
-                      key={autoTxInfo.txId}
                       autoTxInfo={autoTxInfo}
-                      ownerAddress={autoTxInfo.owner}
                     />
+                    </div>
                   )
                 )}
               </StyledDivForAutoTxsGrid>
@@ -127,14 +127,12 @@ export default function AutoTxs() {
 
       <StyledDivForAutoTxsGrid>
         {allAutoTxs.map(
-          (
-            autoTxInfo,
-          ) => (
+          (autoTxInfo, index) => (
+            <div key={index}>
             <AutoTxCard
-              // key={autoTxInfo.txId}
               autoTxInfo={autoTxInfo}
-              ownerAddress={autoTxInfo.owner}
             />
+            </div>
           )
         )}
       </StyledDivForAutoTxsGrid>

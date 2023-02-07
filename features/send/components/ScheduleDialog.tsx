@@ -376,7 +376,7 @@ function RecurrenceContent({
                                     onChange={({ target: { value } }) => handleMaxFee(value)}
                                 /></Text></StyledDivForLiquidityInputs></Inline>   {recurrences > 0 && (<Text align="center"
                                     variant="caption">
-                                    Suggested funds for fees:  {recurrences * 0.1} TRST</Text>)}
+                                    Suggested:  {recurrences * 0.1} TRST</Text>)}
                         </Column>
                     </Column>
 

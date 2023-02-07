@@ -220,6 +220,7 @@ export const AutoTxList = ({
     isExecutingRegisterICA || !icaAddr || !isJsonValid ||
     (autoTxDatas[0].msg && autoTxDatas[0].msg.length == 0 && JSON.parse(autoTxDatas[0].msg)["typeUrl"].length < 5)
 
+
   return (
     <div >
       <Card variant="secondary" disabled css={{ margin: '$6' }}>
@@ -251,18 +252,28 @@ export const AutoTxList = ({
                   {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
                     <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant:<Text variant="caption"> Has grant for message type '{icaAuthzGrants.msgTypeUrl}' that expires in {(relativeTime(icaAuthzGrants.grants[0].expiration.seconds.toNumber() * 1000))}</Text></Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)} </Column>
                 )}
+
                 <Column>
-                  <Row><Text>Examples: </Text> <Button css={{ display: 'end', margin: '$2', }}
-                    variant="secondary"
-                    onClick={() => setExample(index, 'msg', sendExample)}
-                  >Send </Button> <Button css={{ display: 'end', margin: '$2', }}
-                    variant="secondary"
-                    onClick={() => setExample(index, 'msg', stakeExample)}
-                  >Stake </Button>
+                  <Row><Text>Examples: </Text>
+                    {chainSymbol == "JUNO" && (<><Button css={{ display: 'end', margin: '$2', }}
+                      variant="secondary"
+                      onClick={() => setExample(index, 'msg', wasmExecExample)}
+                    >Execute </Button><Button css={{ display: 'end', margin: '$2', }}
+                      variant="secondary"
+                      onClick={() => setExample(index, 'msg', wasmInitExample)}
+                    >Instantiate </Button></>)}
+                    <Button css={{ display: 'end', margin: '$2', }}
+                      variant="secondary"
+                      onClick={() => setExample(index, 'msg', sendExample)}
+                    >Send </Button> <Button css={{ display: 'end', margin: '$2', }}
+                      variant="secondary"
+                      onClick={() => setExample(index, 'msg', claimRewardExample)}
+                    >Claim </Button>
                     <Button css={{ display: 'end', margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', unstakeExample)}
-                    >Unstake </Button> </Row>
+                    >Unstake </Button>
+                  </Row>
                   <Row>
                     <JsonCodeMirrorEditor
                       jsonValue={autoTxData.msg}
@@ -290,7 +301,7 @@ export const AutoTxList = ({
             </Column> */}
           </div>))
         }
-      </Card >
+      </Card>
       {isJsonValid && autoTxDatas[0].msg && autoTxDatas[0].msg.length > 3 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
           <Text align="left"
@@ -387,6 +398,7 @@ function Row({ children }) {
 }
 
 
+
 const sendExample = JSON.stringify({
   "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
   "value": {
@@ -398,7 +410,7 @@ const sendExample = JSON.stringify({
     "to_address": "trust1..."
   }
 }, null, "\t")
-
+/* 
 const stakeExample = JSON.stringify(
   {
     "typeUrl": "/cosmos.staking.v1beta1.MsgDelegate",
@@ -412,7 +424,7 @@ const stakeExample = JSON.stringify(
     }
   }, null, "\t")
 
-
+ */
 const unstakeExample = JSON.stringify(
   {
     "typeUrl": "/cosmos.staking.v1beta1.MsgUndelegate",
@@ -423,5 +435,51 @@ const unstakeExample = JSON.stringify(
       },
       "delegator_address": "trust1....",
       "validator_address": "trustvaloper1..."
+    }
+  }, null, "\t")
+
+const wasmExecExample = JSON.stringify(
+  {
+    "typeUrl": "/cosmwasm.wasm.v1.MsgExecuteContract",
+    "value": {
+      "sender": "trust1....",
+      "contract": "trust1....",
+      "msg": {
+        "claim_tokens": {
+          "amount": "7",
+          "symbol": "btc"
+        }
+      },
+      "funds": [{
+        "amount": "70",
+        "denom": "utrst"
+      }],
+    }
+  }, null, "\t")
+
+const claimRewardExample = JSON.stringify(
+  {
+    "typeUrl": "  /cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+    "value": {
+      "delegator_address": "trust1....",
+      "validator_address": "trustvaloper1..."
+    }
+  }, null, "\t")
+
+
+
+const wasmInitExample = JSON.stringify(
+  {
+    "typeUrl": "/cosmwasm.wasm.v1.MsgInstantiateContract",
+    "value": {
+      "sender": "trust1....",
+      "admin": "trust1....",
+      "codeId": "0",
+      "label": "my contract",
+      "msg": "/** Msg json encoded message to be passed to the contract */",
+      "funds": [{
+        "amount": "70",
+        "denom": "utrst"
+      }],
     }
   }, null, "\t")

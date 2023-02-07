@@ -39,7 +39,8 @@ export const useSubmitAutoTx = ({
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-          
+        
+
             return await executeSubmitAutoTx({
                 owner: address,
                 autoTxData,
@@ -58,8 +59,8 @@ export const useSubmitAutoTx = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
-                        title="Scheduled your automation!"
-                        body={`On-chain trigger created succesfully!} The AutoTX ID is ${autoTxID}`}
+                        title="Your trigger is submitted!"
+                        body={`An on-chain trigger was created succesfully!} The ID is ${autoTxID}`}
                         buttons={
                             <Button
                                 as="a"
@@ -68,7 +69,7 @@ export const useSubmitAutoTx = ({
                                 target="__blank"
                                 iconRight={<UpRightArrow />}
                             >
-                                Go to your trigger
+                                Go to your new trigger
                             </Button>
                         }
                         onClose={() => toast.dismiss(t.id)}
@@ -84,7 +85,7 @@ export const useSubmitAutoTx = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops scheduling error!"
+                        title="Oops error submitting message!"
                         body={errorMessage}
                         buttons={
                             <Button

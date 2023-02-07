@@ -22,7 +22,6 @@ export declare type contractInfoWithDetails = {
 };
 
 export const ContractCard = ({
-    
     contractAddress,
     contractInfo,
    

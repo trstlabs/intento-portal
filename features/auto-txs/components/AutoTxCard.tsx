@@ -17,56 +17,59 @@ import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo';
 
 export declare type autoTxInfoWithDetails = {
-    ownerAddress: string;
-    autoTxInfo?: AutoTxInfo;
+    autoTxInfo: AutoTxInfo;
 
 };
 
 export const AutoTxCard = ({
-    ownerAddress,
     autoTxInfo,
 
 }: autoTxInfoWithDetails) => {
-    const ChainInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
+    const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
     const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
+    const msgData = new TextDecoder().decode(autoTxInfo.data).split(".")
+    const data = msgData.find((data) => data.includes("Msg")).split(",")
     return (
-        <Link href={`/triggers/${ownerAddress}`} passHref>
+        <Link href={`/triggers/${autoTxInfo.txId}`} passHref>
             <Card variant="secondary" active={isActive}>
                 <CardContent size="medium">
                     <Column align="center">
-                        <StyledDivForTokenLogos css={{ paddingTop: '$20' }}>
+                        {ibcInfo && (<StyledDivForTokenLogos css={{ paddingTop: '$20' }}>
                             <ImageForTokenLogo
                                 size="big"
-                                logoURI={ChainInfo.logoURI}
-                                alt={ChainInfo.symbol}
+                                logoURI={ibcInfo.logoURI}
+                                alt={ibcInfo.symbol}
                             />
-                        </StyledDivForTokenLogos>
+                        </StyledDivForTokenLogos>)}
                         <StyledText
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
                         > Trigger ID: {autoTxInfo.txId}  </StyledText>
-                      <Column align="center"> <StyledText variant="caption">On {ChainInfo.name}</StyledText></Column>
-                      
+                        <Column align="center"> <StyledText variant="caption">
+                            <> Message Type: {data[0]}</>
+                        </StyledText></Column>
+
                     </Column>
                 </CardContent>
                 <Divider offsetTop="$10" offsetBottom="$5" />
                 <CardContent size="medium">
                     <Column gap={5} css={{ paddingBottom: '$8' }}>
-                        <Text variant="legend" color="secondary">
+                        {/*    <Text variant="legend" color="secondary">
                             Information
-                        </Text>
+                        </Text> */}
                         <Text variant="legend">
-                            {isActive ? (
-                                <>🟢
+                            {isActive ? <> 🟢 Active Trigger on {ibcInfo.name}</> : <>🔴 Execution ended</>}
+                            {/* {isActive ? (
+                                <>
                                     <StyledSpanForHighlight>
-                                        ExecTime: {autoTxInfo.execTime}{' '}
+                                        🟢  ExecTime: {autoTxInfo.execTime}{' '}
                                     </StyledSpanForHighlight>
                                     EndTime {autoTxInfo.endTime}
                                 </>
                             ) : (
                                 <>🔴 Owner: {autoTxInfo.owner}</>
-                            )}
+                            )} */}
                         </Text>
                     </Column>
                 </CardContent>
@@ -102,8 +105,9 @@ const StyledText: typeof Text = styled(Text, {
         backgroundColor: '$textColors$primary',
     },
 })
-
+/* 
 const StyledSpanForHighlight = styled('span', {
     display: 'inline',
     color: '$textColors$brand',
 })
+ */

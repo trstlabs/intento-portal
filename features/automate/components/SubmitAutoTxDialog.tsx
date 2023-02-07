@@ -37,6 +37,7 @@ export class AutoTxData {
     recurrences: number
     retries: number
     withAuthZ: boolean
+    feeFunds?: number
 }
 
 type SubmitAutoTxDialogProps = {
@@ -67,7 +68,7 @@ export const SubmitAutoTxDialog = ({
     const [duration, setDuration] = useState(autoTxData.duration);
 
     const [interval, setInterval] = useState(autoTxData.interval);
-    //const [feeFunds, setFeeFundsAmount] = useState(null);
+    const [feeFunds, setFeeAmount] = useState(null);
     const [recurrences, setRecurrence] = useState(2);
     const isLoading = false;
 
@@ -147,7 +148,7 @@ export const SubmitAutoTxDialog = ({
         setDisplayRecurrences("2")
     }
 
-    const [feeFundsHostChain, setFeeFundsHostChain] = useState("0");
+    const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
     const [requestedSendFunds, setRequestedSendFunds] = useState(false)
     const { mutate: handleSendFunds, isLoading: isExecutingSendFunds } =
         useSendFunds({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
@@ -186,9 +187,9 @@ export const SubmitAutoTxDialog = ({
         !icaAddr ||
         (autoTxData.msg && autoTxData.msg.length == 0)
 
-    // function handleMaxFee(input) {
-    //     setFeeAmount(input);
-    // }
+    function handleFeeFunds(input) {
+        setFeeAmount(input);
+    }
     function handleDisplayRecurrence(value) {
         let displayRecs = value.toString() + ' times'
         if (value == 1) {
@@ -198,7 +199,7 @@ export const SubmitAutoTxDialog = ({
 
     }
 
-
+    const suggestedFunds = recurrences * 0.1
     const canSchedule = duration > 0 && interval > 0
 
 
@@ -214,8 +215,9 @@ export const SubmitAutoTxDialog = ({
         }
 
         console.log({ startTime, duration, interval, recurrences })
-        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msg: autoTxData.msg, withAuthZ })
+        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msg: autoTxData.msg, withAuthZ, feeFunds })
     }
+
 
     return (
         <Dialog isShowing={isShowing} onRequestClose={onRequestClose}>
@@ -263,8 +265,8 @@ export const SubmitAutoTxDialog = ({
                         </Inline>
                         <DialogDivider offsetY="$4" />
                         <Text css={{ margin: '$4' }} align="center"
-                            variant="caption" >
-                            Optional settings </Text>
+                            variant="legend" >
+                            Optional Settings </Text>
                         <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
                                 <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify a start time for the trigger (optional)</Text><ChipSelected label={"In " + displayStartTime} onClick={() => handleRemoveStartTime()} />
@@ -287,36 +289,7 @@ export const SubmitAutoTxDialog = ({
                                         )}
                                     </span>))}
                             </div>
-                        </Inline>    <DialogDivider offsetTop="$4" offsetBottom="$4" />
-
-                        <Inline justifyContent={'space-between'} align="center">
-                            {icaBalance != 0 ? <Text variant="caption"> Top up balance of  {icaBalance} {chainSymbol} (optional)</Text> : <Text variant="caption"> Important: Fund ICA Balance with {chainSymbol}</Text>} <Text variant="legend"><StyledInput step=".01"
-                                placeholder="0.00" type="number"
-                                value={feeFundsHostChain}
-                                onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
-                            />{chainSymbol}</Text>
-
-                        </Inline>  {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
-                        {!isExecutingAuthzGrant && (<>{!hasIcaAuthzGrant && <Button css={{ marginTop: '$8', margin: '$2' }}
-                            variant="primary"
-                            size="small"
-                            disabled={shouldDisableAuthzGrantButton}
-                            onClick={() =>
-                                handleCreateAuthzGrantClick()
-                            }
-                        >
-                            {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Add Grant')}
-                        </Button>}
-                            {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && !isExecutingSendFunds && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
-                                variant="primary"
-                                size="small"
-                                disabled={shouldDisableSendFundsButton}
-                                onClick={() =>
-                                    handleSendFundsClick()
-                                }
-                            >
-                                {isExecutingSendFunds && (<Spinner instant />)}  {('Send ' + feeFundsHostChain + " " + chainSymbol)}
-                            </Button>}</>)}
+                        </Inline>
                         {/*  <Inline justifyContent={'space-between'} align="center">
                             <Text>  <StyledInput step=".01"
                                 placeholder="0.00" type="number"
@@ -333,44 +306,67 @@ export const SubmitAutoTxDialog = ({
                             >
                                 {isExecutingFeeGrant ? <Spinner instant /> : 'Fee Grant'}
                             </Button>
-                        </Inline> */}
-                        {/*  <Column css={{ padding: '$8 0' }}>
-                            <DialogDivider offsetY="$4" /><Tooltip
-                                label="Funds that are set aside for automatic execution. Remaining funds are refunded."
-                                aria-label="Fee Funds - TRST"
-                            ><Text align="center"
-                                variant="caption">
-                                    Fee Funds - TRST</Text></Tooltip>
-
-
-                            <Inline> <StyledDivForLiquidityInputs>
-
-                                <Text><StyledInput step=".01"
-                                    placeholder="0.00" type="number"
-                                    value={funds}
-                                    onChange={({ target: { value } }) => handleMaxFee(value)}
-                                /></Text></StyledDivForLiquidityInputs></Inline>   {recurrences > 0 && (<Text align="center"
-                                    variant="caption">
-                                    Suggested funds for fees:  {recurrences * 0.1} TRST</Text>)}
-                        </Column> */}
+                            </Inline> */}
                         <Column css={{ padding: '$8 0' }}>
-                            <DialogDivider offsetY="$4" /><Tooltip
-                                label="Funds that are set aside for automatic execution. Remaining funds are refunded."
-                                aria-label="Fee Funds - TRST"
-                            ><Text align="center"
+
+                            <DialogDivider offsetTop="$4" />
+                            <Text css={{ margin: '$4' }} align="center"
+                                variant="legend" >
+                                Execution Settings </Text>
+                            <Text align="center" css={{ margin: '$4' }}
                                 variant="caption">
-                                    Fee Funds - TRST</Text></Tooltip>
+                                Fee Funds - TRST</Text>
 
 
-                            <Inline> <StyledDivForInputs>
+                            <Inline justifyContent={'space-between'} align="center">
 
-                                {/*   <Text><StyledInput step=".01"
+                                <Text variant="legend"><StyledInput step=".01"
                                     placeholder="0.00" type="number"
-                                    value={funds}
-                                    onChange={({ target: { value } }) => handleMaxFee(value)}
-                                /></Text> */}</StyledDivForInputs></Inline>   {recurrences > 0 && (<Text align="center"
+                                    value={feeFunds}
+                                    onChange={({ target: { value } }) => handleFeeFunds(value)}
+                                />TRST</Text>{recurrences > 0 && (<Tooltip
+                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution."
+                                    aria-label="Fee Funds - TRST"
+                                ><Text   color="disabled" wrap={false}
+                                    variant="legend">
+                                        Estimated fees:  {suggestedFunds} TRST</Text></Tooltip>)}
+                            </Inline>
+                           
+                            <Text align="center"
                                 variant="caption">
-                                Estimated funds for fees:  {recurrences * 0.1} TRST</Text>)}
+                                Fee Funds - {chainSymbol}</Text>
+                            <Inline justifyContent={'space-between'} align="center">
+                                <Text variant="legend"><StyledInput step=".01"
+                                    placeholder="0.00" type="number"
+                                    value={feeFundsHostChain}
+                                    onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
+                                />{chainSymbol}</Text>
+                                (<Tooltip
+                                    label="Funds on the interchain account on the host chain. Top it up with caution, you may lose access to the interchain account upon execution failure."
+                                    aria-label="Fee Funds - "
+                                ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}  {icaBalance > suggestedFunds ? <>(optional)</> : <>(important)</>} </Text></Tooltip>)
+
+                            </Inline>   {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
+                            {!isExecutingAuthzGrant && (<>{!hasIcaAuthzGrant && <Button css={{ marginTop: '$8', margin: '$2' }}
+                                variant="primary"
+                                size="small"
+                                disabled={shouldDisableAuthzGrantButton}
+                                onClick={() =>
+                                    handleCreateAuthzGrantClick()
+                                }
+                            >
+                                {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
+                            </Button>}
+                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && !isExecutingSendFunds && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
+                                    variant="primary"
+                                    size="small"
+                                    disabled={shouldDisableSendFundsButton}
+                                    onClick={() =>
+                                        handleSendFundsClick()
+                                    }
+                                >
+                                    {isExecutingSendFunds && (<Spinner instant />)}  {('Send ' + feeFundsHostChain + " " + chainSymbol)}
+                                </Button>}</>)}
                         </Column>
                     </Column>
                 </StyledDivForInputs>
@@ -411,7 +407,7 @@ export const SubmitAutoTxDialog = ({
 
 
 
-        </Dialog>
+        </Dialog >
     )
 }
 
