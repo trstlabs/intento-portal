@@ -325,13 +325,13 @@ export const SubmitAutoTxDialog = ({
                                     value={feeFunds}
                                     onChange={({ target: { value } }) => handleFeeFunds(value)}
                                 />TRST</Text>{recurrences > 0 && (<Tooltip
-                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution."
-                                    aria-label="Fee Funds - TRST"
-                                ><Text   color="disabled" wrap={false}
+                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If unset, your balance will be used"
+                                    aria-label="Fund Trigger - TRST (Optional)"
+                                ><Text color="disabled" wrap={false}
                                     variant="legend">
                                         Estimated fees:  {suggestedFunds} TRST</Text></Tooltip>)}
                             </Inline>
-                           
+
                             <Text align="center"
                                 variant="caption">
                                 Fee Funds - {chainSymbol}</Text>
@@ -341,10 +341,10 @@ export const SubmitAutoTxDialog = ({
                                     value={feeFundsHostChain}
                                     onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
                                 />{chainSymbol}</Text>
-                                (<Tooltip
+                                <Tooltip
                                     label="Funds on the interchain account on the host chain. Top it up with caution, you may lose access to the interchain account upon execution failure."
                                     aria-label="Fee Funds - "
-                                ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}  {icaBalance > suggestedFunds ? <>(optional)</> : <>(important)</>} </Text></Tooltip>)
+                                ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}  {icaBalance > suggestedFunds ? <>(optional)</> : <>(important)</>} </Text></Tooltip>
 
                             </Inline>   {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
                             {!isExecutingAuthzGrant && (<>{!hasIcaAuthzGrant && <Button css={{ marginTop: '$8', margin: '$2' }}

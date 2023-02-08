@@ -9,8 +9,10 @@ import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo, /* useIBCAssetList */ } from './useIBCAssetList'
-import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
+import { getBalanceForAcc, getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
+
+import { useTrustlessChainClient } from './useTrustlessChainClient'
 
 async function fetchTokenBalance({
   client,
@@ -143,4 +145,29 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   )
 
   return [data, isLoading] as const
+}
+
+
+export const useGetBalanceForAcc = (address: string) => {
+  const client = useTrustlessChainClient()
+
+  const { data, isLoading } = useQuery(
+    ['address', address],
+    async () => {
+
+      const resp = await getBalanceForAcc({ address, client })
+      return convertMicroDenomToDenom(resp.balances[0].amount, 6)
+
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: false,
+    },
+  )
+
+  return [data, isLoading] as const
+
+
 }

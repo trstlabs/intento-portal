@@ -12,7 +12,7 @@
       "trst_channel": "channel-1",
       "trst_denom": "ibc/C4CFF46FD6DE35CA4CF4CE031E643C8FDC9BA4B99AE598E9B0ED98FE3A2319F9",
       "logoURI": "https://cryptologos.cc/logos/cosmos-atom-logo.svg?v=014",
-      "connection_id": "connection-1",
+      "connection_id": "connection-3",
       "prefix": "cosmos"
     },
     {
@@ -66,14 +66,14 @@
       "name": "Juno (Local)",
       "symbol": "JUNO",
       "chain_id": "testing",
-      "rpc": "https://openrpcdev2.trustlesshub.com",
+      "rpc": "https://openrpcdev3.trustlesshub.com",
       "denom": "ujunox",
       "decimals": 6,
-      "channel": "channel-0",
-      "trst_channel": "channel-1",
+      "channel": "channel-1",
+      "trst_channel": "channel-0",
       "trst_denom": "ibc/xxx",
       "logoURI": "https://2549163913-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MZiFiIZH5IkEYsWMUO4%2Fuploads%2Fgit-blob-4ea6081652796a8c60be99667f61753ad9983ad2%2FJUNO%20Logo%20(Black).svg?alt=media",
-      "connection_id": "connection-0",
+      "connection_id": "connection-1",
       "prefix": "juno"
     }
   ]

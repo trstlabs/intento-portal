@@ -1,5 +1,5 @@
 
-import { styled, useMedia } from 'junoblocks'
+import { styled, /* useMedia */ } from 'junoblocks'
 import { useEffect,  } from 'react'
 import { useRecoilValue } from 'recoil'
 import {
@@ -22,7 +22,7 @@ export const AutoTxInfosModule = () => {
     
     const isUiDisabled =
         transactionStatus === TransactionStatus.EXECUTING || isAutoTxListLoading
-    const uiSize = useMedia('sm') ? 'small' : 'large'
+   // const uiSize = useMedia('sm') ? 'small' : 'large'
 
 
     return (
@@ -31,10 +31,9 @@ export const AutoTxInfosModule = () => {
                 <AutoTxInfos
                     
                    onChange={() => {
-                        // setTokenSwapState([updateTokenA, tokenB])
                     }}
                     disabled={isUiDisabled}
-                    size={uiSize}
+                    //size={uiSize}
                 />
               
             </StyledDivForWrapper>

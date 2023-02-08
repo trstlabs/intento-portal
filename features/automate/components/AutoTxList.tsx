@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column, styled } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import { useSubmitAutoTx, useRegisterAccount } from '../hooks';
 import { IbcSelector } from './IbcSelector';
@@ -91,9 +91,9 @@ export const AutoTxList = ({
 
 
   const handleSubmitAutoTxButtonClick = (index: number, autoTxData: AutoTxData) => {
-    const newAutoTxs = [...autoTxDatas]
-    newAutoTxs[index] = autoTxData
-    onAutoTxChange(newAutoTxs)
+    const newAutoTxsData = [...autoTxDatas]
+    newAutoTxsData[index] = autoTxData
+    onAutoTxChange(newAutoTxsData)
     return setRequestedSubmitAutoTx(true)
   }
   const handleRegisterAccountClick = () => {
@@ -103,22 +103,26 @@ export const AutoTxList = ({
 
   const handleChangeMsg = (index: number) => (msg: string) => {
     if (!isJsonValid) {
-
+      // alert("Invalid JSON")
       return
     }
-    const newAutoTxs = [...autoTxDatas]
-    newAutoTxs[index] = {
-      ...newAutoTxs[index],
-      msg,
-      typeUrl: JSON.parse(msg)["typeUrl"]
+    try {
+      const newAutoTxsData = [...autoTxDatas]
+      newAutoTxsData[index] = {
+        ...newAutoTxsData[index],
+        msg,
+        typeUrl: JSON.parse(msg)["typeUrl"]
+      }
+      console.log(newAutoTxsData)
+      onAutoTxChange(newAutoTxsData)
+    } catch (e) {
+      console.log(e)
     }
-    console.log(newAutoTxs)
-    onAutoTxChange(newAutoTxs)
   }
 
   function handleChainChange(connectionId: string, newPrefix: string, newDenom: string, name: string, chainSymbol: string) {
 
-    const newAutoTxs = [];
+    const newAutoTxsData = [];
     for (const autoTx of autoTxDatas) {
       autoTx.connectionId = connectionId
 
@@ -127,13 +131,13 @@ export const AutoTxList = ({
       //   newMsg = newMsg.replaceAll(denom, newDenom)
       //   autoTx.msg = newMsg
       // }
-      newAutoTxs.push(autoTx)
-      onAutoTxChange(newAutoTxs)
+      newAutoTxsData.push(autoTx)
+      onAutoTxChange(newAutoTxsData)
     }
 
 
-    //console.log(newAutoTxs)
-    onAutoTxChange(newAutoTxs)
+    //console.log(newAutoTxsData)
+    onAutoTxChange(newAutoTxsData)
     setDenom(newDenom)
     setChainName(name)
     setChainSymbol(chainSymbol)
@@ -143,33 +147,29 @@ export const AutoTxList = ({
   //  a function to handle clicks on the "+" button
   /*   function handleAddNewAutoTxData() {
       // Create a new AutoTxData object
-      const newAutoTxs = [...autoTxDatas]
+      const newAutoTxsData = [...autoTxDatas]
       let newRecipient = new AutoTxData();
-      console.log(newAutoTxs.length)
-      if (newAutoTxs[newAutoTxs.length - 1].msg != "") {
+      console.log(newAutoTxsData.length)
+      if (newAutoTxsData[newAutoTxsData.length - 1].msg != "") {
         // Add the new recipient to the autoTxDatas array
-        console.log("adding to", newAutoTxs[newAutoTxs.length - 1])
-        console.log(newAutoTxs)
-        newAutoTxs.push(newRecipient);
-        onAutoTxChange(newAutoTxs)
+        console.log("adding to", newAutoTxsData[newAutoTxsData.length - 1])
+        console.log(newAutoTxsData)
+        newAutoTxsData.push(newRecipient);
+        onAutoTxChange(newAutoTxsData)
       }
     }
    */
   const setExample = (index: number, key: keyof AutoTxData, msg: string) => {
-    if (!isJsonValid) {
-      return
-    }
-
     let newMsg = msg.replaceAll('trust', prefix)
     newMsg = newMsg.replaceAll('utrst', denom)
-    const newAutoTxs = [...autoTxDatas]
-    newAutoTxs[index] = {
-      ...newAutoTxs[index],
+    const newAutoTxsData = [...autoTxDatas]
+    newAutoTxsData[index] = {
+      ...newAutoTxsData[index],
       [key]: newMsg,
       typeUrl: JSON.parse(newMsg)["typeUrl"]
     }
-    console.log(newAutoTxs)
-    onAutoTxChange(newAutoTxs)
+    console.log(newAutoTxsData)
+    onAutoTxChange(newAutoTxsData)
   }
 
   /* 
@@ -177,11 +177,11 @@ export const AutoTxList = ({
     function handleRemoveAutoTxData(index) {
       console.log("removing", index)
       if (index == 0) {
-        const newAutoTxs = [...autoTxDatas]
+        const newAutoTxsData = [...autoTxDatas]
         let newRecipient = new AutoTxData();
-        newAutoTxs[index] = newRecipient;
-        console.log(newAutoTxs)
-        onAutoTxChange(newAutoTxs)
+        newAutoTxsData[index] = newRecipient;
+        console.log(newAutoTxsData)
+        onAutoTxChange(newAutoTxsData)
    
         return
       }
@@ -198,12 +198,12 @@ export const AutoTxList = ({
         .readText()
         .then((clipText) => {
           // Get the text from the clipboard
-          const newAutoTxs = [...autoTxDatas]
-          newAutoTxs[index] = {
-            ...newAutoTxs[index],
+          const newAutoTxsData = [...autoTxDatas]
+          newAutoTxsData[index] = {
+            ...newAutoTxsData[index],
             [key]: clipText,
           }
-          onAutoTxChange(newAutoTxs)
+          onAutoTxChange(newAutoTxsData)
         })
         .catch((error) => {
           // Handle any errors that may occur when reading from the clipboard
@@ -222,7 +222,7 @@ export const AutoTxList = ({
 
 
   return (
-    <div >
+    <StyledDivForContainer>
       <Card variant="secondary" disabled css={{ margin: '$6' }}>
         {autoTxDatas.map((autoTxData, index) => (
           <div key={index}>
@@ -243,7 +243,7 @@ export const AutoTxList = ({
                     size={'large'}
                   />   <Column>    {!icaAddr && !isIcaLoading &&
 
-                    <Row><Button css={{ display: 'end', margin: '$2', }}
+                    <Row><Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => handleRegisterAccountClick()}
                     >   {isExecutingRegisterICA ? <Spinner instant /> : 'Register Interchain Account '}</Button></Row>
@@ -255,21 +255,21 @@ export const AutoTxList = ({
 
                 <Column>
                   <Row><Text>Examples: </Text>
-                    {chainSymbol == "JUNO" && (<><Button css={{ display: 'end', margin: '$2', }}
+                    {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', wasmExecExample)}
-                    >Execute </Button><Button css={{ display: 'end', margin: '$2', }}
+                    >Execute </Button><Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', wasmInitExample)}
                     >Instantiate </Button></>)}
-                    <Button css={{ display: 'end', margin: '$2', }}
+                    <Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', sendExample)}
-                    >Send </Button> <Button css={{ display: 'end', margin: '$2', }}
+                    >Send </Button> <Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', claimRewardExample)}
                     >Claim </Button>
-                    <Button css={{ display: 'end', margin: '$2', }}
+                    <Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', unstakeExample)}
                     >Unstake </Button>
@@ -291,7 +291,7 @@ export const AutoTxList = ({
               </CardContent>
             </Card>
             {/* <Column >
-              <Button css={{ display: 'end', margin: '$2', }}
+              <Button css={{  margin: '$2', }}
                 icon={<IconWrapper icon={<PlusIcon />} />}
                 variant="ghost"
                 iconColor="tertiary"
@@ -303,17 +303,12 @@ export const AutoTxList = ({
         }
       </Card>
       {isJsonValid && autoTxDatas[0].msg && autoTxDatas[0].msg.length > 3 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
-        <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
+        {/*   <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
           <Text align="left"
             variant="body">
             Messages to Automate</Text>
-
-        </CardContent>
-        {/* <Divider offsetTop="$5" offsetBottom="$2" /> */}
-
+        </CardContent>*/}
         {autoTxDatas.map((autoTxData, index) => (
-
-
           <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
             <div key={index}>      <Text>
               {(autoTxData.msg && autoTxData.msg.length != 0) && (<ul>
@@ -339,8 +334,6 @@ export const AutoTxList = ({
             </div>
           </CardContent>
         ))}
-
-
       </Card>)}
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
         <Button css={{ marginRight: '$4' }}
@@ -369,9 +362,14 @@ export const AutoTxList = ({
           {isExecutingTransaction ? <Spinner instant /> : ' Create Grant'}
         </Button> */}
       </Inline>
-
-    </div >)
+    </StyledDivForContainer>)
 }
+
+
+const StyledDivForContainer = styled('div', {
+  borderRadius: '$4',
+
+})
 
 
 

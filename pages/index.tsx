@@ -47,7 +47,7 @@ export default function Home() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Look into your assets and interact with your personal triggers."
+      subtitle="Manage your on-chain assets and triggers."
     />
   )
 
@@ -88,18 +88,17 @@ export default function Home() {
         <>
           {Boolean(myAutoTxs?.length) && (
             <>
-              <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
-                Your Personal AutoTxs
-              </Text>
+
 
               <StyledDivForAutoTxsGrid>
+                {myAutoTxs.length == 0 ? <Text variant="primary">Your Triggers({myAutoTxs.length} )</Text> : <Text variant="primary">Your Trigger (1)</Text>}
                 {myAutoTxs.map(
                   (autoTxInfo, index) => (
-                      <AutoTxCard
-                        key={index}
-                        //structuredClone does not work on ios
-                        autoTxInfo={structuredClone(autoTxInfo)}
-                      />
+                    <AutoTxCard
+                      key={index}
+                      //structuredClone does not work on ios
+                      autoTxInfo={structuredClone(autoTxInfo)}
+                    />
                   )
                 )}
               </StyledDivForAutoTxsGrid>
@@ -117,7 +116,7 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              <Text variant="primary">{allAutoTxs.length} Other AutoTxs</Text>
+              {allAutoTxs.length == 0 ? <Text variant="primary">{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}

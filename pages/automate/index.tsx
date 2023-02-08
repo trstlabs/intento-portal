@@ -18,7 +18,6 @@ const StyledContainer = styled('div', {
   margin: '0 auto',
 })
 
-
 export default function Automate() {
   return (
     <AppLayout>

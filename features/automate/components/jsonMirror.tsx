@@ -33,42 +33,43 @@ export const JsonCodeMirrorEditor = ({
 
     return (
         <StyledDivForContainer /* container direction="column" height="100%"  gap={1}*/>
-            
-                <StyledDivForContainer>
-                    <ReactCodeMirror
-                        value={jsonValue}
-                        extensions={[json()]}
-                        onChange={(val: string) => {
-                            onChange?.(val);
-                            if (val.length === 0) {
-                                onValidate?.(true);
-                                return;
-                            }
-                            try {
-                                const parsedJSON = JSON.parse(val);
-                                if (!validateJSON(parsedJSON, {})) {
-                                    //TODO: Show correct error message when validate message functionality changes.
-                                    setValidationError("Invalid JSON");
-                                    onValidate?.(false);
-                                } else {
-                                    onValidate?.(true);
-                                    setValidationError("");
-                                }
-                            } catch {
+
+            <StyledDivForContainer>
+                <ReactCodeMirror
+                    maxWidth="100%"
+                    value={jsonValue}
+                    extensions={[json()]}
+                    onChange={(val: string) => {
+                        onChange?.(val);
+                        if (val.length === 0) {
+                            onValidate?.(true);
+                            return;
+                        }
+                        try {
+                            const parsedJSON = JSON.parse(val);
+                            if (!validateJSON(parsedJSON, {})) {
+                                //TODO: Show correct error message when validate message functionality changes.
                                 setValidationError("Invalid JSON");
                                 onValidate?.(false);
+                            } else {
+                                onValidate?.(true);
+                                setValidationError("");
                             }
-                        }}
-                        theme={themeController.theme.name === 'dark' ? 'dark' : 'light'}
-                        placeholder={JSON.stringify(defaultPlaceholder, null, 2)}
-                        style={{ border: "none", height: "100%" }}
-                    />
-                </StyledDivForContainer>
+                        } catch {
+                            setValidationError("Invalid JSON");
+                            onValidate?.(false);
+                        }
+                    }}
+                    theme={themeController.theme.name === 'dark' ? 'dark' : 'light'}
+                    placeholder={JSON.stringify(defaultPlaceholder, null, 2)}
+                    style={{ border: "none", height: "100%" }}
+                />
+            </StyledDivForContainer>
 
             {validationError && (
                 <StyledGrid>
                     <Text>
-                       Validation Error: {validationError}</Text>
+                        Validation Error: {validationError}</Text>
                 </StyledGrid>
             )}
         </StyledDivForContainer>
@@ -86,7 +87,7 @@ const StyledDivForContainer = styled('div', {
     borderRadius: '$4',
     width: '100%',
     transition: 'box-shadow .1s ease-out',
-
+    height: '100%',
 })
 
 

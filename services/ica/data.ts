@@ -1,4 +1,4 @@
-import { QueryClient, setupAuthzExtension, SigningStargateClient } from '@cosmjs/stargate'
+import { QueryClient, setupAuthzExtension } from '@cosmjs/stargate'
 import { TrustlessChainClient } from 'trustlessjs'
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { Grant } from "cosmjs-types/cosmos/authz/v1beta1/authz";
@@ -16,7 +16,6 @@ export const getICA = async ({
 }: ICAQueryInput) => {
     try {
         const response = await client.query.autoibctx.interchainAccountFromAddress({ owner, connectionId })
-
         return response.interchainAccountAddress
     } catch (e) {
         console.error('err(getICA):', e)
@@ -62,27 +61,6 @@ export const getGrants = async ({
         return { grants: resp.grants, msgTypeUrl }
     } catch (e) {
         console.error('err(getGrants):', e)
-    }
-}
-
-
-
-export interface BalanceQueryInput {
-    ica: string,
-    client: SigningStargateClient
-}
-
-
-export const getBalanceForICA = async ({
-    ica,
-    client,
-}: BalanceQueryInput) => {
-    try {
-        const response = await client.getAllBalances(ica)
-
-        return response[0]
-    } catch (e) {
-        console.error('err(getBalanceForICA):', e)
     }
 }
 

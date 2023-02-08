@@ -1,8 +1,8 @@
 {
   "chainId": "testing",
   "chainName": "LocalJuno",
-  "rpc": "https://openrpcdev2.trustlesshub.com/",
-  "rest": "https://openapidev2.trustlesshub.com/",
+  "rpc": "https://openrpcdev3.trustlesshub.com/",
+  "rest": "https://openapidev3.trustlesshub.com/",
   "stakeCurrency": {
     "coinDenom": "JUNO",
     "coinMinimalDenom": "ujunox",

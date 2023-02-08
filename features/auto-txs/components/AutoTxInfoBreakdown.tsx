@@ -7,6 +7,8 @@ import {
     Inline,
     Text,
     maybePluralize,
+    ImageForTokenLogo,
+    CardContent
 
 } from 'junoblocks'
 import Link from 'next/link'
@@ -21,68 +23,96 @@ import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
 import {
     convertMicroDenomToDenom,
 } from 'util/conversion'
-import { AutoTxCard } from './AutoTxCard'
-import { /* useGrantsForUser,  */useICAForUser, useICATokenBalance } from '../../../hooks/useICA'
+
+import { /* useGrantsForUser,  */useGetICA, useICATokenBalance } from '../../../hooks/useICA'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
 import dayjs from 'dayjs'
-
+import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 type AutoTxInfoBreakdownProps = {
     autoTxInfo: AutoTxInfo,
-    size: 'large' | 'small',
+    //size: 'large' | 'small',
 }
 
 type InfoHeaderProps = {
     txId: string
     owner: string
+    active: boolean
 }
 
 export const AutoTxInfoBreakdown = ({
     autoTxInfo,
-
-    size = 'large',
+    //size = 'large',
 }: AutoTxInfoBreakdownProps) => {
     const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
-    const [icaAddr, isIcaLoading] = useICAForUser(autoTxInfo.connectionId)
-    const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(ibcInfo.symbol, icaAddr)
+    const [icaAddr, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
+    const symbol = ibcInfo ? ibcInfo.symbol : ""
+
+    const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddr)
+    const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
+    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
     const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
     // const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, ibcInfo.symbol, autoTxInfo)
-    if (size === 'small') {
-        return (
-            <>
-                <InfoHeader
-                    txId={autoTxInfo.txId}
-                    owner={autoTxInfo.owner}
-                />
-                <Inline
-                    css={{
-                        backgroundColor: '$colors$dark10',
-                        borderRadius: '$4',
-                        marginBottom: '$14',
-                    }}
-                >
-                    <Column
-                        justifyContent="space-between"
-                        css={{ padding: '$10 $16', width: '100%' }}
-                    >
-
-                    </Column>
-                </Inline>
-            </>
-        )
-    }
+    /*  if (size === 'small') {
+         return (
+             <>
+                 <InfoHeader
+                     txId={autoTxInfo.txId}
+                     owner={autoTxInfo.owner}
+                     active={isActive}
+                 />
+                 <Inline
+                     css={{
+                         backgroundColor: '$colors$dark10',
+                         borderRadius: '$4',
+                         marginBottom: '$14',
+                     }}
+                 >
+                     <Column
+                         justifyContent="space-between"
+                         css={{ padding: '$10 $16', width: '100%' }}
+                     >
+ 
+                     </Column>
+                 </Inline>
+             </>
+         )
+     } */
     return (
         <>
             <InfoHeader
                 txId={autoTxInfo.txId}
                 owner={autoTxInfo.owner}
-
+                active={isActive}
             />
+            <Row>
+                <CardContent>
+                    <Column align="center">
+                        {ibcInfo && (
+                            <ImageForTokenLogo
+                                size="big"
+                                logoURI={ibcInfo.logoURI}
+                                alt={ibcInfo.symbol}
+                            />
+                        )}
+                        <Text
+                            variant="title"
+                            align="center"
+                            css={{ paddingTop: '$8' }}
+                        >  {{ isActive } ? <> 🟢  </> : <>🔴</>} Trigger ID: {autoTxInfo.txId}  </Text>
+                        <Column align="center"> <Text variant="caption">
+                            <> Message Type: {new TextDecoder().decode(autoTxInfo.data).split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
+                        </Text></Column>
 
-            <Inline css={{ paddingBottom: '$18' }} gap={8}>
-                <AutoTxCard
-                    autoTxInfo={autoTxInfo}
-                />
-            </Inline>
+                    </Column>
+
+
+                    {/*  <Column gap={5} css={{ padding: '$8' }}>
+                        <Text variant="legend" align="center">
+                            {isActive ? <> 🟢 Active Trigger on {ibcInfo.name}</> : <>🔴 Execution ended</>}
+                        </Text>
+                    </Column> */}</CardContent>
+            </Row>
+
             <>
                 <Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -106,12 +136,11 @@ export const AutoTxInfoBreakdown = ({
                         </Inline>
                     </Column>
                 </Row>
-                {!isIcaLoading && (<Row>
+                {!isIcaLoading && !isIcaBalanceLoading && ibcInfo && (<Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
-                            Interchain Account
-                        </Text>
+                            Interchain Account   </Text>
                         <Inline gap={2}>
                             <Text variant="body">{icaAddr} </Text>
                         </Inline>
@@ -128,13 +157,14 @@ export const AutoTxInfoBreakdown = ({
                         <Inline gap={2}>
                             <Text variant="body">{autoTxInfo.feeAddress} </Text>
                         </Inline>
+                        {!isFeeBalanceLoading && feeBalance > 0 && <Text variant="legend"> Balance:  <Text variant="caption"> {feeBalance} TRST</Text> </Text>}
                     </Column>
                 </Row>
                 <Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
-                            Message Type:
+                            Message Type
                         </Text>
                         <Inline gap={2}>
                             <Text variant="body">{msgData[0]} </Text>
@@ -145,7 +175,7 @@ export const AutoTxInfoBreakdown = ({
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
-                            Message Values:
+                            Message
                         </Text>
                         <Inline gap={2}>
                             <Text variant="body">{msgData[1]} </Text>
@@ -238,7 +268,7 @@ function Row({ children }) {
 }
 
 
-const InfoHeader = ({ txId }: InfoHeaderProps) => (
+const InfoHeader = ({ txId, active }: InfoHeaderProps) => (
     <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
         <Inline gap={6}>
             <Link href="/triggers" passHref>
@@ -254,8 +284,8 @@ const InfoHeader = ({ txId }: InfoHeaderProps) => (
             </Link>
             <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
         </Inline>
-        <Text variant="legend" color="secondary" transform="lowercase">
-            Trigger: {txId}
+        <Text variant="caption" color="secondary">
+            {{ active } ? <> 🟢  </> : <>🔴</>}Trigger ID: {txId}
         </Text>
     </Inline>
 )
