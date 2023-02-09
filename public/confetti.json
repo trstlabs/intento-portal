@@ -1,7 +1,8 @@
 {
 
     "fullScreen": {
-        "enable": true
+        "enable": true,
+        "zIndex": 9990
     },
     "particles": {
       "color": {

@@ -47,7 +47,7 @@ export const executeSubmitAutoTx = async ({
   console.log(JSON.parse(autoTxData.msg))
 
   let duration = autoTxData.duration + "ms"
-  let interval = "100000ms"//autoTxData.interval + "ms"
+  let interval = autoTxData.interval + "ms"
 
   const masterRegistry = new Registry(msgRegistry);
 

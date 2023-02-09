@@ -199,6 +199,12 @@ export const SubmitAutoTxDialog = ({
 
     }
 
+    const [checkedFeeAcc, setCheckedFeeAcc] = useState(true);
+
+    const handleChangeFeeAcc = () => {
+        setCheckedFeeAcc(!checkedFeeAcc);
+    };
+
     const suggestedFunds = recurrences * 0.1
     const canSchedule = duration > 0 && interval > 0
 
@@ -313,24 +319,7 @@ export const SubmitAutoTxDialog = ({
                             <Text css={{ margin: '$4' }} align="center"
                                 variant="legend" >
                                 Execution Settings </Text>
-                            <Text align="center" css={{ margin: '$4' }}
-                                variant="caption">
-                                Fee Funds - TRST</Text>
 
-
-                            <Inline justifyContent={'space-between'} align="center">
-
-                                <Text variant="legend"><StyledInput step=".01"
-                                    placeholder="0.00" type="number"
-                                    value={feeFunds}
-                                    onChange={({ target: { value } }) => handleFeeFunds(value)}
-                                />TRST</Text>{recurrences > 0 && (<Tooltip
-                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If 0, your local balance will be used"
-                                    aria-label="Fund Trigger - TRST (Optional)"
-                                ><Text color="disabled" wrap={false}
-                                    variant="legend">
-                                        Estimated fees:  {suggestedFunds} TRST</Text></Tooltip>)}
-                            </Inline>
 
                             <Text align="center"
                                 variant="caption">
@@ -357,7 +346,7 @@ export const SubmitAutoTxDialog = ({
                             >
                                 {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
                             </Button>}
-                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0"&& feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
+                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
                                     variant="primary"
                                     size="small"
                                     disabled={shouldDisableSendFundsButton}
@@ -367,6 +356,32 @@ export const SubmitAutoTxDialog = ({
                                 >
                                     {isExecutingSendFundsOnHost && (<Spinner instant />)}  {('Send ' + feeFundsHostChain + " " + chainSymbol)}
                                 </Button>}</>)}
+
+                            <Inline justifyContent={'flex-start'}>    <StyledInput type="checkbox" checked={checkedFeeAcc}
+                                onChange={handleChangeFeeAcc} /> <Text css={{ padding: "$4" }} variant="caption">
+
+                                    Deduct TRST fees from local account
+                                </Text> </Inline>
+                            {!checkedFeeAcc && (<>
+                                <Text align="center" css={{ marginTop: '$4' }}
+                                    variant="caption">
+                                    Fee Funds - TRST</Text>
+
+
+                                <Inline justifyContent={'space-between'} align="center">
+
+                                    <Text variant="legend"><StyledInput step=".01"
+                                        placeholder="0.00" type="number"
+                                        value={feeFunds}
+                                        onChange={({ target: { value } }) => handleFeeFunds(value)}
+                                    />TRST</Text>{recurrences > 0 && (<Tooltip
+                                        label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If 0, your local balance will be used"
+                                        aria-label="Fund Trigger - TRST (Optional)"
+                                    ><Text color="disabled" wrap={false}
+                                        variant="legend">
+                                            Estimated fees:  {suggestedFunds} TRST</Text></Tooltip>)}
+                                </Inline></>)}
+
                         </Column>
                     </Column>
                 </StyledDivForInputs>

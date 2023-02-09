@@ -58,20 +58,22 @@ export const AppLayout = ({
   }
 
   return (
-    <StyledWrapper>{isConfetti && (<Particles id="tsparticles" url={"/confetti.json"} init={particlesInit} loaded={particlesLoaded} />)}
-      {navigationSidebar}
-      <StyledContainer >
-        <main>{!isConfetti && themeController.theme.name == "dark" && (<Particles
-          id="tsparticles" style={{ zIndex: -1 }}
-          init={particlesInit}
-          loaded={particlesLoaded}
-          url={"/stars_bg.json"} />)}
+    <>
+      <StyledWrapper>
+        {navigationSidebar}
+        <StyledContainer>
+          <main>
 
-          <StyledChildren> {children}</StyledChildren></main>
-      </StyledContainer>
+            <StyledChildren> {children}</StyledChildren></main>
+        </StyledContainer>
 
-      {!isMediumScreen && extensionSidebar}
-    </StyledWrapper>
+        {!isMediumScreen && extensionSidebar}
+      </StyledWrapper>{isConfetti ? (<Particles id="tsparticles" url={"/confetti.json"} init={particlesInit} loaded={particlesLoaded} />) : themeController.theme.name == "dark" && (<Particles
+        id="tsparticles"
+        init={particlesInit}
+        loaded={particlesLoaded}
+        url={"/stars_bg.json"} />)}
+    </>
   )
 }
 
