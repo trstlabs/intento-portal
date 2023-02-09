@@ -21,6 +21,7 @@ import {
   APP_NAME,
 } from 'util/constants'
 import { useAutoTxInfo } from '../../hooks/useAutoTxInfo'
+import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
 
 export default function AutoTx() {
   const {
@@ -32,7 +33,8 @@ export default function AutoTx() {
   const isMobile = useMedia('sm')
 
   const [autoTxInfo, isLoading] = useAutoTxInfo(id)
-
+  const connectionId = autoTxInfo ? autoTxInfo.connectionId : ""
+  const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (isLoading || !autoTxInfo || !id) {
     return (
@@ -42,15 +44,15 @@ export default function AutoTx() {
         justifyContent="center"
         css={{ padding: '$10', height: '100vh' }}
       > <title>
-          AutoTx
+          Trigger
         </title>
-       {/*  {isLoading && (
+        {/*  {isLoading && (
           <Text variant="header">
             {"Oops, we've messed up. Please try again later."}
           </Text>
         ) : ( */}
-          <Spinner color="primary" />
-   {/*      )} */}
+        <Spinner color="primary" />
+        {/*      )} */}
       </Inline>
     )
   }
@@ -92,7 +94,7 @@ export default function AutoTx() {
           <>
             <AutoTxInfoBreakdown
               autoTxInfo={autoTxInfo}
-              size={isMobile ? 'small' : 'large'}
+              ibcInfo={ibcInfo}
             />
           </>
         )}

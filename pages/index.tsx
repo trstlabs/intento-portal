@@ -88,10 +88,11 @@ export default function Home() {
         <>
           {Boolean(myAutoTxs?.length) && (
             <>
-
-
+       
+                {myAutoTxs.length != 0 ? <Text variant="primary" css={{ padding: '$4'}}>Your Triggers({myAutoTxs.length})</Text> : <Text variant="primary">Your Trigger (1)</Text>}
+  
               <StyledDivForAutoTxsGrid>
-                {myAutoTxs.length == 0 ? <Text variant="primary">Your Triggers({myAutoTxs.length} )</Text> : <Text variant="primary">Your Trigger (1)</Text>}
+
                 {myAutoTxs.map(
                   (autoTxInfo, index) => (
                     <AutoTxCard
@@ -116,7 +117,7 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              {allAutoTxs.length == 0 ? <Text variant="primary">{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
+              {allAutoTxs.length == 0 ? <Text variant="primary"  css={{ padding: '$4'}}>{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}

@@ -14,7 +14,7 @@ function getInitialChainFromSearchParams() {
 }
 
 const StyledContainer = styled('div', {
-  maxWidth: '53.75rem',
+  //maxWidth: '53.75rem',
   margin: '0 auto',
 })
 

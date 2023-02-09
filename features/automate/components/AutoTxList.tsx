@@ -255,7 +255,7 @@ export const AutoTxList = ({
 
                 <Column>
                   <Row><Text>Examples: </Text>
-                    {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2', }}
+                  {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2', }}
                       variant="secondary"
                       onClick={() => setExample(index, 'msg', wasmExecExample)}
                     >Execute </Button><Button css={{ margin: '$2', }}
@@ -302,28 +302,29 @@ export const AutoTxList = ({
           </div>))
         }
       </Card>
-      {isJsonValid && autoTxDatas[0].msg && autoTxDatas[0].msg.length > 3 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
-        {/*   <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
-          <Text align="left"
-            variant="body">
-            Messages to Automate</Text>
-        </CardContent>*/}
+      {isJsonValid && autoTxDatas[0].msg && autoTxDatas[0].msg.length > 3 && (<Card css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+        <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+          <Text align="center"
+          >
+            Messages</Text>
+        </CardContent>
         {autoTxDatas.map((autoTxData, index) => (
-          <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={index}>      <Text>
+          <CardContent size="medium" css={{ padding: '$2', margin: '$2', }}>
+            <div key={index}>     <Text variant="legend" align="left">
               {(autoTxData.msg && autoTxData.msg.length != 0) && (<ul>
-                <Text>Message {index + 1}: <i >{autoTxData.msg}</i></Text>
+                Message {index + 1}
+              </ul>)}
+              <ul>
+                <i >{autoTxData.msg}</i>
+              </ul></Text>
 
-                {autoTxData.connectionId && (<Text>Connection ID: <i >{autoTxData.connectionId}</i></Text>)}
-
-              </ul>)}</Text>
               <SubmitAutoTxDialog
                 denom={denom}
                 chainSymbol={chainSymbol}
                 icaBalance={icaBalance}
-                hasIcaAuthzGrant={icaAuthzGrants && autoTxDatas[0] && autoTxDatas[0].typeUrl == icaAuthzGrants.msgTypeUrl}
+                hasIcaAuthzGrant={icaAuthzGrants && autoTxData && autoTxData.typeUrl == icaAuthzGrants.msgTypeUrl}
                 icaAddr={icaAddr}
-                autoTxData={autoTxDatas[0]}
+                autoTxData={autoTxData}
                 isShowing={isSubmitAutoTxDialogShowing}
                 onRequestClose={() =>
                   setSubmitAutoTxDialogState({
@@ -474,10 +475,17 @@ const wasmInitExample = JSON.stringify(
       "admin": "trust1....",
       "codeId": "0",
       "label": "my contract",
-      "msg": "/** Msg json encoded message to be passed to the contract */",
+      "msg": {
+        "initial_balances": [{
+          "amount": "7",
+          "address": "trust1....",
+        }]
+      },
       "funds": [{
         "amount": "70",
         "denom": "utrst"
       }],
     }
   }, null, "\t")
+
+

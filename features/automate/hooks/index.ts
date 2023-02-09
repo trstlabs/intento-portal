@@ -3,5 +3,5 @@ export { useRegisterAccount } from './useRegisterAccount'
 export { useSubmitAutoTx } from './useSubmitAutoTx'
 export { useCreateFeeGrant } from './useCreateFeeGrant'
 export { useCreateAuthzGrant } from './useCreateAuthzGrant'
-export { useSendFunds } from './useSendFunds'
+export { useSendFundsOnHost } from './useSendFundsOnHost'
 

@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react'
 // import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 // import { useFeeGrantAllowanceForUser, useGrantsForUser } from '../../../hooks/useICA'
-import { useCreateAuthzGrant, useSendFunds } from '../hooks'
+import { useCreateAuthzGrant, useSendFundsOnHost } from '../hooks'
 //import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
 // import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
 
@@ -150,17 +150,17 @@ export const SubmitAutoTxDialog = ({
 
     const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
     const [requestedSendFunds, setRequestedSendFunds] = useState(false)
-    const { mutate: handleSendFunds, isLoading: isExecutingSendFunds } =
-        useSendFunds({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+    const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
+        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
     useEffect(() => {
         const shouldTriggerSendFunds =
-            !isExecutingSendFunds && requestedSendFunds;
+            !isExecutingSendFundsOnHost && requestedSendFunds;
         if (shouldTriggerSendFunds) {
-            handleSendFunds(undefined, { onSettled: () => setRequestedSendFunds(false) })
+            handleSendFundsOnHost(undefined, { onSettled: () => setRequestedSendFunds(false) })
         }
-    }, [isExecutingSendFunds, requestedSendFunds, handleSendFunds])
+    }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
-    const handleSendFundsClick = () => {
+    const handleSendFundsOnHostClick = () => {
         connectExternalWallet(null)
         return setRequestedSendFunds(true)
     }
@@ -325,7 +325,7 @@ export const SubmitAutoTxDialog = ({
                                     value={feeFunds}
                                     onChange={({ target: { value } }) => handleFeeFunds(value)}
                                 />TRST</Text>{recurrences > 0 && (<Tooltip
-                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If unset, your balance will be used"
+                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If 0, your local balance will be used"
                                     aria-label="Fund Trigger - TRST (Optional)"
                                 ><Text color="disabled" wrap={false}
                                     variant="legend">
@@ -342,7 +342,7 @@ export const SubmitAutoTxDialog = ({
                                     onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
                                 />{chainSymbol}</Text>
                                 <Tooltip
-                                    label="Funds on the interchain account on the host chain. Top it up with caution, you may lose access to the interchain account upon execution failure."
+                                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
                                     aria-label="Fee Funds - "
                                 ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}  {icaBalance > suggestedFunds ? <>(optional)</> : <>(important)</>} </Text></Tooltip>
 
@@ -357,15 +357,15 @@ export const SubmitAutoTxDialog = ({
                             >
                                 {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
                             </Button>}
-                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && !isExecutingSendFunds && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
+                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0"&& feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
                                     variant="primary"
                                     size="small"
                                     disabled={shouldDisableSendFundsButton}
                                     onClick={() =>
-                                        handleSendFundsClick()
+                                        handleSendFundsOnHostClick()
                                     }
                                 >
-                                    {isExecutingSendFunds && (<Spinner instant />)}  {('Send ' + feeFundsHostChain + " " + chainSymbol)}
+                                    {isExecutingSendFundsOnHost && (<Spinner instant />)}  {('Send ' + feeFundsHostChain + " " + chainSymbol)}
                                 </Button>}</>)}
                         </Column>
                     </Column>

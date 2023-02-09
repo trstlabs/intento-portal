@@ -86,8 +86,9 @@ const StyledGrid = styled('div', {
 const StyledDivForContainer = styled('div', {
     borderRadius: '$4',
     width: '100%',
-    transition: 'box-shadow .1s ease-out',
+    // transition: 'box-shadow .1s ease-out',
     height: '100%',
+    display: 'block'
 })
 
 

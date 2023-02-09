@@ -8,8 +8,14 @@ import {
     Text,
     maybePluralize,
     ImageForTokenLogo,
-    CardContent
-
+    CardContent,
+    convertDenomToMicroDenom,
+    Spinner,
+    Tooltip,
+    styled,
+    IconWrapper,
+    Chevron,
+    Union
 } from 'junoblocks'
 import Link from 'next/link'
 import React from 'react'
@@ -19,18 +25,21 @@ import {
 } from 'util/constants'
 import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
 // import { useRelativeTimestamp } from '../../liquidity/components/UnbondingLiquidityCard'
-
+import { useEffect, useState } from 'react'
 import {
     convertMicroDenomToDenom,
 } from 'util/conversion'
+import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import { /* useGrantsForUser,  */useGetICA, useICATokenBalance } from '../../../hooks/useICA'
-import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
+
 import dayjs from 'dayjs'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
+import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
+import { useSendFundsOnHost } from '../../automate/hooks'
 type AutoTxInfoBreakdownProps = {
     autoTxInfo: AutoTxInfo,
-    //size: 'large' | 'small',
+    ibcInfo: IBCAssetInfo
 }
 
 type InfoHeaderProps = {
@@ -41,16 +50,38 @@ type InfoHeaderProps = {
 
 export const AutoTxInfoBreakdown = ({
     autoTxInfo,
+    ibcInfo,
     //size = 'large',
 }: AutoTxInfoBreakdownProps) => {
-    const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
+
     const [icaAddr, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
     const symbol = ibcInfo ? ibcInfo.symbol : ""
-
+    const [showICAHostButtons, setShowICAHostButtons] = useState(false)
     const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddr)
     const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
     const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
     const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
+
+    //send funds on host
+    const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
+    const [requestedSendFunds, setRequestedSendFunds] = useState(false)
+    const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
+        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom: ibcInfo.denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+    useEffect(() => {
+        const shouldTriggerSendFunds =
+            !isExecutingSendFundsOnHost && requestedSendFunds;
+        if (shouldTriggerSendFunds) {
+            handleSendFundsOnHost(undefined, { onSettled: () => setRequestedSendFunds(false) })
+        }
+    }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
+    const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol)
+    const handleSendFundsOnHostClick = () => {
+        connectExternalWallet(null)
+        return setRequestedSendFunds(true)
+    }
+
+    ////
+
     // const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, ibcInfo.symbol, autoTxInfo)
     /*  if (size === 'small') {
          return (
@@ -145,7 +176,42 @@ export const AutoTxInfoBreakdown = ({
                             <Text variant="body">{icaAddr} </Text>
                         </Inline>
                         {!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {ibcInfo.symbol}</Text> </Text>}
-                        {/*  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant:<Text variant="caption"> Has grant for message type '{icaAuthzGrants.msgTypeUrl}' that expires in {(relativeTime(icaAuthzGrants.grants[0].expiration.seconds.toNumber() * 1000))}</Text></Text> : <Text variant="caption"> No authorization grants (yet)</Text>)} */}
+                        <Button css={{ justifyContent: "flex-end !important" }}
+                            variant="ghost"
+                            onClick={() => setShowICAHostButtons(!showICAHostButtons)}
+                            icon={
+                                <IconWrapper
+                                    size="medium"
+                                    rotation="-90deg"
+                                    color="tertiary"
+                                    icon={showICAHostButtons ? <Union /> : <Chevron />}
+                                />
+                            }
+                        />
+                        {showICAHostButtons && <Row>
+                            <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                <Text variant="legend"><StyledInput step=".01"
+                                    placeholder="0.00" type="number"
+                                    value={feeFundsHostChain}
+                                    onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
+                                />{ibcInfo.symbol}</Text>
+
+                                <Tooltip
+                                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                                    aria-label="Fee Funds - "
+                                ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {ibcInfo.symbol} </Text></Tooltip>
+
+
+                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button
+                                    variant="primary"
+                                    size="small"
+                                    onClick={() =>
+                                        handleSendFundsOnHostClick()
+                                    }
+                                >
+                                    {isExecutingSendFundsOnHost && (<Spinner instant />)}  {('Send')}
+                                </Button>}</Column>
+                        </Row>}
                     </Column>
                 </Row>)}
                 <Row>
@@ -344,3 +410,11 @@ const getRelativeTime = (seconds: String) => {
     return date.toDate().toLocaleString()
 
 }
+
+const StyledInput = styled('input', {
+    width: '100%',
+    color: 'inherit',
+    // fontSize: `20px`,
+    padding: '$2',
+    margin: '$2',
+})

@@ -29,7 +29,7 @@ type UseSendFundsParams = {
 }
 
 
-export const useSendFunds = ({
+export const useSendFundsOnHost = ({
     toAddress, coin
 }: UseSendFundsParams
 ) => {
