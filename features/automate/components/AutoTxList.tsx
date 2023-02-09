@@ -405,8 +405,8 @@ const sendExample = JSON.stringify({
       "amount": "70",
       "denom": "utrst"
     }],
-    "from_address": "trust1....",
-    "to_address": "trust1..."
+    "fromAddress": "trust1....",
+    "toAddress": "trust1..."
   }
 }, null, "\t")
 /* 
@@ -432,8 +432,8 @@ const unstakeExample = JSON.stringify(
         "amount": "70",
         "denom": "utrst"
       },
-      "delegator_address": "trust1....",
-      "validator_address": "trustvaloper1..."
+      "delegatorAddress": "trust1....",
+      "validatorAddress": "trustvaloper1..."
     }
   }, null, "\t")
 
@@ -460,8 +460,8 @@ const claimRewardExample = JSON.stringify(
   {
     "typeUrl": "  /cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
     "value": {
-      "delegator_address": "trust1....",
-      "validator_address": "trustvaloper1..."
+      "delegatorAddress": "trust1....",
+      "validatorAddress": "trustvaloper1..."
     }
   }, null, "\t")
 

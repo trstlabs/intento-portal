@@ -89,14 +89,14 @@ export const useGetGrantForUser = (granter: string, msgTypeUrl: string) => {
 
 export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: string) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  const { data: balance = 0, isLoading } = useQuery(
+  const { data, isLoading } = useQuery(
     [`icaTokenBalance/${tokenSymbol}`, nativeWalletAddress],
     async () => {
       const { denom, decimals, chain_id, rpc } = ibcAsset
-     
+
       await window.keplr.enable(chain_id)
       //const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
-     
+
       const chainClient = await SigningStargateClient.connect(
         rpc,
         //offlineSigner
@@ -117,7 +117,7 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
     }
   )
 
-  return [balance, isLoading]
+  return [data, isLoading] as const
 }
 
 

@@ -45,7 +45,7 @@ type SubmitAutoTxDialogProps = {
     denom: string
     chainSymbol: string
     icaAddr: string
-    icaBalance: number | boolean
+    icaBalance: number
     hasIcaAuthzGrant: boolean
     autoTxData: AutoTxData
     onRequestClose: () => void
