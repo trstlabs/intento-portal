@@ -60,7 +60,7 @@ export const AutoTxInfoBreakdown = ({
     const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddr)
     const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
     const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
-    const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
+    //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
 
     //send funds on host
     const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
@@ -129,9 +129,9 @@ export const AutoTxInfoBreakdown = ({
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
-                        >  {{ isActive } ? <> 🟢  </> : <>🔴</>} Trigger ID: {autoTxInfo.txId}  </Text>
+                        >  {{ isActive } ? <> 🟢  </> : <>🔴</>}</Text><Text>{autoTxInfo.label != "" ? <> Name: {autoTxInfo.label}</> : <>Trigger ID: {autoTxInfo.txId}</>}  </Text>
                         <Column align="center"> <Text variant="caption">
-                            <> Message Type: {new TextDecoder().decode(autoTxInfo.data).split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
+                            <> Message Type: {autoTxInfo.msgs[0].typeUrl.split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
                         </Text></Column>
 
                     </Column>
@@ -142,7 +142,7 @@ export const AutoTxInfoBreakdown = ({
                             {isActive ? <> 🟢 Active Trigger on {ibcInfo.name}</> : <>🔴 Execution ended</>}
                         </Text>
                     </Column> */}</CardContent>
-            </Row>
+            </Row >
 
             <>
                 <Row>
@@ -226,28 +226,32 @@ export const AutoTxInfoBreakdown = ({
                         {!isFeeBalanceLoading && feeBalance > 0 && <Text variant="legend"> Balance:  <Text variant="caption"> {feeBalance} TRST</Text> </Text>}
                     </Column>
                 </Row>
-                <Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {autoTxInfo.msgs.map((msg, index) => (
+                    <div key={index}>
+                        <Row>
+                            <Column gap={8} align="flex-start" justifyContent="flex-start">
 
-                        <Text variant="legend" color="secondary" align="left">
-                            Message Type
-                        </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{msgData[0]} </Text>
-                        </Inline>
-                    </Column>
-                </Row>
-                <Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                <Text variant="legend" color="secondary" align="left">
+                                    Message Type
+                                </Text>
+                                <Inline gap={2}>
+                                    <Text variant="body">{msg.typeUrl} </Text>
+                                </Inline>
+                            </Column>
+                        </Row>
+                        <Row>
+                            <Column gap={8} align="flex-start" justifyContent="flex-start">
 
-                        <Text variant="legend" color="secondary" align="left">
-                            Message
-                        </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{msgData[1]} </Text>
-                        </Inline>
-                    </Column>
-                </Row>
+                                <Text variant="legend" color="secondary" align="left">
+                                    Message
+                                </Text>
+                                <Inline gap={2}>
+                                    <Text variant="body">{msg.value} </Text>
+                                </Inline>
+                            </Column>
+                        </Row>
+                    </div>))}
+
                 {Number(autoTxInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
                     {
                         autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
@@ -289,7 +293,7 @@ export const AutoTxInfoBreakdown = ({
                 {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
                     Execution History
                 </Text></Inline>
-                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executedOnHost, error, }, index) => <div key={index}>
+                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error }, index) => <div key={index}>
                         <Column gap={2} align="flex-start" justifyContent="flex-start">
 
                             <Column>
@@ -297,7 +301,8 @@ export const AutoTxInfoBreakdown = ({
                             </Column><Column>
                                 <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
                                 <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
-                                <Text variant="caption">Execution On Host: {executedOnHost ? <>🟢</> : <>🔴</>}</Text>
+                                <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
+                                {/* {result && <Text variant="caption">Result: {result}</Text>} */}
                                 {error && <Text variant="caption">Execution Error: {error}</Text>}
                             </Column>
 
@@ -314,7 +319,6 @@ export const AutoTxInfoBreakdown = ({
 
 function Row({ children }) {
     const baseCss = { padding: '$10 $16' }
-
     return (
         <Inline
             css={{
@@ -329,8 +333,6 @@ function Row({ children }) {
             {children}
         </Inline>
     )
-
-
 }
 
 

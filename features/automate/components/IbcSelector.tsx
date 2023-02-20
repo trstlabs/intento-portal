@@ -58,7 +58,7 @@ export const IbcSelector = ({
       >
         {!isConnectionListShowing && (
           <Inline>
-            <IbcSelectorToggle 
+            <IbcSelectorToggle
               connection={connectionId}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
@@ -148,6 +148,7 @@ const StyledDivForWrapper = styled('div', {
   justifyContent: 'space-between',
   position: 'relative',
   zIndex: 0,
+
 })
 
 const StyledDivForSelector = styled('div', {
@@ -179,5 +180,7 @@ const StyledDivForOverlay = styled('div', {
 
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
+  display: 'flex',
   transition: 'box-shadow .1s ease-out',
+
 })

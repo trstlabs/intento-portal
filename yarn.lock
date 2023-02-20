@@ -5799,10 +5799,10 @@ tr46@^3.0.0:
   dependencies:
     punycode "^2.1.1"
 
-trustlessjs@1.2.4-alpha.5:
-  version "1.2.4-alpha.5"
-  resolved "https://registry.yarnpkg.com/trustlessjs/-/trustlessjs-1.2.4-alpha.5.tgz#4b93e41ed7e450b551dc8f772cf5ab7bb37b74c6"
-  integrity sha512-Enb0k/Wmew+YOajzL12jsGhL6MkOpi/34pp8SLX06yTmvXlL+Y6ZILVSpRd0eep/sf2oWpiAerhSs1tiZCu3tA==
+trustlessjs@1.2.4-alpha.8:
+  version "1.2.4-alpha.8"
+  resolved "https://registry.yarnpkg.com/trustlessjs/-/trustlessjs-1.2.4-alpha.8.tgz#40372c0e2b4cac64e94191c55a9ae881f78b2fb2"
+  integrity sha512-TVl6wLxmKYCjB7RRyiM9dCvEu1yHSPKhtbHJQKGqUZyJmaQpcVBnM69YXera0267xQcTZffO9KK9JPKjql8uog==
   dependencies:
     "@cosmjs/encoding" "0.27.1"
     "@cosmjs/math" "0.27.1"

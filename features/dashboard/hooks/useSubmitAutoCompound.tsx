@@ -1,76 +1,83 @@
+
 import {
     Button,
     ErrorIcon,
     formatSdkErrorMessage,
-
+    IconWrapper,
     Toast,
     UpRightArrow,
-
+    Valid,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeCreateAuthzGrant } from '../../../services/ica'
+import { AutoTxData, executeSubmitAutoTx } from '../../../services/ica'
 import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 
-import { Coin } from 'trustlessjs'
-
-
-type UseCreateAuthzGrantParams = {
-    grantee: string
-    msgs: string[]
-    coin?: Coin
-    expirationFromNow?: number
+type UseSubmitAutoCompoundArgs = {
+    autoTxData: AutoTxData
 }
 
-
-export const useCreateAuthzGrant = ({
-    grantee, msgs, expirationFromNow, coin
-}: UseCreateAuthzGrantParams
-) => {
-  const { address, client, status } =
-        useRecoilValue(ibcWalletState)
- 
-    /*   const { address, client, status } =
-        useRecoilValue(walletState)*/
+export const useSubmitAutoCompound = ({
+    autoTxData,
+}: UseSubmitAutoCompoundArgs) => {
+    const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
     return useMutation(
-        'createAuthzGrant',
+        'scheduleTokens',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            if (coin.amount == "0") {
-                coin = undefined
-            }
 
-            return await executeCreateAuthzGrant({
+
+            return await executeSubmitAutoTx({
+                owner: address,
+                autoTxData,
                 client,
-                grantee,
-                granter: address,
-                msgs,
-                expirationFromNow,
-                coin,
-
             })
 
         },
         {
             onSuccess(data) {
                 console.log(data)
+                let autoTxID = data.arrayLog.find(
+                    (log) =>
+                        log.key == "auto_tx_id"
+                ).value;
+                console.log(autoTxID)
+                toast.custom((t) => (
+                    <Toast
+                        icon={<IconWrapper icon={<Valid />} color="primary" />}
+                        title="Your trigger is submitted!"
+                        body={`An on-chain trigger was created succesfully!} The ID is ${autoTxID}`}
+                        buttons={
+                            <Button
+                                as="a"
+                                variant="ghost"
+                                href={`/triggers/${autoTxID}`}
+                                target="__blank"
+                                iconRight={<UpRightArrow />}
+                            >
+                                Go to your new trigger
+                            </Button>
+                        }
+                        onClose={() => toast.dismiss(t.id)}
+                    />
+                ))
                 popConfetti(true)
-                //
+
                 refetchQueries()
             },
             onError(e) {
@@ -79,7 +86,7 @@ export const useCreateAuthzGrant = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops creating authz grant error!"
+                        title="Oops error submitting message!"
                         body={errorMessage}
                         buttons={
                             <Button

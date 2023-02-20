@@ -105,8 +105,7 @@ export default function Contract() {
       <Inline
         align="center"
         justifyContent="center"
-        css={{ padding: '$10', height: '100vh' }}
-      > <title>
+        css={{ padding: '$10', height: '100vh' }}> <title>
           Contract
         </title>
         {isLoading ? (
@@ -134,8 +133,7 @@ export default function Contract() {
               </Link>
             }
           />
-        }
-      >
+        }>
 
         {APP_NAME && contractInfo != undefined && (
           <Head>

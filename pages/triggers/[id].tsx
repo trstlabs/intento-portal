@@ -42,8 +42,7 @@ export default function AutoTx() {
       <Inline
         align="center"
         justifyContent="center"
-        css={{ padding: '$10', height: '100vh' }}
-      > <title>
+        css={{ padding: '$10', height: '100vh' }}> <title>
           Trigger
         </title>
         {/*  {isLoading && (
@@ -71,8 +70,7 @@ export default function AutoTx() {
               </Link>
             }
           />
-        }
-      >
+        }>
 
         {APP_NAME && autoTxInfo != undefined && (
           <Head>

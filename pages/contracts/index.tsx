@@ -68,8 +68,7 @@ export default function Contracts() {
       {!isLoading && isSorting && (<Column
         justifyContent="center"
         align="center"
-        css={{ paddingTop: '$24' }}
-      >
+        css={{ paddingTop: '$24' }}>
         <Inline gap={2}>
           <ConnectIcon color="secondary" />
           <Text variant="primary">

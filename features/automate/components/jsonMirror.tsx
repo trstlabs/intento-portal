@@ -36,7 +36,8 @@ export const JsonCodeMirrorEditor = ({
 
             <StyledDivForContainer>
                 <ReactCodeMirror
-                    maxWidth="100%"
+
+                    maxWidth="580px"
                     value={jsonValue}
                     extensions={[json()]}
                     onChange={(val: string) => {
@@ -86,6 +87,7 @@ const StyledGrid = styled('div', {
 const StyledDivForContainer = styled('div', {
     borderRadius: '$4',
     width: '100%',
+    margin: '$2',
     // transition: 'box-shadow .1s ease-out',
     height: '100%',
     display: 'block'

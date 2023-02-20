@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react'
-import { TrustlessChainClient } from 'trustlessjs'
+
 
 import { TokenInfo } from '../queries/usePoolsListQuery'
 import { useTokenList } from './useTokenList'
@@ -56,24 +56,4 @@ export const useBaseTokenInfo = () => {
 export const useNativeTokenInfo = (denom: string) => {
   const [tokenList] = useTokenList()
   return useMemo(() => getNativeTokenInfoFromTokenList(denom, tokenList?.tokens), [tokenList])
-}
-
-
-export interface BalanceQueryInput {
-  address: string,
-  client: TrustlessChainClient
-}
-
-
-export const getBalanceForAcc = async ({
-  address,
-  client,
-}: BalanceQueryInput) => {
-  try {
-    const response = await client.query.bank.allBalances({ address })
-
-    return response
-  } catch (e) {
-    console.error('err(getBalanceForAcc):', e)
-  }
 }

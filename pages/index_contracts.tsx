@@ -1,4 +1,4 @@
-import { AppLayout, PageHeader } from 'components'
+import { PageHeader } from 'components'
 
 import { useRecoilValue } from 'recoil'
 import {
@@ -30,7 +30,7 @@ import { useContractInfosMulti } from 'hooks/useContractInfo'
 import { ContractCard } from '../features/contracts/components/ContractCard'
 import { ContractInfosWithAcc } from '../features/contracts/hooks/useSortContracts'
 
-export default function Home() {
+export default function Contracts() {
 
   const { address, key } = useRecoilValue(walletState)
   const [contracts, isLoading] = useContractInfosMulti([Number(process.env.NEXT_PUBLIC_TIP20_CODE_ID), Number(process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_ID),])
@@ -58,13 +58,13 @@ export default function Home() {
 
   const pageHeaderContents = (
     <PageHeader
-      title="Dashboard"
-      subtitle="Look into your assets and interact with your personal contracts."
+      title="Contracts"
+      subtitle="Interact with your personal contracts."
     />
   )
 
   return (
-    <AppLayout>
+    <>
       {pageHeaderContents}
       {key ? <Card disabled variant="secondary"><><StyledDivForInfo >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
         {key.name}, Your Keychain Is All Set
@@ -116,8 +116,7 @@ export default function Home() {
       {!isLoading && isSorting && address && (<Column
         justifyContent="center"
         align="center"
-        css={{ paddingTop: '$24' }}
-      >
+        css={{ paddingTop: '$24' }}>
         <Inline gap={2}>
           <ConnectIcon color="secondary" />
           <Text variant="primary">
@@ -191,7 +190,7 @@ export default function Home() {
       </StyledDivForContractsGrid>
 
 
-    </AppLayout >
+    </ >
   )
 }
 

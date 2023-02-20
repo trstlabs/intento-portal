@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column, styled } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column, styled, IconWrapper, PlusIcon, Union } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import { useSubmitAutoTx, useRegisterAccount } from '../hooks';
 import { IbcSelector } from './IbcSelector';
@@ -12,22 +12,17 @@ import { relativeTime } from '../../contracts/components/TokenInfoCard';
 
 
 type AutoTxsInputProps = {
-  autoTxDatas: AutoTxData[]
-  connection: string
-  onAutoTxChange: (autoTxDatas: AutoTxData[]) => void
-  /*   onRemoveAutoTx: (autoTxData: AutoTxData) => void */
+  autoTxData: AutoTxData
+  onAutoTxChange: (autoTxData: AutoTxData) => void
 } & HTMLProps<HTMLInputElement>
 
-export const AutoTxList = ({
-  autoTxDatas,
-  //connection,
+export const AutoTxComponent = ({
+  autoTxData,
   onAutoTxChange,
-  /*   onRemoveAutoTx, */
-  //...inputProps
+
 }: AutoTxsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
-  // const [payload, setPayload] = useState("");
   const [prefix, setPrefix] = useState("trust");
   const [denom, setDenom] = useState("utrst");
   const [chainName, setChainName] = useState("");
@@ -35,21 +30,16 @@ export const AutoTxList = ({
 
   const [isJsonValid, setIsJsonValid] = useState(true);
 
-  /* wallet state */
-  //const { mutate: connectWallet } = useConnectWallet()
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
+  /*   const [showMsgs, setShowMsgs] = useState(true) */
   //const [requestedAuthzGrant, setRequestedAuthzGrant] = useState(false)
-  // const [autoTxData, setAutoTxData] = useState(data)
 
   //const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
 
-  const [icaAddr, isIcaLoading] = useICAForUser(autoTxDatas[0].connectionId)
+  const [icaAddr, isIcaLoading] = useICAForUser(autoTxData.connectionId)
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(chainSymbol, icaAddr)
-
-
-  //if (autoTxData.msg && autoTxData.msg.length > 10) {
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, chainSymbol, autoTxDatas[0])
+  const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, chainSymbol, autoTxData)
 
   ///} 
   /* 
@@ -62,9 +52,9 @@ export const AutoTxList = ({
    */
 
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
-    useSubmitAutoTx({ autoTxData: autoTxDatas[0] })
+    useSubmitAutoTx({ autoTxData })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
-    useRegisterAccount({ connectionId: autoTxDatas[0].connectionId })
+    useRegisterAccount({ connectionId: autoTxData.connectionId })
 
 
   useEffect(() => {
@@ -88,12 +78,16 @@ export const AutoTxList = ({
     }
   }, [isExecutingSchedule, requestedSubmitAutoTx, handleSubmitAutoTx])
 
+  /*   useEffect(() => {
+      if (autoTxData.msgs) {
+        setShowMsgs(true)
+      }
+  
+    })
+   */
 
-
-  const handleSubmitAutoTxButtonClick = (index: number, autoTxData: AutoTxData) => {
-    const newAutoTxsData = [...autoTxDatas]
-    newAutoTxsData[index] = autoTxData
-    onAutoTxChange(newAutoTxsData)
+  const handleSubmitAutoTxButtonClick = (autoTxData: AutoTxData) => {
+    onAutoTxChange(autoTxData)
     return setRequestedSubmitAutoTx(true)
   }
   const handleRegisterAccountClick = () => {
@@ -107,14 +101,15 @@ export const AutoTxList = ({
       return
     }
     try {
-      const newAutoTxsData = [...autoTxDatas]
-      newAutoTxsData[index] = {
-        ...newAutoTxsData[index],
-        msg,
-        typeUrl: JSON.parse(msg)["typeUrl"]
+      let msgs = autoTxData.msgs
+      msgs[index] = msg
+      let newAutoTxData = {
+        ...autoTxData,
+        msgs,
+        typeUrls: JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+
       }
-      console.log(newAutoTxsData)
-      onAutoTxChange(newAutoTxsData)
+      onAutoTxChange(newAutoTxData)
     } catch (e) {
       console.log(e)
     }
@@ -122,22 +117,19 @@ export const AutoTxList = ({
 
   function handleChainChange(connectionId: string, newPrefix: string, newDenom: string, name: string, chainSymbol: string) {
 
-    const newAutoTxsData = [];
-    for (const autoTx of autoTxDatas) {
-      autoTx.connectionId = connectionId
-
-      // if (autoTx.msg && autoTx.msg.length > 10) {
-      //   let newMsg = autoTx.msg.replaceAll(prefix, newPrefix)
-      //   newMsg = newMsg.replaceAll(denom, newDenom)
-      //   autoTx.msg = newMsg
-      // }
-      newAutoTxsData.push(autoTx)
-      onAutoTxChange(newAutoTxsData)
-    }
-
-
+    //const newAutoTxsData = [];
+    // for (const autoTx of autoTxDatas) {
+    let newAutoTx = autoTxData
+    newAutoTx.connectionId = connectionId
+    // for (let(msg, index) of autoTxData.msgs) {
+    //   let newMsg = msg.replaceAll(prefix, newPrefix)
+    //   newMsg = newMsg.replaceAll(denom, newDenom)
+    //   newAutoTx.msgs[index] = newMsg
+    // }
+    //  newAutoTxsData.push(autoTx)
+    //  onAutoTxChange(autoTxData)
     //console.log(newAutoTxsData)
-    onAutoTxChange(newAutoTxsData)
+    onAutoTxChange(newAutoTx)
     setDenom(newDenom)
     setChainName(name)
     setChainSymbol(chainSymbol)
@@ -159,17 +151,46 @@ export const AutoTxList = ({
       }
     }
    */
-  const setExample = (index: number, key: keyof AutoTxData, msg: string) => {
+  function setExample(index: number, msg: string) {
     let newMsg = msg.replaceAll('trust', prefix)
     newMsg = newMsg.replaceAll('utrst', denom)
-    const newAutoTxsData = [...autoTxDatas]
-    newAutoTxsData[index] = {
-      ...newAutoTxsData[index],
-      [key]: newMsg,
-      typeUrl: JSON.parse(newMsg)["typeUrl"]
+    let newAutoTxData = autoTxData
+    newAutoTxData.msgs[index] = newMsg
+    newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+
+    onAutoTxChange(newAutoTxData)
+    console.log("setExample")
+  }
+
+
+  function handleAddMsg() {
+    // Create a new RecipientInfo object
+    let newMsgs = [...autoTxData.msgs]
+    let emptyMsg = ""
+    newMsgs.push(emptyMsg);
+    let newAutoTxData = autoTxData
+    newAutoTxData.msgs = newMsgs;
+    onAutoTxChange(newAutoTxData)
+  }
+  function handleRemoveMsg(index: number) {
+    console.log(index)
+    let newAutoTxData = autoTxData
+    if (index == 0) {
+      let newMsgs = [...autoTxData.msgs]
+      let newMsg = "";
+      newMsgs[index] = newMsg;
+      console.log(newMsgs)
+
+      newAutoTxData.msgs = newMsgs;
+      onAutoTxChange(newAutoTxData)
+      return
     }
-    console.log(newAutoTxsData)
-    onAutoTxChange(newAutoTxsData)
+    const newMsgs = newAutoTxData.msgs.filter(msg => msg !== newAutoTxData.msgs[index])
+    if (autoTxData.typeUrls) {
+      newAutoTxData.typeUrls = autoTxData.typeUrls.filter(url => url !== autoTxData.typeUrls[index]);
+    }
+    newAutoTxData.msgs = newMsgs;
+    onAutoTxChange(newAutoTxData)
   }
 
   /* 
@@ -186,7 +207,7 @@ export const AutoTxList = ({
         return
       }
       if (index == 10) {
-        alert("Maximum autoTxDatas reached, provide feedback to the developers")
+        alert("Maximum messages reached, provide feedback")
         return
       }
       onRemoveAutoTx(autoTxDatas[index])
@@ -218,124 +239,94 @@ export const AutoTxList = ({
 
   const shouldDisableSubmissionButton =
     isExecutingRegisterICA || !icaAddr || !isJsonValid ||
-    (autoTxDatas[0].msg && autoTxDatas[0].msg.length == 0 && JSON.parse(autoTxDatas[0].msg)["typeUrl"].length < 5)
+    (autoTxData.msgs[0] && autoTxData.msgs[0].length == 0 && JSON.parse(autoTxData.msgs[0])["typeUrl"].length < 5)
 
 
   return (
     <StyledDivForContainer>
       <Card variant="secondary" disabled css={{ margin: '$6' }}>
-        {autoTxDatas.map((autoTxData, index) => (
-          <div key={index}>
-
-            <Card variant="secondary" disabled css={{ padding: '$2' }}>
-
-              <CardContent size="medium" >
-
-                {index == 0 && (<Column ><Row>
-
-                  <Text align="center"
-                    variant="caption">
-                    Chain</Text> <IbcSelector
-                    connectionId={autoTxData.connectionId}
-                    onChange={(update) => {
-                      handleChainChange(update.connection, update.prefix, update.denom, update.name, update.symbol)
-                    }}
-                    size={'large'}
-                  />   <Column>    {!icaAddr && !isIcaLoading &&
-
-                    <Row><Button css={{ margin: '$2', }}
-                      variant="secondary"
-                      onClick={() => handleRegisterAccountClick()}
-                    >   {isExecutingRegisterICA ? <Spinner instant /> : 'Register Interchain Account '}</Button></Row>
-
-                  } </Column></Row>
-                  {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
-                    <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant:<Text variant="caption"> Has grant for message type '{icaAuthzGrants.msgTypeUrl}' that expires in {(relativeTime(icaAuthzGrants.grants[0].expiration.seconds.toNumber() * 1000))}</Text></Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)} </Column>
-                )}
-
-                <Column>
-                  <Row><Text>Examples: </Text>
-                  {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2', }}
-                      variant="secondary"
-                      onClick={() => setExample(index, 'msg', wasmExecExample)}
-                    >Execute </Button><Button css={{ margin: '$2', }}
-                      variant="secondary"
-                      onClick={() => setExample(index, 'msg', wasmInitExample)}
-                    >Instantiate </Button></>)}
-                    <Button css={{ margin: '$2', }}
-                      variant="secondary"
-                      onClick={() => setExample(index, 'msg', sendExample)}
-                    >Send </Button> <Button css={{ margin: '$2', }}
-                      variant="secondary"
-                      onClick={() => setExample(index, 'msg', claimRewardExample)}
-                    >Claim </Button>
-                    <Button css={{ margin: '$2', }}
-                      variant="secondary"
-                      onClick={() => setExample(index, 'msg', unstakeExample)}
-                    >Unstake </Button>
-                  </Row>
-                  <Row>
-                    <JsonCodeMirrorEditor
-                      jsonValue={autoTxData.msg}
-                      onChange={handleChangeMsg(index)}
-                      onValidate={setIsJsonValid}
-                    />
 
 
-                  </Row>
+        <Card variant="secondary" disabled css={{ padding: '$2' }}>
 
-                </Column>
+          <CardContent size="medium" >
+            <Column ><Row>
 
+              <Text align="center"
+                variant="caption">
+                Chain</Text> <IbcSelector
+                connectionId={autoTxData.connectionId}
+                onChange={(update) => {
+                  handleChainChange(update.connection, update.prefix, update.denom, update.name, update.symbol)
+                }}
+                size={'large'}
+              />   <Column>
 
+                {!icaAddr && !isIcaLoading &&
 
-              </CardContent>
-            </Card>
-            {/* <Column >
-              <Button css={{  margin: '$2', }}
-                icon={<IconWrapper icon={<PlusIcon />} />}
-                variant="ghost"
-                iconColor="tertiary"
+                  <Row><Button css={{ margin: '$2' }}
+                    variant="secondary"
+                    onClick={() => handleRegisterAccountClick()}
+                  >   {isExecutingRegisterICA ? <Spinner instant /> : 'Register Interchain Account '}</Button></Row>
 
-                onClick={handleAddNewAutoTxData}
-              />
-            </Column> */}
-          </div>))
-        }
-      </Card>
-      {isJsonValid && autoTxDatas[0].msg && autoTxDatas[0].msg.length > 3 && (<Card css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+                }
+              </Column></Row>
+              {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
+                <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant:<Text variant="caption"> Has grant for message type '{icaAuthzGrants.msgTypeUrl}' that expires in {(relativeTime(icaAuthzGrants.grants[0].expiration.seconds.toNumber() * 1000))}</Text></Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)}
+            </Column>
+            {autoTxData.msgs.map((msg, index) => (
+              <div key={index}>
+                {messageData(autoTxData, index, chainSymbol, setExample, handleRemoveMsg, msg, handleChangeMsg, setIsJsonValid)}
+              </div>))}
+          </CardContent>
+        </Card>
+        {< Column >
+          <Button css={{ margin: '$2' }}
+            icon={<IconWrapper icon={<PlusIcon />} />}
+            variant="ghost"
+            iconColor="tertiary"
+
+            onClick={handleAddMsg}
+          />
+        </Column>}
+      </Card >
+      {isJsonValid && autoTxData.msgs && autoTxData.msgs[0].length > 3 && (<Card css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
           <Text align="center"
           >
             Messages</Text>
         </CardContent>
-        {autoTxDatas.map((autoTxData, index) => (
-          <CardContent size="medium" css={{ padding: '$2', margin: '$2', }}>
-            <div key={index}>     <Text variant="legend" align="left">
-              {(autoTxData.msg && autoTxData.msg.length != 0) && (<ul>
-                Message {index + 1}
-              </ul>)}
+        {autoTxData.msgs.map((message, i) => (
+          <div key={message}>   <CardContent size="medium" css={{ padding: '$2', margin: '$2', }}>
+            <Text variant="legend" align="left">
+
+              Message {i + 1}
+
               <ul>
-                <i >{autoTxData.msg}</i>
+                {message}
               </ul></Text>
 
-              <SubmitAutoTxDialog
-                denom={denom}
-                chainSymbol={chainSymbol}
-                icaBalance={icaBalance}
-                hasIcaAuthzGrant={icaAuthzGrants && autoTxData && autoTxData.typeUrl == icaAuthzGrants.msgTypeUrl}
-                icaAddr={icaAddr}
-                autoTxData={autoTxData}
-                isShowing={isSubmitAutoTxDialogShowing}
-                onRequestClose={() =>
-                  setSubmitAutoTxDialogState({
-                    isShowing: false,
-                  })
-                }
-                handleSubmitAutoTx={(autoTxData) => handleSubmitAutoTxButtonClick(index, autoTxData)} />
-            </div>
-          </CardContent>
+            <SubmitAutoTxDialog
+              denom={denom}
+              chainSymbol={chainSymbol}
+              icaBalance={icaBalance}
+              hasIcaAuthzGrant={icaAuthzGrants && autoTxData && JSON.parse(autoTxData.msgs[0])['typeUrl'] == icaAuthzGrants.msgTypeUrl}
+              icaAddr={icaAddr}
+              autoTxData={autoTxData}
+              isShowing={isSubmitAutoTxDialogShowing}
+              onRequestClose={() =>
+                setSubmitAutoTxDialogState({
+                  isShowing: false,
+                })
+              }
+              handleSubmitAutoTx={(autoTxData) => handleSubmitAutoTxButtonClick(autoTxData)} />
+
+          </CardContent>    </div>
         ))}
-      </Card>)}
+      </Card>
+
+      )}
+
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
         <Button css={{ marginRight: '$4' }}
           variant="primary"
@@ -345,8 +336,7 @@ export const AutoTxList = ({
             setSubmitAutoTxDialogState({
               isShowing: true,
             })
-          }
-        >
+          }>
           {isExecutingSchedule ? <Spinner instant /> : 'Automate'}
         </Button>
 
@@ -363,7 +353,7 @@ export const AutoTxList = ({
           {isExecutingTransaction ? <Spinner instant /> : ' Create Grant'}
         </Button> */}
       </Inline>
-    </StyledDivForContainer>)
+    </StyledDivForContainer >)
 }
 
 
@@ -374,9 +364,45 @@ const StyledDivForContainer = styled('div', {
 
 
 
+function messageData(autoTxData: AutoTxData, index: number, chainSymbol: string, setExample: (index: number, msg: string) => void, handleRemoveMsg: (index: number) => void, msg: string, handleChangeMsg: (index: number) => (msg: string) => void, setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>) {
+  return <Column>
+    {autoTxData.typeUrls && autoTxData.typeUrls[index] && <Row> <Text css={{ padding: '$4', textAlign: "center" }} variant="title">{autoTxData.typeUrls[index]}</Text></Row>}
+    <Row><Text>Examples: </Text>
+      {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2' }}
+        variant="secondary"
+        onClick={() => setExample(index, wasmExecExample)}
+      >Execute </Button><Button css={{ margin: '$2' }}
+        variant="secondary"
+        onClick={() => setExample(index, wasmInitExample)}
+      >Instantiate </Button></>)}
+      <Button css={{ margin: '$2' }}
+        variant="secondary"
+        onClick={() => setExample(index, sendExample)}
+      >Send </Button> <Button css={{ margin: '$2' }}
+        variant="secondary"
+        onClick={() => setExample(index, claimRewardExample)}
+      >Claim </Button>
+      <Button css={{ margin: '$2' }}
+        variant="secondary"
+        onClick={() => setExample(index, unstakeExample)}
+      >Unstake </Button>
+      {index != 0 && (<Button
+        icon={<IconWrapper icon={<Union />} />}
+        variant="ghost"
+        iconColor="tertiary"
+
+        onClick={() => handleRemoveMsg(index)} />)} </Row>
+    <Row>
+      <JsonCodeMirrorEditor
+        jsonValue={msg}
+        onChange={handleChangeMsg(index)}
+        onValidate={setIsJsonValid} />
+    </Row>
+  </Column>;
+}
+
 function Row({ children }) {
   const baseCss = { padding: '$2 $4' }
-
   return (
     <Inline
       css={{
@@ -385,15 +411,11 @@ function Row({ children }) {
         justifyContent: 'start',
         marginBottom: '$3',
         columnGap: '$space$1',
-        // border: '1px solid $borderColors$default',
-        // borderRadius: '$2'
       }}
     >
       {children}
     </Inline>
   )
-
-
 }
 
 

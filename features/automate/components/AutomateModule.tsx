@@ -1,51 +1,26 @@
 import { styled } from 'junoblocks'
-import { useEffect, useRef, useState } from 'react'
-
-
-
-import { AutoTxList } from './AutoTxList'
+import { useState } from 'react'
 import { AutoTxData } from './SubmitAutoTxDialog'
+import { AutoTxComponent } from './AutoTxComponent'
 
-type AutomateModuleProps = {
-  /* will be used if provided on first render instead of internal state */
-  initialChain?: string
-}
 
-export const AutomateModule = ({ initialChain }: AutomateModuleProps) => {
-  /* connect to recoil */
-  const [connectionId, setConnectionIDState] = useState('')
+
+export const AutomateModule = () => {
   let data = new AutoTxData()
   data.duration = 14 * 86400000;
   data.interval = 86400000;
-
-  const [autoTxList, setAutoTxList] = useState([data])
-
-  const initialConnectionID = useRef(initialChain).current
-  useEffect(
-    function setInitialChainIfProvided() {
-      if (initialConnectionID) {
-        const ConnectionID = initialConnectionID
-        setConnectionIDState(
-          ConnectionID,
-
-        )
-      }
-    },
-    [initialConnectionID, setConnectionIDState]
-  )
-
+  data.msgs = [""]
+  data.typeUrls = [""]
+  //works faster than without array for some reason
+  const [autoTxDatas, setAutoTxDatas] = useState([data])
 
   return (
-    <> <StyledDivForWrapper>
+    <StyledDivForWrapper>
+      <AutoTxComponent autoTxData={autoTxDatas[0]}
+        onAutoTxChange={((autoTx) => setAutoTxDatas([autoTx]))}
 
-      <AutoTxList autoTxDatas={autoTxList} connection={connectionId}
-
-        onAutoTxChange={((NewAutoTxs) => setAutoTxList(NewAutoTxs))}
-       /*  onRemoveAutoTx={(autoTx) => setAutoTxList(autoTxList.filter(tx => tx !== autoTx))} */
       />
     </StyledDivForWrapper>
-      {/* <TransactionAction isPriceLoading={isPriceLoading} size={uiSize} /> */}
-    </>
   )
 }
 

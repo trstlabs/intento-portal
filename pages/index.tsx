@@ -21,6 +21,8 @@ import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
+import { StakeCard } from '../features/dashboard/components/StakeCard'
+import Contracts from './index_contracts'
 
 
 export default function Home() {
@@ -40,7 +42,7 @@ export default function Home() {
       [sortParameter, sortDirection]
     ),
   })
-
+  const shouldShowAutoCompound = autoTxs?.length && !autoTxs.find(tx => tx.label == "Autocompound");
   const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
 
@@ -70,11 +72,14 @@ export default function Home() {
           </Column>
         </>
       )}
+      <Column
+        css={{ paddingTop: '$24' }}>
+        <StakeCard shouldShowAutoCompound={shouldShowAutoCompound} />
+      </Column>
       {!isLoading && isSorting && address && (<Column
         justifyContent="center"
         align="center"
-        css={{ paddingTop: '$24' }}
-      >
+        css={{ paddingTop: '$24' }}>
         <Inline gap={2}>
           <ConnectIcon color="secondary" />
           <Text variant="primary">
@@ -88,9 +93,9 @@ export default function Home() {
         <>
           {Boolean(myAutoTxs?.length) && (
             <>
-       
-                {myAutoTxs.length != 0 ? <Text variant="primary" css={{ padding: '$4'}}>Your Triggers({myAutoTxs.length})</Text> : <Text variant="primary">Your Trigger (1)</Text>}
-  
+
+              {myAutoTxs.length != 0 ? <Text variant="primary" css={{ padding: '$4' }}>Your Triggers({myAutoTxs.length})</Text> : <Text variant="primary">Your Trigger (1)</Text>}
+
               <StyledDivForAutoTxsGrid>
 
                 {myAutoTxs.map(
@@ -117,7 +122,7 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              {allAutoTxs.length == 0 ? <Text variant="primary"  css={{ padding: '$4'}}>{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
+              {allAutoTxs.length == 0 ? <Text variant="primary" css={{ padding: '$4' }}>{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}
@@ -141,7 +146,7 @@ export default function Home() {
         )}
       </StyledDivForAutoTxsGrid>
 
-
+      {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />}
     </AppLayout >
   )
 }

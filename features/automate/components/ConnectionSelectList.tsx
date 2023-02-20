@@ -12,6 +12,8 @@ import { getPropsForInteractiveElement } from '../../../util/getPropsForInteract
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
+  border: '2px solid $borderColors$default',
+  borderRadius: '4px',
 })
 
 export class IBCInfo {
@@ -65,7 +67,7 @@ export const ConnectionSelectList = ({
 
       <StyledDivForScrollContainer
         {...props}
-        css={{ 
+        css={{
           height: `${visibleNumberOfTokensInViewport * 2.5}rem`,
           ...(props.css ? props.css : {}),
         }}
@@ -116,6 +118,7 @@ const StyledButtonForRow = styled(ButtonForWrapper, {
   '&:last-child': {
     marginBottom: 0,
   },
+  //border: '2px solid $borderColors$default',
 })
 
 const StyledDivForColumn = styled('div', {

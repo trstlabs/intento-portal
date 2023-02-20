@@ -2,8 +2,9 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 
 import {
   Coin,
+
   MsgSend,
-  
+
 } from 'trustlessjs'
 
 import { MsgGrant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/tx'
@@ -12,7 +13,7 @@ import { GenericAuthorization } from 'trustlessjs/dist/protobuf/cosmos/authz/v1b
 type ExecuteCreateAuthzGrantArgs = {
   granter: string
   grantee: string
-  msg: string
+  msgs: string[]
   expirationFromNow?: number
   client: SigningStargateClient
   coin?: Coin
@@ -22,7 +23,7 @@ export const executeCreateAuthzGrant = async ({
   client,
   grantee,
   granter,
-  msg,
+  msgs,
   expirationFromNow,
   coin,
 }: ExecuteCreateAuthzGrantArgs): Promise<any> => {
@@ -33,25 +34,27 @@ export const executeCreateAuthzGrant = async ({
     expireAt = (Date.now() / 1000 + expirationFromNow).toFixed();
   }
 
-  let msgAuthzGrant = MsgGrant.fromPartial({
-    granter, grantee, grant: {
-      authorization: {
-        typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization", value: GenericAuthorization.encode({
-          msg: JSON.parse(msg)["typeUrl"].toString(),
-        }).finish()
-      }, expiration: { seconds: expireAt.toString() }
+  const msgObjects = []
+  for (let msg of msgs) {
+    let msgAuthzGrant = MsgGrant.fromPartial({
+      granter, grantee, grant: {
+        authorization: {
+          typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization", value: GenericAuthorization.encode({
+            msg: JSON.parse(msg)["typeUrl"].toString(),
+          }).finish()
+        }, expiration: { seconds: expireAt.toString() }
+      }
+    })
+    const MsgGrantAllowanceObject = {
+      typeUrl: "/cosmos.authz.v1beta1.MsgGrant",
+      value: msgAuthzGrant,
     }
-  })
-
-
-  const MsgGrantAllowanceObject = {
-    typeUrl: "/cosmos.authz.v1beta1.MsgGrant",
-    value: msgAuthzGrant,
+    console.log(MsgGrantAllowanceObject)
+    msgObjects.push(MsgGrantAllowanceObject)
   }
-  // let lala = isTxBodyEncodeObject(MsgGrantAllowanceObject)
-  // console.log(lala)
+
   console.log(client)
-  console.log(MsgGrantAllowanceObject)
+
 
   if (coin) {
     let sendMsg = new MsgSend({ fromAddress: granter, toAddress: grantee, amount: [coin] })
@@ -59,10 +62,9 @@ export const executeCreateAuthzGrant = async ({
       typeUrl: "/cosmos.bank.v1beta1.MsgSend",
       value: sendMsg,
     }
-
-    return await client.signAndBroadcast(granter, [MsgGrantAllowanceObject, MsgSendObject], "auto")
-  } else {
-    return await client.signAndBroadcast(granter, [MsgGrantAllowanceObject], "auto");
+    msgObjects.push(MsgSendObject)
   }
+  return await client.signAndBroadcast(granter, msgObjects, "auto")
+
 }
 

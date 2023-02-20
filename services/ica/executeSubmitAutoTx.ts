@@ -44,57 +44,62 @@ export const executeSubmitAutoTx = async ({
   }
   console.log(startAt)
   console.log(autoTxData.withAuthZ)
-  console.log(JSON.parse(autoTxData.msg))
-
   let duration = autoTxData.duration + "ms"
   let interval = autoTxData.interval + "ms"
 
-  const masterRegistry = new Registry(msgRegistry);
+  let msgs = []
+  for (let msg in autoTxData.msgs) {
 
-  //let type = masterRegistry.lookupType((JSON.parse(autoTxData.msg)["typeUrl"]).toString())
-  let value = JSON.parse(autoTxData.msg)["value"]
-  console.log(value)
+    console.log(JSON.parse(msg))
+    const masterRegistry = new Registry(msgRegistry);
+    //let type = masterRegistry.lookupType((JSON.parse(autoTxData.msg)["typeUrl"]).toString())
+    let value = JSON.parse(msg)["value"]
+    console.log(value)
 
-  let typeUrl: string = JSON.parse(autoTxData.msg)["typeUrl"].toString()
-  if (typeUrl.startsWith("/cosmwasm")) {
-    let msg: string = JSON.stringify(value["msg"])
-    console.log(msg)
-    let msg2: Uint8Array = toUtf8(msg)
-    console.log(msg2)
-    value["msg"] = msg2
-  }
-
-  const encodeObject = {
-    typeUrl,
-    value
-  }
-  //console.log(type)
-  console.log(encodeObject)
-  let msg = masterRegistry.encodeAsAny(encodeObject)
-  console.log(msg)
-  if (autoTxData.withAuthZ) {
-    const encodeObject2 = {
-      typeUrl: "/cosmos.authz.v1beta1.MsgExec",
-      value: {
-        msgs: [msg],
-        grantee: owner,
-      }
-
+    let typeUrl: string = JSON.parse(msg)["typeUrl"].toString()
+    if (typeUrl.startsWith("/cosmwasm")) {
+      let msg: string = JSON.stringify(value["msg"])
+      console.log(msg)
+      let msg2: Uint8Array = toUtf8(msg)
+      console.log(msg2)
+      value["msg"] = msg2
     }
-    msg = masterRegistry.encodeAsAny(encodeObject2)
-    console.log(msg)
 
+    const encodeObject = {
+      typeUrl,
+      value
+    }
+    console.log(encodeObject)
+    let msgAny = masterRegistry.encodeAsAny(encodeObject)
+
+    if (autoTxData.withAuthZ) {
+      const encodeObject2 = {
+        typeUrl: "/cosmos.authz.v1beta1.MsgExec",
+        value: {
+          msg: msg,
+          grantee: owner,
+        }
+
+      }
+      msgAny = masterRegistry.encodeAsAny(encodeObject2)
+      console.log(msg)
+    }
+
+    console.log(msgAny.value.toString())
+    console.log(msgAny)
+    msgs.push(msgAny)
   }
+
   let feeFunds: Coin[] = [];
   if (autoTxData.feeFunds > 0) {
     feeFunds = [{ denom: "utrst", amount: convertDenomToMicroDenom(autoTxData.feeFunds, 6).toString() }]
   }
 
-  console.log(msg.value.toString())
   return validateTransactionSuccess(
     await client.tx.autoibctx.submit_auto_tx({
       connectionId: autoTxData.connectionId, owner,
-      msg: msg,
+      msgs,
+      label: autoTxData.label ? autoTxData.label : "",
       duration,
       interval,
       startAt: startAt.toString(),
@@ -116,10 +121,11 @@ export class AutoTxData {
   interval?: number
   connectionId: string
   dependsOnTxIds: number[]
-  msg: string
+  msgs: string[]
   retries: number
   withAuthZ: boolean
   feeFunds?: number
+  label?: string
 }
 /* 
 const atob: (b64: string) => string =

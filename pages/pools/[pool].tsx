@@ -104,8 +104,7 @@ export default function Pool() {
       <Inline
         align="center"
         justifyContent="center"
-        css={{ padding: '$10', height: '100vh' }}
-      >
+        css={{ padding: '$10', height: '100vh' }}>
         {isError ? (
           <Text variant="header">
             {"Oops, we've messed up. Please try again later."}
@@ -159,8 +158,7 @@ export default function Pool() {
               </Link>
             }
           />
-        }
-      >
+        }>
         {isLoadingInitial && (
           <StyledDivForSpinner>
             <Spinner color="primary" size={32} />

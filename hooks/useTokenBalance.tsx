@@ -9,10 +9,11 @@ import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo, /* useIBCAssetList */ } from './useIBCAssetList'
-import { getBalanceForAcc, getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
+import {  getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
 
 import { useTrustlessChainClient } from './useTrustlessChainClient'
+import { getBalanceForAcc } from '../services/chain-info'
 
 async function fetchTokenBalance({
   client,
@@ -171,3 +172,4 @@ export const useGetBalanceForAcc = (address: string) => {
 
 
 }
+

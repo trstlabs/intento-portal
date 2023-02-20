@@ -32,22 +32,23 @@ export class AutoTxData {
     interval?: number
     connectionId: string
     dependsOnTxIds: number[]
-    msg: string
-    typeUrl?: string
+    msgs: string[]
+    typeUrls?: string[]
     recurrences: number
     retries: number
     withAuthZ: boolean
     feeFunds?: number
+    label?: string
 }
 
 type SubmitAutoTxDialogProps = {
     isShowing: boolean
-    denom: string
-    chainSymbol: string
-    icaAddr: string
-    icaBalance: number
-    hasIcaAuthzGrant: boolean
     autoTxData: AutoTxData
+    denom?: string
+    chainSymbol?: string
+    icaAddr?: string
+    icaBalance?: number
+    hasIcaAuthzGrant?: boolean
     onRequestClose: () => void
     handleSubmitAutoTx: (data: AutoTxData) => void
 }
@@ -69,6 +70,7 @@ export const SubmitAutoTxDialog = ({
 
     const [interval, setInterval] = useState(autoTxData.interval);
     const [feeFunds, setFeeAmount] = useState(null);
+    const [label, setLabel] = useState("");
     const [recurrences, setRecurrence] = useState(2);
     const isLoading = false;
 
@@ -166,11 +168,11 @@ export const SubmitAutoTxDialog = ({
     }
     const shouldDisableSendFundsButton =
         !icaAddr ||
-        (autoTxData.msg && autoTxData.msg.length == 0)
+        (autoTxData.msgs && autoTxData.msgs.length == 0)
 
     const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
     const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
-        useCreateAuthzGrant({ grantee: icaAddr, msg: autoTxData.msg, expirationFromNow: autoTxData.duration, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+        useCreateAuthzGrant({ grantee: icaAddr, msgs: autoTxData.msgs, expirationFromNow: autoTxData.duration, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
     useEffect(() => {
         const shouldTriggerAuthzGrant =
             !isExecutingAuthzGrant && requestedAuthzGrant;
@@ -185,7 +187,7 @@ export const SubmitAutoTxDialog = ({
     }
     const shouldDisableAuthzGrantButton =
         !icaAddr ||
-        (autoTxData.msg && autoTxData.msg.length == 0)
+        (autoTxData.msgs && autoTxData.msgs.length == 0)
 
     function handleFeeFunds(input) {
         setFeeAmount(input);
@@ -198,12 +200,13 @@ export const SubmitAutoTxDialog = ({
         setDisplayRecurrences(displayRecs)
 
     }
-
+    //true = deduct fees from local acc
     const [checkedFeeAcc, setCheckedFeeAcc] = useState(true);
-
     const handleChangeFeeAcc = () => {
         setCheckedFeeAcc(!checkedFeeAcc);
     };
+
+
 
     const suggestedFunds = recurrences * 0.1
     const canSchedule = duration > 0 && interval > 0
@@ -221,7 +224,7 @@ export const SubmitAutoTxDialog = ({
         }
 
         console.log({ startTime, duration, interval, recurrences })
-        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msg: autoTxData.msg, withAuthZ, feeFunds })
+        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msgs: autoTxData.msgs, withAuthZ, feeFunds, label })
     }
 
 
@@ -375,12 +378,28 @@ export const SubmitAutoTxDialog = ({
                                         value={feeFunds}
                                         onChange={({ target: { value } }) => handleFeeFunds(value)}
                                     />TRST</Text>{recurrences > 0 && (<Tooltip
-                                        label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If 0, your local balance will be used"
+                                        label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If set to 0, your local balance will be used"
                                         aria-label="Fund Trigger - TRST (Optional)"
                                     ><Text color="disabled" wrap={false}
                                         variant="legend">
                                             Estimated fees:  {suggestedFunds} TRST</Text></Tooltip>)}
                                 </Inline></>)}
+                               
+
+
+                                <Inline justifyContent={'space-between'} align="center">
+
+                                    {/* <Text variant="legend"> */}<StyledInput /* step=".01" */
+                                        placeholder="label (optional)" /* type="number" */
+                                        value={label}
+                                        onChange={({ target: { value } }) => setLabel(value)}
+                                    />{/* Label</Text> */}{recurrences > 0 && (<Tooltip
+                                        label="name your trigger so you can find it back later (optional)"
+                                        aria-label="Fund Trigger - TRST (Optional)"
+                                    ><Text color="disabled" wrap={false}
+                                        variant="legend">
+                                            Label {label}</Text></Tooltip>)}
+                                </Inline>
 
                         </Column>
                     </Column>
