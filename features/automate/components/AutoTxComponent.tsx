@@ -32,24 +32,10 @@ export const AutoTxComponent = ({
 
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
-  /*   const [showMsgs, setShowMsgs] = useState(true) */
-  //const [requestedAuthzGrant, setRequestedAuthzGrant] = useState(false)
-
-  //const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
 
   const [icaAddr, isIcaLoading] = useICAForUser(autoTxData.connectionId)
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(chainSymbol, icaAddr)
   const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, chainSymbol, autoTxData)
-
-  ///} 
-  /* 
-    if (icaAddr && !isIcaLoading && chainSymbol) {
-      
-      //const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr)
-     
-      alert(icaBalance)
-    }
-   */
 
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
     useSubmitAutoTx({ autoTxData })
@@ -77,14 +63,6 @@ export const AutoTxComponent = ({
       handleSubmitAutoTx(undefined, { onSettled: () => setRequestedSubmitAutoTx(false) })
     }
   }, [isExecutingSchedule, requestedSubmitAutoTx, handleSubmitAutoTx])
-
-  /*   useEffect(() => {
-      if (autoTxData.msgs) {
-        setShowMsgs(true)
-      }
-  
-    })
-   */
 
   const handleSubmitAutoTxButtonClick = (autoTxData: AutoTxData) => {
     onAutoTxChange(autoTxData)
@@ -117,18 +95,10 @@ export const AutoTxComponent = ({
 
   function handleChainChange(connectionId: string, newPrefix: string, newDenom: string, name: string, chainSymbol: string) {
 
-    //const newAutoTxsData = [];
-    // for (const autoTx of autoTxDatas) {
+
     let newAutoTx = autoTxData
     newAutoTx.connectionId = connectionId
-    // for (let(msg, index) of autoTxData.msgs) {
-    //   let newMsg = msg.replaceAll(prefix, newPrefix)
-    //   newMsg = newMsg.replaceAll(denom, newDenom)
-    //   newAutoTx.msgs[index] = newMsg
-    // }
-    //  newAutoTxsData.push(autoTx)
-    //  onAutoTxChange(autoTxData)
-    //console.log(newAutoTxsData)
+
     onAutoTxChange(newAutoTx)
     setDenom(newDenom)
     setChainName(name)
@@ -136,21 +106,6 @@ export const AutoTxComponent = ({
     setPrefix(newPrefix)
   }
 
-  //  a function to handle clicks on the "+" button
-  /*   function handleAddNewAutoTxData() {
-      // Create a new AutoTxData object
-      const newAutoTxsData = [...autoTxDatas]
-      let newRecipient = new AutoTxData();
-      console.log(newAutoTxsData.length)
-      if (newAutoTxsData[newAutoTxsData.length - 1].msg != "") {
-        // Add the new recipient to the autoTxDatas array
-        console.log("adding to", newAutoTxsData[newAutoTxsData.length - 1])
-        console.log(newAutoTxsData)
-        newAutoTxsData.push(newRecipient);
-        onAutoTxChange(newAutoTxsData)
-      }
-    }
-   */
   function setExample(index: number, msg: string) {
     let newMsg = msg.replaceAll('trust', prefix)
     newMsg = newMsg.replaceAll('utrst', denom)
@@ -192,45 +147,6 @@ export const AutoTxComponent = ({
     newAutoTxData.msgs = newMsgs;
     onAutoTxChange(newAutoTxData)
   }
-
-  /* 
-    //  a function to handle clicks on the "x" button
-    function handleRemoveAutoTxData(index) {
-      console.log("removing", index)
-      if (index == 0) {
-        const newAutoTxsData = [...autoTxDatas]
-        let newRecipient = new AutoTxData();
-        newAutoTxsData[index] = newRecipient;
-        console.log(newAutoTxsData)
-        onAutoTxChange(newAutoTxsData)
-   
-        return
-      }
-      if (index == 10) {
-        alert("Maximum messages reached, provide feedback")
-        return
-      }
-      onRemoveAutoTx(autoTxDatas[index])
-   
-    }
-   
-    function handlePaste(index: number, key: keyof AutoTxData) {
-      return navigator.clipboard
-        .readText()
-        .then((clipText) => {
-          // Get the text from the clipboard
-          const newAutoTxsData = [...autoTxDatas]
-          newAutoTxsData[index] = {
-            ...newAutoTxsData[index],
-            [key]: clipText,
-          }
-          onAutoTxChange(newAutoTxsData)
-        })
-        .catch((error) => {
-          // Handle any errors that may occur when reading from the clipboard
-          console.error(error)
-        })
-    } */
 
   const [
     { isShowing: isSubmitAutoTxDialogShowing },
@@ -429,21 +345,7 @@ const sendExample = JSON.stringify({
     "toAddress": "trust1..."
   }
 }, null, "\t")
-/* 
-const stakeExample = JSON.stringify(
-  {
-    "typeUrl": "/cosmos.staking.v1beta1.MsgDelegate",
-    "value": {
-      "amount": {
-        "amount": "70",
-        "denom": "utrst"
-      },
-      "delegatorAddress": "trust1....",
-      "validatorAddress": "trustvaloper1..."
-    }
-  }, null, "\t")
 
- */
 const unstakeExample = JSON.stringify(
   {
     "typeUrl": "/cosmos.staking.v1beta1.MsgUndelegate",

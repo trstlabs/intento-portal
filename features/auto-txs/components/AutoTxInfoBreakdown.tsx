@@ -130,8 +130,8 @@ export const AutoTxInfoBreakdown = ({
                         <Text
                             variant="title"
                             align="center"
-                            css={{ paddingTop: '$8' }}
-                        >  {{ isActive } ? <> 🟢  </> : <>🔴</>}</Text><Text>{autoTxInfo.label != "" ? <> Name: {autoTxInfo.label}</> : <>Trigger ID: {autoTxInfo.txId}</>}  </Text>
+                            css={{ padding: '$8', }}
+                        >  {{ isActive } ? <> 🟢  </> : <>🔴</>}</Text><Text>{autoTxInfo.label != "" ? <> Trigger: {autoTxInfo.label}</> : <>Trigger ID: {autoTxInfo.txId}</>}  </Text>
                         <Column align="center"> <Text variant="caption">
                             <> Message Type: {autoTxInfo.msgs[0].typeUrl.split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
                         </Text></Column>
@@ -245,10 +245,10 @@ export const AutoTxInfoBreakdown = ({
                             <Column gap={8} align="flex-start" justifyContent="flex-start">
 
                                 <Text variant="legend" color="secondary" align="left">
-                                    Message
+                                    Message Value
                                 </Text>
                                 <Inline gap={2}>
-                                    <Text variant="body">{JSON.stringify(new Registry(msgRegistry).decode(msg))} </Text>
+                                    <Text css={{ wordBreak: "break-all" }} variant="body"><pre>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
                                 </Inline>
                             </Column>
                         </Row>

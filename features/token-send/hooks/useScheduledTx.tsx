@@ -1,4 +1,4 @@
-
+import { useTokenInfo } from 'hooks/useTokenInfo'
 import {
     Button,
     ErrorIcon,
@@ -11,7 +11,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeDirectSend, RecipientInfo } from '../../../services/send'
+import { AutoExecData, executeScheduledSend, RecipientInfo } from '../../../services/send'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -21,64 +21,83 @@ import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
-import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 
 type UseTokenSendArgs = {
-    ibcAsset: IBCAssetInfo
+    tokenSymbol: string
     recipientInfos: RecipientInfo[]
+    autoExecData: AutoExecData
 }
 
-export const useTokenSend = ({
-    ibcAsset,
+export const useScheduledTx = ({
+    tokenSymbol,
     recipientInfos,
+    autoExecData,
 }: UseTokenSendArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
+    const token = useTokenInfo(tokenSymbol)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
     return useMutation(
-        'sendTokens',
+        'scheduleTokens',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            let convertedInfos = structuredClone(recipientInfos)
+            let convertedInfos: RecipientInfo[] = recipientInfos;
             setTransactionState(TransactionStatus.EXECUTING)
-
-            recipientInfos.forEach((recipient, index) => {
-                convertedInfos[index].recipient = recipient.recipient
-                convertedInfos[index].channelID = recipient.channelID
-                convertedInfos[index].memo = recipient.memo
+            console.log(recipientInfos)
+            console.log(convertedInfos)
+            recipientInfos.forEach((field, index) => {
+                convertedInfos[index].recipient = field.recipient
+                convertedInfos[index].channel_id = field.channel_id
+                convertedInfos[index].memo = field.memo
                 convertedInfos[index].amount = convertDenomToMicroDenom(
-                    recipient.amount,
-                    ibcAsset.decimals,
+                    field.amount,
+                    token.decimals
                 )
             })
-            console.log(recipientInfos);
 
-            console.log(address)
-            return await executeDirectSend({
-                denom: ibcAsset.trst_denom,
+            return await executeScheduledSend({
+                token,
                 senderAddress: address,
                 recipientInfos: convertedInfos,
+                autoExecData,
                 client,
             })
 
         },
         {
-            onSuccess() {
+            onSuccess(data) {
+                console.log(data)
+                let contractAddress = data.arrayLog.find(
+                    (log) =>
+                        log.key == "contract_address"
+                ).value;
+                console.log(contractAddress)
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
-                        title="Send successful"
-                        body={`Sent ${ibcAsset.symbol} ! }`}
+                        title="Scheduled contract execution successfully!"
+                        body={`Scheduled to send ${token.symbol} recurringly! Your contract address for this is ${contractAddress}`}
+                        buttons={
+                            <Button
+                                as="a"
+                                variant="ghost"
+                                href={`/contracts/${contractAddress}`}
+                                target="__blank"
+                                iconRight={<UpRightArrow />}
+                            >
+                                Go to your contract
+                            </Button>
+                        }
                         onClose={() => toast.dismiss(t.id)}
                     />
                 ))
                 popConfetti(true)
-                setTimeout(() => popConfetti(false), 3000)
+                
                 refetchQueries()
             },
             onError(e) {
@@ -87,7 +106,7 @@ export const useTokenSend = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops send error!"
+                        title="Oops scheduling error!"
                         body={errorMessage}
                         buttons={
                             <Button

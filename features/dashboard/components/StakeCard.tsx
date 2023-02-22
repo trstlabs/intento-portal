@@ -106,7 +106,7 @@ export const StakeCard = ({
                     <StyledPNG src="./img/pot_light.png" />  <Button css={{ marginleft: '$8' }}
                         variant="primary"
                         size="large"
-                        disabled={isStakeBalanceLoading || stakeBalance.stakingBalanceAmount == 0}
+                        disabled={isStakeBalanceLoading || stakeBalance && stakeBalance.stakingBalanceAmount == 0}
                         onClick={() =>
                             setSubmitAutoTxDialogState({
                                 isShowing: true,

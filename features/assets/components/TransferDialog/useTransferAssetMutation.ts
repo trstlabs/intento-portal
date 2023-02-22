@@ -64,9 +64,8 @@ const sendIbcTokens = (
   //   ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
   //   : undefined
   const transferMsg = new MsgTransfer({
-
-    sourcePort: sourcePort,
-    sourceChannel: sourceChannel,
+    sourcePort,
+    sourceChannel,
     sender: senderAddress,
     receiver: recipientAddress,
     token: transferAmount,

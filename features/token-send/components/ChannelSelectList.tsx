@@ -17,17 +17,13 @@ const StyledDivForScrollContainer = styled('div', {
 export class ChannelInfo {
   name: string;
   logoURI: string;
-  channelID: string;
-  denom: string;
-  symbol: string
-  connectionID: string;
-  trst_denom: string;
+  channel: string;
 }
 
 
 export type ChannelSelectListProps = {
   activeChannel?: string
-  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'denom'|  'trst_denom' | 'logoURI' | 'name' | 'symbol'| 'connection_id'>>
+  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'symbol' | 'logoURI' | 'name'>>
   onSelect: (channelInfo: ChannelInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -46,13 +42,9 @@ export const ChannelSelectList = ({
 
   function passChannel(selectedInfo) {
     let selectedChannel = new ChannelInfo();
-    selectedChannel.channelID = selectedInfo.channel
+    selectedChannel.channel = selectedInfo.channel
     selectedChannel.name = selectedInfo.id
     selectedChannel.logoURI = selectedInfo.logoURI
-    selectedChannel.denom = selectedInfo.denom
-    selectedChannel.trst_denom = selectedInfo.trst_denom
-    selectedChannel.symbol = selectedInfo.symbol
-    selectedChannel.connectionID = selectedInfo.connectionID
     console.log(selectedChannel)
     return selectedChannel
   }
@@ -90,7 +82,7 @@ export const ChannelSelectList = ({
                 />
                 <div data-token-info="">
                   <Text variant="body" >
-                    {chainInfo.name}
+                    {chainInfo.chain_id}
                   </Text>
                 </div>
               </StyledDivForColumn>

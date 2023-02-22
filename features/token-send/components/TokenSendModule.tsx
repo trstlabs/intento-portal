@@ -21,36 +21,38 @@ type TokenSendModuleProps = {
 
 export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
   /* connect to recoil */
-  const [tokenSymbol, setToken] = useState('')
+  const [tokenSymbol, setTokenSendState] = useState('')
 
   const transactionStatus = useRecoilValue(transactionStatusState)
 
   const [tokenRecipientList, setTokenRecipientList] = useState([new RecipientInfo()])
-
+  
   /* fetch token list and set initial state */
   const [tokenList, isTokenListLoading] = useTokenList()
   useEffect(() => {
     const shouldSetDefaultTokenState =
       !tokenSymbol && tokenList
     if (shouldSetDefaultTokenState) {
-      setToken("TRST")
+      setTokenSendState("TTRST",
+
+      )
     }
-  }, [tokenList, setToken])
+  }, [tokenList, setTokenSendState])
 
   const initialTokenValue = useRef(initialToken).current
   useEffect(
     function setInitialTokenPairIfProvided() {
       if (initialTokenValue) {
         const tokenSymbol = initialTokenValue
-        setToken(
+        setTokenSendState(
           tokenSymbol,
 
         )
       }
     },
-    [initialTokenValue, setToken]
+    [initialTokenValue, setTokenSendState]
   )
-
+  
   const isUiDisabled =
     transactionStatus === TransactionStatus.EXECUTING || isTokenListLoading
   const uiSize = useMedia('sm') ? 'small' : 'large'
@@ -62,22 +64,46 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
         <TokenSelector
           tokenSymbol={tokenSymbol}
           onChange={(updateToken) =>
-            setToken(updateToken)
+            setTokenSendState(updateToken)
           }
           disabled={isUiDisabled}
           size={uiSize}
         />
-
+       
       </StyledDivForWrapper>
-      <div > <RecipientList recipients={tokenRecipientList} tokenSymbol={tokenSymbol}
-        // onTokenSymbolChange={(symbol) => setToken(symbol)}
+     <div > <RecipientList recipients={tokenRecipientList} tokenSymbol={tokenSymbol}
+       
         onRecipientsChange={((newRecipients) => setTokenRecipientList(newRecipients))}
         onRemoveRecipient={(recipient) => setTokenRecipientList(tokenRecipientList.filter(item => item !== recipient))}
       /></div>
     </StyledDivForWrapper>
+      {/* <TransactionAction isPriceLoading={isPriceLoading} size={uiSize} /> */}
     </>
   )
 }
+
+/* 
+const styleConfig = {
+  activeBgColor: '#103b64',
+  activeTextColor: '#ffffff',
+  completedBgColor: '#185996',
+  completedTextColor: '#ffffff',
+  inactiveBgColor: '#1c68af',
+  inactiveTextColor: '#ffffff',
+  size: '2em',
+  circleFontSize: '1rem',
+  labelFontSize: '0.875rem',
+  borderRadius: '50%',
+  fontWeight: 500,
+
+}
+const ConnectorStyleProps = {
+  disabledColor: 'tertiary',
+  activeColor: 'primary',
+  completedColor: 'secondary',
+  size: '1px',
+  style: 'solid'
+} */
 
 const StyledDivForWrapper = styled('div', {
   borderRadius: '16px',

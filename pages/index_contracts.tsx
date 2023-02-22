@@ -59,7 +59,7 @@ export default function Contracts() {
   const pageHeaderContents = (
     <PageHeader
       title="Contracts"
-      subtitle="Interact with your personal contracts."
+      subtitle="Interact with your personal contracts"
     />
   )
 

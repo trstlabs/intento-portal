@@ -4,7 +4,7 @@ import { Button, Inline, Spinner, styled, Text } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { ScheduleDialog, AutoExecData } from '../../send/components/ScheduleDialog'
+import { ScheduleDialog, AutoExecData } from '../../token-send/components/ScheduleDialog'
 
 
 import { useTokenSwap, useSwapFee, useCostAveraging } from '../hooks'

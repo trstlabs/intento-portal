@@ -12,15 +12,13 @@ import React, { useRef, useState } from 'react'
 
 import { ChannelSelectorToggle } from './ChannelSelectorToggle'
 import { ChannelOptionsList } from './ChannelOptionsList'
-import { ChannelInfo } from './ChannelSelectList'
-import { Channel } from 'trustlessjs/dist/protobuf/ibc/core/channel/v1/channel'
 
 
 type ChannelSelectorProps = {
   readOnly?: boolean
   disabled?: boolean
   channel: string
-  onChange: (channelInfo: ChannelInfo) => void
+  onChange: (token: { channel; }) => void
   size?: 'small' | 'large'
 }
 
@@ -41,10 +39,10 @@ export const ChannelSelector = ({
   const [chainName, setChainName] = useState('')
 
 
-  const handleSelectChannel = (channelInfo: ChannelInfo) => {
-    setChainLogoURI(channelInfo.logoURI)
-    setChainName(channelInfo.name)
-    onChange(channelInfo)
+  const handleSelectChannel = (selectedChannel: string, uri: string, name: string) => {
+    setChainLogoURI(uri)
+    setChainName(name)
+    onChange({ channel: selectedChannel })
     
     setChannelListShowing(false)
   }
@@ -76,7 +74,7 @@ export const ChannelSelector = ({
         {isChannelListShowing && (
           <ChannelOptionsList
             activeChannel={channel}
-            onSelect={(slct) => handleSelectChannel(slct)}
+            onSelect={(slct) => handleSelectChannel(slct.channel,slct.logoURI,slct.name)}
             css={{ padding: '$4 $6 $12' }}
           
             
@@ -115,7 +113,7 @@ export const ChannelSelector = ({
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
               size="small"
-              onClick={() => handleSelectChannel(new ChannelInfo)}
+              onClick={() => handleSelectChannel('', '', '')}
               iconColor="tertiary"
             />
           )}
@@ -135,7 +133,7 @@ export const ChannelSelector = ({
       {isChannelListShowing && (
         <ChannelOptionsList
           activeChannel={channel}
-          onSelect={(slct) => handleSelectChannel(slct)}
+          onSelect={(slct) => handleSelectChannel(slct.channel,slct.logoURI,slct.name)}
           css={{ padding: '$4 $6 $4' }}
         />
       )}

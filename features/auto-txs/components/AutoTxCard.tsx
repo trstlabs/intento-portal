@@ -45,13 +45,13 @@ export const AutoTxCard = ({
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
-                        > Trigger: {autoTxInfo.label}  </StyledText> : <StyledText
+                        > {autoTxInfo.label}  </StyledText> : <StyledText
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
                         > Trigger ID: {autoTxInfo.txId}  </StyledText>}
                         {autoTxInfo.msgs && <Column align="center"> <StyledText variant="caption">
-                            <> Message Type: {autoTxInfo.msgs[0].typeUrl}</>
+                            <>Message Type: {autoTxInfo.msgs[0].typeUrl.split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
                         </StyledText></Column>}
 
                     </Column>
@@ -63,7 +63,7 @@ export const AutoTxCard = ({
                             Information
                         </Text> */}
                         <Text variant="legend">
-                            {isActive ? <> 🟢 Active Trigger on {ibcInfo.name}</> : <>🔴 Execution ended</>}
+                            {isActive ? <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</> : <>🔴 Execution ended</>}
                             {/* {isActive ? (
                                 <>
                                     <StyledSpanForHighlight>

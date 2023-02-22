@@ -1,8 +1,8 @@
-
+import { useTokenInfo } from 'hooks/useTokenInfo'
 import {
   ButtonForWrapper,
   Chevron,
-
+  formatTokenBalance,
   IconWrapper,
   ImageForTokenLogo,
   styled,
@@ -11,38 +11,39 @@ import {
 import React from 'react'
 import { getPropsForInteractiveElement } from 'util/getPropsForInteractiveElement'
 
-type ChannelSelectorToggleProps = {
+type SelectorToggleProps = {
   isSelecting: boolean
   onToggle: () => void
-  channel: string
-  chainLogoURI: string
-  chainName: string
-  /*   availableAmount: number */
+  tokenSymbol: string
+  availableAmount: number
 }
 
-export const ChannelSelectorToggle = ({
+export const SelectorToggle = ({
   isSelecting,
   onToggle,
-  chainLogoURI,
-  chainName,
-  /*   availableAmount, */
-  channel,
-}: ChannelSelectorToggleProps) => {
-  
-  const hasTokenSelected = Boolean(channel)
+  availableAmount,
+  tokenSymbol,
+}: SelectorToggleProps) => {
+  const { logoURI } = useTokenInfo(tokenSymbol) || {}
+
+  const formattedAvailableAmount = formatTokenBalance(availableAmount, {
+    includeCommaSeparation: true,
+  })
+
+  const hasTokenSelected = Boolean(tokenSymbol)
 
   return (
     <StyledDivForSelector
-      state={isSelecting || !channel ? 'selecting' : 'selected'}
+      state={isSelecting || !tokenSymbol ? 'selecting' : 'selected'}
       {...getPropsForInteractiveElement({ onClick: onToggle })}
       variant="ghost"
     >
       {(isSelecting || !hasTokenSelected) && (
         <>
-          <Text variant="body">Select a Chain</Text>
+          <Text variant="body">Select a token</Text>
           <IconWrapper
             size="large"
-            rotation={channel ? '90deg' : '-90deg'}
+            rotation={tokenSymbol ? '90deg' : '-90deg'}
             color="tertiary"
             icon={<Chevron />}
           />
@@ -50,8 +51,13 @@ export const ChannelSelectorToggle = ({
       )}
       {!isSelecting && hasTokenSelected && (
         <>
-          <ImageForTokenLogo logoURI={chainLogoURI} size="big" alt={channel} />
-          <Text variant="body">{chainName}</Text>
+          <ImageForTokenLogo logoURI={logoURI} size="big" alt={tokenSymbol} />
+          <div>
+            <Text variant="body">{tokenSymbol}</Text>
+            <Text variant="secondary">
+              {formattedAvailableAmount} available
+            </Text>
+          </div>
           <IconWrapper
             size="medium"
             rotation="-90deg"

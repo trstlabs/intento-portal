@@ -23,7 +23,7 @@ export const ExtensionSidebar = () => {
       >
         Report an issue
       </Button>
-      <StyledPNGBottom src="/rocket_portal.png" />
+      <StyledPNGBottom src="/multiportal2.png" />
     </StyledDivForWrapper>
   )
 }
@@ -54,7 +54,7 @@ const StyledPNGBottom = styled('img', {
   position: 'absolute',
   right: 20,
   bottom: 40,
-  width: '75%',
+  width: '100%',
   maxWidth: '300px',
   zIndex: '$1',
   userSelect: 'none',

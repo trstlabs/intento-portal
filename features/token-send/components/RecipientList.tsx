@@ -1,30 +1,28 @@
-import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyIcon, Button, styled, Text, Column, convertDenomToMicroDenom } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union,  CopyIcon, Button, styled, Text,  Column } from 'junoblocks'
 
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import { useConnectWallet } from '../../../hooks/useConnectWallet';
 import { useTokenSend } from '../hooks';
+import { useScheduledTx } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
 import { useRecoilValue } from 'recoil'
-import { SubmitAutoTxDialog, AutoTxData } from '../../automate/components/SubmitAutoTxDialog';
-import { ChannelInfo } from './ChannelSelectList';
-import { useSubmitAutoTx } from '../../automate/hooks';
-import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo';
+import { ScheduleDialog, AutoExecData } from './ScheduleDialog';
 
 export class RecipientInfo {
   recipient: string;
   amount: string | number;
-  channelID: string;
+  channel_id: string;
   memo: string;
 }
+
 
 type RecipientsInputProps = {
   recipients: RecipientInfo[]
   tokenSymbol: string
   onRecipientsChange: (recipients: RecipientInfo[]) => void
   onRemoveRecipient: (recipient: RecipientInfo) => void
-  //onTokenSymbolChange: (symbol: string) => void
 } & HTMLProps<HTMLInputElement>
 
 export const RecipientList = ({
@@ -32,28 +30,27 @@ export const RecipientList = ({
   tokenSymbol,
   onRecipientsChange,
   onRemoveRecipient,
-  // onTokenSymbolChange, 
   //...inputProps
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
 
+  /* wallet state */
   const [requestedSend, setRequestedSend] = useState(false)
   const [requestedSchedule, setRequestedSchedule] = useState(false)
-  const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  // set default times
-  let data = new AutoTxData()
+  //default time
+  let data = new AutoExecData()
   data.duration = 14 * 86400000;
   data.interval = 86400000;
-  data.msgs = [""]
-  data.typeUrls = [""]
-  const [autoTxData, setAutoTxData] = useState(data)
-  const { address, status } = useRecoilValue(walletState)
+  // data.startTime =  0;
+
+  const [autoExecData, setAutoExecData] = useState(data)
+  const { status } = useRecoilValue(walletState)
   const { mutate: connectWallet } = useConnectWallet()
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
-    useTokenSend({ ibcAsset, recipientInfos: recipients, })
+    useTokenSend({ tokenSymbol, recipientInfos: recipients, })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
-    useSubmitAutoTx({ autoTxData })
+    useScheduledTx({ tokenSymbol, recipientInfos: recipients, autoExecData })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -88,20 +85,9 @@ export const RecipientList = ({
     connectWallet(null)
   }
 
-  const handleScheduleButtonClick = (txData: AutoTxData) => {
-
+  const handleScheduleButtonClick = (execData: AutoExecData) => {
     if (status === WalletStatusType.connected) {
-      let msgs = []
-      for (let recipient of recipients) {
-        let sendMsg = sendObject
-        sendObject.value.fromAddress = address,
-          sendObject.value.toAddress = recipient.recipient,
-          sendObject.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
-
-        msgs.push(JSON.stringify(sendMsg))
-      }
-      txData.msgs = msgs
-      setAutoTxData(txData)
+      setAutoExecData(execData)
 
       return setRequestedSchedule(true)
     }
@@ -116,19 +102,16 @@ export const RecipientList = ({
       [key]: event.target.value
     }
     console.log(newRecipients)
-
     onRecipientsChange(newRecipients)
   }
 
-  const handleChannelChange = (index: number, channelInfo: ChannelInfo) => {
+  const handleChannelChange = (index: number, channel: string) => {
     const newRecipients = [...recipients]
     newRecipients[index] = {
       ...newRecipients[index],
-      channelID: channelInfo.channelID
+      channel_id: channel
     }
     console.log(newRecipients)
-    //onTokenSymbolChange(channelInfo.symbol)
-
     onRecipientsChange(newRecipients)
   }
 
@@ -187,13 +170,13 @@ export const RecipientList = ({
   }
 
   const [
-    { isShowing: isScheduleDialogShowing/* , actionType  */ },
+    { isShowing: isScheduleDialogShowing, actionType },
     setScheduleDialogState,
-  ] = useState({ isShowing: false/* , actionType: 'recurrence' as 'recurrence' | "occurrence" } */ })
+  ] = useState({ isShowing: false, actionType: 'recurrence' as 'recurrence' | "occurrence" })
 
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
-    status !== WalletStatusType.connected || !recipients[0].recipient || (recipients[0].recipient && recipients[0].recipient.length < 44) || (Number(recipients[0].amount) == 0)
+    status !== WalletStatusType.connected || (recipients[0].recipient && recipients[0].recipient.length < 44) || (Number(recipients[0].amount) == 0)
 
 
 
@@ -233,7 +216,7 @@ export const RecipientList = ({
                       placeholder="0" type="number"
                       value={recipient.amount}
                       onChange={handleChange(index, 'amount')}
-                    /> {tokenSymbol}</Text></Row>
+                    /></Text></Row>
                   <Row>
                     <Text align="center"
                       variant="caption">
@@ -248,11 +231,11 @@ export const RecipientList = ({
                 <Column><Row>
                   <Text align="center"
                     variant="caption">
-                    To Chain (Optional)</Text>
+                    Chain (Optional)</Text>
                   <Text>  <ChannelSelector
-                    channel={recipient.channelID}
+                    channel={recipient.channel_id}
                     onChange={(updateChannel) => {
-                      handleChannelChange(index, updateChannel)
+                      handleChannelChange(index, updateChannel.channel)
                     }}
                     size={'large'}
                   /></Text></Row></Column>
@@ -284,20 +267,33 @@ export const RecipientList = ({
 
 
           <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={"a" + index}>      <Text>
-              {(recipient.amount != 0) && (<div>
-                <div>Recipient {index + 1}: <i >{recipient.recipient}</i></div>
-                <Text>Amount: <i> {recipient.amount} {tokenSymbol}</i></Text>
-                {recipient.channelID && (<Text>Channel ID: <i >{recipient.channelID}</i></Text>)}
+            <div key={"a"+ index}>      <Text>
+              {(recipient.amount != 0) && (<ul>
+                <Text>Recipient {index + 1}: <i >{recipient.recipient}</i></Text>
+                <Text>Amount: <i > {recipient.amount}</i></Text>
+                {recipient.channel_id && (<Text>Channel ID: <i >{recipient.channel_id}</i></Text>)}
                 {recipient.memo && (<Text>Memo: <i >{recipient.memo}</i></Text>)}
-              </div>)}</Text>
+              </ul>)}</Text>
             </div>
           </CardContent>
         ))}
       </Card>)}
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
-
         <Button css={{ marginRight: '$4' }}
+          variant="primary"
+          size="large"
+          disabled={shouldDisableSubmissionButton}
+          onClick={() =>
+            setScheduleDialogState({
+              isShowing: true,
+              actionType: 'recurrence',
+            })
+          }
+        >
+          {isExecutingTransaction ? <Spinner instant /> : 'Schedule Recurrence'}
+        </Button>
+
+        <Button
           variant="secondary"
           size="large"
           disabled={shouldDisableSubmissionButton}
@@ -309,33 +305,19 @@ export const RecipientList = ({
         >
           {isExecutingTransaction ? <Spinner instant /> : 'Send'}
         </Button>
-        <Button
-          variant="secondary"
-          size="large"
-          disabled={shouldDisableSubmissionButton}
-          onClick={() =>
-            setScheduleDialogState({
-              isShowing: true,
-
-            })
-          }
-        >
-          {isExecutingTransaction ? <Spinner instant /> : 'Schedule Recurrence'}
-        </Button>
-
       </Inline>
-      <SubmitAutoTxDialog
-        // label="Recurring Send"
-        autoTxData={autoTxData}
+      <ScheduleDialog
+        label="Recurring Send"
+        execData={autoExecData}
         isShowing={isScheduleDialogShowing}
-        /* initialActionType={actionType} */
+        initialActionType={actionType}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,
-
+            actionType: 'recurrence',
           })
         }
-        handleSubmitAutoTx={(txData) => handleScheduleButtonClick(txData)}
+        handleSchedule={(execData) => handleScheduleButtonClick(execData)}
       />
     </div >)
 }
@@ -370,19 +352,4 @@ function Row({ children }) {
   )
 
 
-}
-
-
-
-
-const sendObject = {
-  "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
-  "value": {
-    "amount": [{
-      "amount": "70",
-      "denom": "utrst"
-    }],
-    "fromAddress": "trust1....",
-    "toAddress": "trust1..."
-  }
 }

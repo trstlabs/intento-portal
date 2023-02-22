@@ -11,7 +11,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { AutoExecData, executeScheduledSend, RecipientInfo } from '../../../services/send'
+import {  RecipientInfo } from '../../../services/send'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -21,17 +21,18 @@ import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
+import { AutoTxData, executeSubmitAutoTx } from '../../../services/ica'
 
 type UseTokenSendArgs = {
     tokenSymbol: string
     recipientInfos: RecipientInfo[]
-    autoExecData: AutoExecData
+    autoTxData: AutoTxData
 }
 
 export const useScheduledTx = ({
     tokenSymbol,
     recipientInfos,
-    autoExecData,
+    autoTxData,
 }: UseTokenSendArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -60,11 +61,9 @@ export const useScheduledTx = ({
                 )
             })
 
-            return await executeScheduledSend({
-                token,
-                senderAddress: address,
-                recipientInfos: convertedInfos,
-                autoExecData,
+            return await executeSubmitAutoTx({
+                owner: address,
+                autoTxData,
                 client,
             })
 
@@ -80,8 +79,8 @@ export const useScheduledTx = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
-                        title="Scheduled contract execution successfully!"
-                        body={`Scheduled to send ${token.symbol} recurringly!} Your contract address for this is ${contractAddress}`}
+                        title="Scheduled token send successfully!"
+                        body={`Scheduled to send ${token.symbol} recurringly! Your contract address for this is ${contractAddress}`}
                         buttons={
                             <Button
                                 as="a"

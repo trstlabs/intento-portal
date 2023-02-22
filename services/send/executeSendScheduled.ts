@@ -42,8 +42,8 @@ export const executeScheduledSend = async ({
       }
       scheduledRecipients.push(scheduledRecipient)
       totalRecurrenceAmount = totalRecurrenceAmount + Number(recipient.amount);
-      if (recipient.channel_id == undefined) {
-        recipient.channel_id = ''
+      if (recipient.channelID == undefined) {
+        recipient.channelID = ''
       }
     });
 

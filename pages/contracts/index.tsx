@@ -46,7 +46,7 @@ export default function Contracts() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Look into your assets and interact with your personal contracts."
+      subtitle="Look into your assets and interact with your personal contracts"
     />
   )
 

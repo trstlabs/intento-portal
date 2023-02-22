@@ -51,7 +51,10 @@ export const ChannelSelectorToggle = ({
       {!isSelecting && hasTokenSelected && (
         <>
           <ImageForTokenLogo logoURI={chainLogoURI} size="big" alt={channel} />
+
           <Text variant="body">{chainName}</Text>
+
+
           <IconWrapper
             size="medium"
             rotation="-90deg"

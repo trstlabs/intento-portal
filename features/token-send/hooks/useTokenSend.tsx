@@ -1,4 +1,4 @@
-
+import { useTokenInfo } from 'hooks/useTokenInfo'
 import {
     Button,
     ErrorIcon,
@@ -21,20 +21,20 @@ import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
-import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 
 type UseTokenSendArgs = {
-    ibcAsset: IBCAssetInfo
+    tokenSymbol: string
     recipientInfos: RecipientInfo[]
 }
 
 export const useTokenSend = ({
-    ibcAsset,
+    tokenSymbol,
     recipientInfos,
 }: UseTokenSendArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
+    const token = useTokenInfo(tokenSymbol)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
@@ -44,23 +44,23 @@ export const useTokenSend = ({
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            let convertedInfos = structuredClone(recipientInfos)
+            let convertedInfos = [new RecipientInfo()]
             setTransactionState(TransactionStatus.EXECUTING)
-
+            
             recipientInfos.forEach((recipient, index) => {
                 convertedInfos[index].recipient = recipient.recipient
-                convertedInfos[index].channelID = recipient.channelID
+                convertedInfos[index].channel_id = recipient.channel_id
                 convertedInfos[index].memo = recipient.memo
                 convertedInfos[index].amount = convertDenomToMicroDenom(
                     recipient.amount,
-                    ibcAsset.decimals,
+                    token.decimals
                 )
             })
             console.log(recipientInfos);
 
             console.log(address)
             return await executeDirectSend({
-                denom: ibcAsset.trst_denom,
+                token,
                 senderAddress: address,
                 recipientInfos: convertedInfos,
                 client,
@@ -73,12 +73,12 @@ export const useTokenSend = ({
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Send successful"
-                        body={`Sent ${ibcAsset.symbol} ! }`}
+                        body={`Sent ${token.symbol} ! }`}
                         onClose={() => toast.dismiss(t.id)}
                     />
                 ))
                 popConfetti(true)
-                setTimeout(() => popConfetti(false), 3000)
+                setTimeout( () => popConfetti(false), 3000)
                 refetchQueries()
             },
             onError(e) {

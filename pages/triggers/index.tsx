@@ -47,8 +47,8 @@ export default function AutoTxs() {
 
   const pageHeaderContents = (
     <PageHeader
-      title="Dashboard"
-      subtitle="Look into your assets and interact with your personal autoTxs."
+      title="Triggers"
+      subtitle="View Trustless Triggers and interact with them"
     />
   )
 
