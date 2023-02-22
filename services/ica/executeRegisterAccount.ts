@@ -21,7 +21,7 @@ export const executeRegisterAccount = async ({
   connectionId,
   owner,
 }: ExecuteRegisterAccountArgs): Promise<any> => {
-  let tx = await client.tx.autoibctx.register_account({
+  let tx = await client.tx.auto_tx.register_account({
     connectionId, owner,
   },
     { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }

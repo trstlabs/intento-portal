@@ -1,9 +1,9 @@
-import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column, styled } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  ImageForTokenLogo, styled,  */Text, Column, styled, formatTokenBalance } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 
 import { SubmitAutoTxDialog, AutoTxData } from '../../automate/components/SubmitAutoTxDialog';
 import { useSubmitAutoTx } from '../../automate/hooks';
-import { useGetAPR, useGetStakeBalanceForAcc } from '../../../hooks/useDelegations';
+import { useGetAPR, useGetAPY, useGetStakeBalanceForAcc } from '../../../hooks/useChainInfo';
 import { useTokenBalance } from '../../../hooks/useTokenBalance';
 
 type StakeCardProps = {
@@ -16,13 +16,20 @@ export const StakeCard = ({
     // const inputRef = useRef<HTMLInputElement>()
 
     const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
-    const [autoTxData, setAutoTxData] = useState(new AutoTxData())
+    let data = new AutoTxData()
+    data.duration = 14 * 86400000;
+    data.interval = 86400000;
+    data.msgs = [""]
+    data.typeUrls = [""]
+    const [autoTxData, setAutoTxData] = useState(data)
     const [APR, isAPRLoading] = useGetAPR()
+    const [weeklyAPY, isWeeklyAPYLoading] = useGetAPY(60 * 60 * 24 * 7)
     const [stakeBalance, isStakeBalanceLoading] = useGetStakeBalanceForAcc()
+
     const { balance, isLoading } = useTokenBalance('TRST')
 
     const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
-        useSubmitAutoTx({ autoTxData: autoTxData })
+        useSubmitAutoTx({ autoTxData })
 
     useEffect(() => {
         const shouldTriggerSubmitAutoTx =
@@ -34,13 +41,18 @@ export const StakeCard = ({
 
     const handleSubmitAutoTxButtonClick = (newAutoTxData: AutoTxData) => {
         const msgs = []
-        msgs.push(stakeSDKMessage, claimRewardSDKMessage)
-        newAutoTxData = {
-            ...autoTxData,
+        for (const validator of stakeBalance.validators) {
+            let claimMsg = claimRewardSDKMessage
+            claimMsg.value.delegatorAddress = stakeBalance.address
+            claimMsg.value.validatorAddress = validator
+            msgs.push(JSON.stringify(claimMsg))
+        }
+        const autoTx = {
+            ...newAutoTxData,
             msgs,
         }
-        console.log(newAutoTxData)
-        setAutoTxData(autoTxData)
+        // console.log(autoTx)
+        setAutoTxData(autoTx)
         return setRequestedSubmitAutoTx(true)
     }
 
@@ -49,21 +61,22 @@ export const StakeCard = ({
         setSubmitAutoTxDialogState,
     ] = useState({ isShowing: false })
 
-    const shouldDisableSubmissionButton = autoTxData.msgs && autoTxData.msgs[0].length == 0 && JSON.parse(autoTxData.msgs[0])["typeUrl"].length < 5
-
-
     return (
         <StyledDivForContainer>
             < Card variant="secondary" disabled css={{ padding: '$8' }} > <CardContent size="medium" >
-
-
-
                 <Column>
-                    <Row><Text variant="title">Autocompound</Text></Row>
-                    {!isAPRLoading && APR && <>  <Text variant="legend">Nominal APR {APR.estimatedApr}%</Text>
-                        <Text variant="legend">RealTime APR {APR.calculatedApr}%</Text>
-                        {!isLoading && balance > 0 && <Text variant="legend">TRST Balance {balance}</Text>}
-                        <Text variant="caption">  {!isLoading && balance > 0 && !isStakeBalanceLoading && stakeBalance > 0 ? <>Stake Balance {stakeBalance}</> : <>You hold {balance} TRST but have not staked any tokens yet, stake them to secure the network and earn staking rewards</>}</Text>
+                    <Row><Text variant="header" css={{ paddingBottom: '$8' }}  >Autocompound</Text></Row>
+                    {!isAPRLoading && APR && <>  <Text variant="legend">Nominal APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr}%</Text>
+                        {!isWeeklyAPYLoading && weeklyAPY && <> <Text variant="legend"> APY (Weekly Compound)</Text><Text css={{ padding: '$8' }} variant="title">{weeklyAPY}%</Text></>}
+                        <Text variant="legend">RealTime APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr}%</Text>
+
+                        {!isLoading && balance > 0 && <><Text variant="legend">TRST Balance </Text><Text css={{ padding: '$8' }} variant="title">{formatTokenBalance(balance)}</Text></>}
+                        {!isLoading && balance > 0 && <Text variant="legend"> {!isStakeBalanceLoading && stakeBalance && stakeBalance.stakingBalanceAmount > 0 ? <>Stake Balance is {formatTokenBalance(stakeBalance.stakingBalanceAmount)} with {stakeBalance.validators.length} validator{stakeBalance.validators.length > 1 && <>s
+
+                        </>
+
+                        } </> : <>You hold {formatTokenBalance(balance)} TRST but have not staked any tokens yet, stake them to secure the network and earn staking rewards. Staking rewards can be compounded to earn additonal tokens.</>}
+                        </Text>}
 
                     </>}
                     {/* <Row>
@@ -75,26 +88,41 @@ export const StakeCard = ({
 
                     </Row> */}
                 </Column>
-                {shouldShowAutoCompound && <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
-                    <Button css={{ marginRight: '$4' }}
+                {shouldShowAutoCompound ? <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'space-around' }}>
+                    <Button css={{ marginleft: '$8' }}
                         variant="primary"
                         size="large"
-                        disabled={shouldDisableSubmissionButton}
+                        disabled={isStakeBalanceLoading}
+                        as="a"
+                        href={"https://interact.trustlesshub.com/validators/"}
+                        target="__blank"
+                    >{/* <ImageForTokenLogo
+                            logoURI={"https://www.trustlesshub.com/img/brand/icon.png"}
+                            size="medium"
+                            loading="lazy"
+                        /> */}
+                        {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
+                    </Button>
+                    <StyledPNG src="./img/pot_light.png" />  <Button css={{ marginleft: '$8' }}
+                        variant="primary"
+                        size="large"
+                        disabled={isStakeBalanceLoading || stakeBalance.stakingBalanceAmount == 0}
                         onClick={() =>
                             setSubmitAutoTxDialogState({
                                 isShowing: true,
                             })
                         }
                     >
-                        {isExecutingSchedule ? <Spinner instant /> : 'Autocompund'}
+                        {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
                     </Button>
 
-                </Inline>}
+                </Inline> : <StyledPNG src="./img/pot_full.png" />}
 
             </CardContent>
             </Card>
             <SubmitAutoTxDialog
                 autoTxData={autoTxData}
+                customLabel="Autocompound"
                 isShowing={isSubmitAutoTxDialogShowing}
                 onRequestClose={() =>
                     setSubmitAutoTxDialogState({
@@ -123,8 +151,6 @@ function Row({ children }) {
                 justifyContent: 'start',
                 marginBottom: '$3',
                 columnGap: '$space$1',
-                // border: '1px solid $borderColors$default',
-                // borderRadius: '$2'
             }}
         >
             {children}
@@ -132,29 +158,22 @@ function Row({ children }) {
     )
 }
 
+const claimRewardSDKMessage =
+{
+    "typeUrl": "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+    "value": {
+        "delegatorAddress": "trust1....",
+        "validatorAddress": "trustvaloper1..."
+    }
+}
 
+const StyledPNG = styled('img', {
+    width: '75%',
+    maxWidth: '200px',
+    maxHeight: '400px',
+    zIndex: '$1',
+    userSelect: 'none',
+    userDrag: 'none',
+    display: 'block',
 
-const stakeSDKMessage = JSON.stringify(
-    {
-        "typeUrl": "/cosmos.staking.v1beta1.MsgDelegate",
-        "value": {
-            "amount": {
-                "amount": "70",
-                "denom": "utrst"
-            },
-            "delegator_address": "trust1....",
-            "validator_address": "trustvaloper1..."
-        }
-    }, null, "\t")
-
-
-const claimRewardSDKMessage = JSON.stringify(
-    {
-        "typeUrl": "  /cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
-        "value": {
-            "delegatorAddress": "trust1....",
-            "validatorAddress": "trustvaloper1..."
-        }
-    }, null, "\t")
-
-
+})

@@ -35,28 +35,22 @@ export const executeSubmitAutoTx = async ({
   autoTxData,
   owner,
 }: ExecuteSubmitAutoTxArgs): Promise<any> => {
-
-
   let startAt = 0
-
-  if (autoTxData.startTime != 0) {
+  if (autoTxData.startTime > 0) {
     startAt = (Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000);
   }
-  console.log(startAt)
-  console.log(autoTxData.withAuthZ)
+
   let duration = autoTxData.duration + "ms"
   let interval = autoTxData.interval + "ms"
-
   let msgs = []
-  for (let msg in autoTxData.msgs) {
-
-    console.log(JSON.parse(msg))
+  for (let msg of autoTxData.msgs) {
+    console.log(msg)
     const masterRegistry = new Registry(msgRegistry);
     //let type = masterRegistry.lookupType((JSON.parse(autoTxData.msg)["typeUrl"]).toString())
     let value = JSON.parse(msg)["value"]
-    console.log(value)
 
     let typeUrl: string = JSON.parse(msg)["typeUrl"].toString()
+
     if (typeUrl.startsWith("/cosmwasm")) {
       let msg: string = JSON.stringify(value["msg"])
       console.log(msg)
@@ -70,22 +64,19 @@ export const executeSubmitAutoTx = async ({
       value
     }
     console.log(encodeObject)
-    let msgAny = masterRegistry.encodeAsAny(encodeObject)
 
+    let msgAny = masterRegistry.encodeAsAny(encodeObject)
     if (autoTxData.withAuthZ) {
       const encodeObject2 = {
         typeUrl: "/cosmos.authz.v1beta1.MsgExec",
         value: {
-          msg: msg,
+          msg,
           grantee: owner,
         }
 
       }
       msgAny = masterRegistry.encodeAsAny(encodeObject2)
-      console.log(msg)
     }
-
-    console.log(msgAny.value.toString())
     console.log(msgAny)
     msgs.push(msgAny)
   }
@@ -94,16 +85,16 @@ export const executeSubmitAutoTx = async ({
   if (autoTxData.feeFunds > 0) {
     feeFunds = [{ denom: "utrst", amount: convertDenomToMicroDenom(autoTxData.feeFunds, 6).toString() }]
   }
-
+  console.log("label", autoTxData.label)
   return validateTransactionSuccess(
-    await client.tx.autoibctx.submit_auto_tx({
-      connectionId: autoTxData.connectionId, owner,
+    await client.tx.auto_tx.submit_auto_tx({
+      connectionId: autoTxData.connectionId ? autoTxData.connectionId : "",
+      owner,
       msgs,
       label: autoTxData.label ? autoTxData.label : "",
       duration,
       interval,
       startAt: startAt.toString(),
-      // retries: 0,//autoTxData.retries,
       // dependsOnTxIds,
       feeFunds,
     },
@@ -119,28 +110,11 @@ export class AutoTxData {
   duration: number
   startTime?: number
   interval?: number
-  connectionId: string
-  dependsOnTxIds: number[]
+  connectionId?: string
+  dependsOnTxIds?: number[]
   msgs: string[]
   retries: number
   withAuthZ: boolean
-  feeFunds?: number
   label?: string
+  feeFunds?: number
 }
-/* 
-const atob: (b64: string) => string =
-  globalThis.atob ||
-  ((b64) => globalThis.Buffer.from(b64, "base64").toString("binary"));
-function bytesFromBase64(b64: string): Uint8Array {
-  const bin = atob(b64);
-  const arr = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; ++i) {
-    arr[i] = bin.charCodeAt(i);
-  }
-  return arr;
-}
-
-
-
-
- */

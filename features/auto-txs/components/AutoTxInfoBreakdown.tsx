@@ -37,6 +37,7 @@ import dayjs from 'dayjs'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 import { useSendFundsOnHost } from '../../automate/hooks'
+import { Registry, msgRegistry } from 'trustlessjs'
 type AutoTxInfoBreakdownProps = {
     autoTxInfo: AutoTxInfo,
     ibcInfo: IBCAssetInfo
@@ -56,6 +57,7 @@ export const AutoTxInfoBreakdown = ({
 
     const [icaAddr, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
     const symbol = ibcInfo ? ibcInfo.symbol : ""
+    const denom = ibcInfo ? ibcInfo.denom : ""
     const [showICAHostButtons, setShowICAHostButtons] = useState(false)
     const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddr)
     const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
@@ -66,7 +68,7 @@ export const AutoTxInfoBreakdown = ({
     const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
     const [requestedSendFunds, setRequestedSendFunds] = useState(false)
     const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
-        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom: ibcInfo.denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
     useEffect(() => {
         const shouldTriggerSendFunds =
             !isExecutingSendFundsOnHost && requestedSendFunds;
@@ -246,7 +248,7 @@ export const AutoTxInfoBreakdown = ({
                                     Message
                                 </Text>
                                 <Inline gap={2}>
-                                    <Text variant="body">{msg.value} </Text>
+                                    <Text variant="body">{JSON.stringify(new Registry(msgRegistry).decode(msg))} </Text>
                                 </Inline>
                             </Column>
                         </Row>

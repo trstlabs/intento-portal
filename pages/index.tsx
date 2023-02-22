@@ -42,7 +42,7 @@ export default function Home() {
       [sortParameter, sortDirection]
     ),
   })
-  const shouldShowAutoCompound = autoTxs?.length && !autoTxs.find(tx => tx.label == "Autocompound");
+  const shouldShowAutoCompound = !myAutoTxs?.length || !myAutoTxs.find(tx => tx.label == "Autocompound");
   const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
 

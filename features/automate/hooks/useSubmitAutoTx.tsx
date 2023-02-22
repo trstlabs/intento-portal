@@ -40,7 +40,7 @@ export const useSubmitAutoTx = ({
                 throw new Error('Please connect your wallet.')
             }
         
-
+            console.log(autoTxData)
             return await executeSubmitAutoTx({
                 owner: address,
                 autoTxData,

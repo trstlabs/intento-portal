@@ -27,8 +27,8 @@ export const AutoTxCard = ({
 }: autoTxInfoWithDetails) => {
     const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
     const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
-    const msgData = new TextDecoder().decode(autoTxInfo.data).split(".")
-    const data = msgData.find((data) => data.includes("Msg")).split(",")
+    // const msgData = new TextDecoder().decode(autoTxInfo.data).split(".")
+    // const data = msgData.find((data) => data.includes("Msg")).split(",")
     return (
         <Link href={`/triggers/${autoTxInfo.txId}`} passHref>
             <Card variant="secondary" active={isActive}>
@@ -41,14 +41,18 @@ export const AutoTxCard = ({
                                 alt={ibcInfo.symbol}
                             />
                         </StyledDivForTokenLogos>)}
-                        <StyledText
+                        {autoTxInfo.label ? <StyledText
                             variant="title"
                             align="center"
                             css={{ paddingTop: '$8' }}
-                        > Trigger ID: {autoTxInfo.txId}  </StyledText>
-                        <Column align="center"> <StyledText variant="caption">
-                            <> Message Type: {data[0]}</>
-                        </StyledText></Column>
+                        > Trigger: {autoTxInfo.label}  </StyledText> : <StyledText
+                            variant="title"
+                            align="center"
+                            css={{ paddingTop: '$8' }}
+                        > Trigger ID: {autoTxInfo.txId}  </StyledText>}
+                        {autoTxInfo.msgs && <Column align="center"> <StyledText variant="caption">
+                            <> Message Type: {autoTxInfo.msgs[0].typeUrl}</>
+                        </StyledText></Column>}
 
                     </Column>
                 </CardContent>

@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column, styled, IconWrapper, PlusIcon, Union } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  styled,  */Text, Column, styled, IconWrapper, PlusIcon, Union, Divider } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import { useSubmitAutoTx, useRegisterAccount } from '../hooks';
 import { IbcSelector } from './IbcSelector';
@@ -105,10 +105,10 @@ export const AutoTxComponent = ({
       msgs[index] = msg
       let newAutoTxData = {
         ...autoTxData,
-        msgs,
-        typeUrls: JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+        msgs
 
       }
+      newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
       onAutoTxChange(newAutoTxData)
     } catch (e) {
       console.log(e)
@@ -272,11 +272,11 @@ export const AutoTxComponent = ({
                 }
               </Column></Row>
               {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
-                <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant:<Text variant="caption"> Has grant for message type '{icaAuthzGrants.msgTypeUrl}' that expires in {(relativeTime(icaAuthzGrants.grants[0].expiration.seconds.toNumber() * 1000))}</Text></Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)}
+                <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant: {icaAuthzGrants.map((grant) => <Text variant="caption"> Has grants formessage type: '{grant.msgTypeUrl}' that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))} </Text>)}</Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)}
             </Column>
             {autoTxData.msgs.map((msg, index) => (
               <div key={index}>
-                {messageData(autoTxData, index, chainSymbol, setExample, handleRemoveMsg, msg, handleChangeMsg, setIsJsonValid)}
+                {messageData(autoTxData, index, chainSymbol, msg, setExample, handleRemoveMsg, handleChangeMsg, setIsJsonValid)}
               </div>))}
           </CardContent>
         </Card>
@@ -290,27 +290,24 @@ export const AutoTxComponent = ({
           />
         </Column>}
       </Card >
-      {isJsonValid && autoTxData.msgs && autoTxData.msgs[0].length > 3 && (<Card css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+      {isJsonValid && autoTxData.msgs[0] && autoTxData.msgs[0].length > 3 && (<Card css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
           <Text align="center"
           >
             Messages</Text>
         </CardContent>
-        {autoTxData.msgs.map((message, i) => (
-          <div key={message}>   <CardContent size="medium" css={{ padding: '$2', margin: '$2', }}>
+        {autoTxData.typeUrls.map((type, i) => (
+          <div key={type}>   <CardContent size="medium" css={{ padding: '$2', margin: '$2', }}>
             <Text variant="legend" align="left">
 
-              Message {i + 1}
-
-              <ul>
-                {message}
-              </ul></Text>
+              Message {i + 1}: {type}
+             </Text>
 
             <SubmitAutoTxDialog
               denom={denom}
               chainSymbol={chainSymbol}
               icaBalance={icaBalance}
-              hasIcaAuthzGrant={icaAuthzGrants && autoTxData && JSON.parse(autoTxData.msgs[0])['typeUrl'] == icaAuthzGrants.msgTypeUrl}
+              hasIcaAuthzGrant={icaAuthzGrants && icaAuthzGrants.length > 0}
               icaAddr={icaAddr}
               autoTxData={autoTxData}
               isShowing={isSubmitAutoTxDialogShowing}
@@ -364,10 +361,11 @@ const StyledDivForContainer = styled('div', {
 
 
 
-function messageData(autoTxData: AutoTxData, index: number, chainSymbol: string, setExample: (index: number, msg: string) => void, handleRemoveMsg: (index: number) => void, msg: string, handleChangeMsg: (index: number) => (msg: string) => void, setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>) {
+function messageData(autoTxData: AutoTxData, index: number, chainSymbol: string, msg: string, setExample: (index: number, msg: string) => void, handleRemoveMsg: (index: number) => void, handleChangeMsg: (index: number) => (msg: string) => void, setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>) {
   return <Column>
+  <Divider offsetY='$10'/>
     {autoTxData.typeUrls && autoTxData.typeUrls[index] && <Row> <Text css={{ padding: '$4', textAlign: "center" }} variant="title">{autoTxData.typeUrls[index]}</Text></Row>}
-    <Row><Text>Examples: </Text>
+    <Row><Text variant="legend"> Examples </Text>
       {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2' }}
         variant="secondary"
         onClick={() => setExample(index, wasmExecExample)}
@@ -440,8 +438,8 @@ const stakeExample = JSON.stringify(
         "amount": "70",
         "denom": "utrst"
       },
-      "delegator_address": "trust1....",
-      "validator_address": "trustvaloper1..."
+      "delegatorAddress": "trust1....",
+      "validatorAddress": "trustvaloper1..."
     }
   }, null, "\t")
 
@@ -480,7 +478,7 @@ const wasmExecExample = JSON.stringify(
 
 const claimRewardExample = JSON.stringify(
   {
-    "typeUrl": "  /cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+    "typeUrl": "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
     "value": {
       "delegatorAddress": "trust1....",
       "validatorAddress": "trustvaloper1..."

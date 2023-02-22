@@ -104,7 +104,7 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
 
       // const [{ address }] = await offlineSigner.getAccounts()
       const coin = await chainClient.getBalance(nativeWalletAddress, denom)
-      console.log(coin)
+      // console.log(coin)
       const amount = coin ? Number(coin.amount) : 0
 
       return convertMicroDenomToDenom(amount, decimals)
@@ -129,14 +129,18 @@ export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxDat
   const { data, isLoading } = useQuery(
     ['granter', granter],
     async () => {
-
+      let grants = []
       const { rpc } = ibcAsset
-      let url = JSON.parse(autoTxData.msg)["typeUrl"];
-      return await getGrants({ grantee: address, granter, msgTypeUrl: url.toString(), rpc })
+      for (const msg of autoTxData.msgs) {
+        let url = JSON.parse(msg)["typeUrl"];
+        const grant = await getGrants({ grantee: address, granter, msgTypeUrl: url.toString(), rpc })
+        grants.push(grant)
+      }
+      return grants
 
     },
     {
-      enabled: Boolean(autoTxData.msg != "" && autoTxData.msg != undefined && status === WalletStatusType.connected && client && address),
+      enabled: Boolean(autoTxData.msgs.length > 0 && status === WalletStatusType.connected && client && address),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,

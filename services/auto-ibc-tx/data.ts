@@ -18,7 +18,7 @@ export const getAutoTxInfosForOwner = async (
             )
         }
 
-        return await client.query.autoibctx.autoTxsForOwner({ owner })
+        return await client.query.auto_tx.autoTxsForOwner({ owner })
     } catch (e) {
         console.error('Cannot get AutoTxInfosForOwner:', e)
     }
@@ -34,7 +34,7 @@ export const getAutoTxInfos = async (
                 `No rpcEndpoint was provided`
             )
         }
-        const resp = await client.query.autoibctx.autoTxs({})
+        const resp = await client.query.auto_tx.autoTxs({})
         return resp.autoTxInfos
     } catch (e) {
         console.error('Cannot get autoTx infos:', e)
@@ -52,7 +52,7 @@ export const getAutoTxInfo = async (
             )
         }
         console.log(id)
-        return await client.query.autoibctx.autoTx({ id })
+        return await client.query.auto_tx.autoTx({ id })
     } catch (e) {
         console.error('Cannot get autoTx info:', e)
     }

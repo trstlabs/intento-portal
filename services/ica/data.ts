@@ -15,7 +15,7 @@ export const getICA = async ({
     client,
 }: ICAQueryInput) => {
     try {
-        const response = await client.query.autoibctx.interchainAccountFromAddress({ owner, connectionId })
+        const response = await client.query.auto_tx.interchainAccountFromAddress({ owner, connectionId })
         return response.interchainAccountAddress
     } catch (e) {
         console.error('err(getICA):', e)

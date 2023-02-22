@@ -1,13 +1,8 @@
 
 
-
-// import { Coin } from 'trustlessjs/dist/protobuf/cosmos/base/v1beta1/coin'
 import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
-
+import { convertMicroDenomToDenom } from 'junoblocks'
 import { TrustlessChainClient } from 'trustlessjs'
-
-import { Timestamp } from 'trustlessjs/dist/protobuf/google/protobuf/timestamp'
-
 
 
 export interface BaseQueryInput {
@@ -47,6 +42,18 @@ export const getBalanceForAcc = async ({
 
 
 
+export const getValidator = async ({
+    address,
+    client,
+}: BalanceQueryInput) => {
+    try {
+        const resp = await client.query.staking.validator({ validatorAddr: address })
+        return resp.validator
+    } catch (e) {
+        console.error('err(getValidator):', e)
+    }
+}
+
 export const getStakeBalanceForAcc = async ({
     address,
     client,
@@ -55,15 +62,15 @@ export const getStakeBalanceForAcc = async ({
         let stakingBalanceAmount = 0;
         const resp = await client.query.staking.delegatorDelegations({ delegatorAddr: address })
         const delegationResponse = resp.delegationResponses
-        let nrValidators = 0
+        let validators = []
         for (const delegation of delegationResponse) {
             if (!delegation.balance) {
                 continue
             }
             stakingBalanceAmount = stakingBalanceAmount + Number(delegation.balance.amount)
-            nrValidators++
+            validators.push(delegation.delegation.validatorAddress)
         }
-        return { stakingBalanceAmount, nrValidators }
+        return { stakingBalanceAmount, validators, address }
     } catch (e) {
         console.error('err(getBalanceForAcc):', e)
     }
@@ -85,7 +92,10 @@ export const getAPR = async (client: TrustlessChainClient) => {
         const communityTaxNumber = Number(protoDecimalToJson(communityTax));
         const blockParams = (await getBlockParams(client))
         const blocksPerYearNumber = Number(mintParams.params.blocksPerYear);
-        return calculateApr(annualProvisionNumber, bondedTokens, communityTaxNumber, blocksPerYearNumber, blockParams.actualBlocksPerYear)
+        const stakingProvisionPercent = await getStakeProvisionPercent(client)
+
+        const stakingProvision = stakingProvisionPercent * annualProvisionNumber
+        return calculateApr(stakingProvision, bondedTokens, communityTaxNumber, blocksPerYearNumber, blockParams.actualBlocksPerYear)
 
     } catch (e) { console.error('err(getAPR):', e) }
 }
@@ -115,36 +125,47 @@ export const getAPY = async (client: TrustlessChainClient, intervalSeconds: numb
             return 0
         }
 
-        const periodPerYear = intervalSeconds / (60 * 60 * 24 * 365);
-        return (1 + apr.calculatedApr / periodPerYear) ** periodPerYear - 1;
+        const periodsPerYear = (60 * 60 * 24 * 365) / intervalSeconds;
+
+        return (1 + (apr.calculatedApr / periodsPerYear)) ** periodsPerYear - 1;
     } catch (e) { console.error('err(getAPY):', e) }
 }
 
 export const getAPYForAutoCompound = async (client: TrustlessChainClient, intervalSeconds: number, stakingBalanceAmount: number) => {
     try {
         const apy = await getAPY(client, intervalSeconds);
-        const expectedFees = await getExpectedAutoTxFee(client, intervalSeconds)
+        const expectedFees = await getExpectedAutoTxFee(client, intervalSeconds, 1)
         return apy * stakingBalanceAmount - expectedFees
     } catch (e) { console.error('err(getAPYForAutoCompound):', e) }
 }
 
-export const getExpectedAutoTxFee = async (client: TrustlessChainClient, durationSeconds: number, intervalSeconds?: number) => {
+export const getExpectedAutoTxFee = async (client: TrustlessChainClient, durationSeconds: number, lenMsgs: number, intervalSeconds?: number) => {
     try {
-        const params = (await getAutoTxParams(client)).params
-        const recurrences = intervalSeconds ? Math.floor(durationSeconds / intervalSeconds) : 1;
-        const flexFeeForPeriod = Number(params.AutoTxFlexFeeMul) * recurrences
-        const AutoTxFee = recurrences * flexFeeForPeriod + recurrences * Number(params.AutoTxConstantFee)
-        return AutoTxFee
+        console.log("durationSeconds", durationSeconds)
+        console.log("intervalSeconds", intervalSeconds)
+        const params = /* { AutoTxFlexFeeMul: 3, AutoTxConstantFee: 5_000 }// */await getAutoTxParams(client)
+        const recurrences = intervalSeconds && intervalSeconds < durationSeconds ? Math.floor(durationSeconds / intervalSeconds) : 1;
+        const periodSeconds = intervalSeconds && intervalSeconds < durationSeconds ? intervalSeconds : durationSeconds;
+        console.log("periodSeconds", periodSeconds)
+        const periodMinutes = Math.trunc(periodSeconds / 60)
+        console.log("period", periodMinutes)
+        // console.log("AutoTxFlexFeeMul", params.AutoTxFlexFeeMul)
+        const flexFeeForPeriod = (Number(params.AutoTxFlexFeeMul) / 100) * periodMinutes
+        console.log("flexFeeForPeriod", flexFeeForPeriod)
+        // console.log("AutoTxConstantFee", params.AutoTxConstantFee)
+        const autoTxFee = recurrences * flexFeeForPeriod + recurrences * Number(params.AutoTxConstantFee) * lenMsgs
+        const autoTxFeeDenom = convertMicroDenomToDenom(autoTxFee, 6)
+         console.log("autoTxFeeDenom", autoTxFeeDenom)
+        return autoTxFeeDenom
     } catch (e) { console.error('err(getExpectedAutoTxFee):', e) }
 }
 
-function calculateApr(annualProvision: number, bondedTokens: number, communityTax: number, blocksPerYear: number, actualBlocksPerYear: number) {
+function calculateApr(stakingProvision: number, bondedTokens: number, communityTax: number, blocksPerYear: number, actualBlocksPerYear: number) {
     //considering staking rewards is set to 45% of annual provision
-    const stakingProvision = annualProvision * 0.45
     // console.log(stakingProvision)
-   // console.log(bondedTokens)
+    // console.log(bondedTokens)
     // console.log(communityTax)
-    const estimatedApr = Math.ceil((stakingProvision / bondedTokens) * (1 - communityTax))
+    const estimatedApr = Math.ceil((stakingProvision / bondedTokens) * (1 - communityTax) * 100)
     // console.log(estimatedApr)
     // console.log(actualBlocksPerYear)
     // console.log(blocksPerYear)
@@ -221,10 +242,23 @@ async function getAnnualProvisions(client: TrustlessChainClient) {
 }
 
 
+
 async function getAutoTxParams(client: TrustlessChainClient) {
+    console.log("getAutoTxParams")
     try {
-        const resp = await client.query.autoibctx.params({})
+        const resp = await client.query.auto_tx.params({})
+        console.log(resp)
         //   const communityTax = parseFloat(distribution.params.community_tax)
-        return { params: resp.params }
+        return resp.params
     } catch (e) { console.error('err(getAutoTxParams):', e) }
 }
+
+async function getStakeProvisionPercent(client: TrustlessChainClient) {
+    try {
+        const resp = await client.query.allocation.params({})
+        const stakeProvision = protoDecimalToJson(resp.params.distributionProportions.staking)
+        //   const communityTax = parseFloat(distribution.params.community_tax)
+        return Number(stakeProvision)
+    } catch (e) { console.error('err(getStakeProvisionPercent):', e) }
+}
+

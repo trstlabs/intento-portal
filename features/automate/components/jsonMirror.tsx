@@ -6,7 +6,8 @@ import { Validator } from 'jsonschema';
 import {
     styled,
     useControlTheme,
-    Text
+    Text,
+    useMedia
 } from 'junoblocks'
 
 interface JsonCodeMirrorEditorProps {
@@ -27,6 +28,8 @@ export const JsonCodeMirrorEditor = ({
     const defaultPlaceholder = placeholder || {
         JSON: "'Enter your JSON message here'",
     };
+/*     const isSmall = useMedia('sm'); */
+    const isMedium = useMedia('md');
     const themeController = useControlTheme()
     const [validationError, setValidationError] = useState("");
 
@@ -36,8 +39,8 @@ export const JsonCodeMirrorEditor = ({
 
             <StyledDivForContainer>
                 <ReactCodeMirror
-
-                    maxWidth="580px"
+                   /*  maxWidth={isSmall ? "280px" : "580px"} */
+                    width={isMedium ? "480px" : "580px"}
                     value={jsonValue}
                     extensions={[json()]}
                     onChange={(val: string) => {

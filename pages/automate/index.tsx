@@ -7,11 +7,6 @@ import {
 import React from 'react'
 import { AutomateModule } from 'features/automate'
 
-function getInitialChainFromSearchParams() {
-  const params = new URLSearchParams(location.search)
-  const chain = params.get('chain')
-  return chain? (chain as string) : undefined
-}
 
 const StyledContainer = styled('div', {
   //maxWidth: '53.75rem',
@@ -27,7 +22,6 @@ export default function Automate() {
           subtitle={`Automate actions on IBC-enabled chains with Interchain Accounts`}
         />
         <AutomateModule
-          initialChain={getInitialChainFromSearchParams()}
         />
       </StyledContainer>
     </AppLayout>
