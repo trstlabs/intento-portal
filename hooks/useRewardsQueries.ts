@@ -1,10 +1,11 @@
+export {}
 // import { useMutation, useQuery } from 'react-query'
 // import { useRecoilValue } from 'recoil'
 // // import { claimRewards, getPendingRewards } from 'services/rewards'
 // import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 // import {
 //   __POOL_REWARDS_ENABLED__,
-//   DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+//   DEFAULT_REFETCH_INTERVAL,
 // } from 'util/constants'
 // import { convertMicroDenomToDenom } from 'util/conversion'
 
@@ -68,7 +69,7 @@
 //           status === WalletStatusType.connected
 //       ),
 //       refetchOnMount: 'always',
-//       refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+//       refetchInterval: DEFAULT_REFETCH_INTERVAL,
 //       refetchIntervalInBackground: true,
 //     }
 //   )

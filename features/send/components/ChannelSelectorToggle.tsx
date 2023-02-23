@@ -1,8 +1,8 @@
-import { useTokenInfo } from 'hooks/useTokenInfo'
+
 import {
   ButtonForWrapper,
   Chevron,
-  formatTokenBalance,
+
   IconWrapper,
   ImageForTokenLogo,
   styled,
@@ -51,10 +51,7 @@ export const ChannelSelectorToggle = ({
       {!isSelecting && hasTokenSelected && (
         <>
           <ImageForTokenLogo logoURI={chainLogoURI} size="big" alt={channel} />
-
           <Text variant="body">{chainName}</Text>
-
-
           <IconWrapper
             size="medium"
             rotation="-90deg"

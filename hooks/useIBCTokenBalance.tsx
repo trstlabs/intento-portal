@@ -4,7 +4,7 @@ import { useRecoilValue } from 'recoil'
 import { convertMicroDenomToDenom } from 'util/conversion'
 
 import { walletState } from '../state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
 export const useIBCTokenBalance = (tokenSymbol) => {
@@ -18,13 +18,13 @@ export const useIBCTokenBalance = (tokenSymbol) => {
       await window.keplr.enable(chain_id)
       const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
 
-      const wasmChainClient = await SigningStargateClient.connectWithSigner(
+      const chainClient = await SigningStargateClient.connectWithSigner(
         rpc,
         offlineSigner
       )
 
       const [{ address }] = await offlineSigner.getAccounts()
-      const coin = await wasmChainClient.getBalance(address, denom)
+      const coin = await chainClient.getBalance(address, denom)
 
       const amount = coin ? Number(coin.amount) : 0
       return convertMicroDenomToDenom(amount, decimals)
@@ -32,7 +32,7 @@ export const useIBCTokenBalance = (tokenSymbol) => {
     {
       enabled: Boolean(nativeWalletAddress && ibcAsset),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )

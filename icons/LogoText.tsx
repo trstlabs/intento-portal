@@ -2,7 +2,7 @@ import { SVGProps } from 'react'
 
 export const LogoText = (props: SVGProps<SVGSVGElement>) => {
   return (
-    <svg width="170" height="20" viewBox="0 0 400 50" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width="170" height="24" viewBox="0 0 400 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
 
       <g id="Layer_2" data-name="Layer 2">
         <g id="Layer_1-2" data-name="Layer 1">
@@ -11,7 +11,7 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
             style={{
             
               fontSize: 50,
-              fontFamily: "GothamHTF-Medium2,Gotham HTF",
+              fontFamily: "Inter",
               fontWeight: 500,
             }}
           >
@@ -20,57 +20,32 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
                 letterSpacing: "-.02em",
               }}
             >
-              {"C"}
+              {"TriggerP"}
             </tspan>
             <tspan
-              x={35.9}
+              x={195}
               y={0}
               style={{
                 letterSpacing: 0,
               }}
             >
-              {"O"}
+              {"o"}
             </tspan>
             <tspan
-              x={78.15}
+              x={225}
               y={0}
               style={{
                 letterSpacing: 0,
               }}
             >
-              {"SMOPO"}
+              {"rtal"}
             </tspan>
-            <tspan
-              x={271.95}
-              y={0}
-              style={{
-                letterSpacing: 0,
-              }}
-            >
-              {"R"}
-            </tspan>
-            <tspan
-              x={307.95}
-              y={0}
-              style={{
-                letterSpacing: "-.09em",
-              }}
-            >
-              {"T"}
-            </tspan>
-            <tspan x={335.85} y={0}>
-              {"AL"}
-            </tspan>
+          
           </text>
           <path
             className="cls-7"
-            transform="rotate(-45 56.926 25.29)"
-            d="M30.48 21.67h52.89v7.24H30.48z"
-          />
-          <path
-            className="cls-7"
-            transform="rotate(-45 249.895 25.29)"
-            d="M223.45 21.67h52.89v7.24h-52.89z"
+            transform="rotate(-45 125 -200)"
+            d="M2 18h42v6H2"
           />
         </g>
       </g>  </svg>

@@ -4,14 +4,13 @@ import {
   CardContent,
   Column,
   Divider,
-  dollarValueFormatterWithDecimals,
   ImageForTokenLogo,
-  Inline,
+
   styled,
   Text,
 } from 'junoblocks'
 import Link from 'next/link'
-import { PoolEntityType } from 'queries/usePoolsListQuery'
+
 import { PoolState, PoolTokenValue } from 'queries/useQueryPools'
 import { __POOL_REWARDS_ENABLED__ } from 'util/constants'
 import { formatCompactNumber } from 'util/formatCompactNumber'
@@ -176,31 +175,6 @@ const StyledTextForTokenNames: typeof Text = styled(Text, {
     margin: '0 $3',
     borderRadius: '50%',
     backgroundColor: '$textColors$primary',
-  },
-})
-
-const StyledDivForStatsColumn = styled('div', {
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 0.3,
-  justifyContent: 'center',
-  alignItems: 'center',
-  rowGap: '$space$3',
-  variants: {
-    align: {
-      left: {
-        alignItems: 'flex-start',
-        justifyContent: 'flex-start',
-      },
-      center: {
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
-      right: {
-        justifyContent: 'flex-end',
-        alignItems: 'flex-end',
-      },
-    },
   },
 })
 

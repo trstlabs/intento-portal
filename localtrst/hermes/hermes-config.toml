@@ -1,5 +1,7 @@
 
 [global]
+# Specify the verbosity for the relayer logging output. Default: 'info'
+# Valid options are 'error', 'warn', 'info', 'debug', 'trace'.
 log_level = 'info'
 
 [mode]
@@ -9,10 +11,10 @@ refresh = true
 misbehaviour = true
 
 [mode.connections]
-enabled = false
+enabled = true
 
 [mode.channels]
-enabled = false
+enabled = true
 
 [mode.packets]
 enabled = true
@@ -36,19 +38,19 @@ rpc_addr = 'http://localtrst-1:26657'
 grpc_addr = 'http://localtrst-1:9090'
 websocket_addr = 'ws://localtrst-1:26657/websocket'
 
-rpc_timeout = '10s'
+rpc_timeout = '20s'
 account_prefix = 'trust'
 key_name = 'localtrst-key'
 store_prefix = 'ibc'
-default_gas = 50000
+default_gas = 100000
 max_gas = 2000000
 gas_price = { price = 1, denom = 'utrst' }
 gas_multiplier = 1.1
 max_msg_num = 30
 max_tx_size = 2097152
 clock_drift = '5s'
-max_block_time = '10s'
-trusting_period = '79s'
+max_block_time = '20s'
+trusting_period = '2days'
 trust_threshold = { numerator = '1', denominator = '3' }
 address_type = { derivation = 'cosmos' }
 
@@ -65,19 +67,19 @@ rpc_addr = 'http://localtrst-2:26657'
 grpc_addr = 'http://localtrst-2:9090'
 websocket_addr = 'ws://localtrst-2:26657/websocket'
 
-rpc_timeout = '10s'
+rpc_timeout = '20s'
 account_prefix = 'trust'
 key_name = 'localtrst2-key'
 store_prefix = 'ibc'
-default_gas = 50000
+default_gas = 100000
 max_gas = 2000000
 gas_price = { price = 1, denom = 'utrst' }
 gas_multiplier = 1.1
 max_msg_num = 30
 max_tx_size = 2097152
 clock_drift = '5s'
-max_block_time = '10s'
-trusting_period = '79s'
+max_block_time = '20s'
+trusting_period = '2days'
 trust_threshold = { numerator = '1', denominator = '3' }
 address_type = { derivation = 'cosmos' }
 

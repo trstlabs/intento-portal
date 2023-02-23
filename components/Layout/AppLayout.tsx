@@ -9,7 +9,7 @@ import { useCallback } from "react";
 import type { Container, Engine } from "tsparticles-engine";
 import Particles from "react-particles";
 import { loadFull } from "tsparticles";
-import { useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import { particleState } from '../../state/atoms/particlesAtoms'
 
 
@@ -22,8 +22,13 @@ export const AppLayout = ({
   const isSmallScreen = useMedia('sm')
   const isMediumScreen = useMedia('md')
   const themeController = useControlTheme()
-  let isConfetti = useRecoilValue(particleState)
-  
+
+  ///let isConfetti = useRecoilValue(particleState)
+  const [isConfetti, popConfetti] = useRecoilState(particleState)
+  if (isConfetti) {
+    setTimeout(() => popConfetti(false), 4000)
+  }
+
   const particlesInit = useCallback(async (engine: Engine) => {
 
     // you can initialize the tsParticles instance (engine) here, adding custom shapes or presets
@@ -53,20 +58,22 @@ export const AppLayout = ({
   }
 
   return (
-    <StyledWrapper>{isConfetti && (<Particles id="tsparticles" url={"/confetti.json"} init={particlesInit} loaded={particlesLoaded} />)}
-      {navigationSidebar}
-      <StyledContainer >
-        <main>{!isConfetti && themeController.theme.name == "dark" && (<Particles
-        id="tsparticles" style={{ zIndex: -1 }}
+    <>
+      <StyledWrapper>
+        {navigationSidebar}
+        <StyledContainer>
+          <main>
+
+            <StyledChildren> {children}</StyledChildren></main>
+        </StyledContainer>
+
+        {!isMediumScreen && extensionSidebar}
+      </StyledWrapper>{isConfetti ? (<Particles id="tsparticles" url={"/confetti.json"} init={particlesInit} loaded={particlesLoaded} />) : themeController.theme.name == "dark" && (<Particles
+        id="tsparticles"
         init={particlesInit}
         loaded={particlesLoaded}
         url={"/stars_bg.json"} />)}
-
-          <StyledChildren> {children}</StyledChildren></main>
-      </StyledContainer>
-      
-      {!isMediumScreen && extensionSidebar}
-    </StyledWrapper>
+    </>
   )
 }
 

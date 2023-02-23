@@ -1,11 +1,8 @@
 import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
 import { convertMicroDenomToDenom } from 'util/conversion'
-
-import { useTrustlessChainClient } from './../hooks/useTrustlessChainClient'
-
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getRecipients, getRecurrenceAmount } from '../services/contracts'
 import { Coin } from 'trustlessjs/dist/protobuf/cosmos/base/v1beta1/coin'
 
@@ -40,7 +37,7 @@ export const useRecipientListForAcc = (contractAddress: string) => {
     {
       enabled: Boolean(contractAddress != "" && client && status === WalletStatusType.connected),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     },
   )
@@ -68,7 +65,7 @@ export const useRecurrenceAmount = (contractAddress: string) => {
     {
       enabled: Boolean(contractAddress != "" && status === WalletStatusType.connected && client && client.address),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     },
   )
@@ -99,7 +96,7 @@ export const useContractNativeBalances = (address: string) => {
     {
       enabled: Boolean(address && status === WalletStatusType.connected && client),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )

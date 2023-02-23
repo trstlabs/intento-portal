@@ -1,12 +1,12 @@
 import { TokenSelectList, TokenSelectListProps } from 'components'
-import { useTokenList } from 'hooks/useTokenList'
+import { useIBCAssetList } from '../../../hooks/useIBCAssetList'
 
 export const TokenOptionsList = ({
   activeTokenSymbol,
   onSelect,
   ...props
 }: Omit<TokenSelectListProps, 'tokenList' | 'fetchingBalanceMode'>) => {
-  const [tokenList] = useTokenList()
+  const [tokenList] = useIBCAssetList()
   return (
     <TokenSelectList
       {...props}

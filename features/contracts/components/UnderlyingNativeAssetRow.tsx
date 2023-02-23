@@ -12,8 +12,6 @@ import {
 } from 'junoblocks'
 import { useNativeTokenInfo } from '../../../hooks/useTokenInfo'
 
-import { TokenInfo } from '../../../queries/usePoolsListQuery'
-
 type UnderlyingNativeAssetRowProps = {
     tokenSymbol?: string
     tokenAmount?: number

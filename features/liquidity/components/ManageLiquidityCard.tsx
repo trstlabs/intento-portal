@@ -12,7 +12,7 @@ import {
   Text,
   useSubscribeInteractions,
 } from 'junoblocks'
-import { PoolState, PoolTokenValue, ReserveType } from 'queries/useQueryPools'
+import { PoolTokenValue, ReserveType } from 'queries/useQueryPools'
 
 import { UnderlyingAssetRow } from './UnderlyingAssetRow'
 

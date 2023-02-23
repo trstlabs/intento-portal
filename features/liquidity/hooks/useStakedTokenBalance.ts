@@ -1,9 +1,10 @@
+export {}
 // import { usePoolFromListQueryById } from 'queries/usePoolsListQuery'
 // import { useQuery } from 'react-query'
 // import { useRecoilValue } from 'recoil'
 // import { getProvidedStakedAmount } from 'services/staking'
 // import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-// import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from 'util/constants'
+// import { DEFAULT_REFETCH_INTERVAL } from 'util/constants'
 
 // export const useStakedTokenBalance = ({ poolId, enabled = true }) => {
 //   const { address, status, client } = useRecoilValue(walletState)
@@ -24,7 +25,7 @@
 //           enabled
 //       ),
 //       refetchOnMount: 'always',
-//       refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+//       refetchInterval: DEFAULT_REFETCH_INTERVAL,
 //       refetchIntervalInBackground: true,
 //     }
 //   )

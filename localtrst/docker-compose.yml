@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   localtrst-1:
-    image: "trstlabs/localtrst:latest"
+    image: "ghcr.io/trstlabs/localtrst:latest"
     # ports are only here in case interaction
     # between localhost and container is desired
     ports:
@@ -18,11 +18,11 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:26657"]
       interval: 1m30s
-      timeout: 10s
+      timeout: 20s
       retries: 3
       start_period: 40s
   localtrst-2:
-    image: "trstlabs/localtrst:latest"
+    image: "ghcr.io/trstlabs/localtrst:latest"
     # ports are only here in case interaction
     # between localhost and container is desired
     ports:
@@ -39,7 +39,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:26657"]
       interval: 1m30s
-      timeout: 10s
+      timeout: 20s
       retries: 3
       start_period: 40s
   relayer:

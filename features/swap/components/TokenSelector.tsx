@@ -17,7 +17,7 @@ import { ConvenienceBalanceButtons } from './ConvenienceBalanceButtons'
 import { QueryInput } from './QueryInput'
 import { SelectorInput } from './SelectorInput'
 import { TokenSelectorToggle } from './TokenSelectorToggle'
-import { DexSelectorToggle } from './DexSelectorToggle'
+
 import { TokenOptionsList } from './SelectorOptionsList'
 
 type TokenSelectorProps = {

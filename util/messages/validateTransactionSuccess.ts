@@ -1,4 +1,3 @@
-import {  isDeliverTxFailure } from '@cosmjs/stargate'
 import { Tx } from 'trustlessjs'
 
 export function validateTransactionSuccess(result: Tx) {
@@ -7,7 +6,7 @@ export function validateTransactionSuccess(result: Tx) {
       `Error when broadcasting tx ${result.transactionHash} at height ${result.height}. Code: ${result.code}; Raw log: ${result.rawLog}`
     )
   }
-  console.log(result)
+
 
   return result
 }

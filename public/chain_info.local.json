@@ -32,14 +32,14 @@
       "coinDenom": "TRST",
       "coinMinimalDenom": "utrst",
       "coinDecimals": 6,
-      "coinGeckoId": "trustless-hub"
+      "coinGeckoId": "trustless-hub",
+      "gasPriceStep": {
+        "low": 0.025,
+        "average": 0.05,
+        "high": 0.1
+      }
     }
   ],
   "coinType": 118,
-  "gasPriceStep": {
-    "low": 0.025,
-    "average": 0.05,
-    "high": 0.1
-  },
   "features": ["cosmwasm"]
 }

@@ -6,11 +6,14 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 
 import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
-import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
-import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
-import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
+import { useIBCAssetInfo } from './useIBCAssetInfo'
+import { IBCAssetInfo, /* useIBCAssetList */ } from './useIBCAssetList'
+import {  getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
+
+import { useTrustlessChainClient } from './useTrustlessChainClient'
+import { getBalanceForAcc } from '../services/chain-info'
 
 async function fetchTokenBalance({
   client,
@@ -84,7 +87,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
     {
       enabled: Boolean(tokenSymbol && status === WalletStatusType.connected && client),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -95,7 +98,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
 export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   const { address, status, client } = useRecoilValue(walletState)
   const [tokenList] = useTokenList()
-  const [ibcAssetsList] = useIBCAssetList()
+  // const [ibcAssetsList] = useIBCAssetList()
 
   const queryKey = useMemo(
     () => `multipleTokenBalances/${tokenSymbols?.join('+')}`,
@@ -113,7 +116,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
             token:
               getTokenInfoFromTokenList(tokenSymbol, tokenList.tokens) ||
               mapIbcTokenToNative(
-                getIBCAssetInfoFromList(tokenSymbol, ibcAssetsList?.tokens)
+                useIBCAssetInfo(tokenSymbol)
               ) ||
               {},
           })
@@ -133,7 +136,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
       ),
 
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
 
       onError(error) {
@@ -144,3 +147,29 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
 
   return [data, isLoading] as const
 }
+
+
+export const useGetBalanceForAcc = (address: string) => {
+  const client = useTrustlessChainClient()
+
+  const { data, isLoading } = useQuery(
+    ['address', address],
+    async () => {
+
+      const resp = await getBalanceForAcc({ address, client })
+      return convertMicroDenomToDenom(resp.balances[0].amount, 6)
+
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: false,
+    },
+  )
+
+  return [data, isLoading] as const
+
+
+}
+

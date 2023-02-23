@@ -12,13 +12,14 @@ import React, { useRef, useState } from 'react'
 
 import { ChannelSelectorToggle } from './ChannelSelectorToggle'
 import { ChannelOptionsList } from './ChannelOptionsList'
+import { ChannelInfo } from './ChannelSelectList'
 
 
 type ChannelSelectorProps = {
   readOnly?: boolean
   disabled?: boolean
   channel: string
-  onChange: (token: { channel; }) => void
+  onChange: (channelInfo: ChannelInfo) => void
   size?: 'small' | 'large'
 }
 
@@ -39,10 +40,10 @@ export const ChannelSelector = ({
   const [chainName, setChainName] = useState('')
 
 
-  const handleSelectChannel = (selectedChannel: string, uri: string, name: string) => {
-    setChainLogoURI(uri)
-    setChainName(name)
-    onChange({ channel: selectedChannel })
+  const handleSelectChannel = (channelInfo: ChannelInfo) => {
+    setChainLogoURI(channelInfo.logoURI)
+    setChainName(channelInfo.name)
+    onChange(channelInfo)
     
     setChannelListShowing(false)
   }
@@ -74,7 +75,7 @@ export const ChannelSelector = ({
         {isChannelListShowing && (
           <ChannelOptionsList
             activeChannel={channel}
-            onSelect={(slct) => handleSelectChannel(slct.channel,slct.logoURI,slct.name)}
+            onSelect={(slct) => handleSelectChannel(slct)}
             css={{ padding: '$4 $6 $12' }}
           
             
@@ -113,7 +114,7 @@ export const ChannelSelector = ({
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
               size="small"
-              onClick={() => handleSelectChannel('', '', '')}
+              onClick={() => handleSelectChannel(new ChannelInfo)}
               iconColor="tertiary"
             />
           )}
@@ -133,7 +134,7 @@ export const ChannelSelector = ({
       {isChannelListShowing && (
         <ChannelOptionsList
           activeChannel={channel}
-          onSelect={(slct) => handleSelectChannel(slct.channel,slct.logoURI,slct.name)}
+          onSelect={(slct) => handleSelectChannel(slct)}
           css={{ padding: '$4 $6 $4' }}
         />
       )}

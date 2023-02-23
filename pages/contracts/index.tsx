@@ -1,10 +1,6 @@
 import { AppLayout, PageHeader } from 'components'
-import {
-  ButtonWithDropdownForSorting,
-
-} from 'features/contracts'
 import { useRecoilValue } from 'recoil'
-import {
+import {ButtonWithDropdownForSorting,
   SortDirections,
   SortParameters,
   useSortContracts,
@@ -50,7 +46,7 @@ export default function Contracts() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Look into your assets and interact with your personal contracts."
+      subtitle="Look into your assets and interact with your personal contracts"
     />
   )
 
@@ -72,8 +68,7 @@ export default function Contracts() {
       {!isLoading && isSorting && (<Column
         justifyContent="center"
         align="center"
-        css={{ paddingTop: '$24' }}
-      >
+        css={{ paddingTop: '$24' }}>
         <Inline gap={2}>
           <ConnectIcon color="secondary" />
           <Text variant="primary">

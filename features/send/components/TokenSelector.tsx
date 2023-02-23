@@ -6,17 +6,12 @@ import {
   styled,
   Union,
   useOnClickOutside,
-  Text,
-  Column,
+
 } from 'junoblocks'
 import React, { useRef, useState } from 'react'
-import { useTokenDollarValue } from '../../../hooks/useTokenDollarValue'
-import { formatCurrency } from '../../../util/formatCompactNumber'
+
 import { QueryInput } from '../../swap/components/QueryInput'
 
-import { ConvenienceBalanceButtons } from './ConvenienceBalanceButtons'
-
-import { SelectorInput } from './SelectorInput'
 import { SelectorToggle } from './SelectorToggle'
 import { TokenOptionsList } from './TokenOptionsList'
 
@@ -25,7 +20,7 @@ type TokenSelectorProps = {
   disabled?: boolean
 
   tokenSymbol: string
-  onChange: ( tokenSymbol: string) => void
+  onChange: (tokenSymbol: string) => void
   size?: 'small' | 'large'
 }
 
@@ -43,18 +38,13 @@ export const TokenSelector = ({
 
   const { balance: availableAmount } = useTokenBalance(tokenSymbol)
   const [tokenSearchQuery, setTokenSearchQuery] = useState('')
-  const [isInputForSearchFocused, setInputForSearchFocused] = useState(false)
-  const [isInputForAmountFocused, setInputForAmountFocused] = useState(false)
+  const [_, setInputForSearchFocused] = useState(false)
 
-  const shouldShowConvenienceBalanceButtons = Boolean(
-    !isTokenListShowing && tokenSymbol && !readOnly && availableAmount > 0
-  )
 
   const handleSelectToken = (selectedTokenSymbol) => {
-    onChange( selectedTokenSymbol)
+    onChange(selectedTokenSymbol)
     setTokenListShowing(false)
   }
-  const [tokenDollarValue] = useTokenDollarValue(tokenSymbol)
 
   useOnClickOutside([wrapperRef], () => {
     setTokenListShowing(false)
@@ -62,10 +52,7 @@ export const TokenSelector = ({
 
   if (size === 'small') {
     return (
-      <StyledDivForContainer
-        selected={isInputForSearchFocused}
-        ref={wrapperRef}
-      >
+      <div>
         {isTokenListShowing && (
           <Inline justifyContent="space-between" css={{ padding: '$5 $6' }}>
             <QueryInput
@@ -100,26 +87,7 @@ export const TokenSelector = ({
             />
           </Inline>
         )}
-        {!isTokenListShowing && (
-          <StyledInlineForInputWrapper
-            rendersButtons={shouldShowConvenienceBalanceButtons}
-            selected={readOnly ? false : isInputForAmountFocused}
-            onClick={() => {
-              inputRef.current.focus()
-            }}
-          >
-            {/* {shouldShowConvenienceBalanceButtons && (
-              <Inline gap={4}>
-                <ConvenienceBalanceButtons
-                  tokenSymbol={tokenSymbol}
-                  availableAmount={availableAmount}
-                  onChange={}
-                />
-              </Inline>
-            )} */}
-          
-          </StyledInlineForInputWrapper>
-        )}
+
         {isTokenListShowing && (
           <TokenOptionsList
             activeTokenSymbol={tokenSymbol}
@@ -130,15 +98,12 @@ export const TokenSelector = ({
             visibleNumberOfTokensInViewport={4.5}
           />
         )}
-      </StyledDivForContainer>
+      </div>
     )
   }
 
   return (
-    <StyledDivForContainer
-      selected={isInputForAmountFocused || isInputForSearchFocused}
-      ref={wrapperRef}
-    >
+    <div>
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {isTokenListShowing && (
@@ -165,16 +130,7 @@ export const TokenSelector = ({
               }
             />
           )}
-          {/* {shouldShowConvenienceBalanceButtons && (
-            <Inline gap={4} css={{ paddingLeft: '$8' }}>
-              <ConvenienceBalanceButtons
-                disabled={availableAmount <= 0}
-                tokenSymbol={tokenSymbol}
-                availableAmount={availableAmount}
-                onChange={!disabled ? handleAmountChange : () => {}}
-              />
-            </Inline>
-          )} */}
+
         </StyledDivForSelector>
         <StyledDivForAmountWrapper>
           {isTokenListShowing && (
@@ -187,7 +143,7 @@ export const TokenSelector = ({
           )}
         </StyledDivForAmountWrapper>
         <StyledDivForOverlay
-          interactive={readOnly ? false : !isInputForAmountFocused}
+
           onClick={() => {
             if (!readOnly) {
               if (isTokenListShowing) {
@@ -208,7 +164,7 @@ export const TokenSelector = ({
           emptyStateLabel={`No result for “${tokenSearchQuery}”`}
         />
       )}
-    </StyledDivForContainer>
+    </div>
   )
 }
 
@@ -244,54 +200,7 @@ const StyledDivForOverlay = styled('div', {
   height: '100%',
   zIndex: 0,
   backgroundColor: '$colors$dark0',
-  transition: 'background-color .1s ease-out',
-  variants: {
-    interactive: {
-      true: {
-        cursor: 'pointer',
-        '&:hover': {
-          backgroundColor: '$colors$dark5',
-        },
-      },
-    },
-  },
+
+ 
 })
 
-const selectedVariantForInputWrapper = {
-  true: {
-    boxShadow: '0 0 0 $space$1 $borderColors$selected',
-  },
-  false: {
-    boxShadow: '0 0 0 $space$1 $colors$dark0',
-  },
-}
-
-const StyledDivForContainer = styled('div', {
-  borderRadius: '$4',
-  transition: 'box-shadow .1s ease-out',
-  variants: {
-    selected: selectedVariantForInputWrapper,
-  },
-})
-
-const StyledInlineForInputWrapper = styled('div', {
-  borderRadius: '$4',
-  transition: 'box-shadow .1s ease-out',
-  display: 'flex',
-  alignItems: 'center',
-
-  variants: {
-    selected: selectedVariantForInputWrapper,
-
-    rendersButtons: {
-      true: {
-        justifyContent: 'space-between',
-        padding: '$10 $12',
-      },
-      false: {
-        justifyContent: 'flex-end',
-        padding: '$13 $12',
-      },
-    },
-  },
-})

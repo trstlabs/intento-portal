@@ -3,13 +3,13 @@ export { ButtonWithDropdownForSorting } from './components/ButtonWithDropdownFor
 export { LiquidityBreakdown } from './components/LiquidityBreakdown'
 export { LiquidityHeader } from './components/LiquidityHeader'
 export { LiquidityRewardsCard } from './components/LiquidityRewardsCard'
-export { ManageBondedLiquidityCard } from './components/ManageBondedLiquidityCard'
+// export { ManageBondedLiquidityCard } from './components/ManageBondedLiquidityCard'
 export { ManageLiquidityCard } from './components/ManageLiquidityCard'
 export { ManagePoolDialog } from './components/ManagePoolDialog'
 export { PoolCard } from './components/PoolCard'
 export { StakingSummary } from './components/StakingSummary'
 export { UnbondingLiquidityCard, useRelativeTimestamp } from './components/UnbondingLiquidityCard'
-export { UnbondingLiquidityStatusList } from './components/UnbondingLiquidityStatusList'
+// export { UnbondingLiquidityStatusList } from './components/UnbondingLiquidityStatusList'
 export {
   useGetPoolTokensDollarValue,
   usePoolTokensDollarValue,

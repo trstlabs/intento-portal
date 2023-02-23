@@ -1,5 +1,4 @@
-import { TrustlessChainClient, QueryContractsByCodeResponse } from 'trustlessjs'
-import { QueryContractInfoResponse } from 'trustlessjs'
+import { TrustlessChainClient } from 'trustlessjs'
 import { PoolEntityType, TokenInfo } from '../../queries/usePoolsListQuery'
 
 export interface GetToken1ForToken2PriceInput {

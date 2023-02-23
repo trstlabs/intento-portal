@@ -1,17 +1,11 @@
-import { useIBCTokenBalance } from 'hooks/useIBCTokenBalance'
-import { useTokenBalance } from 'hooks/useTokenBalance'
 import {
   ButtonForWrapper,
-  Divider,
-  formatTokenBalance,
   ImageForTokenLogo,
-  Inline,
-  RejectIcon,
-  Spinner,
+
   styled,
   Text,
 } from 'junoblocks'
-import { ComponentPropsWithoutRef, useMemo } from 'react'
+import { ComponentPropsWithoutRef } from 'react'
 
 import { TokenInfo } from '../../../queries/usePoolsListQuery'
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
@@ -23,13 +17,17 @@ const StyledDivForScrollContainer = styled('div', {
 export class ChannelInfo {
   name: string;
   logoURI: string;
-  channel: string;
+  channelID: string;
+  denom: string;
+  symbol: string
+  connectionID: string;
+  trst_denom: string;
 }
 
 
 export type ChannelSelectListProps = {
   activeChannel?: string
-  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'symbol' | 'logoURI' | 'name'>>
+  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'denom'|  'trst_denom' | 'logoURI' | 'name' | 'symbol'| 'connection_id'>>
   onSelect: (channelInfo: ChannelInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -48,16 +46,20 @@ export const ChannelSelectList = ({
 
   function passChannel(selectedInfo) {
     let selectedChannel = new ChannelInfo();
-    selectedChannel.channel = selectedInfo.channel
+    selectedChannel.channelID = selectedInfo.channel
     selectedChannel.name = selectedInfo.id
     selectedChannel.logoURI = selectedInfo.logoURI
+    selectedChannel.denom = selectedInfo.denom
+    selectedChannel.trst_denom = selectedInfo.trst_denom
+    selectedChannel.symbol = selectedInfo.symbol
+    selectedChannel.connectionID = selectedInfo.connectionID
     console.log(selectedChannel)
     return selectedChannel
   }
 
   return (
     <>
-     
+
 
       <StyledDivForScrollContainer
         {...props}
@@ -88,21 +90,17 @@ export const ChannelSelectList = ({
                 />
                 <div data-token-info="">
                   <Text variant="body" >
-                    {chainInfo.chain_id}
+                    {chainInfo.name}
                   </Text>
                 </div>
               </StyledDivForColumn>
             </StyledButtonForRow>
           )
         })}
-       
+
       </StyledDivForScrollContainer>
     </>
   )
-}
-
-function isQueryEmpty(query: string) {
-  return !query || !query.replace(new RegExp(' ', 'g'), '')
 }
 
 const StyledButtonForRow = styled(ButtonForWrapper, {

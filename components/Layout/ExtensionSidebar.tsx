@@ -10,9 +10,8 @@ export const ExtensionSidebar = () => {
         <Text>This is a {__TEST_MODE__ ? 'testnet' : 'beta'} version</Text>
       </StyledDivForTitleWrapper>
       <Text css={{ padding: '$9 0 $11' }}>
-        This website is currently{' '}
-        {__TEST_MODE__ ? 'operates in testnet mode' : 'in beta'}. Please provide
-        feedback.
+        {process.env.NEXT_PUBLIC_SITE_TITLE} is currently{' '}
+        {__TEST_MODE__ ? 'operating in testnet mode' : 'in beta'}. 
       </Text>
       <Button
         as="a"
@@ -24,7 +23,7 @@ export const ExtensionSidebar = () => {
       >
         Report an issue
       </Button>
-      <StyledPNGBottom src="/rocket_portal.png" />
+      <StyledPNGBottom src="/multiportal2.png" />
     </StyledDivForWrapper>
   )
 }
@@ -35,7 +34,7 @@ const StyledDivForWrapper = styled('div', {
   flexShrink: 0,
   zIndex: 1,
   position: 'sticky',
-  borderLeft: '1px solid $borderColors$inactive',
+  // borderLeft: '1px solid $borderColors$inactive',
   top: 0,
   right: 0,
   width: '100%',
@@ -55,7 +54,7 @@ const StyledPNGBottom = styled('img', {
   position: 'absolute',
   right: 20,
   bottom: 40,
-  width: '75%',
+  width: '100%',
   maxWidth: '300px',
   zIndex: '$1',
   userSelect: 'none',
