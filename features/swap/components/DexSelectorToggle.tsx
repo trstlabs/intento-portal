@@ -1,4 +1,4 @@
-import { useTokenInfo } from 'hooks/useTokenInfo'
+
 import { useDexList } from './SelectorOptionsList'
 import {
   ButtonForWrapper,

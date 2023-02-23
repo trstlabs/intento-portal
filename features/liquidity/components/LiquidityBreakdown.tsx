@@ -4,7 +4,6 @@ import {
   ChevronIcon,
   Column,
   Divider,
-  dollarValueFormatter,
   ImageForTokenLogo,
   InfoIcon,
   Inline,
@@ -24,8 +23,6 @@ import { TokenInfo } from '../../../queries/usePoolsListQuery'
 import { PoolTokenValue } from '../../../queries/useQueryPools'
 import { formatCompactNumber } from '../../../util/formatCompactNumber'
 import { usePoolPairTokenAmount } from '../hooks'
-import { AprPill } from './AprPill'
-import { StyledDivForTokenLogos } from './PoolCard'
 
 type LiquidityBreakdownProps = {
   tokenA: TokenInfo

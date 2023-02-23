@@ -1,14 +1,11 @@
 import { AppLayout, PageHeader } from 'components'
-import {
-  ButtonWithDropdownForSorting,
 
-} from 'features/contracts'
 import { useRecoilValue } from 'recoil'
 import {
-  SortDirections,
+  SortDirections, ButtonWithDropdownForSorting,
   SortParameters,
-  useSortContracts,
-} from 'features/contracts'
+  useSortAutoTxs
+} from 'features/auto-txs'
 import {
   Card,
   Column,
@@ -18,29 +15,24 @@ import {
   Spinner,
   styled,
   Text,
-  Valid,
-  Copy,
-  CopyTextTooltip,
-  Button,
-  Tooltip,
-  IconWrapper,
-  Logout,
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
-import { useContractInfosMulti } from 'hooks/useContractInfo'
-import { ContractCard } from '../features/contracts/components/ContractCard'
-import { ContractInfosWithAcc } from '../features/contracts/hooks/useSortContracts'
+import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
+import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
+import { StakeCard } from '../features/dashboard/components/StakeCard'
+import Contracts from './index_contracts'
+
 
 export default function Home() {
 
   const { address, key } = useRecoilValue(walletState)
-  const [contracts, isLoading] = useContractInfosMulti([Number(process.env.NEXT_PUBLIC_TIP20_CODE_ID), Number(process.env.NEXT_PUBLIC_RECURRINGSEND_CODE_ID),])
+  const [autoTxs, isLoading] = useAutoTxInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs: ContractInfosWithAcc = { infos: contracts, address }
-  const [myContracts, allContracts, isSorting] = useSortContracts({
+  const infoArgs = { infos: autoTxs, address }
+  const [myAutoTxs, allAutoTxs, isSorting] = useSortAutoTxs({
     infoArgs,
     sortBy: useMemo(
       () => ({
@@ -50,57 +42,21 @@ export default function Home() {
       [sortParameter, sortDirection]
     ),
   })
-
-  const shouldShowFetchingState = isLoading && isSorting && !contracts?.length;
-  const shouldRenderContracts = Boolean(contracts?.length)
-
-  function unpinKey() {
-    localStorage.removeItem("vk" + address);
-    location.reload()
-  }
+  const shouldShowAutoCompound = !myAutoTxs?.length || !myAutoTxs.find(tx => tx.label == "Autocompound");
+  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
+  const shouldRenderAutoTxs = Boolean(autoTxs?.length)
 
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Look into your assets and interact with your personal contracts."
+      subtitle="Manage your on-chain assets and triggers"
     />
   )
 
   return (
     <AppLayout>
       {pageHeaderContents}
-      {key ? <Card disabled variant="secondary"><><StyledDivForInfo >   {localStorage.getItem("vk" + address) ? <div > <Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
-        {key.name}, Your Keychain Is All Set
-      </Text>  <Text variant="caption" css={{ padding: '$12 $12 $12 $12' }}>
-          Your keychain key is stored locally in your browser. You protect your data and can view private data with this keychain.
-        </Text>   <Inline css={{ padding: '$11 $5 $11 $5' }}> <CopyTextTooltip
-          label="Copy viewing key"
-          successLabel="Viewing key copied!"
-          ariaLabel="Copy viewing key"
-          value={localStorage.getItem("vk" + address)}
-        >
-          {({ copied, ...bind }) => (
-            <Button
-              variant="ghost"
-              size="large"
-              icon={<IconWrapper size="big" icon={copied ? <Valid /> : <Copy />} />}
-              {...bind}
-            />
-          )}
-        </CopyTextTooltip>
-          <Tooltip
-            label="Unpin ViewingKey"
-            aria-label="Unpin from browser instance"
-          >
-            <Button
-              onClick={unpinKey}
-              variant="menu"
-              size="large"
-              icon={<IconWrapper size="big" icon={<Logout />} />}
-            />
-          </Tooltip></Inline></div> : <Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
-        {key.name}, Set a keyring to enjoy enhanced privacy
-      </Text>} <StyledPNG css={{ padding: '$24 $5 $12 $1' }} src="/keychain.png" /> </StyledDivForInfo></></Card> :
+      {!key &&
         <Card disabled variant="secondary"><Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
           Connect a wallet
         </Text></Card>
@@ -116,49 +72,49 @@ export default function Home() {
           </Column>
         </>
       )}
+      <Column
+        css={{ paddingTop: '$24' }}>
+        <StakeCard shouldShowAutoCompound={shouldShowAutoCompound} />
+      </Column>
       {!isLoading && isSorting && address && (<Column
         justifyContent="center"
         align="center"
-        css={{ paddingTop: '$24' }}
-      >
+        css={{ paddingTop: '$24' }}>
         <Inline gap={2}>
           <ConnectIcon color="secondary" />
           <Text variant="primary">
             {
-              "Finding your contracts..."
+              "Finding your triggers..."
             }
           </Text>
         </Inline>
       </Column>)}
-      {shouldRenderContracts && (
+      {shouldRenderAutoTxs && (
         <>
-          {Boolean(myContracts?.length) && (
+          {Boolean(myAutoTxs?.length) && (
             <>
-              <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
-                Your Personal Contracts
-              </Text>
 
-              <StyledDivForContractsGrid>
-                {myContracts.map(
-                  ({
-                    ContractInfo,
-                    contractAddress,
-                  }) => (
-                    <ContractCard
-                      key={contractAddress}
-                      contractInfo={ContractInfo}
-                      contractAddress={contractAddress}
+              {myAutoTxs.length != 0 ? <Text variant="primary" css={{ padding: '$4' }}>Your Triggers({myAutoTxs.length})</Text> : <Text variant="primary">Your Trigger (1)</Text>}
+
+              <StyledDivForAutoTxsGrid>
+
+                {myAutoTxs.map(
+                  (autoTxInfo, index) => (
+                    <AutoTxCard
+                      key={index}
+                      //structuredClone does not work on ios
+                      autoTxInfo={structuredClone(autoTxInfo)}
                     />
                   )
                 )}
-              </StyledDivForContractsGrid>
+              </StyledDivForAutoTxsGrid>
             </>
           )}
         </>
       )}
-      <StyledDivForContractsGrid>
+      <StyledDivForAutoTxsGrid>
         <>
-          {Boolean(allContracts?.length) && (
+          {Boolean(allAutoTxs?.length) && (
             <Inline
               gap={4}
               css={{
@@ -166,7 +122,7 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              <Text variant="primary">{allContracts.length} Other Contracts</Text>
+              {allAutoTxs.length == 0 ? <Text variant="primary" css={{ padding: '$4' }}>{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}
@@ -176,31 +132,28 @@ export default function Home() {
 
             </Inline>
           )}</>
-      </StyledDivForContractsGrid>
+      </StyledDivForAutoTxsGrid>
 
-      <StyledDivForContractsGrid>
-        {allContracts.map(
-          ({
-            ContractInfo,
-            contractAddress,
-          }) => (
-            <ContractCard
-              key={contractAddress}
-              contractInfo={ContractInfo}
-              contractAddress={contractAddress}
+      <StyledDivForAutoTxsGrid>
+        {allAutoTxs.map(
+          (autoTxInfo, index) => (
+            <AutoTxCard
+              key={index}
+              //structuredClone does not work on ios
+              autoTxInfo={structuredClone(autoTxInfo)}
             />
           )
         )}
-      </StyledDivForContractsGrid>
+      </StyledDivForAutoTxsGrid>
 
-
+      {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />}
     </AppLayout >
   )
 }
 
 const useSortControllers = () => {
-  const storeKeyForParameter = '@contracts/sort/parameter'
-  const storeKeyForDirection = '@contracts/sort/direction'
+  const storeKeyForParameter = '@autoTxs/sort/parameter'
+  const storeKeyForDirection = '@autoTxs/sort/direction'
 
   const [sortParameter, setSortParameter] = useState<SortParameters>(
     () =>
@@ -228,7 +181,7 @@ const useSortControllers = () => {
   }
 }
 
-const StyledDivForContractsGrid = styled('div', {
+const StyledDivForAutoTxsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',
@@ -245,25 +198,4 @@ const StyledDivForContractsGrid = styled('div', {
     gridTemplateColumns: '1fr',
     rowGap: '$8',
   },
-})
-
-const StyledDivForInfo = styled('div', {
-  display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  columnGap: '$3',
-  rowGap: '$8',
-
-})
-
-
-const StyledPNG = styled('img', {
-  width: '75%',
-  maxWidth: '200px',
-  maxHeight: '400px',
-  zIndex: '$1',
-  userSelect: 'none',
-  userDrag: 'none',
-  display: 'block',
-  marginLeft: 'auto',
-  marginRight: 'auto',
 })

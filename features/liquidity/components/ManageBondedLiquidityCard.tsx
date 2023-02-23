@@ -1,12 +1,7 @@
-import {
-  ArrowUpIcon,
-  Button,
-  Card,
-  CardContent,
+export {} 
+/*
+ import {
   Column,
-  dollarValueFormatter,
-  dollarValueFormatterWithDecimals,
-  Inline,
   Text,
   UnionIcon,
   useSubscribeInteractions,
@@ -14,8 +9,6 @@ import {
 
 import { PoolTokenValue } from '../../../queries/useQueryPools'
 import { BaseCardForEmptyState } from './BaseCardForEmptyState'
-import { SegmentedRewardsSimulator } from './SegmentedRewardsSimulator'
-import { StepIcon } from './StepIcon'
 
 type ManageBondedLiquidityCardProps = {
   onClick: () => void
@@ -32,10 +25,10 @@ export const ManageBondedLiquidityCard = ({
   //stakedLiquidity,
   // supportsIncentives,
 }: ManageBondedLiquidityCardProps) => {
-  const [refForCard, cardInteractionState] = useSubscribeInteractions()
+  //const [refForCard, cardInteractionState] = useSubscribeInteractions()
 
   // const bondedLiquidity = supportsIncentives
-  const didProvideLiquidity = providedLiquidity?.tokenAmount > 0
+  //const didProvideLiquidity = providedLiquidity?.tokenAmount > 0
 
   // const bondedLiquidityDollarValue = dollarValueFormatterWithDecimals(
   //   stakedLiquidity?.dollarValue,
@@ -169,3 +162,4 @@ export const ManageBondedLiquidityCard = ({
     // </Card>
   //)
 }
+ */

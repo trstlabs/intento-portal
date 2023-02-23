@@ -1,12 +1,11 @@
-import { TrustlessChainClient,MsgTransfer, Tx } from 'trustlessjs'
+import { TrustlessChainClient, MsgTransfer, Tx } from 'trustlessjs'
 import {
-  Coin,
-  DeliverTxResponse,
+  Coin
 } from '@cosmjs/stargate'
-// import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx'
+
 import { Height } from 'trustlessjs'
 import { IBCAssetInfo } from 'hooks/useIBCAssetList'
-import Long from 'long'
+
 import { useMutation } from 'react-query'
 import { useRecoilValue } from 'recoil'
 import { ibcWalletState, walletState } from 'state/atoms/walletAtoms'
@@ -58,21 +57,20 @@ const sendIbcTokens = (
   timeoutHeight: Height | undefined,
   /** timeout in seconds */
   timeoutTimestamp: number | undefined,
-  memo = '',
+  // memo = '',
   client: TrustlessChainClient
 ): Promise<Tx> => {
   // const timeoutTimestampNanoseconds = timeoutTimestamp
   //   ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
   //   : undefined
   const transferMsg = new MsgTransfer({
-
-      sourcePort: sourcePort,
-      sourceChannel: sourceChannel,
-      sender: senderAddress,
-      receiver: recipientAddress,
-      token: transferAmount,
-      timeoutHeight: timeoutHeight,
-      timeoutTimestampSec: timeoutTimestamp.toString(),
+    sourcePort,
+    sourceChannel,
+    sender: senderAddress,
+    receiver: recipientAddress,
+    token: transferAmount,
+    timeoutHeight: timeoutHeight,
+    timeoutTimestampSec: timeoutTimestamp.toString(),
 
   })
   return client.signAndBroadcast([transferMsg])
@@ -125,7 +123,7 @@ export const useTransferAssetMutation = ({
         tokenInfo.trst_channel,
         undefined,
         timeout,
-        '',
+        //'',
         client
       )
     }

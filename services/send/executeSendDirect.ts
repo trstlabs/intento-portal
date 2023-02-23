@@ -1,111 +1,42 @@
 import {
-  TrustlessChainClient, Coin, Msg
+  TrustlessChainClient, Coin, MsgTransfer, MsgSend,
 } from 'trustlessjs'
 
-import { TokenInfo } from '../../queries/usePoolsListQuery'
-import {
-  createExecuteMessage,
-  validateTransactionSuccess,
-} from '../../util/messages'
-
-
 type ExecuteSendDirectArgs = {
-  token: TokenInfo
+  denom: string
   senderAddress: string
   recipientInfos: RecipientInfo[]
   client: TrustlessChainClient
 }
 
 export const executeDirectSend = async ({
-  token,
+  denom,
   client,
   recipientInfos,
   senderAddress,
 }: ExecuteSendDirectArgs): Promise<any> => {
 
-  //if token
-  if (!token.native) {
-    let transferMessage = {}
-    let directRecipients = [];
-    let ibcRecipients = [];
-    let executeSendMessageArray: Msg[] = [];
-    recipientInfos.forEach(recipient => {
-      if (recipient.channel_id == undefined) {
-        let directRecipient = new RecipientInfoDirect()
-        directRecipient.recipient = recipient.recipient
-        directRecipient.amount = recipient.amount
-        directRecipient.memo = recipient.memo
-        directRecipients.push(directRecipient)
-      } else {
-        ibcRecipients.push(recipient)
-      }
-    });
-
-    // create message for ibc recipients (todo implement)
-    let executeIbcSendMultiMessage;
-    if (ibcRecipients[1]) {
-      let transferIBCMessage = {
-        transfer_multi_ibc: {
-          recipients: `${ibcRecipients}`,
-        }
-      }
-      executeIbcSendMultiMessage = createExecuteMessage({
-        message: transferIBCMessage,
-        senderAddress,
-        contractAddress: token.token_address,
-        /* each native token needs to be added to the funds */
-        funds: [
-        ],
-      })
-      executeSendMessageArray.push(executeIbcSendMultiMessage)
-    }
-    // single recipient 
-    if (!recipientInfos[1]) {
-
-      if (recipientInfos[0].channel_id == undefined) {
-        transferMessage = {
-          transfer: {
-            recipient: recipientInfos[0].recipient,
-            amount: recipientInfos[0].amount.toString(),
-          }
-        }
-      } else {
-        transferMessage = {
-          ibc_transfer: {
-            recipient: recipientInfos[0].recipient,
-            amount: recipientInfos[0].amount.toString(),
-            channel_id: recipientInfos[0].channel_id,
-          }
-        }
-      }
-    }
-    const executeSendMessage = createExecuteMessage({
-      message: transferMessage,
-      senderAddress,
-      contractAddress: token.token_address,
-      /* each native token needs to be added to the funds */
-      funds: [
-      ],
-    })
-    executeSendMessageArray.push(executeSendMessage)
-
-    return validateTransactionSuccess(
-      await client.signAndBroadcast(
-        executeSendMessageArray,
-        { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
-      )
-    )
-  }
-
-
   //if one direct
   if (!recipientInfos[1]) {
     console.log(recipientInfos[0])
+    if (recipientInfos[0].channelID) {
+      return await client.tx.ibc.transfer({
+        sourcePort: 'transfer',
+        sourceChannel: recipientInfos[0].channelID,
+        sender: senderAddress,
+        timeoutTimestampSec: (Math.floor(new Date().getTime() / 1000) + 600).toString(),
+        receiver: recipientInfos[0].recipient,
+        token: { denom, amount: recipientInfos[0].amount.toString() },
+      }, {
+        gasLimit: 50_000,
+        memo: recipientInfos[0].memo
+      },)
+    }
     return await client.tx.bank.send(
       {
         fromAddress: senderAddress,
         toAddress: recipientInfos[0].recipient,
-        amount: [{ denom: token.denom, amount: recipientInfos[0].amount.toString() }],
+        amount: [{ denom, amount: recipientInfos[0].amount.toString() }],
 
       },
       {
@@ -115,60 +46,35 @@ export const executeDirectSend = async ({
     )
   }
 
-  //if one direct
-  if (!recipientInfos[1]) {
-    console.log(recipientInfos[0])
-    if (recipientInfos[0].channel_id != undefined) {
-      throw new Error(
-        `sending over ibc for native tokens is not enabled on Cosmoportal yet`
-      )
-    };
-    return await client.tx.bank.send(
-      {
-        fromAddress: senderAddress,
-        toAddress: recipientInfos[0].recipient,
-        amount: [{ denom: token.denom, amount: recipientInfos[0].amount.toString() }],
-
-      },
-      {
-        gasLimit: 30_000,
-        memo: recipientInfos[0].memo
-      },
-    )
-  }
   //if multiple direct
-  let totalAmount = 0
-  let outputRecipients = [];
+  const msgs = []
   recipientInfos.forEach(recipient => {
-    if (recipient.channel_id != undefined) {
-      throw new Error(
-        `sending over ibc for native tokens is not enabled on Cosmoportal yet`
-      )
-    };
-    let outputRecipient = new Output()
-    outputRecipient.address = recipient.recipient
-    outputRecipient.coins[0].denom = token.denom
-    outputRecipient.coins[0].amount = recipient.amount.toString()
-    totalAmount = totalAmount + Number(recipient.amount)
-    outputRecipients.push(outputRecipient)
-  });
+    
+    if (recipient.channelID) {
 
-  prompt("In this transaction, the memo will be the first memo, " + recipientInfos[0].memo + ", for all recipients")
-  return await client.tx.bank.multiSend(
-    {
-      inputs: [
-        {
-          address: senderAddress,
-          coins: [{ denom: token.denom, amount: totalAmount.toString() }],
-        },
-      ],
-      outputs: outputRecipients,
-    },
-    {
-      gasLimit: 200_000,
-      memo: recipientInfos[0].memo
-    },
+      const transferMsg = new MsgTransfer({
+        sourcePort: 'transfer',
+        sourceChannel: recipient.channelID,
+        sender: senderAddress,
+        timeoutTimestampSec: (Math.floor(new Date().getTime() / 1000) + 600).toString(),
+        receiver: recipient.recipient,
+        token: { denom, amount: recipient.amount.toString() },
+      })
+      msgs.push(transferMsg)
+      //return await client.tx.ibc.transfer(
+
+    } else {
+      const sendMsg = new MsgSend({
+        fromAddress: senderAddress,
+        toAddress: recipient.recipient,
+        amount: [{ denom, amount: recipient.amount.toString() }],
+      })
+      msgs.push(sendMsg)
+    }
+  }
   )
+  return await client.signAndBroadcast(msgs)
+
 }
 
 
@@ -181,13 +87,13 @@ export class Output {
 export class RecipientInfo {
   recipient: string;
   amount: string | number;
-  channel_id: string;
+  channelID?: string;
   memo: string;
 }
 
 export class RecipientInfoDirect {
   recipient: string;
   amount: string | number;
-  // channel_id: string;
+  channelID?: string;
   memo: string;
 }

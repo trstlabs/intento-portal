@@ -1,4 +1,4 @@
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import { maybePluralize } from 'util/maybePluralize'
 import {
   usePoolPairTokenAmount,

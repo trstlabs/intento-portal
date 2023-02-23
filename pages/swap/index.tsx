@@ -1,14 +1,9 @@
 import { AppLayout, PageHeader } from 'components'
 
 import {
-  Button,
-  Error,
-  IconWrapper,
   styled,
-  Toast,
-  UpRightArrow,
 } from 'junoblocks'
-import React, { useEffect, useReducer } from 'react'
+import React from 'react'
 import { TokenSwapModule } from 'features/swap'
 import { APP_NAME } from '../../util/constants'
 import { DexSelector } from '../../features/swap/components'

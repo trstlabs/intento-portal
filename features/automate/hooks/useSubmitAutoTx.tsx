@@ -1,4 +1,3 @@
-import { useTokenInfo } from 'hooks/useTokenInfo'
 import {
     Button,
     ErrorIcon,
@@ -11,32 +10,26 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { AutoExecData, executeDirectSend, executeScheduledSend, RecipientInfo } from '../../../services/send'
+import { AutoTxData, executeSubmitAutoTx } from '../../../services/ica'
 import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 
-type UseTokenSendArgs = {
-    tokenSymbol: string
-    recipientInfos: RecipientInfo[]
-    autoExecData: AutoExecData
+type UseSubmitAutoTxArgs = {
+    autoTxData: AutoTxData
 }
 
-export const useScheduledTx = ({
-    tokenSymbol,
-    recipientInfos,
-    autoExecData,
-}: UseTokenSendArgs) => {
+export const useSubmitAutoTx = ({
+    autoTxData,
+}: UseSubmitAutoTxArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
-    const token = useTokenInfo(tokenSymbol)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
@@ -46,24 +39,11 @@ export const useScheduledTx = ({
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            let convertedInfos = [new RecipientInfo()]
-            setTransactionState(TransactionStatus.EXECUTING)
-            
-            recipientInfos.forEach((recipient, index) => {
-                convertedInfos[index].recipient = recipient.recipient
-                convertedInfos[index].channel_id = recipient.channel_id
-                convertedInfos[index].memo = recipient.memo
-                convertedInfos[index].amount = convertDenomToMicroDenom(
-                    recipient.amount,
-                    token.decimals
-                )
-            })
-
-            return await executeScheduledSend({
-                token,
-                senderAddress: address,
-                recipientInfos: convertedInfos,
-                autoExecData,
+        
+            console.log(autoTxData)
+            return await executeSubmitAutoTx({
+                owner: address,
+                autoTxData,
                 client,
             })
 
@@ -71,32 +51,32 @@ export const useScheduledTx = ({
         {
             onSuccess(data) {
                 console.log(data)
-                let contractAddress = data.arrayLog.find(
+                let autoTxID = data.arrayLog.find(
                     (log) =>
-                      log.key == "contract_address"
-                  ).value;
-                console.log(contractAddress)
+                        log.key == "auto_tx_id"
+                ).value;
+                console.log(autoTxID)
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
-                        title="Scheduled contract execution successfully!"
-                        body={`Scheduled to send ${token.symbol} recurringly!} Your contract address for this is ${contractAddress}`}
+                        title="Your trigger is submitted!"
+                        body={`An on-chain trigger was created succesfully!} The ID is ${autoTxID}`}
                         buttons={
                             <Button
-                              as="a"
-                              variant="ghost"
-                              href={`/contracts/${contractAddress}`}
-                              target="__blank"
-                              iconRight={<UpRightArrow />}
+                                as="a"
+                                variant="ghost"
+                                href={`/triggers/${autoTxID}`}
+                                target="__blank"
+                                iconRight={<UpRightArrow />}
                             >
-                              Go to your contract
+                                Go to your new trigger
                             </Button>
-                          }
-                        onClose={() => toast.dismiss(t.id)} 
+                        }
+                        onClose={() => toast.dismiss(t.id)}
                     />
                 ))
                 popConfetti(true)
-                setTimeout( () => popConfetti(false), 3000)
+                
                 refetchQueries()
             },
             onError(e) {
@@ -105,7 +85,7 @@ export const useScheduledTx = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops scheduling error!"
+                        title="Oops error submitting message!"
                         body={errorMessage}
                         buttons={
                             <Button

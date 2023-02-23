@@ -14,7 +14,6 @@ import {
   Text,
   Tooltip,
   Valid, Connect,
-  Wallet,
 } from 'junoblocks'
 import React from 'react'
 import { useRecoilValue } from 'recoil'

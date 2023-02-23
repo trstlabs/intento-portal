@@ -2,7 +2,7 @@ import { useTokenInfo } from 'hooks/useTokenInfo'
 import { usePersistance } from 'junoblocks'
 import { useQueryMatchingPoolsForSwap } from 'queries/useQueryMatchingPoolForSwap'
 import { useQuery } from 'react-query'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from 'util/constants'
+import { DEFAULT_REFETCH_INTERVAL } from 'util/constants'
 
 import { useTrustlessChainClient } from '../../../hooks/useTrustlessChainClient'
 import { tokenToTokenPriceQueryWithPools } from '../../../queries/tokenToTokenPriceQuery'
@@ -55,7 +55,7 @@ export const useTokenToTokenPriceQuery = ({
       ),
       refetchOnMount: false,
       refetchInterval: refetchInBackground
-        ? DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL
+        ? DEFAULT_REFETCH_INTERVAL
         : undefined,
       refetchIntervalInBackground: Boolean(refetchInBackground),
     }

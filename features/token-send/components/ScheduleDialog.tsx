@@ -7,12 +7,12 @@ import {
     DialogContent,
     DialogDivider,
     DialogHeader,
-    Spinner, Divider,
-    styled, Card,
+    Spinner,
+    styled,
     Text,
-    Union,
+   
     Tooltip,
-    convertDenomToMicroDenom,
+  
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
@@ -152,7 +152,7 @@ export const ScheduleDialog = ({
                     funds={funds}
                     interval={interval}
                     duration={duration}
-                    startTime={startTime}
+                    //startTime={startTime}
                     setRecurrence={setRecurrence}
                     recurrences={recurrences}
 
@@ -200,7 +200,6 @@ function RecurrenceContent({
     funds,
     duration,
     interval,
-    startTime,
     recurrences,
 }) {
     const [displayInterval, setDisplayInterval] = useState("1 day");
@@ -377,7 +376,7 @@ function RecurrenceContent({
                                     onChange={({ target: { value } }) => handleMaxFee(value)}
                                 /></Text></StyledDivForLiquidityInputs></Inline>   {recurrences > 0 && (<Text align="center"
                                     variant="caption">
-                                    Suggested funds for fees:  {recurrences * 0.1} TRST</Text>)}
+                                    Suggested:  {recurrences * 0.1} TRST</Text>)}
                         </Column>
                     </Column>
 
@@ -524,9 +523,6 @@ function OccurrenceContent({
     )
 }
 
-const StyledDivForTxRates = styled('div', {
-    padding: '$7 0 $12',
-})
 
 const StyledDivForLiquidityInputs = styled('div', {
     display: 'flex',

@@ -3,7 +3,6 @@ import { Logo } from 'icons'
 import { ConnectIcon, IconWrapper, styled, Text } from 'junoblocks'
 import { useRecoilValue } from 'recoil'
 import { ibcWalletState, walletState } from 'state/atoms/walletAtoms'
-import { APP_NAME } from 'util/constants'
 
 export const WalletInfo = ({ label, icon, address, css }) => {
   return (

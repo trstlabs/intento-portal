@@ -1,36 +1,25 @@
-import { useTokenInfo, } from 'hooks/useTokenInfo'
-import { useTip20Info } from 'hooks/useTip20Info'
+
 import {
-    Button,
     Card,
     CardContent,
     Column,
-
     Divider,
-
-    Inline,
-
     Text,
-    useSubscribeInteractions,
 } from 'junoblocks'
 
 import { ContractInfo } from 'trustlessjs'
 import { convertMicroDenomToDenom } from 'util/conversion'
 
-import { UnderlyingAssetRow } from '../../liquidity/components/UnderlyingAssetRow'
 import { useContractNativeBalances, useRecipientListForAcc, useRecurrenceAmount } from '../../../hooks/useRecurringSend'
 import { UnderlyingNativeAssetRow } from './UnderlyingNativeAssetRow'
 type RecurringSendCardProps = {
     contractInfo: ContractInfo,
     contractAddress: any,
-    // onClick: () => void
-
 }
 
 export const RecurringSendCard = ({
     contractInfo,
     contractAddress,
-    // onClick,
 }: RecurringSendCardProps) => {
 
     //const [{ key, address, client }] = useRecoilState(walletState)
@@ -100,7 +89,10 @@ export const RecurringSendCard = ({
                     </Text>
                 })}
                 {!isRecurrenceAmountLoading && recurrenceAmount && (<Text variant="body" color="secondary" css={{ paddingBottom: '$12' }}>
-                    recurrenceAmount: {recurrenceAmount.amount}
+                    Recurrence Amount: <UnderlyingNativeAssetRow tokenSymbol={recurrenceAmount.token} tokenAmount={convertMicroDenomToDenom(
+                        recurrenceAmount.amount,
+                        6
+                    )} />
                 </Text>)}
                 {!isNativeBalancesLoading && nativeBalances && (<Column gap={6} css={{ paddingBottom: '$16' }}>
                     <UnderlyingNativeAssetRow tokenSymbol={nativeBalances[0].denom} tokenAmount={convertMicroDenomToDenom(

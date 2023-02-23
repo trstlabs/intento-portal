@@ -2,8 +2,8 @@ import { usePriceForOneToken } from 'features/swap'
 import { useQuery } from 'react-query'
 
 import { tokenDollarValueQuery } from '../queries/tokenDollarValueQuery'
-import { DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL } from '../util/constants'
-import { useGetMultipleIBCAssetInfo } from './useIBCAssetInfo'
+import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
+import { useIBCAssetInfo } from './useIBCAssetInfo'
 import {
   useBaseTokenInfo,
   useGetMultipleTokenInfo,
@@ -48,7 +48,7 @@ export const useTokenDollarValue = (tokenSymbol?: string) => {
 
 export const useTokenDollarValueQuery = (tokenSymbols?: Array<string>) => {
   const getMultipleTokenInfo = useGetMultipleTokenInfo()
-  const getMultipleIBCAssetInfo = useGetMultipleIBCAssetInfo()
+  //const getMultipleIBCAssetInfo = useGetMultipleIBCAssetInfo()
 
   const { data, isLoading } = useQuery(
     `tokenDollarValue/${tokenSymbols?.join('/')}`,
@@ -57,7 +57,7 @@ export const useTokenDollarValueQuery = (tokenSymbols?: Array<string>) => {
         (tokenSymbol) =>
           (
             getMultipleTokenInfo([tokenSymbol])?.[0] ||
-            getMultipleIBCAssetInfo([tokenSymbol])?.[0]
+            useIBCAssetInfo(tokenSymbol)
           )?.id
       )
 
@@ -68,7 +68,7 @@ export const useTokenDollarValueQuery = (tokenSymbols?: Array<string>) => {
     {
       enabled: Boolean(tokenSymbols?.length),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_TOKEN_BALANCE_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )

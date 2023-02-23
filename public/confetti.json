@@ -1,11 +1,8 @@
 {
-    "background": {
-        "color": {
-            "value": "#000000"
-        }
-    },
+
     "fullScreen": {
-        "enable": true
+        "enable": true,
+        "zIndex": 9990
     },
     "particles": {
       "color": {

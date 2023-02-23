@@ -1,7 +1,7 @@
-import { useTokenList } from 'hooks/useTokenList'
+
 import { styled, useMedia } from 'junoblocks'
-import { useEffect, useRef } from 'react'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useEffect,  } from 'react'
+import { useRecoilValue } from 'recoil'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -51,8 +51,8 @@ export const ContractInfosModule = () => {
         <>
             <StyledDivForWrapper>
                 <ContractInfos
-                    codeId={1}
-                    onChange={(updateTokenA) => {
+                    
+                   onChange={() => {
                         // setTokenSwapState([updateTokenA, tokenB])
                     }}
                     disabled={isUiDisabled}
