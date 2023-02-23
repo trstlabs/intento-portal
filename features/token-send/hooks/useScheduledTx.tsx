@@ -52,7 +52,7 @@ export const useScheduledTx = ({
             console.log(convertedInfos)
             recipientInfos.forEach((field, index) => {
                 convertedInfos[index].recipient = field.recipient
-                convertedInfos[index].channel_id = field.channel_id
+                convertedInfos[index].channelID = field.channelID
                 convertedInfos[index].memo = field.memo
                 convertedInfos[index].amount = convertDenomToMicroDenom(
                     field.amount,

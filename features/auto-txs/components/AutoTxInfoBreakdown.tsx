@@ -270,7 +270,7 @@ export const AutoTxInfoBreakdown = ({
                     <Inline gap={2}>
                         <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
                     </Inline>
-                    {autoTxInfo.endTime.seconds != autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
+                    {autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
                         End time
                     </Text>
                         <Inline gap={2}>

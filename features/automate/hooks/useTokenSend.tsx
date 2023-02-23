@@ -49,7 +49,7 @@ export const useTokenSend = ({
             
             recipientInfos.forEach((recipient, index) => {
                 convertedInfos[index].recipient = recipient.recipient
-                convertedInfos[index].channel_id = recipient.channel_id
+                convertedInfos[index].channelID = recipient.channelID
                 convertedInfos[index].memo = recipient.memo
                 convertedInfos[index].amount = convertDenomToMicroDenom(
                     recipient.amount,
@@ -60,7 +60,7 @@ export const useTokenSend = ({
 
             console.log(address)
             return await executeDirectSend({
-                token,
+                denom: token.denom,
                 senderAddress: address,
                 recipientInfos: convertedInfos,
                 client,

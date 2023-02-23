@@ -2,7 +2,7 @@ import { SVGProps } from 'react'
 
 export const LogoText = (props: SVGProps<SVGSVGElement>) => {
   return (
-    <svg width="170" height="20" viewBox="0 0 400 50" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
+    <svg width="170" height="24" viewBox="0 0 400 60" fill="currentColor" xmlns="http://www.w3.org/2000/svg" {...props}>
 
       <g id="Layer_2" data-name="Layer 2">
         <g id="Layer_1-2" data-name="Layer 1">
@@ -20,32 +20,32 @@ export const LogoText = (props: SVGProps<SVGSVGElement>) => {
                 letterSpacing: "-.02em",
               }}
             >
-              {"TRIGGERP"}
+              {"TriggerP"}
             </tspan>
             <tspan
-              x={240.9}
+              x={195}
               y={0}
               style={{
                 letterSpacing: 0,
               }}
             >
-              {"O"}
+              {"o"}
             </tspan>
             <tspan
-              x={280.15}
+              x={225}
               y={0}
               style={{
                 letterSpacing: 0,
               }}
             >
-              {"RTAL"}
+              {"rtal"}
             </tspan>
           
           </text>
           <path
             className="cls-7"
             transform="rotate(-45 125 -200)"
-            d="M33 50h53v7H33"
+            d="M2 18h42v6H2"
           />
         </g>
       </g>  </svg>

@@ -13,7 +13,6 @@ import React, { useRef, useState } from 'react'
 import { ChannelSelectorToggle } from './ChannelSelectorToggle'
 import { ChannelOptionsList } from './ChannelOptionsList'
 import { ChannelInfo } from './ChannelSelectList'
-import { Channel } from 'trustlessjs/dist/protobuf/ibc/core/channel/v1/channel'
 
 
 type ChannelSelectorProps = {

@@ -13,7 +13,7 @@ import { ScheduleDialog, AutoExecData } from './ScheduleDialog';
 export class RecipientInfo {
   recipient: string;
   amount: string | number;
-  channel_id: string;
+  channelID: string;
   memo: string;
 }
 
@@ -109,7 +109,7 @@ export const RecipientList = ({
     const newRecipients = [...recipients]
     newRecipients[index] = {
       ...newRecipients[index],
-      channel_id: channel
+      channelID: channel
     }
     console.log(newRecipients)
     onRecipientsChange(newRecipients)
@@ -233,7 +233,7 @@ export const RecipientList = ({
                     variant="caption">
                     Chain (Optional)</Text>
                   <Text>  <ChannelSelector
-                    channel={recipient.channel_id}
+                    channel={recipient.channelID}
                     onChange={(updateChannel) => {
                       handleChannelChange(index, updateChannel.channel)
                     }}
@@ -271,7 +271,7 @@ export const RecipientList = ({
               {(recipient.amount != 0) && (<ul>
                 <Text>Recipient {index + 1}: <i >{recipient.recipient}</i></Text>
                 <Text>Amount: <i > {recipient.amount}</i></Text>
-                {recipient.channel_id && (<Text>Channel ID: <i >{recipient.channel_id}</i></Text>)}
+                {recipient.channelID && (<Text>Channel ID: <i >{recipient.channelID}</i></Text>)}
                 {recipient.memo && (<Text>Memo: <i >{recipient.memo}</i></Text>)}
               </ul>)}</Text>
             </div>
