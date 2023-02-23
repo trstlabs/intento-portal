@@ -1,6 +1,15 @@
-## CosmpPortal interface
+## TriggerPortal interface
 
-Based on Wasmswap, an open-source interface for a CosmWasm decentralized exchange.
+Interface to automate transactions and workflows on-chain. 
+Using Trustless Triggers and Trustless Contracts through the TrustlessJS library. 
+
+### Features
+- Dashboard for Triggers
+- Autocompound TRST tokens
+- Advanced automation for scheduling transactions with interchain accounts
+- Send tokens on a recurring basis
+
+Based on Junoblocks and Wasmswap interface, an open-source interface for a CosmWasm decentralized exchange.
 
 Run the app in dev mode locally.
 
@@ -17,6 +26,8 @@ Access the app on `http://localhost:3000/`.
 The app configuration, feature flags, etc., is located in the .env config file.
 
 To configure the app, you will need to swap the demo example configuration set with your chain information and add your tokens and ibc assets information.
+
+Configure RPC and rest endpoints in public/chain_info.local.json and IBC info in public/ibc_assets.json.
 
 ### Chain configuration
 
