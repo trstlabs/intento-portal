@@ -126,15 +126,15 @@ export const getAPY = async (client: TrustlessChainClient, intervalSeconds: numb
         }
 
         const periodsPerYear = (60 * 60 * 24 * 365) / intervalSeconds;
-
-        return (1 + (apr.calculatedApr / periodsPerYear)) ** periodsPerYear - 1;
+        alert(apr.calculatedApr)
+        return ((1 + ((apr.calculatedApr/100)/ periodsPerYear)) **  periodsPerYear - 1)*100;
     } catch (e) { console.error('err(getAPY):', e) }
 }
 
-export const getAPYForAutoCompound = async (client: TrustlessChainClient, intervalSeconds: number, stakingBalanceAmount: number) => {
+export const getAPYForAutoCompound = async (client: TrustlessChainClient, durationSeconds: number, intervalSeconds: number, stakingBalanceAmount: number) => {
     try {
         const apy = await getAPY(client, intervalSeconds);
-        const expectedFees = await getExpectedAutoTxFee(client, intervalSeconds, 1)
+        const expectedFees = await getExpectedAutoTxFee(client,durationSeconds, 1 ,intervalSeconds, )
         return apy * stakingBalanceAmount - expectedFees
     } catch (e) { console.error('err(getAPYForAutoCompound):', e) }
 }

@@ -376,6 +376,7 @@ const getDuration = (seconds: number) => {
 
 const getRelativeTime = (seconds: String) => {
     /* parse the actual dates */
+    const inTime = "In ";
     const date = dayjs(Number(seconds) * 1000)
 
     const now = dayjs()
@@ -387,7 +388,7 @@ const getRelativeTime = (seconds: String) => {
         const daysLeft = date.diff(now, 'days')
         const hoursLeftAfterDays = Math.round(24 * ((hoursLeft / 24) % 1.0))
 
-        return `${hoursLeftAfterDays > 0
+        return inTime+ `${hoursLeftAfterDays > 0
             ? `${maybePluralize(daysLeft, 'day')} and `
             : ''
             } ${maybePluralize(hoursLeftAfterDays, 'hour')}`
@@ -395,14 +396,14 @@ const getRelativeTime = (seconds: String) => {
 
     /* less than 24 hours left but not less than an hour */
     if (hoursLeft < 24 && hoursLeft > 1) {
-        return maybePluralize(hoursLeft, 'hour')
+        return inTime+  maybePluralize(hoursLeft, 'hour')
     }
 
     const minsLeft = date.diff(now, 'minutes')
 
     if (minsLeft > 0) {
         /* less than an hour */
-        return maybePluralize(minsLeft, 'minute')
+        return inTime+ maybePluralize(minsLeft, 'minute')
     }
 
     const secondsLeft = date.diff(now, 'seconds')

@@ -66,9 +66,9 @@ export const StakeCard = ({
             < Card variant="secondary" disabled css={{ padding: '$8' }} > <CardContent size="medium" >
                 <Column>
                     <Row><Text variant="header" css={{ paddingBottom: '$8' }}  >Autocompound</Text></Row>
-                    {!isAPRLoading && APR && <>  <Text variant="legend">Nominal APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr}%</Text>
-                        {!isWeeklyAPYLoading && weeklyAPY && <> <Text variant="legend"> APY (Weekly Compound)</Text><Text css={{ padding: '$8' }} variant="title">{weeklyAPY}%</Text></>}
-                        <Text variant="legend">RealTime APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr}%</Text>
+                    {!isAPRLoading && APR && <>  <Text variant="legend">Nominal APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(2)}%</Text>
+                        {!isWeeklyAPYLoading && weeklyAPY && <> <Text variant="legend"> APY (Weekly Compound)</Text><Text css={{ padding: '$8' }} variant="title">{weeklyAPY.toPrecision(2)}%</Text></>}
+                        <Text variant="legend">RealTime APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr.toPrecision(2)}%</Text>
 
                         {!isLoading && balance > 0 && <><Text variant="legend">TRST Balance </Text><Text css={{ padding: '$8' }} variant="title">{formatTokenBalance(balance)}</Text></>}
                         {!isLoading && balance > 0 && <Text variant="legend"> {!isStakeBalanceLoading && stakeBalance && stakeBalance.stakingBalanceAmount > 0 ? <>Stake Balance is {formatTokenBalance(stakeBalance.stakingBalanceAmount)} with {stakeBalance.validators.length} validator{stakeBalance.validators.length > 1 && <>s

@@ -83,20 +83,20 @@ export const SubmitAutoTxDialog = ({
     const [displayInterval, setDisplayInterval] = useState("1 day");
     const [displayDuration, setDisplayDuration] = useState("2 weeks");
     const [displayStartTime, setDisplayStartTime] = useState("1 day");
-    const [displayRecurrences, setDisplayRecurrences] = useState("2 times");
+    //const [displayRecurrences, setDisplayRecurrences] = useState("2 times");
 
     const timeLabels = ['1 week', '1 day', '5 days', '1 hour', '2 hours', '30 min', '2 weeks', '30 days', '60 days', '90 days']
     const timeValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 5, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14, 3600000 * 24 * 30, 3600000 * 24 * 60, 3600000 * 24 * 90]
 
-    const recurrenceLabels = ['1 time', '2 times', '5 times', '10 times', '25 times', '50 times']
-    const recurrenceValues = [1, 2, 5, 10, 25, 50]
+    // const recurrenceLabels = ['1 time', '2 times', '5 times', '10 times', '25 times', '50 times']
+    // const recurrenceValues = [1, 2, 5, 10, 25, 50]
 
     function handleInterval(label, value) {
         setInterval(value);
         setDisplayInterval(label)
         const recurrence = Math.floor(duration / value)
         setRecurrence(recurrence)
-        handleDisplayRecurrence(recurrence)
+        //handleDisplayRecurrence(recurrence)
     }
     function handleRemoveInterval() {
         setInterval(0);
@@ -108,7 +108,7 @@ export const SubmitAutoTxDialog = ({
             setDisplayDuration(label)
             const recurrence = Math.floor(value / interval)
             setRecurrence(recurrence)
-            handleDisplayRecurrence(recurrence)
+           // handleDisplayRecurrence(recurrence)
             return
         }
         if (interval > 0) {
@@ -130,13 +130,13 @@ export const SubmitAutoTxDialog = ({
         setDisplayStartTime(label)
         const recurrence = Math.floor(duration / interval)
         setRecurrence(recurrence)
-        handleDisplayRecurrence(recurrence)
+        //handleDisplayRecurrence(recurrence)
     }
     function handleRemoveStartTime() {
         setStartTime(0);
         setDisplayStartTime(displayInterval)
     }
-    function handleRecurrences(label, value) {
+   /*  function handleRecurrences(label, value) {
         const val = interval * value
         const dur = (val / 1000 / 60)
         let displayDur = dur.toString() + ' min'
@@ -153,7 +153,7 @@ export const SubmitAutoTxDialog = ({
     function handleRemoveRecurrences() {
         setRecurrence(0);
         setDisplayRecurrences("2")
-    }
+    } */
 
     const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
     const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -200,14 +200,13 @@ export const SubmitAutoTxDialog = ({
     function handleFeeFunds(input) {
         setFeeAmount(input);
     }
-    function handleDisplayRecurrence(value) {
+    /* function handleDisplayRecurrence(value) {
         let displayRecs = value.toString() + ' times'
         if (value == 1) {
             displayRecs + ' time'
         }
-        setDisplayRecurrences(displayRecs)
-
-    }
+        // setDisplayRecurrences(displayRecs)        
+    } */
     //true = deduct fees from local acc
     const [checkedFeeAcc, setCheckedFeeAcc] = useState(true);
     const handleChangeFeeAcc = () => {
@@ -293,7 +292,7 @@ export const SubmitAutoTxDialog = ({
 
                             </div>
                         </Inline>
-                        <Inline justifyContent={'space-between'} align="center">
+                        {/* <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
                                 <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify amount of recurrences (optional)</Text><ChipSelected label={"For " + displayRecurrences} onClick={() => handleRemoveRecurrences()} />
                                 {recurrenceLabels.map((times, index) => (
@@ -303,7 +302,7 @@ export const SubmitAutoTxDialog = ({
                                         )}
                                     </span>))}
                             </div>
-                        </Inline>
+                        </Inline> */}
                         {/*  <Inline justifyContent={'space-between'} align="center">
                             <Text>  <StyledInput step=".01"
                                 placeholder="0.00" type="number"

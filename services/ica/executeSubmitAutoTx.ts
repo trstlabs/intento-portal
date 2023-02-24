@@ -46,7 +46,6 @@ export const executeSubmitAutoTx = async ({
   for (let msg of autoTxData.msgs) {
     console.log(msg)
     const masterRegistry = new Registry(msgRegistry);
-    //let type = masterRegistry.lookupType((JSON.parse(autoTxData.msg)["typeUrl"]).toString())
     let value = JSON.parse(msg)["value"]
 
     let typeUrl: string = JSON.parse(msg)["typeUrl"].toString()
