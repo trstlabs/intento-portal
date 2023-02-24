@@ -54,7 +54,7 @@ const StyledPNGBottom = styled('img', {
   position: 'absolute',
   right: 20,
   bottom: 40,
-  width: '100%',
+  width: '60%',
   maxWidth: '300px',
   zIndex: '$1',
   userSelect: 'none',

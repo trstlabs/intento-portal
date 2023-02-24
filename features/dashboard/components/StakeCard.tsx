@@ -70,7 +70,7 @@ export const StakeCard = ({
                         {!isWeeklyAPYLoading && weeklyAPY && <> <Text variant="legend"> APY (Weekly Compound)</Text><Text css={{ padding: '$8' }} variant="title">{weeklyAPY.toPrecision(2)}%</Text></>}
                         <Text variant="legend">RealTime APR </Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr.toPrecision(2)}%</Text>
 
-                        {!isLoading && balance > 0 && <><Text variant="legend">TRST Balance </Text><Text css={{ padding: '$8' }} variant="title">{formatTokenBalance(balance)}</Text></>}
+                        {!isLoading && balance > 0 && <><Text variant="legend">Balance </Text><Text css={{ padding: '$8' }} variant="title">{formatTokenBalance(balance)} TRST</Text></>}
                         {!isLoading && balance > 0 && <Text variant="legend"> {!isStakeBalanceLoading && stakeBalance && stakeBalance.stakingBalanceAmount > 0 ? <>Stake Balance is {formatTokenBalance(stakeBalance.stakingBalanceAmount)} with {stakeBalance.validators.length} validator{stakeBalance.validators.length > 1 && <>s
 
                         </>
