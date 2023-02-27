@@ -24,7 +24,7 @@ export type TokenSelectListProps = {
   activeTokenSymbol?: string
   tokenList: Array<Pick<TokenInfo, 'symbol' | 'logoURI' | 'name'>>
   onSelect: (tokenSymbol: string) => void
-  fetchingBalanceMode: 'native' | 'ibc' | 'none'
+  fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
   queryFilter?: string
   emptyStateLabel?: string
@@ -35,7 +35,7 @@ export const TokenSelectList = ({
   tokenList,
   onSelect,
   fetchingBalanceMode = 'native',
-  visibleNumberOfTokensInViewport = 5.5,
+  visibleNumberOfTokensInViewport = 4.5,
   emptyStateLabel = 'No result',
   queryFilter,
   ...props
@@ -120,22 +120,20 @@ export const TokenSelectList = ({
                     alignItems: 'flex-end',
                   }}
                 >
-                  {fetchingBalanceMode === 'native' && (<>
+                  {fetchingBalanceMode === 'native' && (
                     <FetchBalanceTextForNativeTokenSymbol
                       tokenSymbol={tokenInfo.symbol}
-                    /><Text css={{ paddingLeft: '$2' }} variant="caption" color="disabled">
-                       available
-                    </Text></>
+                    />
                   )}
-                  {fetchingBalanceMode === 'ibc' && (<>
+                  {fetchingBalanceMode === 'ibc' && (
                     <FetchBalanceTextForIbcTokenSymbol
                       tokenSymbol={tokenInfo.symbol}
-                    /><Text css={{ paddingLeft: '$2' }} variant="caption" color="disabled">
-                      available
-                    </Text></>
+                    />
                   )}
                 </Text>
-
+                <Text variant="caption" color="disabled">
+                  available
+                </Text>
               </StyledDivForColumn>
             </StyledButtonForRow>
           )

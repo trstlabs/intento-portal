@@ -1,4 +1,3 @@
-import { useTokenInfo } from 'hooks/useTokenInfo'
 import {
   ButtonForWrapper,
   Chevron,
@@ -10,6 +9,7 @@ import {
 } from 'junoblocks'
 import React from 'react'
 import { getPropsForInteractiveElement } from 'util/getPropsForInteractiveElement'
+import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 
 type SelectorToggleProps = {
   isSelecting: boolean
@@ -24,7 +24,7 @@ export const SelectorToggle = ({
   availableAmount,
   tokenSymbol,
 }: SelectorToggleProps) => {
-  const { logoURI } = useTokenInfo(tokenSymbol) || {}
+  const { logoURI } = useIBCAssetInfo(tokenSymbol) || {}
 
   const formattedAvailableAmount = formatTokenBalance(availableAmount, {
     includeCommaSeparation: true,

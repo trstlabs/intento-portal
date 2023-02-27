@@ -451,7 +451,7 @@ export const SubmitAutoTxDialog = ({
 
                 }>
                 {autoTxData.connectionId && <Button
-                    disabled={!hasIcaAuthzGrant}
+                    disabled={!hasIcaAuthzGrant }
                     variant="primary"
                     onClick={() => isLoading ? undefined : handleData(true)}
                 >

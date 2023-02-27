@@ -121,7 +121,6 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
 }
 
 
-
 export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxData?: AutoTxData) => {
 
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
@@ -135,7 +134,13 @@ export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxDat
         let url = JSON.parse(msg)["typeUrl"];
         const grant = await getGrants({ grantee: address, granter, msgTypeUrl: url.toString(), rpc })
         grants.push(grant)
+        // typeUrls.push(grant.msgTypeUrl)
       }
+
+      if (!grants[0].grant) {
+        return
+      }
+      console.log(grants)
       return grants
 
     },

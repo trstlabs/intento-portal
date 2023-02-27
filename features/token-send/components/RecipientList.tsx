@@ -266,11 +266,11 @@ export const RecipientList = ({
         {recipients.map((recipient, index) => (
 
 
-          <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={"a"+ index}>      <Text>
+          <CardContent size="medium" >
+            <div key={"a"+ index}>      <Text css={{ paddingBottom: '$5', marginBottom: '$4', }}>
               {(recipient.amount != 0) && (<ul>
                 <Text>Recipient {index + 1}: <i >{recipient.recipient}</i></Text>
-                <Text>Amount: <i > {recipient.amount}</i></Text>
+                <Text>Amount to send: <i > {recipient.amount}</i></Text>
                 {recipient.channelID && (<Text>Channel ID: <i >{recipient.channelID}</i></Text>)}
                 {recipient.memo && (<Text>Memo: <i >{recipient.memo}</i></Text>)}
               </ul>)}</Text>

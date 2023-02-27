@@ -35,11 +35,11 @@ export const AssetCard = ({
   state,
   ...htmlProps
 }: AssetCardProps) => {
-  const { symbol, name, logoURI, external_deposit_uri } =
+  const { symbol, logoURI, external_deposit_uri } =
     useIBCAssetInfo(tokenSymbol) || {}
   const [showingRedirectDepositDialog, setShowingRedirectDepositDialog] =
     useState(false)
-
+ 
   const [dollarValue] = useTokenDollarValue(tokenSymbol)
 
   const shouldPerformDepositOutsideApp = Boolean(external_deposit_uri)
@@ -89,7 +89,7 @@ export const AssetCard = ({
             <ImageForTokenLogo logoURI={logoURI} size="big" />
             <div>
               <Text variant="primary">
-                {rendersActiveAppearance ? balance : null} {name}
+                {rendersActiveAppearance ? balance : null} {tokenSymbol}
               </Text>
               {rendersActiveAppearance && (
                 <Text variant="caption" css={{ paddingTop: '$1' }}>

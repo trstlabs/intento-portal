@@ -19,7 +19,7 @@ export default function Automate() {
       <StyledContainer>
         <PageHeader
           title="Automate"
-          subtitle={`Automate actions on IBC-enabled chains with Interchain Accounts`}
+          subtitle={`Automate actions on IBC-enabled chains using Interchain Accounts`}
         />
         <AutomateModule
         />

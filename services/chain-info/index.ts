@@ -127,35 +127,35 @@ export const getAPY = async (client: TrustlessChainClient, intervalSeconds: numb
 
         const periodsPerYear = (60 * 60 * 24 * 365) / intervalSeconds;
 
-        return ((1 + ((apr.calculatedApr/100)/ periodsPerYear)) **  periodsPerYear - 1)*100;
+        return ((1 + ((apr.calculatedApr / 100) / periodsPerYear)) ** periodsPerYear - 1) * 100;
     } catch (e) { console.error('err(getAPY):', e) }
 }
 
-export const getAPYForAutoCompound = async (client: TrustlessChainClient, durationSeconds: number, intervalSeconds: number, stakingBalanceAmount: number) => {
+export const getAPYForAutoCompound = async (client: TrustlessChainClient, durationSeconds: number, intervalSeconds: number, stakingBalanceAmount: number, nrMessages: number) => {
     try {
         const apy = await getAPY(client, intervalSeconds);
-        const expectedFees = await getExpectedAutoTxFee(client,durationSeconds, 1 ,intervalSeconds, )
-        return apy * stakingBalanceAmount - expectedFees
+        const expectedFees = await getExpectedAutoTxFee(client, durationSeconds, nrMessages, intervalSeconds,)
+        return ((apy * stakingBalanceAmount) / stakingBalanceAmount) - expectedFees
     } catch (e) { console.error('err(getAPYForAutoCompound):', e) }
 }
 
 export const getExpectedAutoTxFee = async (client: TrustlessChainClient, durationSeconds: number, lenMsgs: number, intervalSeconds?: number) => {
     try {
-        console.log("durationSeconds", durationSeconds)
-        console.log("intervalSeconds", intervalSeconds)
+        // console.log("durationSeconds", durationSeconds)
+        // console.log("intervalSeconds", intervalSeconds)
         const params = /* { AutoTxFlexFeeMul: 3, AutoTxConstantFee: 5_000 }// */await getAutoTxParams(client)
         const recurrences = intervalSeconds && intervalSeconds < durationSeconds ? Math.floor(durationSeconds / intervalSeconds) : 1;
         const periodSeconds = intervalSeconds && intervalSeconds < durationSeconds ? intervalSeconds : durationSeconds;
-        console.log("periodSeconds", periodSeconds)
+        // console.log("periodSeconds", periodSeconds)
         const periodMinutes = Math.trunc(periodSeconds / 60)
-        console.log("period", periodMinutes)
+        // console.log("period", periodMinutes)
         // console.log("AutoTxFlexFeeMul", params.AutoTxFlexFeeMul)
         const flexFeeForPeriod = (Number(params.AutoTxFlexFeeMul) / 100) * periodMinutes
-        console.log("flexFeeForPeriod", flexFeeForPeriod)
+        // console.log("flexFeeForPeriod", flexFeeForPeriod)
         // console.log("AutoTxConstantFee", params.AutoTxConstantFee)
         const autoTxFee = recurrences * flexFeeForPeriod + recurrences * Number(params.AutoTxConstantFee) * lenMsgs
         const autoTxFeeDenom = convertMicroDenomToDenom(autoTxFee, 6)
-         console.log("autoTxFeeDenom", autoTxFeeDenom)
+        // console.log("autoTxFeeDenom", autoTxFeeDenom)
         return autoTxFeeDenom
     } catch (e) { console.error('err(getExpectedAutoTxFee):', e) }
 }

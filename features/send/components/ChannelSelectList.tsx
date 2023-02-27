@@ -73,7 +73,7 @@ export const ChannelSelectList = ({
             <StyledButtonForRow
               role="listitem"
               variant="ghost"
-              key={chainInfo.channel}
+              key={chainInfo.name}
               selected={chainInfo.channel === activeChannel}
               {...getPropsForInteractiveElement({
                 onClick() {

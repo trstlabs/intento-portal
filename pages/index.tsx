@@ -49,7 +49,7 @@ export default function Home() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Manage your on-chain assets and triggers"
+      subtitle="Autocompound and manage your on-chain assets and triggers"
     />
   )
 

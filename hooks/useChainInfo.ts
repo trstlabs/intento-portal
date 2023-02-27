@@ -9,7 +9,7 @@ import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 
 
 import { useTrustlessChainClient } from './useTrustlessChainClient'
-import { getStakeBalanceForAcc, getValidators, getAPR, getAPY, getExpectedAutoTxFee } from '../services/chain-info'
+import { getStakeBalanceForAcc, getValidators, getAPR, getAPY, getExpectedAutoTxFee, getAPYForAutoCompound } from '../services/chain-info'
 import { useRecoilValue } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { AutoTxData } from '../services/ica'
@@ -133,6 +133,30 @@ export const useGetAPR = () => {
     async () => {
 
       const resp = await getAPR(client)
+      return resp
+
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    },
+  )
+
+  return [data, isLoading] as const
+}
+
+
+
+export const useGetAPYForWithFees = (duration: number, interval: number, stakingBalance: number, nrMessages: number) => {
+  const client = useTrustlessChainClient()
+
+  const { data, isLoading } = useQuery(
+    "useGetAPRForCompound",
+    async () => {
+
+      const resp = await getAPYForAutoCompound(client, duration, interval, stakingBalance, nrMessages)
       return resp
 
     },

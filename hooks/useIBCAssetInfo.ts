@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
 
@@ -18,5 +18,21 @@ export const useIBCAssetInfoFromConnection = (ibcConnectionID: string) => {
   return useMemo(
     () => getIBCAssetInfo('connection_id', ibcConnectionID, assetList?.tokens),
     [assetList, ibcConnectionID]
+  )
+}
+export const getIBCAssetInfoFromList = (
+  assetSymbol: string,
+  assetList: Array<IBCAssetInfo>
+): IBCAssetInfo | undefined => assetList?.find((x) => x.symbol === assetSymbol)
+
+export const useGetMultipleIBCAssetInfo = () => {
+  const [assetList] = useIBCAssetList()
+  return useCallback(
+    function getMultipleIBCAssetInfo(assetSymbols: Array<string>) {
+      return assetSymbols?.map((assetSymbol) =>
+        getIBCAssetInfoFromList(assetSymbol, assetList?.tokens)
+      )
+    },
+    [assetList]
   )
 }

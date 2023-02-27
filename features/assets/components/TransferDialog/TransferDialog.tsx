@@ -41,6 +41,7 @@ export const TransferDialog = ({
   onRequestClose,
   onTokenSelect,
 }: TransferDialogProps) => {
+
   const tokenInfo = useIBCAssetInfo(tokenSymbol)
   const deposit_gas_fee = tokenInfo.deposit_gas_fee
     ? tokenInfo.deposit_gas_fee

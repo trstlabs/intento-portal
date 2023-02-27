@@ -183,12 +183,12 @@ export const AutoTxComponent = ({
                   <Row><Button css={{ margin: '$2' }}
                     variant="secondary"
                     onClick={() => handleRegisterAccountClick()}
-                  >   {isExecutingRegisterICA ? <Spinner instant /> : 'Register Interchain Account '}</Button></Row>
+                  >   {isExecutingRegisterICA ? <Spinner instant /> : 'Register Interchain Account '}</Button>  {isExecutingRegisterICA && isIcaLoading && <Text variant="legend">Retrieving Interchain Account on {chainName}. This takes approx. 30 seconds. It can take up to a minute.</Text>}</Row>
 
                 }
               </Column></Row>
               {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
-                <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants ? <Text variant="legend"> Grant: {icaAuthzGrants.map((grant) => <Text variant="caption"> Has grants formessage type: '{grant.msgTypeUrl}' that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))} </Text>)}</Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)}
+                <CardContent size="medium" css={{ margin: '$2' }}>{!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>) : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>{!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}</>)}  {!isAuthzGrantsLoading && (icaAuthzGrants && icaAuthzGrants[0] ? <Text variant="legend"> Grant: {icaAuthzGrants.map((grant) => <Text variant="caption"> Has grants formessage type: '{grant.msgTypeUrl}' that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))} </Text>)}</Text> : <Text variant="caption"> No authorization grants (yet)</Text>)}</CardContent></Card>)}
             </Column>
             {autoTxData.msgs.map((msg, index) => (
               <div key={index}>
@@ -213,11 +213,11 @@ export const AutoTxComponent = ({
             Messages</Text>
         </CardContent>
         {autoTxData.typeUrls.map((type, i) => (
-          <div key={type}>   <CardContent size="medium" css={{ padding: '$2', margin: '$2', }}>
-            <Text variant="legend" align="left">
+          <div key={type}>   <CardContent size="medium">
+            <Text variant="legend" align="left" css={{ paddingBottom: '$10'}}>
 
               Message {i + 1}: {type}
-             </Text>
+            </Text>
 
             <SubmitAutoTxDialog
               denom={denom}
@@ -279,7 +279,7 @@ const StyledDivForContainer = styled('div', {
 
 function messageData(autoTxData: AutoTxData, index: number, chainSymbol: string, msg: string, setExample: (index: number, msg: string) => void, handleRemoveMsg: (index: number) => void, handleChangeMsg: (index: number) => (msg: string) => void, setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>) {
   return <Column>
-  <Divider offsetY='$10'/>
+    <Divider offsetY='$10' />
     {autoTxData.typeUrls && autoTxData.typeUrls[index] && <Row> <Text css={{ padding: '$4', textAlign: "center" }} variant="title">{autoTxData.typeUrls[index]}</Text></Row>}
     <Row><Text variant="legend"> Examples </Text>
       {chainSymbol == "JUNO" && (<><Button css={{ margin: '$2' }}

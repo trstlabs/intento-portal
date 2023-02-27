@@ -28,8 +28,6 @@ export default function AutoTx() {
     query: { id },
   } = useRouter()
 
-
-
   const isMobile = useMedia('sm')
 
   const [autoTxInfo, isLoading] = useAutoTxInfo(id)

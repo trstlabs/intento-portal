@@ -31,7 +31,7 @@ export const DexOptionsList = ({
       tokenList={dexList}
       activeTokenSymbol={activeTokenSymbol}
       onSelect={onSelect}
-      fetchingBalanceMode="none"
+      fetchingBalanceMode="native"
     />
   )
 }

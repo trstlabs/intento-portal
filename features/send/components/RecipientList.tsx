@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyIcon, Button, styled, Text, Column, convertDenomToMicroDenom } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyIcon, Button, styled, Text, Column, convertDenomToMicroDenom, ImageForTokenLogo } from 'junoblocks'
 
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
@@ -249,13 +249,13 @@ export const RecipientList = ({
                   <Text align="center"
                     variant="caption">
                     To Chain (Optional)</Text>
-                  <Text>  <ChannelSelector
+                  <ChannelSelector
                     channel={recipient.channelID}
                     onChange={(updateChannel) => {
                       handleChannelChange(index, updateChannel)
                     }}
                     size={'large'}
-                  /></Text></Row></Column>
+                  /></Row></Column>
 
               </CardContent>
             </Card>
@@ -284,12 +284,17 @@ export const RecipientList = ({
 
 
           <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={"a" + index}>      <Text>
+            <div key={"a" + index}>       <Text css={{ paddingBottom: '$5', marginBottom: '$4', }}>
               {(recipient.amount != 0) && (<div>
-                <div>Recipient {index + 1}: <i >{recipient.recipient}</i></div>
-                <Text>Amount: <i> {recipient.amount} {tokenSymbol}</i></Text>
-                {recipient.channelID && (<Text>Channel ID: <i >{recipient.channelID}</i></Text>)}
-                {recipient.memo && (<Text>Memo: <i >{recipient.memo}</i></Text>)}
+                <Row>Recipient {index + 1}: <i >{recipient.recipient}</i></Row>
+                <Row>Amount: <i> {recipient.amount} </i>  <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
+                  logoURI={ibcAsset.logoURI}
+                  size="medium"
+                  alt={ibcAsset.symbol}
+                  loading="lazy"
+                /></Row>
+                {recipient.channelID && (<Row>Channel ID: <i >{recipient.channelID}</i></Row>)}
+                {recipient.memo && (<Row>Memo: <i >{recipient.memo}</i></Row>)}
               </div>)}</Text>
             </div>
           </CardContent>
