@@ -34,7 +34,7 @@ export default function AutoTx() {
   const connectionId = autoTxInfo ? autoTxInfo.connectionId : ""
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
-  if (isLoading || !autoTxInfo || !id) {
+  if (!id) {
     return (
 
       <Inline
@@ -78,7 +78,7 @@ export default function AutoTx() {
           </Head>
         )}
 
-        {isLoading && (
+        {(isLoading || !autoTxInfo) && (
           <StyledDivForSpinner>
             <Spinner color="primary" size={32} />
           </StyledDivForSpinner>

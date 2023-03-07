@@ -24,7 +24,7 @@ type RecipientsInputProps = {
   tokenSymbol: string
   onRecipientsChange: (recipients: RecipientInfo[]) => void
   onRemoveRecipient: (recipient: RecipientInfo) => void
-  //onTokenSymbolChange: (symbol: string) => void
+
 } & HTMLProps<HTMLInputElement>
 
 export const RecipientList = ({
@@ -32,8 +32,7 @@ export const RecipientList = ({
   tokenSymbol,
   onRecipientsChange,
   onRemoveRecipient,
-  // onTokenSymbolChange, 
-  //...inputProps
+
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
@@ -41,7 +40,7 @@ export const RecipientList = ({
   const [requestedSend, setRequestedSend] = useState(false)
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  // set default times
+  // set default fields
   let data = new AutoTxData()
   data.duration = 14 * 86400000;
   data.interval = 86400000;
@@ -93,10 +92,19 @@ export const RecipientList = ({
     if (status === WalletStatusType.connected) {
       let msgs = []
       for (let recipient of recipients) {
-        let sendMsg = sendObject
-        sendObject.value.fromAddress = address,
-          sendObject.value.toAddress = recipient.recipient,
-          sendObject.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
+        let sendMsg;
+        if (recipient.channelID) {
+          sendMsg = transferObject
+          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }
+          sendMsg.value.sender = address
+          sendMsg.value.reciever = recipient.recipient
+          sendMsg.value.source_channel = recipient.channelID
+        } else {
+          sendMsg = sendObject;
+          sendMsg.value.fromAddress = address
+          sendMsg.value.toAddress = recipient.recipient
+          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
+        }
 
         msgs.push(JSON.stringify(sendMsg))
       }
@@ -389,5 +397,19 @@ const sendObject = {
     }],
     "fromAddress": "trust1....",
     "toAddress": "trust1..."
+  }
+}
+
+const transferObject = {
+  "typeUrl": "/ibc.applications.transfer.v1.MsgTransfer",
+  "value": {
+    "token": {},
+    "sender": "trust1....",
+    "receiver": "trust1...",
+    "source_port": "transfer",
+    "source_channel": "",
+    "timeout_height": "0",
+    "timeout_timestamp": "0",
+    "memo": "",
   }
 }

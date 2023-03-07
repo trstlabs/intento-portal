@@ -158,17 +158,17 @@ export const AutoTxInfoBreakdown = ({
                         </Inline>
                     </Column>
                 </Row>
-                <Row>
+                {autoTxInfo.portId && <Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
-                            IBC Port ID
+                            IBC Port
                         </Text>
                         <Inline gap={2}>
                             <Text variant="body">{autoTxInfo.portId} </Text>
                         </Inline>
                     </Column>
-                </Row>
+                </Row>}
                 {!isIcaLoading && !isIcaBalanceLoading && ibcInfo && (<Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
 
@@ -248,73 +248,73 @@ export const AutoTxInfoBreakdown = ({
                                     Message Value
                                 </Text>
                                 <Inline gap={2}>
-                                    <Text css={{ wordBreak: "break-all" }} variant="body"><pre>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
-                                </Inline>
-                            </Column>
-                        </Row>
+                                    <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block" , overflow: "hidden",float: "left", }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
+                            </Inline>
+                        </Column>
+                    </Row>
                     </div>))}
 
-                {Number(autoTxInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
-                    {
-                        autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
-                            Start Time
-                        </Text>
-                            <Inline gap={2}>
-                                <Text variant="body">{getRelativeTime(autoTxInfo.startTime.seconds)}</Text>
-
-                            </Inline></>)
-                    }
-                    <Text variant="legend" color="secondary" align="left">
-                        Execution Time
-                    </Text>
-                    <Inline gap={2}>
-                        <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
-                    </Inline>
-                    {autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
-                        End time
+            {Number(autoTxInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {
+                    autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
+                        Start Time
                     </Text>
                         <Inline gap={2}>
-                            <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
+                            <Text variant="body">{getRelativeTime(autoTxInfo.startTime.seconds)}</Text>
 
-                        </Inline>
-                    </>)}
-                    {
-                        autoTxInfo.interval.seconds != "0" && (<> <Text variant="legend" color="secondary" align="left">
-                            Interval
-                        </Text>
-                            <Inline gap={2}>
-                                <Text variant="body">{getDuration(Number(autoTxInfo.interval.seconds))}</Text>
+                        </Inline></>)
+                }
+                <Text variant="legend" color="secondary" align="left">
+                    Execution Time
+                </Text>
+                <Inline gap={2}>
+                    <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
+                </Inline>
+                {autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
+                    End time
+                </Text>
+                    <Inline gap={2}>
+                        <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
 
-                            </Inline></>)
-                    }
-                </Column>
-                </Row>
-                )}
+                    </Inline>
+                </>)}
+                {
+                    autoTxInfo.interval.seconds != "0" && (<> <Text variant="legend" color="secondary" align="left">
+                        Interval
+                    </Text>
+                        <Inline gap={2}>
+                            <Text variant="body">{getDuration(Number(autoTxInfo.interval.seconds))}</Text>
+
+                        </Inline></>)
+                }
+            </Column>
+            </Row>
+            )}
 
 
-                {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
-                    Execution History
-                </Text></Inline>
-                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error }, index) => <div key={index}>
-                        <Column gap={2} align="flex-start" justifyContent="flex-start">
+            {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                Execution History
+            </Text></Inline>
+                {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error }, index) => <div key={index}>
+                    <Column gap={2} align="flex-start" justifyContent="flex-start">
 
-                            <Column>
-                                <Text variant="body">At {getRelativeTime(scheduledExecTime.seconds)} </Text>
-                            </Column><Column>
-                                <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
-                                <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
-                                <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
-                                {/* {result && <Text variant="caption">Result: {result}</Text>} */}
-                                {error && <Text variant="caption">Execution Error: {error}</Text>}
-                            </Column>
-
+                        <Column>
+                            <Text variant="body">At {getRelativeTime(scheduledExecTime.seconds)} </Text>
+                        </Column><Column>
+                            <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
+                            <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
+                            <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
+                            {/* {result && <Text variant="caption">Result: {result}</Text>} */}
+                            {error && <Text variant="caption">Execution Error: {error}</Text>}
                         </Column>
-                    </div>)}</Column></Row></>)}
-                {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds && autoTxInfo.autoTxHistory.length == 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
-                    Execution History Not available yet
-                </Text></Inline>
-                </Column></Row>)}
-            </>
+
+                    </Column>
+                </div>)}</Column></Row></>)}
+            {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds && autoTxInfo.autoTxHistory.length == 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                Execution History Not available yet
+            </Text></Inline>
+            </Column></Row>)}
+        </>
         </>
     )
 }
@@ -388,7 +388,7 @@ const getRelativeTime = (seconds: String) => {
         const daysLeft = date.diff(now, 'days')
         const hoursLeftAfterDays = Math.round(24 * ((hoursLeft / 24) % 1.0))
 
-        return inTime+ `${hoursLeftAfterDays > 0
+        return inTime + `${hoursLeftAfterDays > 0
             ? `${maybePluralize(daysLeft, 'day')} and `
             : ''
             } ${maybePluralize(hoursLeftAfterDays, 'hour')}`
@@ -396,14 +396,14 @@ const getRelativeTime = (seconds: String) => {
 
     /* less than 24 hours left but not less than an hour */
     if (hoursLeft < 24 && hoursLeft > 1) {
-        return inTime+  maybePluralize(hoursLeft, 'hour')
+        return inTime + maybePluralize(hoursLeft, 'hour')
     }
 
     const minsLeft = date.diff(now, 'minutes')
 
     if (minsLeft > 0) {
         /* less than an hour */
-        return inTime+ maybePluralize(minsLeft, 'minute')
+        return inTime + maybePluralize(minsLeft, 'minute')
     }
 
     const secondsLeft = date.diff(now, 'seconds')
