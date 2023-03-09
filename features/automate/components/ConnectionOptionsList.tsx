@@ -11,7 +11,7 @@ export const ConnectionOptionsList = ({
   return (
     <ConnectionSelectList
       {...props}
-      connectionList={connectionList.tokens}
+      connectionList={connectionList.tokens.filter(chain => chain.connection_id)}
       activeConnection={activeConnection}
       onSelect={onSelect}
       fetchingBalanceMode="native"

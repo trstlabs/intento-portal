@@ -22,12 +22,13 @@ export class ChannelInfo {
   symbol: string
   connectionID: string;
   trst_denom: string;
+  prefix: string
 }
 
 
 export type ChannelSelectListProps = {
   activeChannel?: string
-  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'denom'|  'trst_denom' | 'logoURI' | 'name' | 'symbol'| 'connection_id'>>
+  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'trst_denom' | 'logoURI' | 'name' | 'symbol'| 'connection_id'>>
   onSelect: (channelInfo: ChannelInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -46,13 +47,14 @@ export const ChannelSelectList = ({
 
   function passChannel(selectedInfo) {
     let selectedChannel = new ChannelInfo();
-    selectedChannel.channelID = selectedInfo.channel
+    selectedChannel.channelID = selectedInfo.trst_channel
     selectedChannel.name = selectedInfo.id
     selectedChannel.logoURI = selectedInfo.logoURI
     selectedChannel.denom = selectedInfo.denom
     selectedChannel.trst_denom = selectedInfo.trst_denom
     selectedChannel.symbol = selectedInfo.symbol
     selectedChannel.connectionID = selectedInfo.connectionID
+    selectedChannel.prefix = selectedInfo.prefix
     console.log(selectedChannel)
     return selectedChannel
   }

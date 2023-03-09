@@ -85,7 +85,7 @@ export default function AutoTxs() {
           {Boolean(myAutoTxs?.length) && (
             <>
               <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
-                Your Personal AutoTxs
+                Your Personal Triggers
               </Text>
               <StyledDivForAutoTxsGrid>
                 {myAutoTxs.map(

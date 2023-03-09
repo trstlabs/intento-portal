@@ -54,7 +54,7 @@ export const useAutoTxInfo = (id) => {
     const { data, isLoading } = useQuery(
         ['autoTxId', id],
         async () => {
-            console.log(id)
+           
             const info = await getAutoTxInfo(id, client)
             console.log(info)
             return info.autoTxInfo

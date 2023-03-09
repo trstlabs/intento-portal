@@ -20,7 +20,7 @@ export const StakeCard = ({
     data.duration = 14 * 86400000;
     data.interval = 86400000;
     data.msgs = [""]
-    data.typeUrls = [""]
+   // data.typeUrls = [""]
     const [autoTxData, setAutoTxData] = useState(data)
     const [APR, isAPRLoading] = useGetAPR()
     const week = (60 * 60 * 24 * 7)
@@ -69,7 +69,7 @@ export const StakeCard = ({
                 <Column>
                     <Row><Text variant="header" css={{ paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text></Row>
                     < Card variant="secondary" disabled css={{ padding: '$8' }} >
-                        {!isAPRLoading && APR && <><Text variant="legend"> <Tooltip label="The Nominal APR refers to the annual percentage rate that doesn't take into account compounding interest. It's the simple staking reward rate over the course of a year."><span>Nominal APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(4)}%</Text>
+                        {!isAPRLoading && APR && <><Text variant="legend"> <Tooltip label="Nominal APR refers to the annual percentage rate that doesn't take into account compounding interest. It's the simple staking reward rate over the course of a year."><span>Nominal APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(4)}%</Text>
                             <Text variant="legend"> <Tooltip label="RealTime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time."><span>RealTime APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr.toPrecision(4)}%</Text>
                             {!isWeeklyAPYLoading && weeklyAPY && <> <Text variant="legend"> <Tooltip label="APY stands for Annual Percentage Yield and represents the effective annual rate of return of staked TRST tokens that is compounded over the course of a year. In the case of Weekly Compound APY, the rewards are calculated and added to the staking balance every week."><span>APY (Weekly Compound)</span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{weeklyAPY.toPrecision(5).toString()}%{!isAPYWFeesLoading && APYWFees < weeklyAPY && <Text css={{ paddingTop: '$1' }} variant="caption"> Estimated at {APYWFees.toPrecision(5).toString()}% with current fees applied and your staked tokens</Text>}</Text></>}
                             {!isLoading && balance > 0 && <><Text variant="legend">Local Balance </Text><Text css={{ padding: '$8' }} variant="title">{formatTokenBalance(balance, {
@@ -122,7 +122,7 @@ export const StakeCard = ({
                                 {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
                             </Button></StyledDivForButtons>
 
-                    </Inline> : <StyledPNG src="./img/pot_full.png" />
+                    </Inline> : <><StyledPNG src="./img/pot_full.png" /><Text >You are autocompounding</Text></>
                 }
 
             </CardContent >

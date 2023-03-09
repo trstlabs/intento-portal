@@ -31,13 +31,16 @@ import {
 } from 'util/conversion'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
-import { /* useGrantsForUser,  */useGetICA, useICATokenBalance } from '../../../hooks/useICA'
+import { /* useGrantsForUser,  */useGetICA, /* useIsActiveICAForUser,  */useICATokenBalance } from '../../../hooks/useICA'
 
 import dayjs from 'dayjs'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 import { useSendFundsOnHost } from '../../automate/hooks'
 import { Registry, msgRegistry } from 'trustlessjs'
+// import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx";
+// import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
+
 type AutoTxInfoBreakdownProps = {
     autoTxInfo: AutoTxInfo,
     ibcInfo: IBCAssetInfo
@@ -56,6 +59,7 @@ export const AutoTxInfoBreakdown = ({
 }: AutoTxInfoBreakdownProps) => {
 
     const [icaAddr, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
+    //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
     const symbol = ibcInfo ? ibcInfo.symbol : ""
     const denom = ibcInfo ? ibcInfo.denom : ""
     const [showICAHostButtons, setShowICAHostButtons] = useState(false)
@@ -82,6 +86,17 @@ export const AutoTxInfoBreakdown = ({
         return setRequestedSendFunds(true)
     }
 
+    function getMsgsFromExec(exMsg) {
+        const msgs = []
+        const newMsg = new Registry(msgRegistry).decode(exMsg)
+        console.log
+        for (let message of newMsg.msgs) {
+            message = new Registry(msgRegistry).decode(message)
+            msgs.push(message)
+        }
+        return JSON.stringify({ grantee: newMsg.grantee, msgs }, null, '\t')
+    }
+
     ////
 
     // const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, ibcInfo.symbol, autoTxInfo)
@@ -104,7 +119,7 @@ export const AutoTxInfoBreakdown = ({
                          justifyContent="space-between"
                          css={{ padding: '$10 $16', width: '100%' }}
                      >
- 
+     
                      </Column>
                  </Inline>
              </>
@@ -135,15 +150,8 @@ export const AutoTxInfoBreakdown = ({
                         <Column align="center"> <Text variant="caption">
                             <> Message Type: {autoTxInfo.msgs[0].typeUrl.split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
                         </Text></Column>
-
                     </Column>
-
-
-                    {/*  <Column gap={5} css={{ padding: '$8' }}>
-                        <Text variant="legend" align="center">
-                            {isActive ? <> 🟢 Active Trigger on {ibcInfo.name}</> : <>🔴 Execution ended</>}
-                        </Text>
-                    </Column> */}</CardContent>
+                </CardContent>
             </Row >
 
             <>
@@ -158,7 +166,7 @@ export const AutoTxInfoBreakdown = ({
                         </Inline>
                     </Column>
                 </Row>
-                {autoTxInfo.portId && <Row>
+                {autoTxInfo.portId && /* (icaActive && !isIcaActiveLoading ?  */ <Row>
                     <Column gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
@@ -168,9 +176,18 @@ export const AutoTxInfoBreakdown = ({
                             <Text variant="body">{autoTxInfo.portId} </Text>
                         </Inline>
                     </Column>
-                </Row>}
+                </Row>/*  : //for this to work there has to be a query for GetActiveChannelID
+                    <Row>
+                        <Column gap={8} align="flex-start" justifyContent="flex-start">
+
+                            <Text variant="legend" color="secondary" align="left">
+                                IBC Port inactive
+                            </Text>
+
+                        </Column>
+                    </Row>)*/}
                 {!isIcaLoading && !isIcaBalanceLoading && ibcInfo && (<Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
+                    <Column style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }} gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
                             Interchain Account   </Text>
@@ -199,8 +216,8 @@ export const AutoTxInfoBreakdown = ({
                                 />{ibcInfo.symbol}</Text>
 
                                 <Tooltip
-                                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
-                                    aria-label="Fee Funds - "
+                                    label="Fund the interchain account on the host chain. Only use this for fees. The tokens may be lost on the interchain account."
+                                    aria-label="Fee Funds "
                                 ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {ibcInfo.symbol} </Text></Tooltip>
 
 
@@ -223,7 +240,7 @@ export const AutoTxInfoBreakdown = ({
                             Fee Address
                         </Text>
                         <Inline gap={2}>
-                            <Text variant="body">{autoTxInfo.feeAddress} </Text>
+                            <Text css={{ wordBreak: "break-all" }} variant="body">{autoTxInfo.feeAddress} </Text>
                         </Inline>
                         {!isFeeBalanceLoading && feeBalance > 0 && <Text variant="legend"> Balance:  <Text variant="caption"> {feeBalance} TRST</Text> </Text>}
                     </Column>
@@ -247,74 +264,77 @@ export const AutoTxInfoBreakdown = ({
                                 <Text variant="legend" color="secondary" align="left">
                                     Message Value
                                 </Text>
-                                <Inline gap={2}>
-                                    <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block" , overflow: "hidden",float: "left", }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
-                            </Inline>
-                        </Column>
-                    </Row>
+                                {msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec" ? <Inline gap={2}>
+                                    <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }}>{getMsgsFromExec(msg)} </pre></Text>
+
+                                </Inline> :
+                                    <Inline gap={2}> <Text css={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }} variant="body"><pre style={{ display: "inline-block", overflow: "hidden", float: "left", }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
+                                    </Inline>}
+                            </Column>
+                        </Row>
                     </div>))}
 
-            {Number(autoTxInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
-                {
-                    autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
-                        Start Time
-                    </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{getRelativeTime(autoTxInfo.startTime.seconds)}</Text>
+                {Number(autoTxInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
+                    {
+                        autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
+                            Start Time
+                        </Text>
+                            <Inline gap={2}>
+                                <Text variant="body">{getRelativeTime(autoTxInfo.startTime.seconds)}</Text>
 
-                        </Inline></>)
-                }
-                <Text variant="legend" color="secondary" align="left">
-                    Execution Time
-                </Text>
-                <Inline gap={2}>
-                    <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
-                </Inline>
-                {autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
-                    End time
-                </Text>
+                            </Inline></>)
+                    }
+                    <Text variant="legend" color="secondary" align="left">
+                        Execution Time
+                    </Text>
                     <Inline gap={2}>
-                        <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
-
+                        <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
                     </Inline>
-                </>)}
-                {
-                    autoTxInfo.interval.seconds != "0" && (<> <Text variant="legend" color="secondary" align="left">
-                        Interval
+                    {autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
+                        End time
                     </Text>
                         <Inline gap={2}>
-                            <Text variant="body">{getDuration(Number(autoTxInfo.interval.seconds))}</Text>
+                            <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
 
-                        </Inline></>)
-                }
-            </Column>
-            </Row>
-            )}
+                        </Inline>
+                    </>)}
+                    {
+                        autoTxInfo.interval.seconds != "0" && (<> <Text variant="legend" color="secondary" align="left">
+                            Interval
+                        </Text>
+                            <Inline gap={2}>
+                                <Text variant="body">{getDuration(Number(autoTxInfo.interval.seconds))}</Text>
+
+                            </Inline></>)
+                    }
+                </Column>
+                </Row>
+                )}
 
 
-            {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
-                Execution History
-            </Text></Inline>
-                {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error }, index) => <div key={index}>
-                    <Column gap={2} align="flex-start" justifyContent="flex-start">
+                {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                    Execution History
+                </Text></Inline>
+                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error }, index) => <div key={index}>
+                        <Column gap={2} align="flex-start" justifyContent="flex-start">
 
-                        <Column>
-                            <Text variant="body">At {getRelativeTime(scheduledExecTime.seconds)} </Text>
-                        </Column><Column>
-                            <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
-                            <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
-                            <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
-                            {/* {result && <Text variant="caption">Result: {result}</Text>} */}
-                            {error && <Text variant="caption">Execution Error: {error}</Text>}
+                            <Column>
+                                <Text variant="body">At {getRelativeTime(scheduledExecTime.seconds)} </Text>
+                            </Column><Column>
+                                <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
+                                <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
+                                <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
+                                {/* {result && <Text variant="caption">Result: {result}</Text>} */}
+                                {error && <Text variant="caption">Execution Error: {error}</Text>}
+                            </Column>
+
                         </Column>
-
-                    </Column>
-                </div>)}</Column></Row></>)}
-            {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds && autoTxInfo.autoTxHistory.length == 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
-                Execution History Not available yet
-            </Text></Inline>
-            </Column></Row>)}
-        </>
+                    </div>)}</Column></Row></>)}
+                {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds && autoTxInfo.autoTxHistory.length == 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                    Execution History Not available yet
+                </Text></Inline>
+                </Column></Row>)}
+            </>
         </>
     )
 }

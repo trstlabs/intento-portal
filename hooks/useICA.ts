@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil'
 
 import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-import { getICA, getGrants, getFeeGrantAllowance, AutoTxData } from '../services/ica'
+import { getICA, /* getIsActiveICA, */ getGrants, getFeeGrantAllowance, AutoTxData, GrantResponse } from '../services/ica'
 // import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
@@ -35,9 +35,32 @@ export const useICAForUser = (connectionId: string) => {
 
 }
 
+/* 
+export const useIsActiveICAForUser = (connectionId: string) => {
+  const { status, client } = useRecoilValue(walletState)
+  const { data: ica, isLoading } = useQuery(
+    'useIsActiveICAForUser',
+    async () => {
+      console.log("useIsActiveICAForUser")
+      const resp = await getIsActiveICA({ connectionId, portId: "icacontroller-" + client.address, client })
+      return resp
+
+    },
+    {
+      enabled: Boolean(status === WalletStatusType.connected && client && client.address),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: false,
+    },
+  )
+
+  return [ica, isLoading] as const
+}
+ */
+
 export const useGetICA = (connectionId: string, accAddr: string) => {
   //const { status, client } = useRecoilValue(walletState)
-  console.log("useGetICA")
+
 
   const client = useTrustlessChainClient()
   const { data: ica, isLoading } = useQuery(
@@ -53,6 +76,7 @@ export const useGetICA = (connectionId: string, accAddr: string) => {
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
+
     },
   )
 
@@ -128,34 +152,36 @@ export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxDat
   const { data, isLoading } = useQuery(
     ['granter', granter],
     async () => {
-      let grants = []
+      console.log("getgrants")
+      let grants: GrantResponse[] = []
       const { rpc } = ibcAsset
       for (const msg of autoTxData.msgs) {
         let url = JSON.parse(msg)["typeUrl"];
+        console.log(url)
         const grant = await getGrants({ grantee: address, granter, msgTypeUrl: url.toString(), rpc })
         grants.push(grant)
+        
         // typeUrls.push(grant.msgTypeUrl)
       }
 
-      if (!grants[0].grant) {
+      if (!grants[0]) {
         return
       }
-      console.log(grants)
+      
       return grants
 
     },
     {
-      enabled: Boolean(autoTxData.msgs.length > 0 && status === WalletStatusType.connected && client && address),
+      enabled: Boolean(autoTxData.msgs[0] && autoTxData.msgs[0].includes("typeUrl") && status === WalletStatusType.connected && client && address),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
+      refetchIntervalInBackground: true,
     },
   )
 
   return [data, isLoading] as const
-
-
 }
+
 
 
 export const useFeeGrantAllowanceForUser = (granter: string) => {

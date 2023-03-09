@@ -12,7 +12,7 @@ export type IBCAssetInfo = {
   trst_channel: string
   channel: string
   logoURI: string
-  connection_id: string
+  connection_id?: string
   deposit_gas_fee?: number
   external_deposit_uri?: string
   prefix: string

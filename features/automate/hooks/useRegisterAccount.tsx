@@ -3,14 +3,17 @@ import {
     ErrorIcon,
     formatSdkErrorMessage,
 
+    IconWrapper,
+
     Toast,
     UpRightArrow,
+    Valid,
 
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeRegisterAccount } from '../../../services/ica'
+import { executeRegisterAccount, getICA } from '../../../services/ica'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -46,11 +49,46 @@ export const useRegisterAccount = ({
                   throw new Error('connection id not found')
               } */
 
-            return await executeRegisterAccount({
+            await executeRegisterAccount({
                 owner: address,
                 connectionId,
                 client,
             })
+            toast.custom((t) => (
+                <Toast
+                    icon={<IconWrapper icon={<Valid />} color="primary" />}
+                    title="Interchain account registrated on Trustless Hub"
+                    body={`Now registering on destination chain`}
+                   
+                    onClose={() => toast.dismiss(t.id)}
+                />
+            ))
+            await sleep(30000)
+            let acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(20000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(15000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(5000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(5000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            return undefined
 
         },
         {
@@ -59,7 +97,7 @@ export const useRegisterAccount = ({
                 if (data) {
                     popConfetti(true)
                 }
-                
+
                 refetchQueries()
             },
             onError(e) {
@@ -91,3 +129,8 @@ export const useRegisterAccount = ({
         }
     )
 }
+
+
+async function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }

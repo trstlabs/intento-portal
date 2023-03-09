@@ -116,7 +116,7 @@ export const useCostAveraging = ({
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Cost Averaging started successfully!"
-                        body={`Started to cost average into ${tokenB.symbol} !} Your personal contract is ${contractAddress}`}
+                        body={`Started to cost average into ${tokenB.symbol} ! Your personal contract is ${contractAddress}`}
                         buttons={
                             <Button
                                 as="a"

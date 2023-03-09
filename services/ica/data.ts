@@ -22,6 +22,30 @@ export const getICA = async ({
     }
 }
 
+/* 
+export interface IsICAActiveQueryInput {
+    channnelId: string,
+    portId: string,
+    client: TrustlessChainClient
+}
+
+export const getIsActiveICA = async ({
+    channnelId,
+    portId,
+    client,
+}: IsICAActiveQueryInput) => {
+    try {
+        console.log(portId)
+        const response = await client.query.ibc_channel.channel({ channnelId,portId })
+        console.log("response")
+        console.log(response)
+        return response
+    } catch (e) {
+        console.error('err(getIsActiveICA):', e)
+    }
+} */
+
+
 export interface GrantQueryInput {
     grantee: string,
     granter: string,
@@ -47,22 +71,22 @@ export const getGrants = async ({
     const queryClient = QueryClient.withExtensions(
         tendermintClient,
         setupAuthzExtension,
-
     );
-
     try {
-
-        // let response: GrantQueryResponse;
         let resp = await queryClient.authz.grants(grantee, granter, msgTypeUrl)
-        //. response.grants = resp.grants
-
-        //console.log(response)
-        //response.msgTypeUrl = msgTypeUrl
-        return { grants: resp.grants, msgTypeUrl }
+        const res: GrantResponse = { grants: resp.grants[0], msgTypeUrl }
+        return res
     } catch (e) {
         console.error('err(getGrants):', e)
     }
 }
+
+
+export interface GrantResponse {
+    grants: Grant,
+    msgTypeUrl: string,
+}
+
 
 export interface FeeGrantQueryInput {
     grantee: string,

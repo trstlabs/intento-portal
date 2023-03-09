@@ -36,7 +36,7 @@ export const RecipientList = ({
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
-
+  const [prefix, setPrefix] = useState("trust")
   const [requestedSend, setRequestedSend] = useState(false)
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
@@ -45,7 +45,6 @@ export const RecipientList = ({
   data.duration = 14 * 86400000;
   data.interval = 86400000;
   data.msgs = [""]
-  data.typeUrls = [""]
   const [autoTxData, setAutoTxData] = useState(data)
   const { address, status } = useRecoilValue(walletState)
   const { mutate: connectWallet } = useConnectWallet()
@@ -97,8 +96,8 @@ export const RecipientList = ({
           sendMsg = transferObject
           sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }
           sendMsg.value.sender = address
-          sendMsg.value.reciever = recipient.recipient
-          sendMsg.value.source_channel = recipient.channelID
+          sendMsg.value.receiver = recipient.recipient
+          sendMsg.value.sourceChannel = recipient.channelID
         } else {
           sendMsg = sendObject;
           sendMsg.value.fromAddress = address
@@ -135,6 +134,8 @@ export const RecipientList = ({
       channelID: channelInfo.channelID
     }
     console.log(newRecipients)
+
+    setPrefix(channelInfo.prefix)
     //onTokenSymbolChange(channelInfo.symbol)
 
     onRecipientsChange(newRecipients)
@@ -219,7 +220,7 @@ export const RecipientList = ({
                       variant="caption">
                       Recipient</Text>
                     <Text>  <StyledInput
-                      placeholder="trust1..."
+                      placeholder={prefix + "1..."}
                       value={recipient.recipient}
                       onChange={handleChange(index, 'recipient')}
                     /></Text>
@@ -279,7 +280,7 @@ export const RecipientList = ({
           </div>))
         }
       </Card>
-      {recipients[0].recipient && recipients[0].recipient.length >= 44 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+      {recipients[0].recipient && recipients[0].recipient.length >= 40 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
           <Text align="left"
             variant="header">
@@ -289,23 +290,22 @@ export const RecipientList = ({
         {/* <Divider offsetTop="$5" offsetBottom="$2" /> */}
 
         {recipients.map((recipient, index) => (
-
-
-          <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={"a" + index}>       <Text css={{ paddingBottom: '$5', marginBottom: '$4', }}>
-              {(recipient.amount != 0) && (<div>
-                <Row>Recipient {index + 1}: <i >{recipient.recipient}</i></Row>
-                <Row>Amount: <i> {recipient.amount} </i>  <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
+          recipient.amount != "0" && <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
+            <div key={"a" + index}>       <Text variant="legend" css={{ wordBreak: "break-all", paddingBottom: '$5', marginBottom: '$4', }}>
+              {(recipient.amount != "0") && (<div>
+                <Row>Recipient {index + 1}: </Row> <i>{recipient.recipient}</i>
+                <Row>Amount {recipient.amount} <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
                   logoURI={ibcAsset.logoURI}
                   size="medium"
                   alt={ibcAsset.symbol}
                   loading="lazy"
-                /></Row>
+                /> </Row>
                 {recipient.channelID && (<Row>Channel ID: <i >{recipient.channelID}</i></Row>)}
                 {recipient.memo && (<Row>Memo: <i >{recipient.memo}</i></Row>)}
               </div>)}</Text>
             </div>
           </CardContent>
+
         ))}
       </Card>)}
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
@@ -354,9 +354,10 @@ export const RecipientList = ({
 }
 
 const StyledInput = styled('input', {
-  width: '100%',
+  minWidth: '180px',
+  maxWidth: '400px',
   color: 'inherit',
-  // fontSize: `20px`,
+  fontSize: `12px`,
   padding: '$2',
   margin: '$2',
 })
@@ -406,10 +407,10 @@ const transferObject = {
     "token": {},
     "sender": "trust1....",
     "receiver": "trust1...",
-    "source_port": "transfer",
-    "source_channel": "",
-    "timeout_height": "0",
-    "timeout_timestamp": "0",
+    "sourcePort": "transfer",
+    "sourceChannel": "",
+    "timeoutHeight": "0",
+    "timeoutTimestamp": "0",
     "memo": "",
   }
 }

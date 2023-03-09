@@ -55,12 +55,13 @@ export const useSubmitAutoTx = ({
                     (log) =>
                         log.key == "auto_tx_id"
                 ).value;
+                
                 console.log(autoTxID)
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Your trigger is submitted!"
-                        body={`An on-chain trigger was created succesfully!} The ID is ${autoTxID}`}
+                        body={`An on-chain trigger was created succesfully! Trigger ID is ${autoTxID}`}
                         buttons={
                             <Button
                                 as="a"

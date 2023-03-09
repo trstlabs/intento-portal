@@ -32,7 +32,7 @@ export const SelectorToggle = ({
 
   const hasTokenSelected = Boolean(tokenSymbol)
 
-  return (
+  return (<><Text variant="legend"  css={{ marginRight: '$4' }}>Token</Text>
     <StyledDivForSelector
       state={isSelecting || !tokenSymbol ? 'selecting' : 'selected'}
       {...getPropsForInteractiveElement({ onClick: onToggle })}
@@ -67,7 +67,7 @@ export const SelectorToggle = ({
         </>
       )}
     </StyledDivForSelector>
-  )
+  </>)
 }
 
 const StyledDivForSelector = styled(ButtonForWrapper, {

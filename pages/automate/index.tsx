@@ -13,6 +13,12 @@ const StyledContainer = styled('div', {
   margin: '0 auto',
 })
 
+function getInitialExampleFromSearchParams() {
+  const params = new URLSearchParams(location.search)
+  const example = params.get('example')
+  return example ? (example as string) : undefined
+}
+
 export default function Automate() {
   return (
     <AppLayout>
@@ -22,6 +28,7 @@ export default function Automate() {
           subtitle={`Automate actions on IBC-enabled chains using Interchain Accounts`}
         />
         <AutomateModule
+        initialExample={getInitialExampleFromSearchParams()}
         />
       </StyledContainer>
     </AppLayout>
