@@ -10,24 +10,14 @@ import {
     Spinner,
     styled,
     Text,
-
     Tooltip,
-    convertDenomToMicroDenom,
     Union,
     Chevron,
 
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useEffect, useState } from 'react'
-// import { usePrevious } from 'react-use'
-// //import { Coin } from 'trustlessjs'
-// import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
-import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
-// import { useFeeGrantAllowanceForUser, useGrantsForUser } from '../../../hooks/useICA'
-import { useCreateAuthzGrant, useSendFundsOnHost } from '../hooks'
+import { useState } from 'react'
 import { useGetExpectedAutoTxFee } from '../../../hooks/useChainInfo'
-//import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
-// import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
 
 export class AutoTxData {
     duration: number
@@ -48,14 +38,22 @@ export class AutoTxData {
 type SubmitAutoTxDialogProps = {
     isShowing: boolean
     autoTxData: AutoTxData
-    denom?: string
     chainSymbol?: string
     icaAddr?: string
     icaBalance?: number
     hasIcaAuthzGrant?: boolean
     customLabel?: string
+    feeFundsHostChain?: string
+    isLoading: boolean
+    isExecutingAuthzGrant?: boolean
+    isExecutingSendFundsOnHost?: boolean
+    shouldDisableAuthzGrantButton?: boolean
+    shouldDisableSendFundsButton?: boolean
     onRequestClose: () => void
     handleSubmitAutoTx: (data: AutoTxData) => void
+    handleCreateAuthzGrantClick?: () => void
+    handleSendFundsOnHostClick?: () => void
+    setFeeFundsHostChain?: (data: string) => void
 }
 
 export const SubmitAutoTxDialog = ({
@@ -63,12 +61,20 @@ export const SubmitAutoTxDialog = ({
     icaAddr,
     icaBalance,
     hasIcaAuthzGrant,
-    denom,
     customLabel,
     chainSymbol,
     autoTxData,
+    feeFundsHostChain,
+    isExecutingAuthzGrant,
+    isExecutingSendFundsOnHost,
+    isLoading,
+    shouldDisableAuthzGrantButton,
+    shouldDisableSendFundsButton,
     onRequestClose,
+    setFeeFundsHostChain,
     handleSubmitAutoTx,
+    handleCreateAuthzGrantClick,
+    handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
 
     const [startTime, setStartTime] = useState(0);
@@ -78,10 +84,6 @@ export const SubmitAutoTxDialog = ({
     const [feeFunds, setFeeAmount] = useState(0);
     const [txLabel, setLabel] = useState(customLabel);
     const [recurrences, setRecurrence] = useState(2);
-    const isLoading = false;
-
-
-    const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
 
     const [displayInterval, setDisplayInterval] = useState("1 day");
     const [editInterval, setEditInterval] = useState(false);
@@ -96,9 +98,6 @@ export const SubmitAutoTxDialog = ({
 
     const timeLabels = ['1 week', '1 day', '5 days', '1 hour', '2 hours', '30 min', '2 weeks', '30 days', '60 days', '90 days']
     const timeSecondValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 5, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14, 3600000 * 24 * 30, 3600000 * 24 * 60, 3600000 * 24 * 90]
-
-    // const recurrenceLabels = ['1 time', '2 times', '5 times', '10 times', '25 times', '50 times']
-    // const recurrenceValues = [1, 2, 5, 10, 25, 50]
 
     function handleInterval(label, value) {
         if (value >= duration) {
@@ -158,66 +157,6 @@ export const SubmitAutoTxDialog = ({
         setStartTime(0);
         setDisplayStartTime(displayInterval)
     }
-    /*  function handleRecurrences(label, value) {
-         const val = interval * value
-         const dur = (val / 1000 / 60)
-         let displayDur = dur.toString() + ' min'
-         if ((dur / 60 / 24) >= 1) {
-             displayDur = dur / 60 / 24 + ' days'
-         } else if ((dur / 60) >= 1) {
-             displayDur = dur / 60 + ' hours'
-         }
-         setRecurrence(value);
-         setDuration(val)
-         setDisplayRecurrences(label)
-         setDisplayDuration(displayDur)
-     }
-     function handleRemoveRecurrences() {
-         setRecurrence(0);
-         setDisplayRecurrences("2")
-     } */
-
-    const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
-    const [requestedSendFunds, setRequestedSendFunds] = useState(false)
-    const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
-        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
-    useEffect(() => {
-        const shouldTriggerSendFunds =
-            !isExecutingSendFundsOnHost && requestedSendFunds;
-        if (shouldTriggerSendFunds) {
-            handleSendFundsOnHost(undefined, { onSettled: () => setRequestedSendFunds(false) })
-        }
-    }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
-
-    const handleSendFundsOnHostClick = () => {
-        connectExternalWallet(null)
-        return setRequestedSendFunds(true)
-    }
-    // check if duration == displayduration, interval == displayinterval
-    const shouldDisableSubmissionButton = false//timeLabels[timeSecondValues.indexOf(duration)] != displayDuration || timeLabels[timeSecondValues.indexOf(interval)] != displayInterval || timeLabels[timeSecondValues.indexOf(startTime)] != displayStartTime && startTime != 0
-
-    const shouldDisableSendFundsButton =
-        !icaAddr ||
-        (autoTxData.msgs && autoTxData.msgs.length == 0)
-
-    const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
-    const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
-        useCreateAuthzGrant({ grantee: icaAddr, msgs: autoTxData.msgs, expirationFromNow: autoTxData.duration, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
-    useEffect(() => {
-        const shouldTriggerAuthzGrant =
-            !isExecutingAuthzGrant && requestedAuthzGrant;
-        if (shouldTriggerAuthzGrant) {
-            handleCreateAuthzGrant(undefined, { onSettled: () => setRequestedCreateAuthzGrant(false) })
-        }
-    }, [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant])
-
-    const handleCreateAuthzGrantClick = () => {
-        connectExternalWallet(null)
-        return setRequestedCreateAuthzGrant(true)
-    }
-    const shouldDisableAuthzGrantButton =
-        !icaAddr ||
-        (autoTxData.msgs && autoTxData.msgs.length == 0)
 
 
     const editLabel = "Must be weeks(s), days(s), hour(s) or minute(s)"
@@ -244,39 +183,9 @@ export const SubmitAutoTxDialog = ({
         ))
     }
 
-    function cleanInputForDisplay(input: string) {
-        const number = Number(input.match(/\d/g));
-        const isOne = number == 1
-        if (input.includes("hour")) {
-            if (isOne) {
-                return number + " hour"
-            }
-            return number + " hours"
-        } else if (input.includes("day")) {
-            if (isOne) {
-                return number + " day"
-            }
-            return number + " days"
-        } else if (input.includes("minute")) {
-            if (isOne) {
-                return number + " minute"
-            }
-            return number + " minutes"
-        } else if (input.includes("week")) {
-            if (isOne) {
-                return number + " week"
-            }
-            return number + " weeks"
-        }
-    }
+    //
 
-    /* function handleDisplayRecurrence(value) {
-        let displayRecs = value.toString() + ' times'
-        if (value == 1) {
-            displayRecs + ' time'
-        }
-        // setDisplayRecurrences(displayRecs)        
-    } */
+
     //true = deduct fees from local acc
     const [checkedFeeAcc, setCheckedFeeAcc] = useState(true);
     const handleChangeFeeAcc = () => {
@@ -359,7 +268,7 @@ export const SubmitAutoTxDialog = ({
                                         variant="primary"
                                         size="small"
                                         onClick={() =>
-                                            handleInterval(cleanInputForDisplay(editIntervalValue), convertTime(editIntervalValue))
+                                            handleInterval(cleanCustomInputForDisplay(editIntervalValue), convertTime(editIntervalValue))
                                         }
                                     >
                                         {('Edit')}
@@ -403,7 +312,7 @@ export const SubmitAutoTxDialog = ({
                                         variant="primary"
                                         size="small"
                                         onClick={() =>
-                                            handleDuration(cleanInputForDisplay(editDurationValue), convertTime(editDurationValue))
+                                            handleDuration(cleanCustomInputForDisplay(editDurationValue), convertTime(editDurationValue))
                                         }
                                     >
                                         {('Edit')}
@@ -451,7 +360,7 @@ export const SubmitAutoTxDialog = ({
                                         variant="primary"
                                         size="small"
                                         onClick={() =>
-                                            handleStartTime(cleanInputForDisplay(editStartTimeValue), convertTime(editStartTimeValue))
+                                            handleStartTime(cleanCustomInputForDisplay(editStartTimeValue), convertTime(editStartTimeValue))
                                         }
                                     >
                                         {('Edit')}
@@ -491,7 +400,7 @@ export const SubmitAutoTxDialog = ({
                                         handleCreateAuthzGrantClick()
                                     }
                                 >
-                                    {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
+                                    {isExecutingAuthzGrant && (<Spinner instant />)}  {Number(feeFundsHostChain) != 0 ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
                                 </Button>}
                                     {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
                                         variant="primary"
@@ -570,14 +479,14 @@ export const SubmitAutoTxDialog = ({
             <DialogDivider offsetTop="$4" offsetBottom="$2" />
             <DialogButtons
                 cancellationButton={
-                    <Button variant="secondary" onClick={onRequestClose}>
+                    <Button variant="ghost" onClick={onRequestClose}>
                         Cancel
                     </Button>
                 }
                 confirmationButton={
                     <Button
-                        disabled={shouldDisableSubmissionButton}
-                        variant="primary"
+                        disabled={false}
+                        variant="secondary"
                         onClick={() => isLoading ? undefined : handleData("")}
                     >
                         {isLoading ? (
@@ -590,7 +499,7 @@ export const SubmitAutoTxDialog = ({
                 }>
                 {autoTxData.connectionId && <Button
                     disabled={!hasIcaAuthzGrant}
-                    variant="primary"
+                    variant="secondary"
                     onClick={() => isLoading ? undefined : handleData(icaAddr)}
                 >
                     {isLoading ? (
@@ -607,8 +516,32 @@ export const SubmitAutoTxDialog = ({
     )
 }
 
-
-
+// helper function to clean users input for display (e.g. mistyping minute for minutex)
+function cleanCustomInputForDisplay(input: string) {
+    const number = Number(input.match(/\d+/g));
+    const isOne = number == 1
+    if (input.includes("hour")) {
+        if (isOne) {
+            return number + " hour"
+        }
+        return number + " hours"
+    } else if (input.includes("day")) {
+        if (isOne) {
+            return number + " day"
+        }
+        return number + " days"
+    } else if (input.includes("minute")) {
+        if (isOne) {
+            return number + " minute"
+        }
+        return number+ " minutes"
+    } else if (input.includes("week")) {
+        if (isOne) {
+            return number + " week"
+        }
+        return number + " weeks"
+    }
+}
 
 const StyledDivForInputs = styled('div', {
     display: 'flex',
@@ -616,7 +549,6 @@ const StyledDivForInputs = styled('div', {
     rowGap: 8,
 })
 const StyledInput = styled('input', {
-
     color: 'inherit',
     padding: '$2',
     margin: '$2',

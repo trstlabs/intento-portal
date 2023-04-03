@@ -36,8 +36,11 @@ import { /* useGrantsForUser,  */useGetICA, /* useIsActiveICAForUser,  */useICAT
 import dayjs from 'dayjs'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
-import { useSendFundsOnHost } from '../../automate/hooks'
-import { Registry, msgRegistry } from 'trustlessjs'
+import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
+import { MsgUpdateAutoTxParams, Registry, msgRegistry } from 'trustlessjs'
+import { JsonCodeMirrorEditor } from '../../automate/components/jsonMirror'
+import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
+
 // import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx";
 // import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
 
@@ -86,20 +89,94 @@ export const AutoTxInfoBreakdown = ({
         return setRequestedSendFunds(true)
     }
 
-    function getMsgsFromExec(exMsg) {
-        const msgs = []
-        const newMsg = new Registry(msgRegistry).decode(exMsg)
+    function getMsgValueForMsgExec(exMsg: Any) {
+        let msgs = []
+        const msgExecDecoded = new Registry(msgRegistry).decode(exMsg)
         console.log
-        for (let message of newMsg.msgs) {
-            message = new Registry(msgRegistry).decode(message)
-            msgs.push(message)
+        for (let message of msgExecDecoded.msgs) {
+            let messageValue = new Registry(msgRegistry).decode(message)
+            console.log(messageValue)
+            msgs.push({ typeUrl: message.typeUrl, value: messageValue })
         }
-        return JSON.stringify({ grantee: newMsg.grantee, msgs }, null, '\t')
+        return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
     }
+
+    //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+    const [isJsonValid, setIsJsonValid] = useState(true);
+    const [editor, setEditor] = useState(true);
+    const [editMsg, setEditMsg] = useState("");
+
+    let autoTxParams: MsgUpdateAutoTxParams
+    const [updatedAutoTxParams, setUpdatedAutoTxParams] = useState(autoTxParams);
+
+    function showEditor(show: boolean, msg: Any) {
+        setEditor(show)
+        if (!show) {
+            setEditMsg(JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t'))
+            return
+        }
+        setEditMsg("")
+    }
+    const [requestedUpdateAutoTx, setRequestedUpdateAutoTx] = useState(false)
+    const { mutate: handleUpdateAutoTx, isLoading: isExecutingUpdateAutoTx } =
+        useUpdateAutoTx({ autoTxParams: updatedAutoTxParams })
+    useEffect(() => {
+        const shouldTriggerUpdateAutoTx =
+            !isExecutingUpdateAutoTx && requestedUpdateAutoTx;
+        if (shouldTriggerUpdateAutoTx) {
+            handleUpdateAutoTx(undefined, { onSettled: () => setRequestedUpdateAutoTx(false) })
+        }
+    }, [isExecutingUpdateAutoTx, requestedUpdateAutoTx, handleUpdateAutoTx])
+
+    const handleUpdateAutoTxMsgClick = (index: number) => {
+        connectExternalWallet(null)
+        if (!isJsonValid) {
+            //alert("Invalid JSON")
+            return
+        }
+        try {
+            let value = JSON.parse(editMsg)
+            console.log(value)
+            if (autoTxInfo.msgs[index].typeUrl == "/cosmos.authz.v1beta1.MsgExec") {
+                //let msgExecMsgs: [];
+                value.msgs.forEach((msgExecMsg, i) => {
+                    console.log("valueA")
+                    console.log(msgExecMsg)
+                    const encodeObject = {
+                        typeUrl: msgExecMsg.typeUrl,
+                        value: msgExecMsg.value
+                    }
+                    console.log(encodeObject)
+                    const msgExecMsgEncoded = new Registry(msgRegistry).encodeAsAny(encodeObject)
+                    console.log(msgExecMsgEncoded)
+
+                    value.msgs[i] = msgExecMsgEncoded
+                })
+
+            }
+            console.log(autoTxInfo.msgs[0])
+            const encodeObject = {
+                typeUrl: autoTxInfo.msgs[index].typeUrl,
+                value
+            }
+            const msgEncoded = new Registry(msgRegistry).encodeAsAny(encodeObject)
+            let params = {
+                txId: Number(autoTxInfo.txId),
+                msgs: [msgEncoded],
+                owner: autoTxInfo.owner
+            }
+            setUpdatedAutoTxParams(params)
+            console.log(params)
+        } catch (e) {
+            console.log(e)
+        }
+        return setRequestedUpdateAutoTx(true)
+    }
+    const shouldDisableUpdateAutoTxButton = false// !updatedAutoTxParams || !updatedAutoTxParams.txId
 
     ////
 
-    // const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, ibcInfo.symbol, autoTxInfo)
+    // const [icaUpdateAutoTxs, isUpdateAutoTxsLoading] = useGrantsForUser(icaAddr, ibcInfo.symbol, autoTxInfo)
     /*  if (size === 'small') {
          return (
              <>
@@ -258,23 +335,60 @@ export const AutoTxInfoBreakdown = ({
                                 </Inline>
                             </Column>
                         </Row>
+                        {msg.typeUrl != "/cosmos.authz.v1beta1.MsgExec" ? <Button
+                            variant="ghost"
+                            size="small"
+                            onClick={() =>
+                                showEditor(!editor, msg)
+                            }>
+                            {editor ? "Edit" : "Discard"}
+                        </Button> :
+                            <Button
+                                variant="ghost"
+                                size="small"
+                                onClick={() => {
+                                    setEditor(!editor);
+                                    setEditMsg(getMsgValueForMsgExec(msg))
+                                }
+                                }>
+                                {editor ? "Edit" : "Discard"}
+                            </Button>
+                        }
                         <Row>
                             <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                {editor ? <>
+                                    <Text variant="legend" color="secondary" align="left">
+                                        Message Value
+                                    </Text>
+                                    {msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec" ?
 
-                                <Text variant="legend" color="secondary" align="left">
-                                    Message Value
-                                </Text>
-                                {msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec" ? <Inline gap={2}>
-                                    <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }}>{getMsgsFromExec(msg)} </pre></Text>
-
-                                </Inline> :
-                                    <Inline gap={2}> <Text css={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }} variant="body"><pre style={{ display: "inline-block", overflow: "hidden", float: "left", }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
-                                    </Inline>}
+                                        <Inline gap={2}>
+                                            <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }}>{getMsgValueForMsgExec(msg)} </pre></Text>
+                                        </Inline> :
+                                        <Inline gap={2}> <Text css={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }} variant="body"><pre style={{ display: "inline-block", overflow: "hidden", float: "left", }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
+                                        </Inline>
+                                    }
+                                </> : <>
+                                    <JsonCodeMirrorEditor
+                                        jsonValue={editMsg}
+                                        onChange={setEditMsg/* (val) => {handleChangeMsg(index, val, msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec")} */}
+                                        onValidate={setIsJsonValid} />
+                                    <Button css={{ marginTop: '$8', margin: '$2' }}
+                                        variant="secondary"
+                                        size="small"
+                                        disabled={shouldDisableUpdateAutoTxButton}
+                                        onClick={() =>
+                                            handleUpdateAutoTxMsgClick(index)
+                                        }
+                                    >
+                                        {isExecutingUpdateAutoTx ? <Spinner instant /> : 'Update Message'}
+                                    </Button>
+                                </>}
                             </Column>
                         </Row>
                     </div>))}
 
-                {Number(autoTxInfo.duration.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {Number(autoTxInfo.startTime.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
                     {
                         autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
                             Start Time
@@ -311,6 +425,14 @@ export const AutoTxInfoBreakdown = ({
                 </Row>
                 )}
 
+{autoTxInfo.updateHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                    Update History
+                </Text></Inline>
+                    {autoTxInfo.updateHistory?.map((entry, index) => <div key={index}>
+                        <Column gap={2} align="flex-start" justifyContent="flex-start">
+                                <Text variant="body">At {getRelativeTime(entry.seconds)} </Text>
+                        </Column>
+                    </div>)}</Column></Row></>)}
 
                 {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
                     Execution History
@@ -331,7 +453,7 @@ export const AutoTxInfoBreakdown = ({
                         </Column>
                     </div>)}</Column></Row></>)}
                 {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds && autoTxInfo.autoTxHistory.length == 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
-                    Execution History Not available yet
+                    Execution History not available (yet)
                 </Text></Inline>
                 </Column></Row>)}
             </>

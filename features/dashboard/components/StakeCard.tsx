@@ -20,7 +20,7 @@ export const StakeCard = ({
     data.duration = 14 * 86400000;
     data.interval = 86400000;
     data.msgs = [""]
-   // data.typeUrls = [""]
+    // data.typeUrls = [""]
     const [autoTxData, setAutoTxData] = useState(data)
     const [APR, isAPRLoading] = useGetAPR()
     const week = (60 * 60 * 24 * 7)
@@ -128,6 +128,7 @@ export const StakeCard = ({
             </CardContent >
             </Card >
             <SubmitAutoTxDialog
+                isLoading={isExecutingSchedule}
                 autoTxData={autoTxData}
                 customLabel="Autocompound"
                 isShowing={isSubmitAutoTxDialogShowing}

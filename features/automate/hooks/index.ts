@@ -4,4 +4,5 @@ export { useSubmitAutoTx } from './useSubmitAutoTx'
 export { useCreateFeeGrant } from './useCreateFeeGrant'
 export { useCreateAuthzGrant } from './useCreateAuthzGrant'
 export { useSendFundsOnHost } from './useSendFundsOnHost'
+export { useUpdateAutoTx } from './useUpdateAutoTx'
 

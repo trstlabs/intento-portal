@@ -150,7 +150,7 @@ export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxDat
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   const { status, client, address } = useRecoilValue(ibcWalletState)
   const { data, isLoading } = useQuery(
-    ['granter', granter],
+    ['granterGrants', granter],
     async () => {
       console.log("getgrants")
       let grants: GrantResponse[] = []

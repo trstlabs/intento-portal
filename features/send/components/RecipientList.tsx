@@ -202,7 +202,7 @@ export const RecipientList = ({
 
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
-    status !== WalletStatusType.connected || !recipients[0].recipient || (recipients[0].recipient && recipients[0].recipient.length < 44) || (Number(recipients[0].amount) == 0)
+    status !== WalletStatusType.connected || !recipients[0].recipient || (recipients[0].recipient && recipients[0].recipient.length < 40) || (Number(recipients[0].amount) == 0)
 
 
 
@@ -333,11 +333,12 @@ export const RecipientList = ({
             })
           }
         >
-          {isExecutingTransaction ? <Spinner instant /> : 'Schedule Recurrence'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Schedule Recurrence'}
         </Button>
 
       </Inline>
       <SubmitAutoTxDialog
+        isLoading={isExecutingSchedule}
         // label="Recurring Send"
         autoTxData={autoTxData}
         isShowing={isScheduleDialogShowing}

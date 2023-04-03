@@ -53,7 +53,6 @@ export const executeSubmitAutoTx = async ({
     console.log(encodeObject)
 
     let msgAny = masterRegistry.encodeAsAny(encodeObject)
-   
     console.log(msgAny)
     msgs.push(msgAny)
   }
@@ -76,14 +75,14 @@ export const executeSubmitAutoTx = async ({
   }
   console.log("label", autoTxData.label)
   return validateTransactionSuccess(
-    await client.tx.auto_tx.submit_auto_tx({
+    await client.tx.autoTx.submitAutoTx({
       connectionId: autoTxData.connectionId ? autoTxData.connectionId : "",
       owner,
       msgs,
       label: autoTxData.label ? autoTxData.label : "",
       duration,
       interval,
-      startAt: startAt.toString(),
+      startAt,
       // dependsOnTxIds,
       feeFunds,
     },

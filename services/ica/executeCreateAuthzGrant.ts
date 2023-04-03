@@ -14,7 +14,7 @@ type ExecuteCreateAuthzGrantArgs = {
   granter: string
   grantee: string
   msgs: string[]
-  expirationFromNow?: number
+  expirationDurationMs?: number
   client: SigningStargateClient
   coin?: Coin
 }
@@ -24,14 +24,13 @@ export const executeCreateAuthzGrant = async ({
   grantee,
   granter,
   msgs,
-  expirationFromNow,
+  expirationDurationMs,
   coin,
 }: ExecuteCreateAuthzGrantArgs): Promise<any> => {
 
   let expireAt = ((Date.now() + 31556926000) / 1000).toFixed()//31556926000=1year in ms
-
-  if (expirationFromNow != undefined) {
-    expireAt = (Date.now() / 1000 + expirationFromNow).toFixed();
+  if (expirationDurationMs != undefined) {
+    expireAt = ((Date.now() + expirationDurationMs) / 1000).toFixed();
   }
 
   const msgObjects = []
@@ -64,7 +63,7 @@ export const executeCreateAuthzGrant = async ({
     }
     msgObjects.push(MsgSendObject)
   }
-  return await client.signAndBroadcast(granter, msgObjects, "auto")
+  return await client.signAndBroadcast(granter, msgObjects, Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM))
 
 }
 

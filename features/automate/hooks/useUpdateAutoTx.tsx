@@ -2,75 +2,69 @@ import {
     Button,
     ErrorIcon,
     formatSdkErrorMessage,
-
+    IconWrapper,
     Toast,
     UpRightArrow,
-
+    Valid,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeCreateAuthzGrant } from '../../../services/ica'
+import { executeUpdateAutoTx } from '../../../services/auto-ibc-tx'
 import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
+import { MsgUpdateAutoTxParams } from 'trustlessjs'
 
-import { Coin } from 'trustlessjs'
 
-
-type UseCreateAuthzGrantParams = {
-    grantee: string
-    msgs: string[]
-    coin?: Coin
-    expirationDurationMs?: number
+type UseUpdateAutoTxArgs = {
+    autoTxParams: MsgUpdateAutoTxParams
 }
 
-
-export const useCreateAuthzGrant = ({
-    grantee, msgs, expirationDurationMs, coin
-}: UseCreateAuthzGrantParams
-) => {
-  const { address, client, status } =
-        useRecoilValue(ibcWalletState)
- 
-    /*   const { address, client, status } =
-        useRecoilValue(walletState)*/
+export const useUpdateAutoTx = ({
+    autoTxParams,
+}: UseUpdateAutoTxArgs) => {
+    const { client, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
-
     return useMutation(
-        'createAuthzGrant',
+        'updateAutoTx',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            if (coin.amount == "0") {
-                coin = undefined
+            if (client.address !== autoTxParams.owner) {
+                throw new Error('This feature is only available for the owner: '+ autoTxParams.owner)
             }
 
-            return await executeCreateAuthzGrant({
+            return await executeUpdateAutoTx({
+                autoTxParams,
                 client,
-                grantee,
-                granter: address,
-                msgs,
-                expirationDurationMs,
-                coin,
-
             })
 
         },
         {
             onSuccess(data) {
                 console.log(data)
+
+                toast.custom((t) => (
+                    <Toast
+                        icon={<IconWrapper icon={<Valid />} color="primary" />}
+                        title="Your trigger is updated!"
+                        body={`An on-chain trigger was created updated`}
+
+                        onClose={() => toast.dismiss(t.id)}
+                    />
+                ))
                 popConfetti(true)
-                //
+
                 refetchQueries()
             },
             onError(e) {
@@ -79,7 +73,7 @@ export const useCreateAuthzGrant = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops creating authz grant error!"
+                        title="Oops error updating message!"
                         body={errorMessage}
                         buttons={
                             <Button

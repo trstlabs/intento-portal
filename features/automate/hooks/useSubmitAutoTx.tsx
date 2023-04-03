@@ -34,7 +34,7 @@ export const useSubmitAutoTx = ({
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
     return useMutation(
-        'scheduleTokens',
+        'submitAutoTx',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')

@@ -56,7 +56,7 @@ export const useAutoTxInfo = (id) => {
         async () => {
            
             const info = await getAutoTxInfo(id, client)
-            console.log(info)
+            //console.log(info)
             return info.autoTxInfo
         },
         {
