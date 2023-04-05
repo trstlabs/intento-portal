@@ -1,15 +1,9 @@
 import {
-    Button,
-    ErrorIcon,
     formatSdkErrorMessage,
-
-    Toast,
-    UpRightArrow,
-
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { executeSendFunds } from '../../../services/ica'
 import {
     TransactionStatus,
@@ -18,7 +12,6 @@ import {
 import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { particleState } from '../../../state/atoms/particlesAtoms'
 
 import { Coin } from 'trustlessjs'
 
@@ -33,13 +26,12 @@ export const useSendFundsOnHost = ({
     toAddress, coin
 }: UseSendFundsParams
 ) => {
-  const { address, client, status } =
+    const { address, client, status } =
         useRecoilValue(ibcWalletState)
- 
+
     /*   const { address, client, status } =
         useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
-    const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
@@ -65,32 +57,15 @@ export const useSendFundsOnHost = ({
         {
             onSuccess(data) {
                 console.log(data)
-                popConfetti(true)
+                //popConfetti(true)
                 //
+                toast.success("Succesfully sent")
                 refetchQueries()
             },
             onError(e) {
                 const errorMessage = formatSdkErrorMessage(e)
 
-                toast.custom((t) => (
-                    <Toast
-                        icon={<ErrorIcon color="error" />}
-                        title="Oops sending funds to Interchain Account!"
-                        body={errorMessage}
-                        buttons={
-                            <Button
-                                as="a"
-                                variant="ghost"
-                                href={process.env.NEXT_PUBLIC_FEEDBACK_LINK}
-                                target="__blank"
-                                iconRight={<UpRightArrow />}
-                            >
-                                Provide feedback
-                            </Button>
-                        }
-                        onClose={() => toast.dismiss(t.id)}
-                    />
-                ))
+                toast.error("Oops sending funds to Interchain Account! " + errorMessage)
             },
             onSettled() {
                 setTransactionState(TransactionStatus.IDLE)

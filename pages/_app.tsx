@@ -33,9 +33,13 @@ function MyApp({ Component, pageProps }: AppProps) {
             {__TEST_MODE__ && <TestnetDialog />}
             <Toaster
               position={isSmallScreen ? 'bottom-center' : 'top-right'}
-              toastOptions={{ duration: 1000000 }}
+              toastOptions={{
+                className: '',
+                duration: 20000, 
+              }}
               containerClassName={toasterClassName}
               containerStyle={isSmallScreen ? { inset: 0 } : undefined}
+
             />
           </ErrorBoundary>
         </NextJsAppRoot>

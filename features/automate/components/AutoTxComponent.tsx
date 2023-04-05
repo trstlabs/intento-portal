@@ -113,7 +113,7 @@ export const AutoTxComponent = ({
     connectExternalWallet(null)
     return setRequestedCreateAuthzGrant(true)
   }
-  const shouldDisableAuthzGrantButton = autoTxData.msgs && autoTxData.msgs.length == 0 
+  const shouldDisableAuthzGrantButton = autoTxData.msgs && autoTxData.msgs[0].length < 10
 
 
   //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -236,16 +236,31 @@ export const AutoTxComponent = ({
                   {!isAuthzGrantsLoading && (icaAuthzGrants && icaAuthzGrants[0] && icaAuthzGrants[0].msgTypeUrl
                     ? <Text variant="legend"> Grants: {icaAuthzGrants.map((grant) => <Text variant="caption"> Has grant for message type: '{grant.msgTypeUrl}' {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}</Text>
                     )}</Text>
-                    : (icaAddr && autoTxData.msgs.length[0] && <>
+                    : (icaAddr && !shouldDisableAuthzGrantButton && <>
                       <Card variant="secondary" disabled css={{ padding: '$4', margin: '$4' }}>
                         <CardContent>
+                        <Tooltip
+                              label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                              aria-label="Fee Funds"
+                            ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}</Text></Tooltip>
                           <Row>
                             <Text variant="legend"><StyledInput step=".01"
                               placeholder="0.00" type="number"
                               value={feeFundsHostChain}
                               onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
                             />{chainSymbol}
-                            </Text><Button css={{ margin: '$2' }}
+                            </Text>
+                          </Row>
+                          <Row>
+                            <Button css={{ marginTop: '$8', margin: '$2' }}
+                              variant="secondary"
+                              size="small"
+                              disabled={shouldDisableSendFundsButton || shouldDisableAuthzGrantButton && Number(feeFundsHostChain) != 0}
+                              onClick={() =>
+                                handleCreateAuthzGrantClick()
+                              }>
+                              {isExecutingAuthzGrant ? <Spinner instant /> : ('AuthZ Grant + Send')}
+                            </Button><Button css={{ margin: '$2' }}
                               variant="secondary"
                               size="small"
                               disabled={shouldDisableSendFundsButton}
@@ -255,38 +270,29 @@ export const AutoTxComponent = ({
                             >
                               {isExecutingSendFundsOnHost ? (<Spinner instant />) : "Send"}
                             </Button>
-                            <Tooltip
-                              label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
-                              aria-label="Fee Funds"
-                            ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}</Text></Tooltip>
+                           
                           </Row>
                         </CardContent>
                       </Card>
                       <Card variant="secondary" disabled css={{ padding: '$4', margin: '$4' }}>
                         <CardContent>
-                          <Text variant="legend"> No authorization grants for message typeUrl (yet)</Text>
-                          <Inline>
-                            <Button css={{ marginTop: '$8', margin: '$2' }}
-                              variant="secondary"
-                              size="small"
-                              disabled={shouldDisableAuthzGrantButton}
-                              onClick={() =>
-                                handleCreateAuthzGrantClick()
-                              }
-                            >
-                              {isExecutingAuthzGrant ? <Spinner instant /> : 'Create Grant'}
-                            </Button>
-                            <Button css={{ marginTop: '$8', margin: '$2' }}
-                              variant="secondary"
-                              size="small"
-                              disabled={shouldDisableAuthzGrantButton && Number(feeFundsHostChain) != 0}
-                              onClick={() =>
-                                handleCreateAuthzGrantClick()
-                              }>
-                              {isExecutingAuthzGrant ? <Spinner instant /> : ('Send + Create Grant')}
-                            </Button>
+                          <Tooltip
+                            label="An AuthZ grant allows the Interchain Account that automates your transaction to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"
+                            aria-label="Fee Funds"
+                          ><Text variant="legend"> No authorization grants for specified message type (yet)</Text></Tooltip>
 
-                          </Inline>
+                          <Button css={{ marginTop: '$8', padding: '$4' }}
+                            variant="secondary"
+                            size="small"
+                            disabled={shouldDisableAuthzGrantButton}
+                            onClick={() =>
+                              handleCreateAuthzGrantClick()
+                            }
+                          >
+                            {isExecutingAuthzGrant ? <Spinner instant /> : 'Create AuthZ Grant'}
+                          </Button>
+
+
                         </CardContent>
                       </Card>
 
@@ -320,7 +326,7 @@ export const AutoTxComponent = ({
                 Messages</Text>
             </CardContent>
             {autoTxData.msgs && autoTxData.msgs.map((msgToDisplay, i) => (
-              <div key={msgToDisplay}>   <CardContent size="medium" css={{ display: "inline-block", overflow: "hidden"}}>
+              <div key={msgToDisplay}>   <CardContent size="medium" css={{ display: "inline-block", overflow: "hidden" }}>
                 <Text variant="legend" align="left" css={{ paddingBottom: '$10' }}>
 
                   Message {i + 1}: <pre>{msgToDisplay}</pre>
@@ -410,7 +416,7 @@ function messageData(index: number, chainSymbol: string, msg: string, setExample
 
         onClick={() => handleRemoveMsg(index)} />)} </Inline>
     <div style={{ display: "inline-block", overflow: "hidden", float: "left", }}>
-      <JsonCodeMirrorEditor 
+      <JsonCodeMirrorEditor
         jsonValue={msg}
         onChange={handleChangeMsg(index)}
         onValidate={setIsJsonValid} />

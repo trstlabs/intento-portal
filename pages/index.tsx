@@ -15,6 +15,7 @@ import {
   Spinner,
   styled,
   Text,
+  Tooltip
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
@@ -50,7 +51,7 @@ export default function Home() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Autocompound and manage your on-chain assets and triggers"
+      subtitle="Manage your on-chain assets and triggers"
     />
   )
 
@@ -74,7 +75,7 @@ export default function Home() {
         </>
       )}
       <Column
-        css={{ paddingTop: '$24' }}>
+        css={{ paddingTop: '12' }}>
         <StakeCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>
       {!isLoading && isSorting && address && (<Column
@@ -90,6 +91,7 @@ export default function Home() {
           </Text>
         </Inline>
       </Column>)}
+      <Text variant="title" css={{ paddingLeft:'$4', paddingBottom: '$8' }} ><Tooltip label="Trustless Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub " ><span>Trustless Triggers</span></Tooltip></Text>
       {shouldRenderAutoTxs && (
         <>
           {Boolean(myAutoTxs?.length) && (

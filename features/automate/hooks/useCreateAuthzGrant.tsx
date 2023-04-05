@@ -9,7 +9,7 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { executeCreateAuthzGrant } from '../../../services/ica'
 import {
     TransactionStatus,
@@ -18,7 +18,6 @@ import {
 import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { particleState } from '../../../state/atoms/particlesAtoms'
 
 import { Coin } from 'trustlessjs'
 
@@ -41,7 +40,6 @@ export const useCreateAuthzGrant = ({
     /*   const { address, client, status } =
         useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
-    const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
@@ -69,8 +67,12 @@ export const useCreateAuthzGrant = ({
         {
             onSuccess(data) {
                 console.log(data)
-                popConfetti(true)
+                //popConfetti(true)
                 //
+                toast.success("Succesfully created AuthZ grant")
+                if (coin.amount != "0") {
+                    toast.success("Succesfully sent funds")
+                }
                 refetchQueries()
             },
             onError(e) {

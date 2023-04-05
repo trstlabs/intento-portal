@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */ Button,/*  ImageForTokenLogo, styled,  */Text, Column, styled, formatTokenBalance, Tooltip } from 'junoblocks'
+import { Inline, Card, Spinner, /* IconWrapper, PlusIcon, */ Button,/*  ImageForTokenLogo, styled,  */Text, Column, styled, formatTokenBalance, Tooltip } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 
 import { SubmitAutoTxDialog, AutoTxData } from '../../automate/components/SubmitAutoTxDialog';
@@ -65,9 +65,9 @@ export const StakeCard = ({
 
     return (
         <StyledDivForContainer>
-            < Card variant="secondary" disabled css={{ padding: '$8', margin: '$8' }} > <CardContent size="medium" >
+           
                 <Column>
-                    <Row><Text variant="header" css={{ paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text></Row>
+                    <Text variant="title" css={{ paddingLeft:'$4', paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text>
                     < Card variant="secondary" disabled css={{ padding: '$8' }} >
                         {!isAPRLoading && APR && <><Text variant="legend"> <Tooltip label="Nominal APR refers to the annual percentage rate that doesn't take into account compounding interest. It's the simple staking reward rate over the course of a year."><span>Nominal APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(4)}%</Text>
                             <Text variant="legend"> <Tooltip label="RealTime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time."><span>RealTime APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr.toPrecision(4)}%</Text>
@@ -125,8 +125,6 @@ export const StakeCard = ({
                     </Inline> : <><StyledPNG src="./img/pot_full.png" /><Text >You are autocompounding</Text></>
                 }
 
-            </CardContent >
-            </Card >
             <SubmitAutoTxDialog
                 isLoading={isExecutingSchedule}
                 autoTxData={autoTxData}
@@ -148,23 +146,6 @@ const StyledDivForContainer = styled('div', {
     borderRadius: '$4',
 
 })
-
-function Row({ children }) {
-    const baseCss = { padding: '$2 $4' }
-    return (
-        <Inline
-            css={{
-                ...baseCss,
-                display: 'flex',
-                justifyContent: 'start',
-                marginBottom: '$3',
-                columnGap: '$space$1',
-            }}
-        >
-            {children}
-        </Inline>
-    )
-}
 
 const claimRewardSDKMessage =
 {

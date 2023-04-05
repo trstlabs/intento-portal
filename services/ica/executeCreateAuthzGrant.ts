@@ -63,7 +63,7 @@ export const executeCreateAuthzGrant = async ({
     }
     msgObjects.push(MsgSendObject)
   }
-  return await client.signAndBroadcast(granter, msgObjects, Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM))
+  return await client.signAndBroadcast(granter, msgObjects, 'auto' )
 
 }
 

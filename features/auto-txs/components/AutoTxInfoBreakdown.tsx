@@ -95,7 +95,6 @@ export const AutoTxInfoBreakdown = ({
         console.log
         for (let message of msgExecDecoded.msgs) {
             let messageValue = new Registry(msgRegistry).decode(message)
-            console.log(messageValue)
             msgs.push({ typeUrl: message.typeUrl, value: messageValue })
         }
         return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
@@ -530,7 +529,7 @@ const getRelativeTime = (seconds: String) => {
         const daysLeft = date.diff(now, 'days')
         const hoursLeftAfterDays = Math.round(24 * ((hoursLeft / 24) % 1.0))
 
-        return inTime + `${hoursLeftAfterDays > 0
+        return inTime + `${hoursLeftAfterDays >= 0
             ? `${maybePluralize(daysLeft, 'day')} and `
             : ''
             } ${maybePluralize(hoursLeftAfterDays, 'hour')}`

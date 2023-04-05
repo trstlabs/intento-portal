@@ -57,9 +57,8 @@ export const useRegisterAccount = ({
             toast.custom((t) => (
                 <Toast
                     icon={<IconWrapper icon={<Valid />} color="primary" />}
-                    title="Interchain account registrated on Trustless Hub"
-                    body={`Now registering on destination chain`}
-                   
+                    title="Now registering on destination chain"
+                    body={`Created an Interchain Account on Trustless Hub`}
                     onClose={() => toast.dismiss(t.id)}
                 />
             ))
@@ -94,6 +93,7 @@ export const useRegisterAccount = ({
         {
             onSuccess(data) {
                 console.log(data)
+                toast.success("Succesfully registered account on destination chain")
                 if (data) {
                     popConfetti(true)
                 }

@@ -152,7 +152,6 @@ export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxDat
   const { data, isLoading } = useQuery(
     ['granterGrants', granter],
     async () => {
-      console.log("getgrants")
       let grants: GrantResponse[] = []
       const { rpc } = ibcAsset
       for (const msg of autoTxData.msgs) {

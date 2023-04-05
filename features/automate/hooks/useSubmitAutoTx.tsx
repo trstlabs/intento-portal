@@ -39,7 +39,7 @@ export const useSubmitAutoTx = ({
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-        
+
             console.log(autoTxData)
             return await executeSubmitAutoTx({
                 owner: address,
@@ -55,7 +55,7 @@ export const useSubmitAutoTx = ({
                     (log) =>
                         log.key == "auto_tx_id"
                 ).value;
-                
+
                 console.log(autoTxID)
                 toast.custom((t) => (
                     <Toast
@@ -74,10 +74,12 @@ export const useSubmitAutoTx = ({
                             </Button>
                         }
                         onClose={() => toast.dismiss(t.id)}
+
                     />
-                ))
+                ),
+                )
                 popConfetti(true)
-                
+
                 refetchQueries()
             },
             onError(e) {
@@ -101,7 +103,15 @@ export const useSubmitAutoTx = ({
                         }
                         onClose={() => toast.dismiss(t.id)}
                     />
-                ))
+                ), ({
+                    style: {
+
+                        borderRadius: "22px !important",
+                        background: '$colors$blue !important',
+                        color: '$colors$dark',
+                        opacity: '0.2 !important'
+                    }
+                }))
             },
             onSettled() {
                 setTransactionState(TransactionStatus.IDLE)

@@ -100,7 +100,8 @@ export const SubmitAutoTxDialog = ({
     const timeSecondValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 5, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14, 3600000 * 24 * 30, 3600000 * 24 * 60, 3600000 * 24 * 90]
 
     function handleInterval(label, value) {
-        if (value >= duration) {
+        console.log(value)
+        if (value >= duration ) {
             toast.custom((t) => (
                 <Toast
                     icon={<IconWrapper icon={<Error />} color="error" />}
@@ -129,15 +130,15 @@ export const SubmitAutoTxDialog = ({
             // handleDisplayRecurrence(recurrence)
             return
         }
-        if (interval > 0) {
-            toast.custom((t) => (
-                <Toast
-                    icon={<IconWrapper icon={<Error />} color="error" />}
-                    title={"Can't select a lower duration than interval " + displayInterval + ",your specified duration is: " + label}
-                    onClose={() => toast.dismiss(t.id)}
-                />
-            ))
-        }
+        // if (interval > 0) {
+        toast.custom((t) => (
+            <Toast
+                icon={<IconWrapper icon={<Error />} color="error" />}
+                title={"Can't select a lower duration than interval " + interval + ' seconds' + ",your specified duration is: " + value + 'seconds'}
+                onClose={() => toast.dismiss(t.id)}
+            />
+        ))
+        // }
     }
     function handleRemoveDuration() {
         setDuration(0);
@@ -161,17 +162,17 @@ export const SubmitAutoTxDialog = ({
 
     const editLabel = "Must be weeks(s), days(s), hour(s) or minute(s)"
     function convertTime(input: string) {
-        if (input.includes("hour")) {
-            const hours = Number(input.match(/\d/g));
+       if (input.includes("hour")) {
+            const hours = Number(input.match(/\d/g).join(''));
             return hours * 3600000
         } else if (input.includes("day")) {
-            const days = Number(input.match(/\d/g));
+            const days = Number(input.match(/\d/g).join(''));
             return days * 3600000 * 24
         } else if (input.includes("minute")) {
-            const minutes = Number(input.match(/\d/g));
+            const minutes = Number(input.match(/\d/g).join(''));
             return minutes * 60000
         } else if (input.includes("week")) {
-            const weeks = Number(input.match(/\d/g));
+            const weeks = Number(input.match(/\d/g).join(''));
             return weeks * 3600000 * 24 * 7
         }
         toast.custom((t) => (
@@ -534,7 +535,7 @@ function cleanCustomInputForDisplay(input: string) {
         if (isOne) {
             return number + " minute"
         }
-        return number+ " minutes"
+        return number + " minutes"
     } else if (input.includes("week")) {
         if (isOne) {
             return number + " week"
