@@ -65,11 +65,11 @@ export const StakeCard = ({
 
     return (
         <StyledDivForContainer>
-           
+            {!isAPRLoading && APR &&
                 <Column>
-                    <Text variant="title" css={{ paddingLeft:'$4', paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text>
+                    <Text variant="title" css={{ paddingLeft: '$4', paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text>
                     < Card variant="secondary" disabled css={{ padding: '$8' }} >
-                        {!isAPRLoading && APR && <><Text variant="legend"> <Tooltip label="Nominal APR refers to the annual percentage rate that doesn't take into account compounding interest. It's the simple staking reward rate over the course of a year."><span>Nominal APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(4)}%</Text>
+                        <><Text variant="legend"> <Tooltip label="Nominal APR refers to the annual percentage rate that doesn't take into account compounding interest. It's the simple staking reward rate over the course of a year."><span>Nominal APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(4)}%</Text>
                             <Text variant="legend"> <Tooltip label="RealTime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time."><span>RealTime APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr.toPrecision(4)}%</Text>
                             {!isWeeklyAPYLoading && weeklyAPY && <> <Text variant="legend"> <Tooltip label="APY stands for Annual Percentage Yield and represents the effective annual rate of return of staked TRST tokens that is compounded over the course of a year. In the case of Weekly Compound APY, the rewards are calculated and added to the staking balance every week."><span>APY (Weekly Compound)</span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{weeklyAPY.toPrecision(5).toString()}%{!isAPYWFeesLoading && APYWFees < weeklyAPY && <Text css={{ paddingTop: '$1' }} variant="caption"> Estimated at {APYWFees.toPrecision(5).toString()}% with current fees applied and your staked tokens</Text>}</Text></>}
                             {!isLoading && balance > 0 && <><Text variant="legend">Local Balance </Text><Text css={{ padding: '$8' }} variant="title">{formatTokenBalance(balance, {
@@ -83,7 +83,7 @@ export const StakeCard = ({
                                 } </> : <>You hold {formatTokenBalance(balance)} TRST but have not staked any tokens yet, stake them to secure the network and earn staking rewards. Staking rewards can be compounded to earn additonal tokens.</>}
                             </Text>}
 
-                        </>}</Card>
+                        </></Card>
                     {/* <Row>
                         <Button css={{ margin: '$2', }}
                             variant="secondary"
@@ -92,38 +92,41 @@ export const StakeCard = ({
                         </Button>
 
                     </Row> */}
-                </Column>
-                {
-                    shouldShowAutoCompound ? <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'space-around' }}>
-                        <StyledPNG src="./img/pot_light.png" />  <StyledDivForButtons><Button css={{ marginleft: '$8' }}
-                            variant="primary"
-                            size="large"
-                            disabled={isStakeBalanceLoading}
-                            as="a"
-                            href={"https://interact.trustlesshub.com/validators/"}
-                            target="__blank"
-                        >{/* <ImageForTokenLogo
+                    {
+                        shouldShowAutoCompound ? <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'space-around' }}>
+                            <StyledPNG src="./img/pot_light.png" />  <StyledDivForButtons><Button css={{ marginleft: '$8' }}
+                                variant="primary"
+                                size="large"
+                                disabled={isStakeBalanceLoading}
+                                as="a"
+                                href={"https://interact.trustlesshub.com/validators/"}
+                                target="__blank"
+                            >{/* <ImageForTokenLogo
                             logoURI={"https://www.trustlesshub.com/img/brand/icon.png"}
                             size="medium"
                             loading="lazy"
                         /> */}
-                            {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
-                        </Button>
-                            <Button css={{ marginleft: '$8' }}
-                                variant="primary"
-                                size="large"
-                                disabled={isStakeBalanceLoading || stakeBalance && stakeBalance.stakingBalanceAmount == 0}
-                                onClick={() =>
-                                    setSubmitAutoTxDialogState({
-                                        isShowing: true,
-                                    })
-                                }
-                            >
-                                {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
-                            </Button></StyledDivForButtons>
+                                {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
+                            </Button>
+                                <Button css={{ marginleft: '$8' }}
+                                    variant="primary"
+                                    size="large"
+                                    disabled={isStakeBalanceLoading || stakeBalance && stakeBalance.stakingBalanceAmount == 0}
+                                    onClick={() =>
+                                        setSubmitAutoTxDialogState({
+                                            isShowing: true,
+                                        })
+                                    }
+                                >
+                                    {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
+                                </Button></StyledDivForButtons>
 
-                    </Inline> : <><StyledPNG src="./img/pot_full.png" /><Text >You are autocompounding</Text></>
-                }
+                        </Inline> : <><StyledPNG src="./img/pot_full.png" /><Text >You are autocompounding</Text></>
+                    }
+
+                </Column>
+
+            }
 
             <SubmitAutoTxDialog
                 isLoading={isExecutingSchedule}

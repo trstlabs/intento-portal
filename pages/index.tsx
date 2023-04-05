@@ -59,7 +59,7 @@ export default function Home() {
     <AppLayout>
       {pageHeaderContents}
       {!key &&
-        <Card disabled variant="secondary"><Text variant="header" css={{ padding: '$12 $12 $12 $12' }}>
+        <Card css={{ marginBottom: '$12', padding: '$12' }} disabled variant="secondary"><Text variant="header" >
           Connect a wallet
         </Text></Card>
       }
@@ -117,7 +117,7 @@ export default function Home() {
       )}
       <StyledDivForAutoTxsGrid>
         <>
-          {Boolean(allAutoTxs?.length) && (
+          {Boolean(allAutoTxs?.length) ? (
             <Inline
               gap={4}
               css={{
@@ -134,7 +134,9 @@ export default function Home() {
               />
 
             </Inline>
-          )}</>
+          ) : <Text variant="caption" css={{ padding: '$4' }}> No Triggers found</Text>
+        }
+        </>
       </StyledDivForAutoTxsGrid>
 
       <StyledDivForAutoTxsGrid>

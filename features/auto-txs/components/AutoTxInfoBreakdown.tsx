@@ -362,9 +362,9 @@ export const AutoTxInfoBreakdown = ({
                                     {msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec" ?
 
                                         <Inline gap={2}>
-                                            <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }}>{getMsgValueForMsgExec(msg)} </pre></Text>
+                                            <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", fontSize: '0.8rem' }}>{getMsgValueForMsgExec(msg)} </pre></Text>
                                         </Inline> :
-                                        <Inline gap={2}> <Text css={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }} variant="body"><pre style={{ display: "inline-block", overflow: "hidden", float: "left", }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t')} </pre></Text>
+                                        <Inline gap={2}> <Text css={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }} variant="body"><pre style={{ display: "inline-block", overflow: "hidden", float: "left", fontSize: "0.8rem" }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, 2)} </pre></Text>
                                         </Inline>
                                     }
                                 </> : <>
@@ -389,32 +389,32 @@ export const AutoTxInfoBreakdown = ({
 
                 {Number(autoTxInfo.startTime.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
                     {
-                        autoTxInfo.startTime && (<> <Text variant="legend" color="secondary" align="left">
+                        autoTxInfo.startTime && (<><Tooltip label={"Start time is the time the trigger was started. Execution starts at start time when a custom start time in the future is provided at trigger submission"}><Text variant="legend" color="secondary" align="left">
                             Start Time
-                        </Text>
+                        </Text></Tooltip>
                             <Inline gap={2}>
                                 <Text variant="body">{getRelativeTime(autoTxInfo.startTime.seconds)}</Text>
 
                             </Inline></>)
                     }
-                    <Text variant="legend" color="secondary" align="left">
+                    <Tooltip label={"Execution time is the time the next execution takes place. In case a trigger has ended, the execution time is the time of the last execution"}><Text variant="legend" color="secondary" align="left">
                         Execution Time
-                    </Text>
+                    </Text></Tooltip>
                     <Inline gap={2}>
                         <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
                     </Inline>
-                    {autoTxInfo.endTime.seconds && (<>< Text variant="legend" color="secondary" align="left">
+                    {autoTxInfo.endTime.seconds && (<><Tooltip label={"End time is the time last time execution can place"}>< Text variant="legend" color="secondary" align="left">
                         End time
-                    </Text>
+                    </Text></Tooltip>
                         <Inline gap={2}>
                             <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
 
                         </Inline>
                     </>)}
                     {
-                        autoTxInfo.interval.seconds != "0" && (<> <Text variant="legend" color="secondary" align="left">
+                        autoTxInfo.interval.seconds != "0" && (<> <Tooltip label={"Interval is the fixed time between 2 executions"}><Text variant="legend" color="secondary" align="left">
                             Interval
-                        </Text>
+                        </Text></Tooltip>
                             <Inline gap={2}>
                                 <Text variant="body">{getDuration(Number(autoTxInfo.interval.seconds))}</Text>
 
@@ -424,19 +424,19 @@ export const AutoTxInfoBreakdown = ({
                 </Row>
                 )}
 
-{autoTxInfo.updateHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                {autoTxInfo.updateHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
                     Update History
                 </Text></Inline>
                     {autoTxInfo.updateHistory?.map((entry, index) => <div key={index}>
                         <Column gap={2} align="flex-start" justifyContent="flex-start">
-                                <Text variant="body">At {getRelativeTime(entry.seconds)} </Text>
+                            <Text variant="body">At {getRelativeTime(entry.seconds)} </Text>
                         </Column>
                     </div>)}</Column></Row></>)}
 
                 {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
                     Execution History
                 </Text></Inline>
-                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error }, index) => <div key={index}>
+                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error, timedOut }, index) => <div key={index}>
                         <Column gap={2} align="flex-start" justifyContent="flex-start">
 
                             <Column>
@@ -447,6 +447,7 @@ export const AutoTxInfoBreakdown = ({
                                 <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
                                 {/* {result && <Text variant="caption">Result: {result}</Text>} */}
                                 {error && <Text variant="caption">Execution Error: {error}</Text>}
+                                {timedOut && <Text variant="caption">Execution on the destination chain did not happen because it timed out</Text>}
                             </Column>
 
                         </Column>

@@ -103,16 +103,7 @@ export const useSubmitAutoTx = ({
                         }
                         onClose={() => toast.dismiss(t.id)}
                     />
-                ), ({
-                    style: {
-
-                        borderRadius: "22px !important",
-                        background: '$colors$blue !important',
-                        color: '$colors$dark',
-                        opacity: '0.2 !important'
-                    }
-                }))
-            },
+                ))},
             onSettled() {
                 setTransactionState(TransactionStatus.IDLE)
             },
