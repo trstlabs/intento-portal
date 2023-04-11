@@ -40,5 +40,6 @@
       }
     }
   ],
+  "coinType": 118,
   "features": ["cosmwasm"]
 }

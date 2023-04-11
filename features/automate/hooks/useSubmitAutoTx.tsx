@@ -53,7 +53,7 @@ export const useSubmitAutoTx = ({
                 console.log(data)
                 let autoTxID = data.arrayLog.find(
                     (log) =>
-                        log.key == "auto_tx_id"
+                        log.key == "tx-id"
                 ).value;
 
                 console.log(autoTxID)

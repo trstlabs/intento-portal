@@ -34,9 +34,9 @@ export const useCreateAuthzGrant = ({
     grantee, msgs, expirationDurationMs, coin
 }: UseCreateAuthzGrantParams
 ) => {
-  const { address, client, status } =
+    const { address, client, status } =
         useRecoilValue(ibcWalletState)
- 
+
     /*   const { address, client, status } =
         useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)

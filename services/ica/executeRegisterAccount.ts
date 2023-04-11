@@ -22,7 +22,7 @@ export const executeRegisterAccount = async ({
   let tx = await client.tx.autoTx.registerAccount({
     connectionId, owner,
   },
-    { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
+    { gasLimit: 200_000 }
   )
   validateTransactionSuccess(tx)
  

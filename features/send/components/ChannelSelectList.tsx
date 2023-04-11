@@ -47,7 +47,7 @@ export const ChannelSelectList = ({
 
   function passChannel(selectedInfo) {
     let selectedChannel = new ChannelInfo();
-    selectedChannel.channelID = selectedInfo.trst_channel
+    selectedChannel.channelID = selectedInfo.channel
     selectedChannel.name = selectedInfo.id
     selectedChannel.logoURI = selectedInfo.logoURI
     selectedChannel.denom = selectedInfo.denom

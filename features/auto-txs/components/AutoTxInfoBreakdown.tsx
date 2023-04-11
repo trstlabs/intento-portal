@@ -53,6 +53,7 @@ type InfoHeaderProps = {
     txId: string
     owner: string
     active: boolean
+    latestExecWasError: boolean
 }
 
 export const AutoTxInfoBreakdown = ({
@@ -69,6 +70,7 @@ export const AutoTxInfoBreakdown = ({
     const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddr)
     const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
     const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
+    const latestExecWasError = autoTxInfo.autoTxHistory.length > 0 && autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ""
     //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
 
     //send funds on host
@@ -207,6 +209,7 @@ export const AutoTxInfoBreakdown = ({
                 txId={autoTxInfo.txId}
                 owner={autoTxInfo.owner}
                 active={isActive}
+                latestExecWasError={latestExecWasError}
             />
             <Row>
                 <CardContent>
@@ -219,11 +222,11 @@ export const AutoTxInfoBreakdown = ({
                             />
                         )}
                         <Text
-                            variant="title"
+                            variant="caption"
                             align="center"
                             css={{ padding: '$8', }}
-                        >  {{ isActive } ? <> 🟢  </> : <>🔴</>}</Text><Text>{autoTxInfo.label != "" ? <> Trigger: {autoTxInfo.label}</> : <>Trigger ID: {autoTxInfo.txId}</>}  </Text>
-                        <Column align="center"> <Text variant="caption">
+                        >  {latestExecWasError ? <>🔴</> : <>🟢 </>}</Text><Text>{autoTxInfo.label != "" ? <> Trigger: {autoTxInfo.label}</> : <>Trigger ID: {autoTxInfo.txId}</>}  </Text>
+                        <Column align="center"> <Text variant="title">
                             <> Message Type: {autoTxInfo.msgs[0].typeUrl.split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
                         </Text></Column>
                     </Column>
@@ -444,9 +447,9 @@ export const AutoTxInfoBreakdown = ({
                             </Column><Column>
                                 <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
                                 <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
-                                <Text variant="caption">Execution: {executed ? <>🟢</> : <>🔴</>}</Text>
+
                                 {/* {result && <Text variant="caption">Result: {result}</Text>} */}
-                                {error && <Text variant="caption">Execution Error: {error}</Text>}
+                                {error ? <Text variant="caption">🔴 Execution Error: {error}</Text> : <Text variant="caption">Executed: {executed ? <>🟢</> : <>🔴</>}</Text>}
                                 {timedOut && <Text variant="caption">Execution on the destination chain did not happen because it timed out</Text>}
                             </Column>
 
@@ -480,7 +483,7 @@ function Row({ children }) {
 }
 
 
-const InfoHeader = ({ txId, active }: InfoHeaderProps) => (
+const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
     <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
         <Inline gap={6}>
             <Link href="/triggers" passHref>
@@ -497,7 +500,7 @@ const InfoHeader = ({ txId, active }: InfoHeaderProps) => (
             <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
         </Inline>
         <Text variant="caption" color="secondary">
-            {{ active } ? <> 🟢  </> : <>🔴</>}Trigger ID: {txId}
+            {latestExecWasError ? <>🔴</> : active && <>🟢</>}Trigger ID: {txId}
         </Text>
     </Inline>
 )

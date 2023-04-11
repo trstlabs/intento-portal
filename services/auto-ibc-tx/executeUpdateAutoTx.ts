@@ -31,7 +31,7 @@ export const executeUpdateAutoTx = async ({
       //dependsOnTxId: autoTxParams.dependsOnTxId ? autoTxParams.dependsOnTxIds || [],
       feeFunds: autoTxParams.feeFunds ? autoTxParams.feeFunds : [],
     },
-      { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
+      { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM) }
     )
   )
 

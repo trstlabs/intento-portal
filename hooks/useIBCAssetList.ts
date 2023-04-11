@@ -9,7 +9,7 @@ export type IBCAssetInfo = {
   denom: string
   decimals: number
   trst_denom: string
-  trst_channel: string
+  channel_to_trst: string
   channel: string
   logoURI: string
   connection_id?: string

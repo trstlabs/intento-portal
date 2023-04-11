@@ -63,7 +63,7 @@ export const AutoTxCard = ({
                             Information
                         </Text> */}
                         <Text variant="legend">
-                            {isActive ? <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</> : <>🔴 Execution ended</>}
+                            {isActive ? <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</> : <>Execution ended</>}
                             {/* {isActive ? (
                                 <>
                                     <StyledSpanForHighlight>

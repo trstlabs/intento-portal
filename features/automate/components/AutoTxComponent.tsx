@@ -6,7 +6,7 @@ import { SubmitAutoTxDialog, AutoTxData } from './SubmitAutoTxDialog';
 import { JsonCodeMirrorEditor } from './jsonMirror';
 import { useICAForUser, useGrantsForUser, useICATokenBalance } from '../../../hooks/useICA';
 
-import { examples, osmoExamples, wasmExamples } from './exampleMsgs';
+import { generalExamples, osmoExamples, wasmExamples } from './exampleMsgs';
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 
@@ -105,6 +105,7 @@ export const AutoTxComponent = ({
     const shouldTriggerAuthzGrant =
       !isExecutingAuthzGrant && requestedAuthzGrant;
     if (shouldTriggerAuthzGrant) {
+      connectExternalWallet(null)
       handleCreateAuthzGrant(undefined, { onSettled: () => setRequestedCreateAuthzGrant(false) })
     }
   }, [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant])
@@ -392,7 +393,7 @@ function messageData(index: number, chainSymbol: string, msg: string, setExample
     <Divider offsetY='$10' />
     {/* {autoTxData.typeUrls && autoTxData.typeUrls[index] && <Row> <Text css={{ padding: '$4', textAlign: "center" }} variant="title">{autoTxData.typeUrls[index]}</Text></Row>} */}
     <Inline css={{ display: 'inline' }}><Text css={{ paddingBottom: '$4' }} variant="legend"> Examples</Text>
-      {examples.map((example, ei) => (
+      {generalExamples.map((example, ei) => (
         <span key={ei}>  <Chip label={example.typeUrl.split(".").find((data) => data.includes("Msg")).slice(3).replace(/([A-Z])/g, ' $1').trim()} onClick={() => setExample(index, example)} />
         </span>
       ))}

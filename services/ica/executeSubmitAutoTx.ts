@@ -86,7 +86,7 @@ export const executeSubmitAutoTx = async ({
       // dependsOnTxIds,
       feeFunds,
     },
-      { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
+      { gasLimit: 140_000 }
     )
   )
 
