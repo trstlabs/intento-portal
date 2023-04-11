@@ -2,7 +2,7 @@ import { styled } from 'junoblocks'
 import { useState, useRef, useEffect } from 'react'
 import { AutoTxData } from './SubmitAutoTxDialog'
 import { AutoTxComponent } from './AutoTxComponent'
-import { examples } from './exampleMsgs'
+import { generalExamples } from './exampleMsgs'
 
 type AutomateModuleProps = {
   /* will be used if provided on first render instead of internal state */
@@ -25,10 +25,9 @@ export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
     function setInitialExampleIfProvided() {
       if (initialExampleValue) {
         const exampleIndex = initialExampleValue
-        autoTxDatas[0].msgs[0] = JSON.stringify(examples[exampleIndex], null, "\t")
+        autoTxDatas[0].msgs[0] = JSON.stringify(generalExamples[exampleIndex], null, "\t")
         setAutoTxDatas(
           autoTxDatas
-
         )
       }
     },
