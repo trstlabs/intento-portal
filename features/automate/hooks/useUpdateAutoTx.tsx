@@ -58,7 +58,7 @@ export const useUpdateAutoTx = ({
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Your trigger is updated!"
-                        body={`An on-chain trigger was created updated`}
+                        body={`An on-chain trigger was updated succesfully`}
 
                         onClose={() => toast.dismiss(t.id)}
                     />
