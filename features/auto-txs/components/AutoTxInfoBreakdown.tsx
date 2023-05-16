@@ -265,7 +265,7 @@ export const AutoTxInfoBreakdown = ({
 
                         </Column>
                     </Row>)*/}
-                {!isIcaLoading && !isIcaBalanceLoading && ibcInfo && (<Row>
+                {!isIcaLoading && !isIcaBalanceLoading && autoTxInfo.connectionId && (<Row>
                     <Column style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }} gap={8} align="flex-start" justifyContent="flex-start">
 
                         <Text variant="legend" color="secondary" align="left">
@@ -406,14 +406,6 @@ export const AutoTxInfoBreakdown = ({
                     <Inline gap={2}>
                         <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
                     </Inline>
-                    {autoTxInfo.endTime.seconds && (<><Tooltip label={"End time is the time last time execution can place"}>< Text variant="legend" color="secondary" align="left">
-                        End time
-                    </Text></Tooltip>
-                        <Inline gap={2}>
-                            <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
-
-                        </Inline>
-                    </>)}
                     {
                         autoTxInfo.interval.seconds != "0" && (<> <Tooltip label={"Interval is the fixed time between 2 executions"}><Text variant="legend" color="secondary" align="left">
                             Interval
@@ -423,6 +415,14 @@ export const AutoTxInfoBreakdown = ({
 
                             </Inline></>)
                     }
+                    {autoTxInfo.endTime.seconds && (<><Tooltip label={"End time is the time last time execution can place"}>< Text variant="legend" color="secondary" align="left">
+                        End time
+                    </Text></Tooltip>
+                        <Inline gap={2}>
+                            <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
+
+                        </Inline>
+                    </>)}
                 </Column>
                 </Row>
                 )}
@@ -439,9 +439,8 @@ export const AutoTxInfoBreakdown = ({
                 {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
                     Execution History
                 </Text></Inline>
-                    {autoTxInfo.autoTxHistory?.map(({ execFee, actualExecTime, scheduledExecTime, executed, error, timedOut }, index) => <div key={index}>
+                    {autoTxInfo.autoTxHistory?.slice(0).reverse().map(({ execFee, actualExecTime, scheduledExecTime, executed, error, timedOut }, index) => <div key={index}>
                         <Column gap={2} align="flex-start" justifyContent="flex-start">
-
                             <Column>
                                 <Text variant="body">At {getRelativeTime(scheduledExecTime.seconds)} </Text>
                             </Column><Column>

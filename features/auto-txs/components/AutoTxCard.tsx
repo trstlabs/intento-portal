@@ -38,7 +38,7 @@ export const AutoTxCard = ({
                             <ImageForTokenLogo
                                 size="big"
                                 logoURI={ibcInfo.logoURI}
-                                alt={ibcInfo.symbol}
+                                css={{ backgroundColor: "transparent !important"  }}
                             />
                         </StyledDivForTokenLogos>)}
                         {autoTxInfo.label ? <StyledText

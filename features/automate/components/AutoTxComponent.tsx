@@ -226,10 +226,9 @@ export const AutoTxComponent = ({
                     </>
                   }
                 </></Row>
-              {chainName && (<Card variant="secondary" disabled css={{ padding: '$2' }}>
+              {chainName && (isIcaLoading ? (<Spinner size={18} style={{ margin: 0 }} />) : (<Card variant="secondary" disabled css={{ padding: '$2' }}>
                 <CardContent size="medium">
-
-                  {!icaAddr && !isIcaLoading ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>)
+                  {!icaAddr ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>)
                     : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>
                       {!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}
                     </>
@@ -240,10 +239,10 @@ export const AutoTxComponent = ({
                     : (icaAddr && !shouldDisableAuthzGrantButton && <>
                       <Card variant="secondary" disabled css={{ padding: '$4', margin: '$4' }}>
                         <CardContent>
-                        <Tooltip
-                              label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
-                              aria-label="Fee Funds"
-                            ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}</Text></Tooltip>
+                          <Tooltip
+                            label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                            aria-label="Fee Funds"
+                          ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}</Text></Tooltip>
                           <Row>
                             <Text variant="legend"><StyledInput step=".01"
                               placeholder="0.00" type="number"
@@ -271,7 +270,7 @@ export const AutoTxComponent = ({
                             >
                               {isExecutingSendFundsOnHost ? (<Spinner instant />) : "Send"}
                             </Button>
-                           
+
                           </Row>
                         </CardContent>
                       </Card>
@@ -301,7 +300,8 @@ export const AutoTxComponent = ({
                     </>)
                   )}
                 </CardContent>
-              </Card>)}
+              </Card>))}
+
             </Column>
             {autoTxData.msgs.map((msg, index) => (
               <div key={index}>

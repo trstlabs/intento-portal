@@ -18,7 +18,12 @@ export const getICA = async ({
         const response = await client.query.auto_tx.interchainAccountFromAddress({ owner, connectionId })
         return response.interchainAccountAddress
     } catch (e) {
-        console.error('err(getICA):', e)
+        if (e.message.includes("account found")) {
+            return ""
+        }
+        else {
+            console.error('err(getICA):', e)
+        }
     }
 }
 
