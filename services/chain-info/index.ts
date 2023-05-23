@@ -2,7 +2,11 @@
 
 import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
 import { convertMicroDenomToDenom } from 'junoblocks'
+
 import { TrustlessChainClient } from 'trustlessjs'
+
+import { Params } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
+import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 
 
 export interface BaseQueryInput {
@@ -76,28 +80,41 @@ export const getStakeBalanceForAcc = async ({
     }
 }
 
-export const getAPR = async (client: TrustlessChainClient) => {
+export const getAPR = async (client: TrustlessChainClient, moduleState: ParamsState) => {
+
     try {
-        const annualProvision = await getAnnualProvisions(client)
         // decode the protobuf-encoded bytes into a string
-        const decString = new TextDecoder().decode(annualProvision);
+        const decString = new TextDecoder().decode(moduleState.annualProvision);
 
         const annualProvisionNumber = Number(protoDecimalToJson(decString));
 
-        const mintParams = await getMintParams(client)
+        const bondedTokens = await getBondedTokens(client)
 
-        const bondedTokens = await (await getStakingParams(client)).bondedTokens
-
-        const communityTax = (await getDistributionParams(client)).communityTax
+        const communityTax = moduleState.distrModuleParams.communityTax
         const communityTaxNumber = Number(protoDecimalToJson(communityTax));
         const blockParams = (await getBlockParams(client))
-        const blocksPerYearNumber = Number(mintParams.params.blocksPerYear);
-        const stakingProvisionPercent = await getStakeProvisionPercent(client)
+        const blocksPerYearNumber = Number(moduleState.mintModuleParams.blocksPerYear);
 
-        const stakingProvision = stakingProvisionPercent * annualProvisionNumber
+        const stakingProvision = moduleState.stakingProvision * annualProvisionNumber
         return calculateApr(stakingProvision, bondedTokens, communityTaxNumber, blocksPerYearNumber, blockParams.actualBlocksPerYear)
 
     } catch (e) { console.error('err(getAPR):', e) }
+}
+
+export const getModuleParams = async (client: TrustlessChainClient) => {
+    try {
+        const annualProvision = await getAnnualProvisions(client)
+        const mintModuleParams = (await getMintParams(client)).params
+
+        // const stakingParams = await getStakingParams(client)
+
+        const distrModuleParams = (await getDistributionParams(client)).params.params
+        const communityTax = (await getDistributionParams(client)).communityTax  
+        const stakingProvision = await getStakeProvisionPercent(client)
+
+        return { distrModuleParams, mintModuleParams,/*  stakingParams, */annualProvision, stakingProvision, communityTax}
+
+    } catch (e) { console.error('err(getModuleParams):', e) }
 }
 
 /* 
@@ -118,9 +135,9 @@ export const getAPRForAcc = async (client: TrustlessChainClient) => {
     } catch (e) { console.error('err(getAPR):', e) }
 }
  */
-export const getAPY = async (client: TrustlessChainClient, intervalSeconds: number) => {
+export const getAPY = async (client: TrustlessChainClient, paramsState: ParamsState, intervalSeconds: number) => {
     try {
-        const apr = await getAPR(client);
+        const apr = await getAPR(client, paramsState);
         if (!apr) {
             return 0
         }
@@ -131,44 +148,36 @@ export const getAPY = async (client: TrustlessChainClient, intervalSeconds: numb
     } catch (e) { console.error('err(getAPY):', e) }
 }
 
-export const getAPYForAutoCompound = async (client: TrustlessChainClient, durationSeconds: number, intervalSeconds: number, stakingBalanceAmount: number, nrMessages: number) => {
+export const getAPYForAutoCompound = async (triggerParams: Params, paramsState: ParamsState, client: TrustlessChainClient, durationSeconds: number, intervalSeconds: number, stakingBalanceAmount: number, nrMessages: number) => {
+
     try {
-        const apy = await getAPY(client, intervalSeconds);
-        const expectedFees = await getExpectedAutoTxFee(client, durationSeconds, nrMessages, intervalSeconds,)
+        const apy = await getAPY(client, paramsState, intervalSeconds);
+        const expectedFees = await getExpectedAutoTxFee(triggerParams, durationSeconds, nrMessages, intervalSeconds,)
         return ((apy * stakingBalanceAmount) / stakingBalanceAmount) - expectedFees
     } catch (e) { console.error('err(getAPYForAutoCompound):', e) }
 }
 
-export const getExpectedAutoTxFee = async (client: TrustlessChainClient, durationSeconds: number, lenMsgs: number, intervalSeconds?: number) => {
-    try {
-        // console.log("durationSeconds", durationSeconds)
-        // console.log("intervalSeconds", intervalSeconds)
-        const params = /* { AutoTxFlexFeeMul: 3, AutoTxConstantFee: 5_000 }// */await getAutoTxParams(client)
-        const recurrences = intervalSeconds && intervalSeconds < durationSeconds ? Math.floor(durationSeconds / intervalSeconds) : 1;
-        const periodSeconds = intervalSeconds && intervalSeconds < durationSeconds ? intervalSeconds : durationSeconds;
-        // console.log("periodSeconds", periodSeconds)
-        const periodMinutes = Math.trunc(periodSeconds / 60)
-        // console.log("period", periodMinutes)
-        // console.log("AutoTxFlexFeeMul", params.AutoTxFlexFeeMul)
-        const flexFeeForPeriod = (Number(params.AutoTxFlexFeeMul) / 100) * periodMinutes
-        // console.log("flexFeeForPeriod", flexFeeForPeriod)
-        // console.log("AutoTxConstantFee", params.AutoTxConstantFee)
-        const autoTxFee = recurrences * flexFeeForPeriod + recurrences * Number(params.AutoTxConstantFee) * lenMsgs
-        const autoTxFeeDenom = convertMicroDenomToDenom(autoTxFee, 6)
-        // console.log("autoTxFeeDenom", autoTxFeeDenom)
-        return autoTxFeeDenom
-    } catch (e) { console.error('err(getExpectedAutoTxFee):', e) }
+export const getExpectedAutoTxFee = (triggerParams: Params, durationSeconds: number, lenMsgs: number, intervalSeconds?: number) => {
+
+    const recurrences = intervalSeconds && intervalSeconds < durationSeconds ? Math.floor(durationSeconds / intervalSeconds) : 1;
+    const periodSeconds = intervalSeconds && intervalSeconds < durationSeconds ? intervalSeconds : durationSeconds;
+
+    const periodMinutes = Math.trunc(periodSeconds / 60)
+
+    const flexFeeForPeriod = (Number(triggerParams.AutoTxFlexFeeMul) / 100) * periodMinutes
+
+    const autoTxFee = recurrences * flexFeeForPeriod + recurrences * Number(triggerParams.AutoTxConstantFee) * lenMsgs
+    const autoTxFeeDenom = convertMicroDenomToDenom(autoTxFee, 6)
+
+    return autoTxFeeDenom
+
 }
 
 function calculateApr(stakingProvision: number, bondedTokens: number, communityTax: number, blocksPerYear: number, actualBlocksPerYear: number) {
-    //considering staking rewards is set to 45% of annual provision
-    // console.log(stakingProvision)
-    // console.log(bondedTokens)
-    // console.log(communityTax)
+    //considering staking rewards is set to x% of annual provision
+
     const estimatedApr = Math.ceil((stakingProvision / bondedTokens) * (1 - communityTax) * 100)
-    // console.log(estimatedApr)
-    // console.log(actualBlocksPerYear)
-    // console.log(blocksPerYear)
+
     //calculatedApr is apr based on actual blocks per year
     const calculatedApr = Math.ceil(estimatedApr * (actualBlocksPerYear / blocksPerYear))
 
@@ -200,7 +209,7 @@ async function getBlockParams(client: TrustlessChainClient) {
         }
     } catch (e) { console.error('err(getBlockParams):', e) }
 }
-
+/* 
 async function getStakingParams(client: TrustlessChainClient) {
     try {
         const staking = await client.query.staking.params({})
@@ -215,10 +224,20 @@ async function getStakingParams(client: TrustlessChainClient) {
             staking: staking.params
         }
     } catch (e) { console.error('err(getStakingParams):', e) }
+} */
+
+
+async function getBondedTokens(client: TrustlessChainClient) {
+    try {
+
+        const pool = await client.query.staking.pool({})
+        const bondedTokens = Number(pool.pool.bondedTokens);
+        return bondedTokens
+    } catch (e) { console.error('err(getStakingParams):', e) }
 }
 
 
-async function getDistributionParams(client: TrustlessChainClient) {
+export async function getDistributionParams(client: TrustlessChainClient) {
     try {
         const distribution = await client.query.distribution.params({})
         //   const communityTax = parseFloat(distribution.params.community_tax)
@@ -243,12 +262,11 @@ async function getAnnualProvisions(client: TrustlessChainClient) {
 
 
 
-async function getAutoTxParams(client: TrustlessChainClient) {
-    console.log("getAutoTxParams")
+export async function getAutoTxParams(client: TrustlessChainClient) {
     try {
         const resp = await client.query.auto_tx.params({})
-        console.log(resp)
-        //   const communityTax = parseFloat(distribution.params.community_tax)
+        // console.log(resp)
+        // const communityTax = parseFloat(distribution.params.community_tax)
         return resp.params
     } catch (e) { console.error('err(getAutoTxParams):', e) }
 }

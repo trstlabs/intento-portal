@@ -41,7 +41,7 @@ export const useCreateAuthzGrant = ({
         useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries(['tokenBalance', 'userAuthZGrants'])
 
     return useMutation(
         'createAuthzGrant',
@@ -59,8 +59,7 @@ export const useCreateAuthzGrant = ({
                 granter: address,
                 msgs,
                 expirationDurationMs,
-                coin,
-
+                coin
             })
 
         },

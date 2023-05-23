@@ -1,13 +1,14 @@
-import { Inline, Card, Spinner, CardContent, /* IconWrapper, PlusIcon, */Tooltip, Button,/*  styled,  */Text, Column, styled, IconWrapper, PlusIcon, Union, Divider, convertDenomToMicroDenom } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, Button,/*  styled,  */Text, Column, styled, IconWrapper, PlusIcon, convertDenomToMicroDenom } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import { useSubmitAutoTx, useRegisterAccount, useCreateAuthzGrant, useSendFundsOnHost } from '../hooks';
 import { IbcSelector } from './IbcSelector';
 import { SubmitAutoTxDialog, AutoTxData } from './SubmitAutoTxDialog';
-import { JsonCodeMirrorEditor } from './jsonMirror';
-import { useICAForUser, useGrantsForUser, useICATokenBalance } from '../../../hooks/useICA';
+import { useGetICA, useAuthZGrantsForUser, useICATokenBalance } from '../../../hooks/useICA';
 
-import { generalExamples, osmoExamples, wasmExamples } from './exampleMsgs';
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
+import { useRefetchQueries } from '../../../hooks/useRefetchQueries';
+import { IcaCard } from './IcaCard';
+import { ExampleMessageButtons } from './ExampleMessageButtons';
 
 
 type AutoTxsInputProps = {
@@ -33,9 +34,11 @@ export const AutoTxComponent = ({
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
 
   //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
-  const [icaAddr, isIcaLoading] = useICAForUser(autoTxData.connectionId)
-  const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(chainSymbol, icaAddr)
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useGrantsForUser(icaAddr, chainSymbol, autoTxData)
+  const [icaAddress, isIcaLoading] = useGetICA(autoTxData.connectionId, "")
+  const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(chainSymbol, icaAddress)
+  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(icaAddress, chainSymbol, autoTxData)
+  const refetchGrants = useRefetchQueries(['userAuthZGrants'])
+  const refetchICA = useRefetchQueries([`interchainAccount/${autoTxData.connectionId}`, `icaTokenBalance/${chainSymbol}`])
 
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
     useSubmitAutoTx({ autoTxData })
@@ -73,12 +76,16 @@ export const AutoTxComponent = ({
   }
 
   //////////////////////////////////////// ICA funds \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol, {
+    onError(error) {
+      console.log(error)
+    }
+  })
 
   const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
   const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
-    useSendFundsOnHost({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+    useSendFundsOnHost({ toAddress: icaAddress, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
   useEffect(() => {
     const shouldTriggerSendFunds =
       !isExecutingSendFundsOnHost && requestedSendFunds;
@@ -93,14 +100,14 @@ export const AutoTxComponent = ({
   }
 
   const shouldDisableSendFundsButton =
-    !icaAddr ||
+    !icaAddress ||
     (autoTxData.msgs && autoTxData.msgs.length == 0) || Number(feeFundsHostChain) == 0
 
   ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   ////////////////////////////////////////ICA Authz Grant / Send funds\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
-    useCreateAuthzGrant({ grantee: icaAddr, msgs: autoTxData.msgs/* , expirationDurationMs: autoTxData.duration */, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+    useCreateAuthzGrant({ grantee: icaAddress, msgs: autoTxData.msgs/* , expirationDurationMs: autoTxData.duration */, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
   useEffect(() => {
     const shouldTriggerAuthzGrant =
       !isExecutingAuthzGrant && requestedAuthzGrant;
@@ -133,6 +140,11 @@ export const AutoTxComponent = ({
       }
       //newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
       onAutoTxChange(newAutoTxData)
+      if (JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg"))) {
+        connectExternalWallet(null)
+        refetchGrants()
+      }
+
     } catch (e) {
       console.log(e)
     }
@@ -147,6 +159,10 @@ export const AutoTxComponent = ({
     setChainName(name)
     setChainSymbol(chainSymbol)
     setPrefix(newPrefix)
+    connectExternalWallet(null)
+    refetchICA()
+    refetchGrants()
+
   }
 
   function setExample(index: number, msgObject: any) {
@@ -192,17 +208,14 @@ export const AutoTxComponent = ({
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmissionButton =
-    isExecutingRegisterICA || !icaAddr || !isJsonValid ||
+    isExecutingRegisterICA || !icaAddress || !isJsonValid ||
     (autoTxData.msgs[0] && autoTxData.msgs[0].length == 0 && JSON.parse(autoTxData.msgs[0])["typeUrl"].length < 5)
 
 
   return (
     <StyledDivForContainer>
       <Card variant="secondary" disabled css={{ margin: '$6' }}>
-
-
         <Card variant="secondary" disabled css={{ padding: '$2' }}>
-
           <CardContent size="medium" >
             <Column>
               <Row>
@@ -216,7 +229,7 @@ export const AutoTxComponent = ({
                   size={'large'}
                 />   <>
 
-                  {/* !icaActive && !isIcaActiveLoading &&  */!icaAddr && !isIcaLoading && autoTxData.connectionId != "" &&
+                  {/* !icaActive && !isIcaActiveLoading &&  */!icaAddress && !isIcaLoading && autoTxData.connectionId != "" &&
                     <>
                       <Button css={{ margin: '$2', overflow: "hidden", float: "left" }}
                         variant="secondary"
@@ -226,86 +239,37 @@ export const AutoTxComponent = ({
                     </>
                   }
                 </></Row>
-              {chainName && (isIcaLoading ? (<Spinner size={18} style={{ margin: 0 }} />) : (<Card variant="secondary" disabled css={{ padding: '$2' }}>
-                <CardContent size="medium">
-                  {!icaAddr ? (<Text variant="caption">No Interchain Account for this chain: {chainName}.</Text>)
-                    : (<>  <Text variant="body" css={{ padding: '$4 $3' }}>Interchain Account</Text><Text variant="legend"> Address: <Text variant="caption"> {icaAddr}</Text></Text>
-                      {!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {chainSymbol}</Text> </Text>}
-                    </>
-                    )}
-                  {!isAuthzGrantsLoading && (icaAuthzGrants && icaAuthzGrants[0] && icaAuthzGrants[0].msgTypeUrl
-                    ? <Text variant="legend"> Grants: {icaAuthzGrants.map((grant) => <Text variant="caption"> Has grant for message type: '{grant.msgTypeUrl}' {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}</Text>
-                    )}</Text>
-                    : (icaAddr && !shouldDisableAuthzGrantButton && <>
-                      <Card variant="secondary" disabled css={{ padding: '$4', margin: '$4' }}>
-                        <CardContent>
-                          <Tooltip
-                            label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
-                            aria-label="Fee Funds"
-                          ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {chainSymbol}</Text></Tooltip>
-                          <Row>
-                            <Text variant="legend"><StyledInput step=".01"
-                              placeholder="0.00" type="number"
-                              value={feeFundsHostChain}
-                              onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
-                            />{chainSymbol}
-                            </Text>
-                          </Row>
-                          <Row>
-                            <Button css={{ marginTop: '$8', margin: '$2' }}
-                              variant="secondary"
-                              size="small"
-                              disabled={shouldDisableSendFundsButton || shouldDisableAuthzGrantButton && Number(feeFundsHostChain) != 0}
-                              onClick={() =>
-                                handleCreateAuthzGrantClick()
-                              }>
-                              {isExecutingAuthzGrant ? <Spinner instant /> : ('AuthZ Grant + Send')}
-                            </Button><Button css={{ margin: '$2' }}
-                              variant="secondary"
-                              size="small"
-                              disabled={shouldDisableSendFundsButton}
-                              onClick={() =>
-                                handleSendFundsOnHostClick()
-                              }
-                            >
-                              {isExecutingSendFundsOnHost ? (<Spinner instant />) : "Send"}
-                            </Button>
-
-                          </Row>
-                        </CardContent>
-                      </Card>
-                      <Card variant="secondary" disabled css={{ padding: '$4', margin: '$4' }}>
-                        <CardContent>
-                          <Tooltip
-                            label="An AuthZ grant allows the Interchain Account that automates your transaction to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"
-                            aria-label="Fee Funds"
-                          ><Text variant="legend"> No authorization grants for specified message type (yet)</Text></Tooltip>
-
-                          <Button css={{ marginTop: '$8', padding: '$4' }}
-                            variant="secondary"
-                            size="small"
-                            disabled={shouldDisableAuthzGrantButton}
-                            onClick={() =>
-                              handleCreateAuthzGrantClick()
-                            }
-                          >
-                            {isExecutingAuthzGrant ? <Spinner instant /> : 'Create AuthZ Grant'}
-                          </Button>
-
-
-                        </CardContent>
-                      </Card>
-
-
-                    </>)
-                  )}
-                </CardContent>
-              </Card>))}
+              {chainName && (isIcaLoading ? (<Spinner size={18} style={{ margin: 0 }} />) : <>
+                {!icaAddress ? <Text variant="caption">No Interchain Account for this chain: {chainName}.</Text> : <IcaCard
+                  icaAddress={icaAddress}
+                  chainSymbol={chainSymbol}
+                  feeFundsHostChain={feeFundsHostChain}
+                  icaBalance={icaBalance}
+                  isIcaBalanceLoading={isIcaBalanceLoading}
+                  isAuthzGrantsLoading={isAuthzGrantsLoading}
+                  icaAuthzGrants={icaAuthzGrants}
+                  shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
+                  shouldDisableSendFundsButton={shouldDisableSendFundsButton}
+                  setFeeFundsHostChain={setFeeFundsHostChain}
+                  handleSendFundsOnHostClick={handleSendFundsOnHostClick}
+                  isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
+                  handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
+                  isExecutingAuthzGrant={isExecutingAuthzGrant}
+                />}</>
+              )}
 
             </Column>
             {autoTxData.msgs.map((msg, index) => (
               <div key={index}>
-                {messageData(index, chainSymbol, msg, setExample, handleRemoveMsg, handleChangeMsg, setIsJsonValid)}
+                {<ExampleMessageButtons
+                  index={index}
+                  chainSymbol={chainSymbol}
+                  msg={msg}
+                  setExample={setExample}
+                  handleRemoveMsg={handleRemoveMsg}
+                  handleChangeMsg={handleChangeMsg}
+                  setIsJsonValid={setIsJsonValid}
+                />}
               </div>))}
           </CardContent>
         </Card>
@@ -337,9 +301,9 @@ export const AutoTxComponent = ({
                   chainSymbol={chainSymbol}
                   icaBalance={icaBalance}
                   hasIcaAuthzGrant={icaAuthzGrants && icaAuthzGrants[0] != undefined}
-                  icaAddr={icaAddr}
+                  icaAddress={icaAddress}
                   autoTxData={autoTxData}
-                  isShowing={isSubmitAutoTxDialogShowing}
+                  isDialogShowing={isSubmitAutoTxDialogShowing}
                   onRequestClose={() =>
                     setSubmitAutoTxDialogState({
                       isShowing: false,
@@ -356,8 +320,8 @@ export const AutoTxComponent = ({
                   handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
                   handleSendFundsOnHostClick={handleSendFundsOnHostClick}
                 />
-
-              </CardContent>    </div>
+              </CardContent>
+              </div>
             ))
             }
           </Card>)
@@ -386,46 +350,7 @@ const StyledDivForContainer = styled('div', {
 
 })
 
-
-
-function messageData(index: number, chainSymbol: string, msg: string, setExample: (index: number, msg: any) => void, handleRemoveMsg: (index: number) => void, handleChangeMsg: (index: number) => (msg: string) => void, setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>) {
-  return <Column>
-    <Divider offsetY='$10' />
-    {/* {autoTxData.typeUrls && autoTxData.typeUrls[index] && <Row> <Text css={{ padding: '$4', textAlign: "center" }} variant="title">{autoTxData.typeUrls[index]}</Text></Row>} */}
-    <Inline css={{ display: 'inline' }}><Text css={{ paddingBottom: '$4' }} variant="legend"> Examples</Text>
-      {generalExamples.map((example, ei) => (
-        <span key={ei}>  <Chip label={example.typeUrl.split(".").find((data) => data.includes("Msg")).slice(3).replace(/([A-Z])/g, ' $1').trim()} onClick={() => setExample(index, example)} />
-        </span>
-      ))}
-      {chainSymbol == "JUNO" && (<>
-        {wasmExamples.map((example, ei) => (
-          <span key={ei}>  <Chip label={example.typeUrl.split(".").find((data) => data.includes("Msg")).slice(3).replace(/([A-Z])/g, ' $1').trim()} onClick={() => setExample(index, example)} />
-          </span>
-        ))}
-      </>)}
-      {chainSymbol == "OSMO" && (<>
-        {osmoExamples.map((example, ei) => (
-          <span key={ei}>  <Chip label={example.typeUrl.split(".").find((data) => data.includes("Msg")).slice(3).replace(/([A-Z])/g, ' $1').trim()} onClick={() => setExample(index, example)} />
-          </span>
-        ))}
-      </>)}
-
-      {(<Button
-        icon={<IconWrapper icon={<Union />} />}
-        variant="ghost"
-        iconColor="tertiary"
-
-        onClick={() => handleRemoveMsg(index)} />)} </Inline>
-    <div style={{ display: "inline-block", overflow: "hidden", float: "left", }}>
-      <JsonCodeMirrorEditor
-        jsonValue={msg}
-        onChange={handleChangeMsg(index)}
-        onValidate={setIsJsonValid} />
-    </div>
-  </Column>;
-}
-
-function Row({ children }) {
+export function Row({ children }) {
   const baseCss = { padding: '$2 $4' }
   return (
     <Inline
@@ -443,7 +368,7 @@ function Row({ children }) {
 }
 
 
-function Chip({ label, onClick }) {
+export function Chip({ label, onClick }) {
   return (
     <ChipContainer onClick={onClick}>
       {label}
@@ -467,7 +392,7 @@ const ChipContainer = styled('div', {
 
 })
 
-const StyledInput = styled('input', {
+export const StyledInput = styled('input', {
   color: 'inherit',
   padding: '$2',
   margin: '$2',

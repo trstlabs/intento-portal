@@ -33,7 +33,7 @@ export const useSendFundsOnHost = ({
         useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries([`ibcTokenBalance/${coin.denom}`])
 
     return useMutation(
         'SendFunds',

@@ -57,12 +57,12 @@ export const executeSubmitAutoTx = async ({
     msgs.push(msgAny)
   }
 
-  if (autoTxData.icaAddrForAuthZGrant && autoTxData.icaAddrForAuthZGrant != "") {
+  if (autoTxData.icaAddressForAuthZGrant && autoTxData.icaAddressForAuthZGrant != "") {
     const encodeObject2 = {
       typeUrl: "/cosmos.authz.v1beta1.MsgExec",
       value: {
         msgs,
-        grantee: autoTxData.icaAddrForAuthZGrant,
+        grantee: autoTxData.icaAddressForAuthZGrant,
       }
     }
     msgs = [masterRegistry.encodeAsAny(encodeObject2)]
@@ -101,7 +101,7 @@ export class AutoTxData {
   dependsOnTxIds?: number[]
   msgs: string[]
   retries: number
-  icaAddrForAuthZGrant?: string
+  icaAddressForAuthZGrant?: string
   label?: string
   feeFunds?: number
 }

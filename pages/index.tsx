@@ -24,6 +24,7 @@ import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
 import { StakeCard } from '../features/dashboard/components/StakeCard'
 import Contracts from './index_contracts'
+import { useSetModuleParams } from '../hooks/useChainInfo'
 
 
 export default function Home() {
@@ -43,7 +44,7 @@ export default function Home() {
       [sortParameter, sortDirection]
     ),
   })
-
+  useSetModuleParams()
   const shouldShowAutoCompound = !myAutoTxs?.length || (myAutoTxs.find(tx => tx.label === "Autocompound") == undefined);
   const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)

@@ -13,7 +13,6 @@ type StakeCardProps = {
 export const StakeCard = ({
     shouldShowAutoCompound
 }: StakeCardProps) => {
-    // const inputRef = useRef<HTMLInputElement>()
 
     const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
     let data = new AutoTxData()
@@ -65,9 +64,9 @@ export const StakeCard = ({
 
     return (
         <StyledDivForContainer>
-            {!isAPRLoading && APR &&
-                <Column>
-                    <Text variant="title" css={{ paddingLeft: '$4', paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text>
+            <Column css={{ paddingBottom: '$6' }}>
+                <Text variant="title" css={{ paddingLeft: '$4', paddingBottom: '$8' }} ><Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time." ><span> Autocompound</span></Tooltip></Text>
+                {!isAPRLoading && APR ? <>
                     < Card variant="secondary" disabled css={{ padding: '$8' }} >
                         <><Text variant="legend"> <Tooltip label="Nominal APR refers to the annual percentage rate that doesn't take into account compounding interest. It's the simple staking reward rate over the course of a year."><span>Nominal APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.estimatedApr.toPrecision(4)}%</Text>
                             <Text variant="legend"> <Tooltip label="RealTime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time."><span>RealTime APR </span></Tooltip></Text><Text css={{ padding: '$8' }} variant="title">{APR.calculatedApr.toPrecision(4)}%</Text>
@@ -84,14 +83,7 @@ export const StakeCard = ({
                             </Text>}
 
                         </></Card>
-                    {/* <Row>
-                        <Button css={{ margin: '$2', }}
-                            variant="secondary"
-                            onClick={() => setSDKMessage(stakeSDKMessage)}
-                        > Autocompund 
-                        </Button>
 
-                    </Row> */}
                     {
                         shouldShowAutoCompound ? <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'space-around' }}>
                             <StyledPNG src="./img/pot_light.png" />  <StyledDivForButtons><Button css={{ marginleft: '$8' }}
@@ -124,15 +116,21 @@ export const StakeCard = ({
                         </Inline> : <><StyledPNG src="./img/pot_full.png" /><Text >You are autocompounding</Text></>
                     }
 
-                </Column>
 
-            }
+                </> :
+                    <Card variant="secondary" disabled css={{ padding: '$12' }} >
+                        <Text>Calculating expected returns...</Text>
+                        <Spinner size={40} style={{ margin: 0 }} />
+
+                    </Card>
+                }
+            </Column>
 
             <SubmitAutoTxDialog
                 isLoading={isExecutingSchedule}
                 autoTxData={autoTxData}
                 customLabel="Autocompound"
-                isShowing={isSubmitAutoTxDialogShowing}
+                isDialogShowing={isSubmitAutoTxDialogShowing}
                 onRequestClose={() =>
                     setSubmitAutoTxDialogState({
                         isShowing: false,

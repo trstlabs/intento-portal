@@ -341,7 +341,7 @@ export const RecipientList = ({
         isLoading={isExecutingSchedule}
         // label="Recurring Send"
         autoTxData={autoTxData}
-        isShowing={isScheduleDialogShowing}
+        isDialogShowing={isScheduleDialogShowing}
         /* initialActionType={actionType} */
         onRequestClose={() =>
           setScheduleDialogState({

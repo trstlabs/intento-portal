@@ -63,8 +63,6 @@ export const ConnectionSelectList = ({
 
   return (
     <>
-
-
       <StyledDivForScrollContainer
         {...props}
         css={{

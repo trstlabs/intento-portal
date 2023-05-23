@@ -36,10 +36,10 @@ export const useRegisterAccount = ({
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries(['tokenBalance', `interchainAccount/${connectionId}`])
 
     return useMutation(
-        'registerRA',
+        'registerICA',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')

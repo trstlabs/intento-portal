@@ -64,13 +64,14 @@ export interface GrantQueryResponse {
 }
 
 
-export const getGrants = async ({
+export const getAuthZGrants = async ({
     grantee,
     granter,
     msgTypeUrl,
     rpc,
 
 }: GrantQueryInput) => {
+
     const tendermintClient = await Tendermint34Client.connect(rpc);
     // Setup the query client
     const queryClient = QueryClient.withExtensions(
@@ -79,10 +80,15 @@ export const getGrants = async ({
     );
     try {
         let resp = await queryClient.authz.grants(grantee, granter, msgTypeUrl)
-        const res: GrantResponse = { grants: resp.grants[0], msgTypeUrl }
-        return res
+        if (resp.grants[0]) {
+
+
+            const res: GrantResponse = { grants: resp.grants[0], msgTypeUrl }
+            return res
+        }
+        return
     } catch (e) {
-        console.error('err(getGrants):', e)
+        console.error('err(getAuthZGrants):', e)
     }
 }
 

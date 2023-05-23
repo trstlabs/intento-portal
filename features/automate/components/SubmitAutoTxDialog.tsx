@@ -18,6 +18,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useGetExpectedAutoTxFee } from '../../../hooks/useChainInfo'
+import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
 export class AutoTxData {
     duration: number
@@ -26,7 +27,7 @@ export class AutoTxData {
     connectionId?: string
     dependsOnTxIds?: number[]
     msgs: string[]
-    icaAddrForAuthZGrant?: string
+    icaAddressForAuthZGrant?: string
     // typeUrls?: string[]
     recurrences: number
     retries: number
@@ -36,10 +37,10 @@ export class AutoTxData {
 }
 
 type SubmitAutoTxDialogProps = {
-    isShowing: boolean
+    isDialogShowing: boolean
     autoTxData: AutoTxData
     chainSymbol?: string
-    icaAddr?: string
+    icaAddress?: string
     icaBalance?: number
     hasIcaAuthzGrant?: boolean
     customLabel?: string
@@ -57,8 +58,8 @@ type SubmitAutoTxDialogProps = {
 }
 
 export const SubmitAutoTxDialog = ({
-    isShowing,
-    icaAddr,
+    isDialogShowing,
+    icaAddress,
     icaBalance,
     hasIcaAuthzGrant,
     customLabel,
@@ -76,7 +77,6 @@ export const SubmitAutoTxDialog = ({
     handleCreateAuthzGrantClick,
     handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
-
     const [startTime, setStartTime] = useState(0);
     const [duration, setDuration] = useState(14 * 86400000);
 
@@ -101,7 +101,7 @@ export const SubmitAutoTxDialog = ({
 
     function handleInterval(label, value) {
         console.log(value)
-        if (value >= duration ) {
+        if (value >= duration) {
             toast.custom((t) => (
                 <Toast
                     icon={<IconWrapper icon={<Error />} color="error" />}
@@ -115,6 +115,7 @@ export const SubmitAutoTxDialog = ({
         setDisplayInterval(label)
         const recurrence = Math.floor(duration / value)
         setRecurrence(recurrence)
+        refetchExpectedAutoTxFee()
         //handleDisplayRecurrence(recurrence)
     }
     function handleRemoveInterval() {
@@ -127,6 +128,7 @@ export const SubmitAutoTxDialog = ({
             setDisplayDuration(label)
             const recurrence = Math.floor(value / interval)
             setRecurrence(recurrence)
+            refetchExpectedAutoTxFee()
             // handleDisplayRecurrence(recurrence)
             return
         }
@@ -143,6 +145,7 @@ export const SubmitAutoTxDialog = ({
     function handleRemoveDuration() {
         setDuration(0);
         setDisplayDuration('None Selected')
+        refetchExpectedAutoTxFee()
     }
     function handleStartTime(label: string, value: number) {
         if (value == undefined) {
@@ -152,17 +155,19 @@ export const SubmitAutoTxDialog = ({
         setDisplayStartTime(label)
         const recurrence = Math.floor(duration / interval)
         setRecurrence(recurrence)
+        refetchExpectedAutoTxFee()
         //handleDisplayRecurrence(recurrence)
     }
     function handleRemoveStartTime() {
         setStartTime(0);
         setDisplayStartTime(displayInterval)
+        refetchExpectedAutoTxFee()
     }
 
 
     const editLabel = "Must be weeks(s), days(s), hour(s) or minute(s)"
     function convertTime(input: string) {
-       if (input.includes("hour")) {
+        if (input.includes("hour")) {
             const hours = Number(input.match(/\d/g).join(''));
             return hours * 3600000
         } else if (input.includes("day")) {
@@ -193,11 +198,12 @@ export const SubmitAutoTxDialog = ({
         setCheckedFeeAcc(!checkedFeeAcc);
     };
 
-    const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedAutoTxFee(duration, autoTxData, interval)
+    const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedAutoTxFee(duration, autoTxData, isDialogShowing, interval)
+    const refetchExpectedAutoTxFee = useRefetchQueries('expectedAutoTxFee')
     const canSchedule = duration > 0 && interval > 0
 
 
-    const handleData = (icaAddrForAuthZGrant: string) => {
+    const handleData = (icaAddressForAuthZGrant: string) => {
         if (duration < interval || startTime > duration) {
             toast.custom((t) => (
                 <Toast
@@ -208,11 +214,11 @@ export const SubmitAutoTxDialog = ({
             ))
         }
         console.log({ startTime, duration, interval, recurrences })
-        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msgs: autoTxData.msgs, icaAddrForAuthZGrant, feeFunds, label: txLabel })
+        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msgs: autoTxData.msgs, icaAddressForAuthZGrant, feeFunds, label: txLabel })
     }
 
     return (
-        <Dialog isShowing={isShowing} onRequestClose={onRequestClose}>
+        <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
             <DialogHeader paddingBottom={canSchedule ? '$8' : '$12'}>
                 <Text variant="header">Automate Transaction</Text>
             </DialogHeader>
@@ -501,7 +507,7 @@ export const SubmitAutoTxDialog = ({
                 {autoTxData.connectionId && <Button
                     disabled={!hasIcaAuthzGrant}
                     variant="secondary"
-                    onClick={() => isLoading ? undefined : handleData(icaAddr)}
+                    onClick={() => isLoading ? undefined : handleData(icaAddress)}
                 >
                     {isLoading ? (
                         <Spinner instant={true} size={16} />

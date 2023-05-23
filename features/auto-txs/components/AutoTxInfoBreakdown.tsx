@@ -31,7 +31,7 @@ import {
 } from 'util/conversion'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
-import { /* useGrantsForUser,  */useGetICA, /* useIsActiveICAForUser,  */useICATokenBalance } from '../../../hooks/useICA'
+import { /* useAuthZGrantsForUser,  */useGetICA, /* useIsActiveICAForUser,  */useICATokenBalance } from '../../../hooks/useICA'
 
 import dayjs from 'dayjs'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
@@ -62,12 +62,12 @@ export const AutoTxInfoBreakdown = ({
     //size = 'large',
 }: AutoTxInfoBreakdownProps) => {
 
-    const [icaAddr, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
+    const [icaAddress, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
     //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
     const symbol = ibcInfo ? ibcInfo.symbol : ""
     const denom = ibcInfo ? ibcInfo.denom : ""
     const [showICAHostButtons, setShowICAHostButtons] = useState(false)
-    const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddr)
+    const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddress)
     const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
     const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
     const latestExecWasError = autoTxInfo.autoTxHistory.length > 0 && autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ""
@@ -77,7 +77,7 @@ export const AutoTxInfoBreakdown = ({
     const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
     const [requestedSendFunds, setRequestedSendFunds] = useState(false)
     const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
-        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
+        useSendFundsOnHost({ toAddress: icaAddress, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
     useEffect(() => {
         const shouldTriggerSendFunds =
             !isExecutingSendFundsOnHost && requestedSendFunds;
@@ -177,7 +177,7 @@ export const AutoTxInfoBreakdown = ({
 
     ////
 
-    // const [icaUpdateAutoTxs, isUpdateAutoTxsLoading] = useGrantsForUser(icaAddr, ibcInfo.symbol, autoTxInfo)
+    // const [icaUpdateAutoTxs, isUpdateAutoTxsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, autoTxInfo)
     /*  if (size === 'small') {
          return (
              <>
@@ -271,7 +271,7 @@ export const AutoTxInfoBreakdown = ({
                         <Text variant="legend" color="secondary" align="left">
                             Interchain Account   </Text>
                         <Inline gap={2}>
-                            <Text variant="body">{icaAddr} </Text>
+                            <Text variant="body">{icaAddress} </Text>
                         </Inline>
                         {!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {ibcInfo.symbol}</Text> </Text>}
                         <Button css={{ justifyContent: "flex-end !important" }}

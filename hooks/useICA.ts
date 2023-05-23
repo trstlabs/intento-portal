@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil'
 
 import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-import { getICA, /* getIsActiveICA, */ getGrants, getFeeGrantAllowance, AutoTxData, GrantResponse } from '../services/ica'
+import { getICA, /* getIsActiveICA, */ getAuthZGrants, getFeeGrantAllowance, AutoTxData, GrantResponse } from '../services/ica'
 // import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
@@ -11,60 +11,16 @@ import { useIBCAssetInfo } from './useIBCAssetInfo'
 
 import { useTrustlessChainClient } from './useTrustlessChainClient'
 
-export const useICAForUser = (connectionId: string) => {
-  const { status, client } = useRecoilValue(walletState)
+export const useGetICA = (connectionId: string, accAddr?: string) => {
 
-  const { data: ica, isLoading } = useQuery(
-    ['connection_id', connectionId],
-    async () => {
-
-      const resp: string = await getICA({ owner: client.address, connectionId, client })
-      return resp
-
-    },
-    {
-      enabled: Boolean(connectionId != "" && connectionId != undefined && status === WalletStatusType.connected && client && client.address),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
-    },
-  )
-
-  return [ica, isLoading] as const
-
-
-}
-
-/* 
-export const useIsActiveICAForUser = (connectionId: string) => {
-  const { status, client } = useRecoilValue(walletState)
-  const { data: ica, isLoading } = useQuery(
-    'useIsActiveICAForUser',
-    async () => {
-      console.log("useIsActiveICAForUser")
-      const resp = await getIsActiveICA({ connectionId, portId: "icacontroller-" + client.address, client })
-      return resp
-
-    },
-    {
-      enabled: Boolean(status === WalletStatusType.connected && client && client.address),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
-    },
-  )
-
-  return [ica, isLoading] as const
-}
- */
-
-export const useGetICA = (connectionId: string, accAddr: string) => {
-  //const { status, client } = useRecoilValue(walletState)
-
+  if (accAddr === "") {
+    const { address } = useRecoilValue(walletState)
+    accAddr = address
+  }
 
   const client = useTrustlessChainClient()
   const { data: ica, isLoading } = useQuery(
-    ['connection_id', connectionId],
+    [`interchainAccount/${connectionId}`, connectionId],
     async () => {
 
       const resp: string = await getICA({ owner: accAddr, connectionId, client })
@@ -84,32 +40,6 @@ export const useGetICA = (connectionId: string, accAddr: string) => {
 
 
 }
-/* 
-export const useGetGrantForUser = (granter: string, msgTypeUrl: string) => {
-  const { status, client } = useRecoilValue(walletState)
-
-  const { data, isLoading } = useQuery(
-    ['granter', granter],
-    async () => {
-
-      const resp: Grant[] = await getGrants({ grantee: client.address, granter, msgTypeUrl, client })
-
-      return resp
-
-    },
-    {
-      enabled: Boolean(msgTypeUrl != "" && status === WalletStatusType.connected && client && client.address),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
-    },
-  )
-
-  return [data, isLoading] as const
-
-
-} */
-
 
 export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: string) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
@@ -134,7 +64,7 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(nativeWalletAddress && ibcAsset),
+      enabled: Boolean(tokenSymbol && nativeWalletAddress && ibcAsset),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
@@ -145,33 +75,34 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
 }
 
 
-export const useGrantsForUser = (granter: string, tokenSymbol: string, autoTxData?: AutoTxData) => {
+export const useAuthZGrantsForUser = (granter: string, tokenSymbol: string, autoTxData?: AutoTxData) => {
 
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  const { status, client, address } = useRecoilValue(ibcWalletState)
+  let ibcState = useRecoilValue(ibcWalletState)
+
   const { data, isLoading } = useQuery(
-    ['granterGrants', granter],
+    ['userAuthZGrants', granter],
     async () => {
       let grants: GrantResponse[] = []
       const { rpc } = ibcAsset
       for (const msg of autoTxData.msgs) {
         let url = JSON.parse(msg)["typeUrl"];
         console.log(url)
-        const grant = await getGrants({ grantee: address, granter, msgTypeUrl: url.toString(), rpc })
+        const grant = await getAuthZGrants({ grantee: ibcState.address, granter, msgTypeUrl: url.toString(), rpc })
         grants.push(grant)
-        
+
         // typeUrls.push(grant.msgTypeUrl)
       }
 
       if (!grants[0]) {
         return
       }
-      
+
       return grants
 
     },
     {
-      enabled: Boolean(autoTxData.msgs[0] && autoTxData.msgs[0].includes("typeUrl") && status === WalletStatusType.connected && client && address),
+      enabled: Boolean(granter && ibcAsset && ibcState.address.includes(ibcAsset.prefix) && granter.includes(ibcAsset.prefix) && autoTxData.msgs[0] && autoTxData.msgs[0].includes("typeUrl") && ibcState.status === WalletStatusType.connected && ibcState.client && ibcState.address),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,

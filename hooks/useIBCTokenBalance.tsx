@@ -10,10 +10,11 @@ import { useIBCAssetInfo } from './useIBCAssetInfo'
 export const useIBCTokenBalance = (tokenSymbol) => {
   const { address: nativeWalletAddress } = useRecoilValue(walletState)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
+  const { denom, decimals, chain_id, rpc } = ibcAsset
   const { data: balance = 0, isLoading } = useQuery(
-    [`ibcTokenBalance/${tokenSymbol}`, nativeWalletAddress],
+    [`ibcTokenBalance/${denom}`, nativeWalletAddress],
     async () => {
-      const { denom, decimals, chain_id, rpc } = ibcAsset
+      
 
       await window.keplr.enable(chain_id)
       const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
