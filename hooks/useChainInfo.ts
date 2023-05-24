@@ -48,7 +48,6 @@ export const useGetExpectedAutoTxFee = (durationSeconds: number, autoTxData: Aut
     async () => {
 
       const triggerModuleParams = await getAutoTxParams(client)
-      alert(triggerModuleParams.AutoTxFlexFeeMul)
       const fee = getExpectedAutoTxFee(triggerModuleParams, durationSeconds, autoTxData.msgs.length, intervalSeconds)
       setTriggerModuleData(triggerModuleParams)
       return fee

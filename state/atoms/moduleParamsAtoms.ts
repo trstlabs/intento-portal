@@ -1,27 +1,26 @@
 import { atom } from 'recoil'
-import { Params as triggerModuleParams } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types';
-import { Params as distrModuleParams } from 'trustlessjs/dist/protobuf/cosmos/distribution/v1beta1/distribution';
-import { Params as mintModuleParams } from 'trustlessjs/dist/protobuf/mint/v1beta1/mint';
-// import { Params as allocModuleParams } from 'trustlessjs/dist/protobuf/alloc/v1beta1/params';
-// import { Params as stakingModuleParams } from 'trustlessjs/dist/protobuf/cosmos/staking/v1beta1/staking';
+import { Params as TriggerModuleParams } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types';
+import { Params as DistrModuleParams } from 'trustlessjs/dist/protobuf/cosmos/distribution/v1beta1/distribution';
+import { Params as MintModuleParams } from 'trustlessjs/dist/protobuf/mint/v1beta1/mint';
+import { Params as AllocModuleParams } from 'trustlessjs/dist/protobuf/alloc/v1beta1/params';
+import { Params as StakingModuleParams } from 'trustlessjs/dist/protobuf/cosmos/staking/v1beta1/staking';
 
 
 
 
 // Define an atom state for the session data
-export const triggerModuleParamsAtom = atom<triggerModuleParams>({
+export const triggerModuleParamsAtom = atom<TriggerModuleParams>({
   key: 'triggerModuleParams',
   default: null,
 });
 
 export type ParamsState = {
-  distrModuleParams:distrModuleParams
-  mintModuleParams: mintModuleParams
-  //allocModuleParams: allocModuleParams
-  annualProvision: Uint8Array
+  distrModuleParams:DistrModuleParams
+  mintModuleParams: MintModuleParams
+  allocModuleParams: AllocModuleParams
+  stakingModuleParams: StakingModuleParams
+  annualProvision: string
   stakingProvision: number
-  communityTax: string
-
 }
 
 export const paramsStateAtom = atom<ParamsState>({

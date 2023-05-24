@@ -22,7 +22,7 @@ import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
-import { StakeCard } from '../features/dashboard/components/StakeCard'
+import { InfoCard } from '../features/dashboard/components/InfoCard'
 import Contracts from './index_contracts'
 import { useSetModuleParams } from '../hooks/useChainInfo'
 
@@ -52,7 +52,7 @@ export default function Home() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="Manage your on-chain assets and triggers"
+      subtitle="View chain info and manage your on-chain triggers"
     />
   )
 
@@ -77,7 +77,7 @@ export default function Home() {
       )}
       <Column
         css={{ paddingTop: '12' }}>
-        <StakeCard shouldShowAutoCompound={shouldShowAutoCompound} />
+        <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>
       {!isLoading && isSorting && address && (<Column
         justifyContent="center"
@@ -92,13 +92,13 @@ export default function Home() {
           </Text>
         </Inline>
       </Column>)}
-      <Text variant="title" css={{ paddingLeft:'$4', paddingBottom: '$8' }} ><Tooltip label="Trustless Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub " ><span>Trustless Triggers</span></Tooltip></Text>
+      <Text variant="title" css={{ paddingLeft:'$2', padding: '$8' }} ><Tooltip label="Trustless Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub " ><span>Trustless Triggers</span></Tooltip></Text>
       {shouldRenderAutoTxs && (
         <>
           {Boolean(myAutoTxs?.length) && (
             <>
 
-              {myAutoTxs.length > 1 ? <Text variant="primary" css={{ padding: '$4' }}>Your Triggers({myAutoTxs.length})</Text> : <Text variant="primary">Your Trigger (1)</Text>}
+            <Text variant="caption" css={{ padding: '$4' }}>  {myAutoTxs.length > 1 ?  <span> Your Triggers({myAutoTxs.length})</span>: <span> Your Trigger (1)</span> }</Text>
 
               <StyledDivForAutoTxsGrid>
 
@@ -126,7 +126,8 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              {allAutoTxs.length > 1 ? <Text variant="primary" css={{ padding: '$4' }}>{allAutoTxs.length} Triggers</Text> : <Text variant="primary">{allAutoTxs.length} Trigger</Text>}
+              <Text variant="caption" css={{ padding: '$4' }}>  {allAutoTxs.length > 1 ?  <span> All Triggers({allAutoTxs.length})</span>: <span> Other trigger (1)</span> }</Text>
+       
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}

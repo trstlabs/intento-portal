@@ -6,7 +6,6 @@ import {
     WalletIcon,
     Inline,
     Text,
-    maybePluralize,
     ImageForTokenLogo,
     CardContent,
     convertDenomToMicroDenom,
@@ -33,13 +32,14 @@ import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import { /* useAuthZGrantsForUser,  */useGetICA, /* useIsActiveICAForUser,  */useICATokenBalance } from '../../../hooks/useICA'
 
-import dayjs from 'dayjs'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
 import { MsgUpdateAutoTxParams, Registry, msgRegistry } from 'trustlessjs'
 import { JsonCodeMirrorEditor } from '../../automate/components/jsonMirror'
 import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
+import { getDuration, getRelativeTime } from '../../../util/time'
+
 
 // import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx";
 // import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
@@ -503,62 +503,6 @@ const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
         </Text>
     </Inline>
 )
-
-const getDuration = (seconds: number) => {
-    if ((seconds / 60 / 60 / 24) > 1) {
-        return seconds / 60 / 60 / 24 + ' days'
-    }
-    else if ((seconds / 60 / 60) > 1) {
-        return seconds / 60 / 60 + ' hours'
-    }
-    else if ((seconds / 60) > 1) {
-        return seconds / 60 + ' minutes'
-    }
-
-    return seconds + ' seconds'
-}
-
-const getRelativeTime = (seconds: String) => {
-    /* parse the actual dates */
-    const inTime = "In ";
-    const date = dayjs(Number(seconds) * 1000)
-
-    const now = dayjs()
-
-    const hoursLeft = date.diff(now, 'hours')
-
-    /* more than a day */
-    if (hoursLeft > 24) {
-        const daysLeft = date.diff(now, 'days')
-        const hoursLeftAfterDays = Math.round(24 * ((hoursLeft / 24) % 1.0))
-
-        return inTime + `${hoursLeftAfterDays >= 0
-            ? `${maybePluralize(daysLeft, 'day')} and `
-            : ''
-            } ${maybePluralize(hoursLeftAfterDays, 'hour')}`
-    }
-
-    /* less than 24 hours left but not less than an hour */
-    if (hoursLeft < 24 && hoursLeft > 1) {
-        return inTime + maybePluralize(hoursLeft, 'hour')
-    }
-
-    const minsLeft = date.diff(now, 'minutes')
-
-    if (minsLeft > 0) {
-        /* less than an hour */
-        return inTime + maybePluralize(minsLeft, 'minute')
-    }
-
-    const secondsLeft = date.diff(now, 'seconds')
-
-    if (secondsLeft > 0) {
-        return 'less than a minute from now'
-    }
-
-    return date.toDate().toLocaleString()
-
-}
 
 const StyledInput = styled('input', {
     width: '100%',
