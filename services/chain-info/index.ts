@@ -253,6 +253,7 @@ type BlockParams = {
 async function getBlockParams(client: TrustlessChainClient) {
   try {
     const currentBlock = await client.query.tendermint.getLatestBlock({})
+
     if (!currentBlock.block) {
       return
     }
@@ -262,8 +263,9 @@ async function getBlockParams(client: TrustlessChainClient) {
 
     const currentBlockHeight = Number(currentBlock.block.header.height)
     const prevBlock = await client.query.tendermint.getBlockByHeight({
-      height: (currentBlockHeight - 10).toString(),
+      height: (currentBlockHeight - 1).toString(),
     })
+
     // console.log(prevBlock)
     const prevBlockTime =
       Number(prevBlock.block.header.time.seconds) * 1000 +

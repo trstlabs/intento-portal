@@ -6,8 +6,6 @@ import { Params as AllocModuleParams } from 'trustlessjs/dist/protobuf/alloc/v1b
 import { Params as StakingModuleParams } from 'trustlessjs/dist/protobuf/cosmos/staking/v1beta1/staking';
 
 
-
-
 // Define an atom state for the session data
 export const triggerModuleParamsAtom = atom<TriggerModuleParams>({
   key: 'triggerModuleParams',
