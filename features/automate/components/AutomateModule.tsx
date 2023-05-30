@@ -2,7 +2,7 @@ import { styled } from 'junoblocks'
 import { useState, useRef, useEffect } from 'react'
 import { AutoTxData } from './SubmitAutoTxDialog'
 import { AutoTxComponent } from './AutoTxComponent'
-import { generalExamples } from './exampleMsgs'
+import { generalExamples } from './ExampleMsgs'
 
 type AutomateModuleProps = {
   /* will be used if provided on first render instead of internal state */
@@ -13,7 +13,7 @@ export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
   let data = new AutoTxData()
   data.duration = 14 * 86400000;
   data.interval = 86400000;
-  data.msgs = [""]
+  data.msgs = [JSON.stringify(generalExamples[0], null, 2)]
   //data.typeUrls = [""]
   //works faster than without array for some reason
   const [autoTxDatas, setAutoTxDatas] = useState([data])

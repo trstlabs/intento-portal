@@ -286,7 +286,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             </>
           ) : (
             <Card variant="secondary" disabled css={{ padding: '$12' }}>
-              <Text>Retreiving info...</Text>
+              <Text>Retrieving info...</Text>
               <Spinner size={40} style={{ margin: 0 }} />
             </Card>
           )}

@@ -36,7 +36,7 @@ import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
 import { MsgUpdateAutoTxParams, Registry, msgRegistry } from 'trustlessjs'
-import { JsonCodeMirrorEditor } from '../../automate/components/jsonMirror'
+import { JsonCodeMirrorEditor } from '../../automate/components/Editor/CodeMirror'
 import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
 import { getDuration, getRelativeTime } from '../../../util/time'
 

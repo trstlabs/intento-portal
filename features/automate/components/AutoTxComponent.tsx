@@ -10,6 +10,10 @@ import {
   IconWrapper,
   PlusIcon,
   convertDenomToMicroDenom,
+  OpenIcon,
+  ToggleSwitch,
+  Info,
+  Union,
 } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 import {
@@ -29,7 +33,8 @@ import {
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
-import { ExampleMessageButtons } from './ExampleMessageButtons'
+import { CodeMirrorWrapper } from './Editor/CodeMirrorWrapper'
+import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 
 type AutoTxsInputProps = {
   autoTxData: AutoTxData
@@ -46,8 +51,9 @@ export const AutoTxComponent = ({
   const [denom, setDenom] = useState('utrst')
   const [chainName, setChainName] = useState('')
   const [chainSymbol, setChainSymbol] = useState('TRST')
-
+  const [showWarning, hideWarning] = useState(true)
   const [isJsonValid, setIsJsonValid] = useState(true)
+  const [showJsonForm, setShowJsonForm] = useState(true)
 
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
@@ -189,6 +195,7 @@ export const AutoTxComponent = ({
         ...autoTxData,
         msgs,
       }
+      console.log('handleChangeMsg')
       //newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
       onAutoTxChange(newAutoTxData)
       if (
@@ -213,7 +220,16 @@ export const AutoTxComponent = ({
   ) {
     let newAutoTx = autoTxData
     newAutoTx.connectionId = connectionId
-
+    autoTxData.msgs.map((editMsg, editIndex)=>{
+      if (editMsg.includes(prefix + '1...')) {
+        newAutoTx.msgs[editIndex] = editMsg.replaceAll(
+          prefix + '1...',
+          newPrefix + '1...'
+        )
+        newAutoTx.msgs[editIndex] = newAutoTx.msgs[editIndex].replaceAll(denom, newDenom)
+      }
+    })
+   
     onAutoTxChange(newAutoTx)
     setDenom(newDenom)
     setChainName(name)
@@ -362,10 +378,29 @@ export const AutoTxComponent = ({
                   </>
                 ))}
             </Column>
+            <Inline css={{ display: 'grid' }}>
+              <Button
+                iconLeft={<OpenIcon />}
+                variant="ghost"
+                size="large"
+                onClick={() => setShowJsonForm((show) => !show)}
+                iconRight={
+                  <ToggleSwitch
+                    id="theme-toggle"
+                    name="dark-theme"
+                    onChange={() => setShowJsonForm((show) => !show)}
+                    checked={!showJsonForm}
+                    optionLabels={['Dark theme', 'Light theme']}
+                  />
+                }
+              >
+                Advanced mode
+              </Button>
+            </Inline>
             {autoTxData.msgs.map((msg, index) => (
               <div key={index}>
-                {
-                  <ExampleMessageButtons
+                {showJsonForm ? (
+                  <JsonFormWrapper
                     index={index}
                     chainSymbol={chainSymbol}
                     msg={msg}
@@ -374,7 +409,17 @@ export const AutoTxComponent = ({
                     handleChangeMsg={handleChangeMsg}
                     setIsJsonValid={setIsJsonValid}
                   />
-                }
+                ) : (
+                  <CodeMirrorWrapper
+                    index={index}
+                    chainSymbol={chainSymbol}
+                    msg={msg}
+                    setExample={setExample}
+                    handleRemoveMsg={handleRemoveMsg}
+                    handleChangeMsg={handleChangeMsg}
+                    setIsJsonValid={setIsJsonValid}
+                  />
+                )}
               </div>
             ))}
           </CardContent>
@@ -398,8 +443,31 @@ export const AutoTxComponent = ({
           disabled
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-            <Text align="center">Messages</Text>
+            <Text css={{ paddingBottom: '$4' }} align="center">
+              Preview
+            </Text>
+
+            {showWarning && (
+              <Card css={{ padding: '$4' }}>
+                <Inline>
+                  <IconWrapper icon={<Info />} color="primary" />
+                  <Text variant="caption" align="left">
+                    {' '}
+                    You may lose funds if message values are incorrect. Do not
+                    interact if you do not know what you are doing. Always
+                    review messages before submitting.
+                  </Text>
+                  <Button
+                    variant="ghost"
+                    onClick={() => hideWarning(!showWarning)}
+                  >
+                    <Union />
+                  </Button>
+                </Inline>
+              </Card>
+            )}
           </CardContent>
+
           {autoTxData.msgs &&
             autoTxData.msgs.map((msgToDisplay, i) => (
               <div key={msgToDisplay}>
@@ -414,8 +482,7 @@ export const AutoTxComponent = ({
                     css={{ paddingBottom: '$10' }}
                   >
                     Message {i + 1}: <pre>{msgToDisplay}</pre>
-                  </Text>
-
+                  </Text>{' '}
                   <SubmitAutoTxDialog
                     chainSymbol={chainSymbol}
                     icaBalance={icaBalance}

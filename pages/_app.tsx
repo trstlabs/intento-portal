@@ -1,7 +1,7 @@
 import 'normalize.css'
 import 'styles/globals.scss'
 import 'focus-visible'
-
+import '../features/automate/components/Editor/rjsfform.css'
 import { ErrorBoundary } from 'components/ErrorBoundary'
 import { TestnetDialog } from 'components/TestnetDialog'
 import { css, media, useMedia } from 'junoblocks'

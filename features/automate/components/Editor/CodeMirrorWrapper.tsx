@@ -1,10 +1,10 @@
 import { Inline, Button, /*  styled,  */ Text, Column, IconWrapper, Union, Divider } from 'junoblocks';
 import React from 'react';
-import { JsonCodeMirrorEditor } from './jsonMirror';
-import { generalExamples, osmoExamples, wasmExamples } from './exampleMsgs';
-import { Chip } from './AutoTxComponent';
+import { JsonCodeMirrorEditor } from './CodeMirror';
+import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs';
+import { Chip } from './../AutoTxComponent';
 
-export const ExampleMessageButtons = ({
+export const CodeMirrorWrapper = ({
   index,
   chainSymbol,
   msg,

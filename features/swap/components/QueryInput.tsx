@@ -22,14 +22,14 @@ export const QueryInput = ({
   }, [onQueryChange])
 
   return (
-    <Inline gap={5} css={{ padding: '$7 $5', width: '100%' }}>
+    <Inline gap={5} css={{ margin: '0 $7', width: '100%' }}>
       <SearchIcon color="tertiary" />
       <Text variant="secondary">
         <input
           ref={inputRef}
           type="text"
           lang="en-US"
-          placeholder="Search name or symbol"
+          placeholder="Search..."
           value={searchQuery}
           onChange={({ target: { value } }) => onQueryChange(value)}
           autoComplete="off"

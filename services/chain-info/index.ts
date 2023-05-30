@@ -262,6 +262,7 @@ async function getBlockParams(client: TrustlessChainClient) {
       currentBlock.block.header.time.nanos / 1e6
 
     const currentBlockHeight = Number(currentBlock.block.header.height)
+    console.log("currentBlock", currentBlockHeight)
     const prevBlock = await client.query.tendermint.getBlockByHeight({
       height: (currentBlockHeight - 1).toString(),
     })
@@ -271,9 +272,12 @@ async function getBlockParams(client: TrustlessChainClient) {
       Number(prevBlock.block.header.time.seconds) * 1000 +
       prevBlock.block.header.time.nanos / 1e6
     const prevBlockHeight = Number(prevBlock.block.header.height)
+    console.log("prevBlockHeight", prevBlockHeight)
+    console.log("currentBlockTime", currentBlockTime)
     const actualBlockTime =
       (currentBlockTime - prevBlockTime) /
       (currentBlockHeight - prevBlockHeight)
+      console.log("actualBlockTime", actualBlockTime)
     ///console.log(actualBlockTime)
     const actualBlocksPerYear = Math.ceil(
       (365 * 24 * 60 * 60 * 1000) / actualBlockTime
