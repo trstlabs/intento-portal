@@ -177,7 +177,16 @@ export const JsonFormWrapper = ({
                     .slice(3)
                     .replace(/([A-Z])/g, ' $1')
                     .trim()}
-                  onClick={() => setExample(index, example)}
+                  onClick={() => {
+                    setExampleSchema(
+                      findFileByName(
+                        example.typeUrl
+                          .split('.')
+                          .find((data) => data.includes('Msg'))
+                      )
+                    )
+                    setExample(index, example)
+                  }}
                 />
               </span>
             ))}
@@ -195,7 +204,16 @@ export const JsonFormWrapper = ({
                     .slice(3)
                     .replace(/([A-Z])/g, ' $1')
                     .trim()}
-                  onClick={() => setExample(index, example)}
+                  onClick={() => {
+                    setExampleSchema(
+                      findFileByName(
+                        example.typeUrl
+                          .split('.')
+                          .find((data) => data.includes('Msg'))
+                      )
+                    )
+                    setExample(index, example)
+                  }}
                 />
               </span>
             ))}

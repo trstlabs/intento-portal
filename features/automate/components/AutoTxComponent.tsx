@@ -170,12 +170,19 @@ export const AutoTxComponent = ({
     if (shouldTriggerAuthzGrant) {
       connectExternalWallet(null)
       handleCreateAuthzGrant(undefined, {
-        onSettled: () => setRequestedCreateAuthzGrant(false),
+        onSettled: () => {
+          setRequestedSendAndAuthzGrant(false)
+          setRequestedCreateAuthzGrant(false)
+        },
       })
     }
   }, [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant])
 
-  const handleCreateAuthzGrantClick = () => {
+  const [isExecutingSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
+    useState(false)
+
+  const handleCreateAuthzGrantClick = (withFunds?: boolean) => {
+    setRequestedSendAndAuthzGrant(withFunds)
     connectExternalWallet(null)
     return setRequestedCreateAuthzGrant(true)
   }
@@ -220,16 +227,19 @@ export const AutoTxComponent = ({
   ) {
     let newAutoTx = autoTxData
     newAutoTx.connectionId = connectionId
-    autoTxData.msgs.map((editMsg, editIndex)=>{
+    autoTxData.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
         newAutoTx.msgs[editIndex] = editMsg.replaceAll(
           prefix + '1...',
           newPrefix + '1...'
         )
-        newAutoTx.msgs[editIndex] = newAutoTx.msgs[editIndex].replaceAll(denom, newDenom)
+        newAutoTx.msgs[editIndex] = newAutoTx.msgs[editIndex].replaceAll(
+          denom,
+          newDenom
+        )
       }
     })
-   
+
     onAutoTxChange(newAutoTx)
     setDenom(newDenom)
     setChainName(name)
@@ -366,19 +376,22 @@ export const AutoTxComponent = ({
                         shouldDisableSendFundsButton={
                           shouldDisableSendFundsButton
                         }
+                        isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
+                        isExecutingAuthzGrant={isExecutingAuthzGrant}
+                        isExecutingSendAndAuthzGrant={
+                          isExecutingSendAndAuthzGrant
+                        }
                         setFeeFundsHostChain={setFeeFundsHostChain}
                         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                        isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                        handleCreateAuthzGrantClick={
-                          handleCreateAuthzGrantClick
+                        handleCreateAuthzGrantClick={(withFunds) =>
+                          handleCreateAuthzGrantClick(withFunds)
                         }
-                        isExecutingAuthzGrant={isExecutingAuthzGrant}
                       />
                     )}
                   </>
                 ))}
             </Column>
-            <Inline css={{ display: 'grid' }}>
+            <Inline css={{ display: 'grid', margin: '$4' }}>
               <Button
                 iconLeft={<OpenIcon />}
                 variant="ghost"
@@ -498,7 +511,6 @@ export const AutoTxComponent = ({
                       })
                     }
                     isLoading={isExecutingSchedule}
-                    setFeeFundsHostChain={setFeeFundsHostChain}
                     feeFundsHostChain={feeFundsHostChain}
                     shouldDisableSendFundsButton={shouldDisableSendFundsButton}
                     isExecutingAuthzGrant={isExecutingAuthzGrant}
@@ -506,6 +518,7 @@ export const AutoTxComponent = ({
                     shouldDisableAuthzGrantButton={
                       shouldDisableAuthzGrantButton
                     }
+                    setFeeFundsHostChain={setFeeFundsHostChain}
                     handleSubmitAutoTx={(autoTxData) =>
                       handleSubmitAutoTxButtonClick(autoTxData)
                     }
