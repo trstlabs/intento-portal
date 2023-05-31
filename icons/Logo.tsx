@@ -29,7 +29,7 @@ export const Logo = (props: SVGProps<SVGSVGElement>) => {
         <stop offset={1} stopColor="#a6a6a6" />
       </linearGradient>
     </defs>
-    <title>{"portalAsset 1"}</title>
+    <title>{"TriggerPortal"}</title>
     <g data-name="Layer 2">
       <g data-name="Layer 1">
         <path

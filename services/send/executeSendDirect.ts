@@ -1,6 +1,7 @@
 import {
   TrustlessChainClient, Coin, MsgTransfer, MsgSend,
 } from 'trustlessjs'
+import { validateTransactionSuccess } from '../../util/messages'
 
 type ExecuteSendDirectArgs = {
   denom: string
@@ -20,7 +21,7 @@ export const executeDirectSend = async ({
   if (!recipientInfos[1]) {
     console.log(recipientInfos[0])
     if (recipientInfos[0].channelID) {
-      return await client.tx.ibc.transfer({
+      return validateTransactionSuccess(await client.tx.ibc.transfer({
         sourcePort: 'transfer',
         sourceChannel: recipientInfos[0].channelID,
         sender: senderAddress,
@@ -28,11 +29,11 @@ export const executeDirectSend = async ({
         receiver: recipientInfos[0].recipient,
         token: { denom, amount: recipientInfos[0].amount.toString() },
       }, {
-        gasLimit: 50_000,
+        gasLimit: 120_000,
         memo: recipientInfos[0].memo
-      },)
+      },))
     }
-    return await client.tx.bank.send(
+    return validateTransactionSuccess(await client.tx.bank.send(
       {
         fromAddress: senderAddress,
         toAddress: recipientInfos[0].recipient,
@@ -43,20 +44,20 @@ export const executeDirectSend = async ({
         gasLimit: 30_000,
         memo: recipientInfos[0].memo
       },
-    )
+    ))
   }
 
   //if multiple direct
   const msgs = []
   recipientInfos.forEach(recipient => {
-    
+
     if (recipient.channelID) {
 
       const transferMsg = new MsgTransfer({
         sourcePort: 'transfer',
         sourceChannel: recipient.channelID,
         sender: senderAddress,
-        timeoutTimestampSec: (Math.floor(new Date().getTime() / 1000) + 600).toString(),
+        // timeoutTimestampSec: (Math.floor(new Date().getTime() / 1000) + 600).toString(),
         receiver: recipient.recipient,
         token: { denom, amount: recipient.amount.toString() },
       })
@@ -73,7 +74,7 @@ export const executeDirectSend = async ({
     }
   }
   )
-  return await client.signAndBroadcast(msgs)
+  return validateTransactionSuccess(await client.signAndBroadcast(msgs))
 
 }
 

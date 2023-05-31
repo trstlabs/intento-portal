@@ -3,12 +3,12 @@ import { styled, Text, useDelayedAppearanceFlag } from 'junoblocks'
 import { walletState } from 'state/atoms/walletAtoms'
 import { __TRANSFERS_ENABLED__ } from 'util/constants'
 
-import { useGetSupportedAssetsBalancesOnChain } from '../hooks/useGetSupportedAssetsBalancesOnChain'
+import { useGetIBCAssetsBalances } from '../hooks/useGetSupportedAssetsBalances'
 import { AssetCard, AssetCardState } from './AssetCard'
 
 export const AssetsList = ({ onActionClick }) => {
   const [loadingBalances, [myTokens, allTokens]] =
-    useGetSupportedAssetsBalancesOnChain()
+  useGetIBCAssetsBalances()
 
   const { isConnecting, isConnected } = useWalletConnectionStatus(walletState)
 

@@ -11,7 +11,7 @@ import {
 } from 'junoblocks'
 import React from 'react'
 import { TokenSendModule } from 'features/send'
-import Link from 'next/link'
+// import Link from 'next/link'
 
 import { useIBCAssetList } from '../../hooks/useIBCAssetList'
 
@@ -40,7 +40,8 @@ export default function Send() {
         <TokenSendModule
           initialToken={getInitialTokenFromSearchParams()}
         />
-        <Link href={`/automate`} passHref>
+       
+        <a href={`/automate?example=0`} target={"_blank"} rel="noreferrer">
           <Card variant="secondary" css={{ padding: '$8' }} > <CardContent size="medium">
 
             <Column align="center">
@@ -66,7 +67,9 @@ export default function Send() {
 
             </Column>
           </CardContent>
-          </Card></Link>
+          </Card>
+          </a>
+          
       </StyledContainer>
 
     </AppLayout>

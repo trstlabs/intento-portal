@@ -120,7 +120,7 @@ export const useTransferAssetMutation = ({
           denom: tokenInfo.trst_denom,
         },
         'transfer',
-        tokenInfo.trst_channel,
+        tokenInfo.channel_to_trst,
         undefined,
         timeout,
         //'',

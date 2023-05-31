@@ -1,7 +1,7 @@
 import 'normalize.css'
 import 'styles/globals.scss'
 import 'focus-visible'
-
+import '../features/automate/components/Editor/rjsfform.css'
 import { ErrorBoundary } from 'components/ErrorBoundary'
 import { TestnetDialog } from 'components/TestnetDialog'
 import { css, media, useMedia } from 'junoblocks'
@@ -33,9 +33,13 @@ function MyApp({ Component, pageProps }: AppProps) {
             {__TEST_MODE__ && <TestnetDialog />}
             <Toaster
               position={isSmallScreen ? 'bottom-center' : 'top-right'}
-              toastOptions={{ duration: 1000000 }}
+              toastOptions={{
+                className: '',
+                duration: 20000, 
+              }}
               containerClassName={toasterClassName}
               containerStyle={isSmallScreen ? { inset: 0 } : undefined}
+
             />
           </ErrorBoundary>
         </NextJsAppRoot>

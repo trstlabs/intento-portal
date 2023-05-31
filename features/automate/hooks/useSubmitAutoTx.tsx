@@ -34,12 +34,12 @@ export const useSubmitAutoTx = ({
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
     return useMutation(
-        'scheduleTokens',
+        'submitAutoTx',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-        
+
             console.log(autoTxData)
             return await executeSubmitAutoTx({
                 owner: address,
@@ -53,14 +53,15 @@ export const useSubmitAutoTx = ({
                 console.log(data)
                 let autoTxID = data.arrayLog.find(
                     (log) =>
-                        log.key == "auto_tx_id"
+                        log.key == "tx-id"
                 ).value;
+
                 console.log(autoTxID)
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Your trigger is submitted!"
-                        body={`An on-chain trigger was created succesfully!} The ID is ${autoTxID}`}
+                        body={`An on-chain trigger was created succesfully! Trigger ID is ${autoTxID}`}
                         buttons={
                             <Button
                                 as="a"
@@ -73,10 +74,12 @@ export const useSubmitAutoTx = ({
                             </Button>
                         }
                         onClose={() => toast.dismiss(t.id)}
+
                     />
-                ))
+                ),
+                )
                 popConfetti(true)
-                
+
                 refetchQueries()
             },
             onError(e) {
@@ -100,8 +103,7 @@ export const useSubmitAutoTx = ({
                         }
                         onClose={() => toast.dismiss(t.id)}
                     />
-                ))
-            },
+                ))},
             onSettled() {
                 setTransactionState(TransactionStatus.IDLE)
             },

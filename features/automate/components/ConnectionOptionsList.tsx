@@ -8,13 +8,16 @@ export const ConnectionOptionsList = ({
 }: Omit<ConnectionSelectListProps, 'connectionList' | 'fetchingBalanceMode'>) => {
   const [connectionList] = useIBCAssetList()
   console.log(connectionList)
+
   return (
-    <ConnectionSelectList
-      {...props}
-      connectionList={connectionList.tokens}
-      activeConnection={activeConnection}
-      onSelect={onSelect}
-      fetchingBalanceMode="native"
-    />
+    connectionList && (
+      <ConnectionSelectList
+        {...props}
+        connectionList={connectionList && connectionList.tokens.filter(chain => chain.connection_id)}
+        activeConnection={activeConnection}
+        onSelect={onSelect}
+        fetchingBalanceMode="native"
+      />
+    )
   )
 }

@@ -63,8 +63,6 @@ export const ConnectionSelectList = ({
 
   return (
     <>
-
-
       <StyledDivForScrollContainer
         {...props}
         css={{
@@ -108,7 +106,7 @@ export const ConnectionSelectList = ({
 }
 
 const StyledButtonForRow = styled(ButtonForWrapper, {
-  display: 'flex',
+  //display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
   padding: '$2 $4 !important',

@@ -51,7 +51,7 @@ export const getAutoTxInfo = async (
                 `No rpcEndpoint was provided`
             )
         }
-        console.log(id)
+       
         return await client.query.auto_tx.autoTx({ id })
     } catch (e) {
         console.error('Cannot get autoTx info:', e)
