@@ -10,7 +10,7 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { executeDirectSend, RecipientInfo } from '../../../services/send'
 import {
     TransactionStatus,
@@ -20,7 +20,6 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { particleState } from '../../../state/atoms/particlesAtoms'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 
 type UseTokenSendArgs = {
@@ -34,7 +33,6 @@ export const useTokenSend = ({
 }: UseTokenSendArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
-    const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
@@ -73,12 +71,12 @@ export const useTokenSend = ({
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Send successful"
-                        body={`Sent ${ibcAsset.symbol} ! }`}
+                        body={`Sent ${ibcAsset.symbol} !`}
                         onClose={() => toast.dismiss(t.id)}
                     />
                 ))
-                popConfetti(true)
-                setTimeout(() => popConfetti(false), 3000)
+                //  popConfetti(true)
+                //setTimeout(() => popConfetti(false), 3000)
                 refetchQueries()
             },
             onError(e) {

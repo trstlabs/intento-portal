@@ -9,7 +9,7 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { executeCreateAuthzGrant } from '../../../services/ica'
 import {
     TransactionStatus,
@@ -18,7 +18,6 @@ import {
 import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { particleState } from '../../../state/atoms/particlesAtoms'
 
 import { Coin } from 'trustlessjs'
 
@@ -27,23 +26,22 @@ type UseCreateAuthzGrantParams = {
     grantee: string
     msgs: string[]
     coin?: Coin
-    expirationFromNow?: number
+    expirationDurationMs?: number
 }
 
 
 export const useCreateAuthzGrant = ({
-    grantee, msgs, expirationFromNow, coin
+    grantee, msgs, expirationDurationMs, coin
 }: UseCreateAuthzGrantParams
 ) => {
-  const { address, client, status } =
+    const { address, client, status } =
         useRecoilValue(ibcWalletState)
- 
+
     /*   const { address, client, status } =
         useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
-    const [_, popConfetti] = useRecoilState(particleState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries(['tokenBalance', 'userAuthZGrants'])
 
     return useMutation(
         'createAuthzGrant',
@@ -60,17 +58,20 @@ export const useCreateAuthzGrant = ({
                 grantee,
                 granter: address,
                 msgs,
-                expirationFromNow,
-                coin,
-
+                expirationDurationMs,
+                coin
             })
 
         },
         {
             onSuccess(data) {
                 console.log(data)
-                popConfetti(true)
+                //popConfetti(true)
                 //
+                toast.success("Succesfully created AuthZ grant")
+                if (coin.amount != "0") {
+                    toast.success("Succesfully sent funds")
+                }
                 refetchQueries()
             },
             onError(e) {

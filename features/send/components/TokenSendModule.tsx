@@ -61,9 +61,9 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
       <StyledDivForWrapper>
         <TokenSelector
           tokenSymbol={tokenSymbol}
-          onChange={(updateToken) =>
-            setToken(updateToken)
-          }
+          onChange={(updateToken) => {
+            setToken(updateToken.tokenSymbol)
+          }}
           disabled={isUiDisabled}
           size={uiSize}
         />

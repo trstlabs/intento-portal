@@ -18,9 +18,38 @@ export const getICA = async ({
         const response = await client.query.auto_tx.interchainAccountFromAddress({ owner, connectionId })
         return response.interchainAccountAddress
     } catch (e) {
-        console.error('err(getICA):', e)
+        if (e.message.includes("account found")) {
+            return ""
+        }
+        else {
+            console.error('err(getICA):', e)
+        }
     }
 }
+
+/* 
+export interface IsICAActiveQueryInput {
+    channnelId: string,
+    portId: string,
+    client: TrustlessChainClient
+}
+
+export const getIsActiveICA = async ({
+    channnelId,
+    portId,
+    client,
+}: IsICAActiveQueryInput) => {
+    try {
+        console.log(portId)
+        const response = await client.query.ibc_channel.channel({ channnelId,portId })
+        console.log("response")
+        console.log(response)
+        return response
+    } catch (e) {
+        console.error('err(getIsActiveICA):', e)
+    }
+} */
+
 
 export interface GrantQueryInput {
     grantee: string,
@@ -35,34 +64,40 @@ export interface GrantQueryResponse {
 }
 
 
-export const getGrants = async ({
+export const getAuthZGrants = async ({
     grantee,
     granter,
     msgTypeUrl,
     rpc,
 
 }: GrantQueryInput) => {
+
     const tendermintClient = await Tendermint34Client.connect(rpc);
     // Setup the query client
     const queryClient = QueryClient.withExtensions(
         tendermintClient,
         setupAuthzExtension,
-
     );
-
     try {
-
-        // let response: GrantQueryResponse;
         let resp = await queryClient.authz.grants(grantee, granter, msgTypeUrl)
-        //. response.grants = resp.grants
+        if (resp.grants[0]) {
 
-        //console.log(response)
-        //response.msgTypeUrl = msgTypeUrl
-        return { grants: resp.grants, msgTypeUrl }
+
+            const res: GrantResponse = { grants: resp.grants[0], msgTypeUrl }
+            return res
+        }
+        return
     } catch (e) {
-        console.error('err(getGrants):', e)
+        console.error('err(getAuthZGrants):', e)
     }
 }
+
+
+export interface GrantResponse {
+    grants: Grant,
+    msgTypeUrl: string,
+}
+
 
 export interface FeeGrantQueryInput {
     grantee: string,

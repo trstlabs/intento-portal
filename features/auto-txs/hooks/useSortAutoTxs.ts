@@ -2,7 +2,7 @@
 import { useMemo } from 'react'
 import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
 
-export type SortParameters = 'exec_time' | 'alphabetical'
+export type SortParameters = 'exec_time' | 'id' |  'label'
 export type SortDirections = 'asc' | 'desc'
 
 export type InfoArgs = {
@@ -71,14 +71,26 @@ function sortAutoTxs(
       }
     }
 
-    /* sort by autoTxId names */
-    if (sortBy.parameter === 'alphabetical') {
+    /* sort by autoTxId */
+    if (sortBy.parameter === 'id') {
       const autoTxIdA = autoTxA.txId
       const autoTxIdB = autoTxB.txId
 
       if (autoTxIdA > autoTxIdB) {
         return 1
       } else if (autoTxIdA < autoTxIdB) {
+        return -1
+      }
+    }
+
+     /* sort by autoTx label*/
+     if (sortBy.parameter === 'label') {
+      const autoTxLblA = autoTxA.label
+      const autoTxLblB = autoTxB.label
+
+      if (autoTxLblA > autoTxLblB) {
+        return 1
+      } else if (autoTxLblA < autoTxLblB) {
         return -1
       }
     }

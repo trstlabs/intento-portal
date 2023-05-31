@@ -73,7 +73,7 @@ export const useTokenSend = ({
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Send successful"
-                        body={`Sent ${token.symbol} ! }`}
+                        body={`Sent ${token.symbol} !`}
                         onClose={() => toast.dismiss(t.id)}
                     />
                 ))

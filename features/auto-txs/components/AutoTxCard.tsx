@@ -38,7 +38,7 @@ export const AutoTxCard = ({
                             <ImageForTokenLogo
                                 size="big"
                                 logoURI={ibcInfo.logoURI}
-                                alt={ibcInfo.symbol}
+                                css={{ backgroundColor: "transparent !important"  }}
                             />
                         </StyledDivForTokenLogos>)}
                         {autoTxInfo.label ? <StyledText
@@ -63,7 +63,7 @@ export const AutoTxCard = ({
                             Information
                         </Text> */}
                         <Text variant="legend">
-                            {isActive ? <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</> : <>🔴 Execution ended</>}
+                            {isActive ? <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</> : <>Execution ended</>}
                             {/* {isActive ? (
                                 <>
                                     <StyledSpanForHighlight>

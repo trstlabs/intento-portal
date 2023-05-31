@@ -10,22 +10,15 @@ import {
     Spinner,
     styled,
     Text,
-
     Tooltip,
-    convertDenomToMicroDenom,
+    Union,
+    Chevron,
 
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useEffect, useState } from 'react'
-// import { usePrevious } from 'react-use'
-// //import { Coin } from 'trustlessjs'
-// import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
-import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
-// import { useFeeGrantAllowanceForUser, useGrantsForUser } from '../../../hooks/useICA'
-import { useCreateAuthzGrant, useSendFundsOnHost } from '../hooks'
+import { useState } from 'react'
 import { useGetExpectedAutoTxFee } from '../../../hooks/useChainInfo'
-//import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
-// import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
+import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
 export class AutoTxData {
     duration: number
@@ -34,40 +27,56 @@ export class AutoTxData {
     connectionId?: string
     dependsOnTxIds?: number[]
     msgs: string[]
-    typeUrls?: string[]
+    icaAddressForAuthZGrant?: string
+    // typeUrls?: string[]
     recurrences: number
     retries: number
-    withAuthZ: boolean
+    useSubmitAutoTx?: boolean
     feeFunds?: number
     label?: string
 }
 
 type SubmitAutoTxDialogProps = {
-    isShowing: boolean
+    isDialogShowing: boolean
     autoTxData: AutoTxData
-    denom?: string
     chainSymbol?: string
-    icaAddr?: string
+    icaAddress?: string
     icaBalance?: number
     hasIcaAuthzGrant?: boolean
     customLabel?: string
+    feeFundsHostChain?: string
+    isLoading: boolean
+    isExecutingAuthzGrant?: boolean
+    isExecutingSendFundsOnHost?: boolean
+    shouldDisableAuthzGrantButton?: boolean
+    shouldDisableSendFundsButton?: boolean
     onRequestClose: () => void
     handleSubmitAutoTx: (data: AutoTxData) => void
+    handleCreateAuthzGrantClick?: () => void
+    handleSendFundsOnHostClick?: () => void
+    setFeeFundsHostChain?: (data: string) => void
 }
 
 export const SubmitAutoTxDialog = ({
-    isShowing,
-    icaAddr,
+    isDialogShowing,
+    icaAddress,
     icaBalance,
     hasIcaAuthzGrant,
-    denom,
     customLabel,
     chainSymbol,
     autoTxData,
+    feeFundsHostChain,
+    isExecutingAuthzGrant,
+    isExecutingSendFundsOnHost,
+    isLoading,
+    shouldDisableAuthzGrantButton,
+    shouldDisableSendFundsButton,
     onRequestClose,
+    setFeeFundsHostChain,
     handleSubmitAutoTx,
+    handleCreateAuthzGrantClick,
+    handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
-
     const [startTime, setStartTime] = useState(0);
     const [duration, setDuration] = useState(14 * 86400000);
 
@@ -75,28 +84,39 @@ export const SubmitAutoTxDialog = ({
     const [feeFunds, setFeeAmount] = useState(0);
     const [txLabel, setLabel] = useState(customLabel);
     const [recurrences, setRecurrence] = useState(2);
-    const isLoading = false;
-
-
-    const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol)
 
     const [displayInterval, setDisplayInterval] = useState("1 day");
+    const [editInterval, setEditInterval] = useState(false);
+    const [editIntervalValue, setEditIntervalValue] = useState("0");
     const [displayDuration, setDisplayDuration] = useState("2 weeks");
+    const [editDuration, setEditDuration] = useState(false);
+    const [editDurationValue, setEditDurationValue] = useState("0");
     const [displayStartTime, setDisplayStartTime] = useState("1 day");
-    const [displayRecurrences, setDisplayRecurrences] = useState("2 times");
+    const [editStartTime, setEditStartTime] = useState(false);
+    const [editStartTimeValue, setEditStartTimeValue] = useState("0");
+    //const [displayRecurrences, setDisplayRecurrences] = useState("2 times");
 
     const timeLabels = ['1 week', '1 day', '5 days', '1 hour', '2 hours', '30 min', '2 weeks', '30 days', '60 days', '90 days']
-    const timeValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 5, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14, 3600000 * 24 * 30, 3600000 * 24 * 60, 3600000 * 24 * 90]
-
-    const recurrenceLabels = ['1 time', '2 times', '5 times', '10 times', '25 times', '50 times']
-    const recurrenceValues = [1, 2, 5, 10, 25, 50]
+    const timeSecondValues = [3600000 * 24 * 7, 3600000 * 24, 3600000 * 24 * 5, 3600000, 3600000 * 2, 3600000 / 2, 3600000 * 24 * 14, 3600000 * 24 * 30, 3600000 * 24 * 60, 3600000 * 24 * 90]
 
     function handleInterval(label, value) {
+        console.log(value)
+        if (value >= duration) {
+            toast.custom((t) => (
+                <Toast
+                    icon={<IconWrapper icon={<Error />} color="error" />}
+                    title={"Can't make interval higher than duration " + displayInterval + ",your specified interval is: " + label}
+                    onClose={() => toast.dismiss(t.id)}
+                />
+            ))
+            return
+        }
         setInterval(value);
         setDisplayInterval(label)
         const recurrence = Math.floor(duration / value)
         setRecurrence(recurrence)
-        handleDisplayRecurrence(recurrence)
+        refetchExpectedAutoTxFee()
+        //handleDisplayRecurrence(recurrence)
     }
     function handleRemoveInterval() {
         setInterval(0);
@@ -108,117 +128,82 @@ export const SubmitAutoTxDialog = ({
             setDisplayDuration(label)
             const recurrence = Math.floor(value / interval)
             setRecurrence(recurrence)
-            handleDisplayRecurrence(recurrence)
+            refetchExpectedAutoTxFee()
+            // handleDisplayRecurrence(recurrence)
             return
         }
-        if (interval > 0) {
-            toast.custom((t) => (
-                <Toast
-                    icon={<IconWrapper icon={<Error />} color="error" />}
-                    title={"Can't select lower than interval " + displayInterval + ",your specified duration is: " + label}
-                    onClose={() => toast.dismiss(t.id)}
-                />
-            ))
-        }
+        // if (interval > 0) {
+        toast.custom((t) => (
+            <Toast
+                icon={<IconWrapper icon={<Error />} color="error" />}
+                title={"Can't select a lower duration than interval " + interval + ' seconds' + ",your specified duration is: " + value + 'seconds'}
+                onClose={() => toast.dismiss(t.id)}
+            />
+        ))
+        // }
     }
     function handleRemoveDuration() {
         setDuration(0);
         setDisplayDuration('None Selected')
+        refetchExpectedAutoTxFee()
     }
-    function handleStartTime(label, value) {
+    function handleStartTime(label: string, value: number) {
+        if (value == undefined) {
+            return
+        }
         setStartTime(value);
         setDisplayStartTime(label)
         const recurrence = Math.floor(duration / interval)
         setRecurrence(recurrence)
-        handleDisplayRecurrence(recurrence)
+        refetchExpectedAutoTxFee()
+        //handleDisplayRecurrence(recurrence)
     }
     function handleRemoveStartTime() {
         setStartTime(0);
         setDisplayStartTime(displayInterval)
+        refetchExpectedAutoTxFee()
     }
-    function handleRecurrences(label, value) {
-        const val = interval * value
-        const dur = (val / 1000 / 60)
-        let displayDur = dur.toString() + ' min'
-        if ((dur / 60 / 24) >= 1) {
-            displayDur = dur / 60 / 24 + ' days'
-        } else if ((dur / 60) >= 1) {
-            displayDur = dur / 60 + ' hours'
+
+
+    const editLabel = "Must be weeks(s), days(s), hour(s) or minute(s)"
+    function convertTime(input: string) {
+        if (input.includes("hour")) {
+            const hours = Number(input.match(/\d/g).join(''));
+            return hours * 3600000
+        } else if (input.includes("day")) {
+            const days = Number(input.match(/\d/g).join(''));
+            return days * 3600000 * 24
+        } else if (input.includes("minute")) {
+            const minutes = Number(input.match(/\d/g).join(''));
+            return minutes * 60000
+        } else if (input.includes("week")) {
+            const weeks = Number(input.match(/\d/g).join(''));
+            return weeks * 3600000 * 24 * 7
         }
-        setRecurrence(value);
-        setDuration(val)
-        setDisplayRecurrences(label)
-        setDisplayDuration(displayDur)
+        toast.custom((t) => (
+            <Toast
+                icon={<IconWrapper icon={<Error />} color="error" />}
+                title={"Can't use your input as a time value " + input}
+                onClose={() => toast.dismiss(t.id)}
+            />
+        ))
     }
-    function handleRemoveRecurrences() {
-        setRecurrence(0);
-        setDisplayRecurrences("2")
-    }
 
-    const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
-    const [requestedSendFunds, setRequestedSendFunds] = useState(false)
-    const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
-        useSendFundsOnHost({ toAddress: icaAddr, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
-    useEffect(() => {
-        const shouldTriggerSendFunds =
-            !isExecutingSendFundsOnHost && requestedSendFunds;
-        if (shouldTriggerSendFunds) {
-            handleSendFundsOnHost(undefined, { onSettled: () => setRequestedSendFunds(false) })
-        }
-    }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
+    //
 
-    const handleSendFundsOnHostClick = () => {
-        connectExternalWallet(null)
-        return setRequestedSendFunds(true)
-    }
-    // check if duration == displayduration, interval == displayinterval
-    const shouldDisableSubmissionButton = timeLabels[timeValues.indexOf(duration)] != displayDuration || timeLabels[timeValues.indexOf(interval)] != displayInterval || timeLabels[timeValues.indexOf(startTime)] != displayStartTime && startTime != 0
 
-    const shouldDisableSendFundsButton =
-        !icaAddr ||
-        (autoTxData.msgs && autoTxData.msgs.length == 0)
-
-    const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
-    const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
-        useCreateAuthzGrant({ grantee: icaAddr, msgs: autoTxData.msgs, expirationFromNow: autoTxData.duration, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
-    useEffect(() => {
-        const shouldTriggerAuthzGrant =
-            !isExecutingAuthzGrant && requestedAuthzGrant;
-        if (shouldTriggerAuthzGrant) {
-            handleCreateAuthzGrant(undefined, { onSettled: () => setRequestedCreateAuthzGrant(false) })
-        }
-    }, [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant])
-
-    const handleCreateAuthzGrantClick = () => {
-        connectExternalWallet(null)
-        return setRequestedCreateAuthzGrant(true)
-    }
-    const shouldDisableAuthzGrantButton =
-        !icaAddr ||
-        (autoTxData.msgs && autoTxData.msgs.length == 0)
-
-    function handleFeeFunds(input) {
-        setFeeAmount(input);
-    }
-    function handleDisplayRecurrence(value) {
-        let displayRecs = value.toString() + ' times'
-        if (value == 1) {
-            displayRecs + ' time'
-        }
-        setDisplayRecurrences(displayRecs)
-
-    }
     //true = deduct fees from local acc
     const [checkedFeeAcc, setCheckedFeeAcc] = useState(true);
     const handleChangeFeeAcc = () => {
         setCheckedFeeAcc(!checkedFeeAcc);
     };
 
-    const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedAutoTxFee(duration, autoTxData, interval)
+    const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedAutoTxFee(duration, autoTxData, isDialogShowing, interval)
+    const refetchExpectedAutoTxFee = useRefetchQueries('expectedAutoTxFee')
     const canSchedule = duration > 0 && interval > 0
 
 
-    const handleData = (withAuthZ: boolean) => {
+    const handleData = (icaAddressForAuthZGrant: string) => {
         if (duration < interval || startTime > duration) {
             toast.custom((t) => (
                 <Toast
@@ -229,11 +214,11 @@ export const SubmitAutoTxDialog = ({
             ))
         }
         console.log({ startTime, duration, interval, recurrences })
-        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msgs: autoTxData.msgs, withAuthZ, feeFunds, label: txLabel })
+        handleSubmitAutoTx({ startTime, duration, interval, recurrences, connectionId: autoTxData.connectionId, dependsOnTxIds: autoTxData.dependsOnTxIds, retries: autoTxData.retries, msgs: autoTxData.msgs, icaAddressForAuthZGrant, feeFunds, label: txLabel })
     }
 
     return (
-        <Dialog isShowing={isShowing} onRequestClose={onRequestClose}>
+        <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
             <DialogHeader paddingBottom={canSchedule ? '$8' : '$12'}>
                 <Text variant="header">Automate Transaction</Text>
             </DialogHeader>
@@ -259,11 +244,43 @@ export const SubmitAutoTxDialog = ({
                                 {timeLabels.map((time, index) => (
                                     <span key={index}>
                                         {displayInterval != time && (
-                                            <Chip label={time} onClick={() => handleInterval(time, timeValues[index])} />
+                                            <Chip label={time} onClick={() => handleInterval(time, timeSecondValues[index])} />
                                         )}
                                     </span>))}
 
                             </div>
+                            <Button css={{ justifyContent: "flex-end !important" }}
+                                variant="ghost"
+                                onClick={() => setEditInterval(!editInterval)}
+                                icon={
+                                    <IconWrapper
+                                        size="medium"
+                                        rotation="-90deg"
+                                        color="tertiary"
+                                        icon={editInterval ? <Union /> : <Chevron />}
+                                    />
+                                }
+                            />
+                            {editInterval && <Inline>
+                                <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                    <Tooltip
+                                        label={editLabel}
+                                        aria-label="edit start time"
+                                    ><Text variant="legend">Interval<StyledInput
+                                        placeholder={displayInterval}
+                                        value={editIntervalValue}
+                                        onChange={({ target: { value } }) => setEditIntervalValue(value)}
+                                    /></Text></Tooltip>
+                                    <Button
+                                        variant="primary"
+                                        size="small"
+                                        onClick={() =>
+                                            handleInterval(cleanCustomInputForDisplay(editIntervalValue), convertTime(editIntervalValue))
+                                        }
+                                    >
+                                        {('Edit')}
+                                    </Button></Column>
+                            </Inline>}
                         </Inline>
                         <Inline justifyContent={'space-between'} align="center">
                             <div className="chips">
@@ -271,11 +288,43 @@ export const SubmitAutoTxDialog = ({
                                 {timeLabels.map((time, index) => (
                                     <span key={"b" + index}>
                                         {displayDuration != time && (
-                                            <Chip label={time} onClick={() => handleDuration(time, timeValues[index])} />
+                                            <Chip label={time} onClick={() => handleDuration(time, timeSecondValues[index])} />
                                         )}
                                     </span>))}
 
                             </div>
+                            <Button css={{ justifyContent: "flex-end !important" }}
+                                variant="ghost"
+                                onClick={() => setEditDuration(!editDuration)}
+                                icon={
+                                    <IconWrapper
+                                        size="medium"
+                                        rotation="-90deg"
+                                        color="tertiary"
+                                        icon={editDuration ? <Union /> : <Chevron />}
+                                    />
+                                }
+                            />
+                            {editDuration && <Inline>
+                                <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                    <Tooltip
+                                        label={editLabel}
+                                        aria-label="edit start time"
+                                    ><Text variant="legend">Duration<StyledInput
+                                        placeholder={displayDuration}
+                                        value={editDurationValue}
+                                        onChange={({ target: { value } }) => setEditDurationValue(value)}
+                                    /></Text></Tooltip>
+                                    <Button
+                                        variant="primary"
+                                        size="small"
+                                        onClick={() =>
+                                            handleDuration(cleanCustomInputForDisplay(editDurationValue), convertTime(editDurationValue))
+                                        }
+                                    >
+                                        {('Edit')}
+                                    </Button></Column>
+                            </Inline>}
                         </Inline>
                         <DialogDivider offsetY="$4" />
                         <Text css={{ margin: '$4' }} align="center"
@@ -287,40 +336,44 @@ export const SubmitAutoTxDialog = ({
                                 {timeLabels.map((time, index) => (
                                     <span key={"c" + index}>
                                         {displayStartTime != time && index <= 4 && (
-                                            <Chip label={"In " + time} onClick={() => handleStartTime(time, timeValues[index])} />
+                                            <Chip label={"In " + time} onClick={() => handleStartTime(time, timeSecondValues[index])} />
                                         )}
                                     </span>))}
 
                             </div>
-                        </Inline>
-                        <Inline justifyContent={'space-between'} align="center">
-                            <div className="chips">
-                                <Text align="center" variant="caption" css={{ margin: '$4' }}>Specify amount of recurrences (optional)</Text><ChipSelected label={"For " + displayRecurrences} onClick={() => handleRemoveRecurrences()} />
-                                {recurrenceLabels.map((times, index) => (
-                                    <span key={"c" + index}>
-                                        {displayRecurrences != times && (
-                                            <Chip label={times} onClick={() => handleRecurrences(times, recurrenceValues[index])} />
-                                        )}
-                                    </span>))}
-                            </div>
-                        </Inline>
-                        {/*  <Inline justifyContent={'space-between'} align="center">
-                            <Text>  <StyledInput step=".01"
-                                placeholder="0.00" type="number"
-                                value={feeGrantForPeriod}
-                                onChange={({ target: { value } }) => setFeeGrantForPeriod(Number(value))}
-                            /></Text>
-                            <Button css={{ marginRight: '$4' }}
-                                variant="primary"
-                                size="large"
-                                disabled={shouldDisableFeeGrantButton}
-                                onClick={() =>
-                                    handleCreateFeeGrantClick()
+                            <Button css={{ justifyContent: "flex-end !important" }}
+                                variant="ghost"
+                                onClick={() => setEditStartTime(!editStartTime)}
+                                icon={
+                                    <IconWrapper
+                                        size="medium"
+                                        rotation="-90deg"
+                                        color="tertiary"
+                                        icon={editStartTime ? <Union /> : <Chevron />}
+                                    />
                                 }
-                            >
-                                {isExecutingFeeGrant ? <Spinner instant /> : 'Fee Grant'}
-                            </Button>
-                            </Inline> */}
+                            />
+                            {editStartTime && <Inline>
+                                <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                    <Tooltip
+                                        label={editLabel}
+                                        aria-label="edit start time"
+                                    ><Text variant="legend">Start In<StyledInput
+                                        placeholder={displayStartTime}
+                                        value={editStartTimeValue}
+                                        onChange={({ target: { value } }) => setEditStartTimeValue(value)}
+                                    /></Text></Tooltip>
+                                    <Button
+                                        variant="primary"
+                                        size="small"
+                                        onClick={() =>
+                                            handleStartTime(cleanCustomInputForDisplay(editStartTimeValue), convertTime(editStartTimeValue))
+                                        }
+                                    >
+                                        {('Edit')}
+                                    </Button></Column>
+                            </Inline>}
+                        </Inline>
                         <Column css={{ padding: '$8 0' }}>
 
                             <DialogDivider offsetTop="$4" />
@@ -354,7 +407,7 @@ export const SubmitAutoTxDialog = ({
                                         handleCreateAuthzGrantClick()
                                     }
                                 >
-                                    {isExecutingAuthzGrant && (<Spinner instant />)}  {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
+                                    {isExecutingAuthzGrant && (<Spinner instant />)}  {Number(feeFundsHostChain) != 0 ? ('Send ' + feeFundsHostChain + " " + chainSymbol + ' + Grant') : ('Create Grant')}
                                 </Button>}
                                     {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button css={{ margin: '$2' }}
                                         variant="primary"
@@ -374,43 +427,43 @@ export const SubmitAutoTxDialog = ({
                                     Deduct TRST fees from local account
                                 </Text> </Inline>
                             {!checkedFeeAcc && (<>
-                                <Text align="center" css={{ marginTop: '$4' }}
+                                <Tooltip
+                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If set to 0, your local balance will be used"
+                                    aria-label="Fund Trigger - TRST (Optional)"
+                                ><Text align="center" css={{ marginTop: '$4' }}
                                     variant="caption">
-                                    Fee Funds - TRST</Text>
+                                        Fee Funds - TRST</Text></Tooltip>
                                 <Inline >
                                     <Text variant="legend"><StyledInput step=".01"
                                         placeholder="0.00" type="number"
                                         value={feeFunds}
-                                        onChange={({ target: { value } }) => handleFeeFunds(Number(value))}
+                                        onChange={({ target: { value } }) => setFeeAmount(Number(value))}
                                     />TRST</Text>
                                 </Inline></>)}
                             {recurrences > 0 && !isSuggestedFundsLoading && (
-                                <Tooltip
-                                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If set to 0, your local balance will be used"
-                                    aria-label="Fund Trigger - TRST (Optional)"
-                                >
-                                    <Text color="disabled" wrap={false}
-                                        variant="legend">
-                                        Estimated AutoTx fees:  {suggestedFunds} TRST</Text>
-                                </Tooltip>)}
+
+                                <Text color="disabled" wrap={false}
+                                    variant="legend">
+                                    Estimated AutoTx fees:  {suggestedFunds} TRST</Text>
+                            )}
 
                             <DialogDivider offsetY='$10' />
-                            {duration && interval && <><Text align="center"
+                            {duration && <><Text align="center"
                                 variant="legend">
                                 Details</Text>
                                 <Inline justifyContent={'flex-start'}>
-                                    <Text css={{ padding: "$4" }} variant="caption">
+                                    {startTime && <Text css={{ padding: "$4" }} variant="caption">
                                         Execution Starts in {displayStartTime}
-                                    </Text>
+                                    </Text>}
                                     <Text css={{ padding: "$4" }} variant="caption">
                                         Duration is {displayDuration}
                                     </Text>
-                                    <Text css={{ padding: "$4" }} variant="caption">
+                                    {interval && <><Text css={{ padding: "$4" }} variant="caption">
                                         Interval is {displayInterval}
                                     </Text>
-                                    <Text css={{ padding: "$4" }} variant="caption">
-                                        {Math.floor(duration / interval)} recurrences
-                                    </Text> </Inline>
+                                        <Text css={{ padding: "$4" }} variant="caption">
+                                            {Math.floor(duration / interval)} recurrences
+                                        </Text></>}</Inline>
                                 <Inline justifyContent={'space-between'} align="center">
                                     <Tooltip
                                         label="name your trigger so you can find it back later (optional)"
@@ -433,15 +486,15 @@ export const SubmitAutoTxDialog = ({
             <DialogDivider offsetTop="$4" offsetBottom="$2" />
             <DialogButtons
                 cancellationButton={
-                    <Button variant="secondary" onClick={onRequestClose}>
+                    <Button variant="ghost" onClick={onRequestClose}>
                         Cancel
                     </Button>
                 }
                 confirmationButton={
                     <Button
-                        disabled={shouldDisableSubmissionButton}
-                        variant="primary"
-                        onClick={() => isLoading ? undefined : handleData(false)}
+                        disabled={false}
+                        variant="secondary"
+                        onClick={() => isLoading ? undefined : handleData("")}
                     >
                         {isLoading ? (
                             <Spinner instant={true} size={16} />
@@ -453,8 +506,8 @@ export const SubmitAutoTxDialog = ({
                 }>
                 {autoTxData.connectionId && <Button
                     disabled={!hasIcaAuthzGrant}
-                    variant="primary"
-                    onClick={() => isLoading ? undefined : handleData(true)}
+                    variant="secondary"
+                    onClick={() => isLoading ? undefined : handleData(icaAddress)}
                 >
                     {isLoading ? (
                         <Spinner instant={true} size={16} />
@@ -470,8 +523,32 @@ export const SubmitAutoTxDialog = ({
     )
 }
 
-
-
+// helper function to clean users input for display (e.g. mistyping minute for minutex)
+function cleanCustomInputForDisplay(input: string) {
+    const number = Number(input.match(/\d+/g));
+    const isOne = number == 1
+    if (input.includes("hour")) {
+        if (isOne) {
+            return number + " hour"
+        }
+        return number + " hours"
+    } else if (input.includes("day")) {
+        if (isOne) {
+            return number + " day"
+        }
+        return number + " days"
+    } else if (input.includes("minute")) {
+        if (isOne) {
+            return number + " minute"
+        }
+        return number + " minutes"
+    } else if (input.includes("week")) {
+        if (isOne) {
+            return number + " week"
+        }
+        return number + " weeks"
+    }
+}
 
 const StyledDivForInputs = styled('div', {
     display: 'flex',
@@ -479,7 +556,6 @@ const StyledDivForInputs = styled('div', {
     rowGap: 8,
 })
 const StyledInput = styled('input', {
-
     color: 'inherit',
     padding: '$2',
     margin: '$2',

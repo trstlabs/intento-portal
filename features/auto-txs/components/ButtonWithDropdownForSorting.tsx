@@ -23,8 +23,11 @@ import {
     onSortDirectionChange,
   }: Props) => {
     function getSortByLabel() {
-      if (sortParameter === 'alphabetical') {
-        return 'Sort alphabetically'
+      if (sortParameter === 'id') {
+        return 'Sort by ID'
+      }
+      if (sortParameter === 'label') {
+        return 'Sort by label'
       }
       if (sortParameter === 'exec_time') {
         return 'Sort by execute time'
@@ -39,13 +42,23 @@ import {
             <Column css={{ padding: '$6 $6 $4' }}>
               <Button
                 variant="ghost"
-                onClick={() => onSortParameterChange('alphabetical')}
-                selected={sortParameter === 'alphabetical'}
+                onClick={() => onSortParameterChange('id')}
+                selected={sortParameter === 'id'}
                 iconLeft={
-                  <ValidIcon visible={sortParameter === 'alphabetical'} />
+                  <ValidIcon visible={sortParameter === 'id'} />
                 }
               >
-                Alphabetical order
+              TxID
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => onSortParameterChange('label')}
+                selected={sortParameter === 'label'}
+                iconLeft={
+                  <ValidIcon visible={sortParameter === 'label'} />
+                }
+              >
+               Label
               </Button>
               <Button
                 variant="ghost"
@@ -53,7 +66,7 @@ import {
                 selected={sortParameter === 'exec_time'}
                 iconLeft={<ValidIcon visible={sortParameter === 'exec_time'} />}
               >
-                AutoExec Time
+                Execution Time
               </Button>
             </Column>
             <Divider />

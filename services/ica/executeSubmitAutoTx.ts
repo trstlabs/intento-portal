@@ -1,8 +1,6 @@
 import { convertDenomToMicroDenom } from 'junoblocks'
 import {
   Coin,
-  // GeneratedType,
-  // getMsgDecoderRegistry,
   msgRegistry, Registry,
   toUtf8,
   TrustlessChainClient,
@@ -12,17 +10,6 @@ import {
 
   validateTransactionSuccess,
 } from '../../util/messages'
-
-// import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
-// //import { encodeAsAny } from '@cosmjs/proto-signing/build/registry'
-// import { MsgExec } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/tx'
-// import { MsgDelegate } from 'trustlessjs/dist/protobuf/cosmos/staking/v1beta1/tx'
-// import { MsgDelegateEncodeObject, SigningStargateClient } from '@cosmjs/stargate'
-// import { EncodeObject } from '@cosmjs/proto-signing'
-// import { Coin } from 'trustlessjs/dist/protobuf/cosmos/base/v1beta1/coin'
-//import { MsgDelegate } from '@cosmjs/launchpad'
-
-
 
 type ExecuteSubmitAutoTxArgs = {
   owner: string
@@ -36,17 +23,17 @@ export const executeSubmitAutoTx = async ({
   owner,
 }: ExecuteSubmitAutoTxArgs): Promise<any> => {
   let startAt = 0
-  if (autoTxData.startTime > 0) {
+  if (autoTxData.startTime && autoTxData.startTime > 0) {
     startAt = (Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000);
   }
 
   let duration = autoTxData.duration + "ms"
   let interval = autoTxData.interval + "ms"
   let msgs = []
+  const masterRegistry = new Registry(msgRegistry);
   for (let msg of autoTxData.msgs) {
     console.log(msg)
-    const masterRegistry = new Registry(msgRegistry);
-    //let type = masterRegistry.lookupType((JSON.parse(autoTxData.msg)["typeUrl"]).toString())
+
     let value = JSON.parse(msg)["value"]
 
     let typeUrl: string = JSON.parse(msg)["typeUrl"].toString()
@@ -66,19 +53,20 @@ export const executeSubmitAutoTx = async ({
     console.log(encodeObject)
 
     let msgAny = masterRegistry.encodeAsAny(encodeObject)
-    if (autoTxData.withAuthZ) {
-      const encodeObject2 = {
-        typeUrl: "/cosmos.authz.v1beta1.MsgExec",
-        value: {
-          msg,
-          grantee: owner,
-        }
-
-      }
-      msgAny = masterRegistry.encodeAsAny(encodeObject2)
-    }
     console.log(msgAny)
     msgs.push(msgAny)
+  }
+
+  if (autoTxData.icaAddressForAuthZGrant && autoTxData.icaAddressForAuthZGrant != "") {
+    const encodeObject2 = {
+      typeUrl: "/cosmos.authz.v1beta1.MsgExec",
+      value: {
+        msgs,
+        grantee: autoTxData.icaAddressForAuthZGrant,
+      }
+    }
+    msgs = [masterRegistry.encodeAsAny(encodeObject2)]
+    console.log(msgs)
   }
 
   let feeFunds: Coin[] = [];
@@ -87,19 +75,18 @@ export const executeSubmitAutoTx = async ({
   }
   console.log("label", autoTxData.label)
   return validateTransactionSuccess(
-    await client.tx.auto_tx.submit_auto_tx({
+    await client.tx.autoTx.submitAutoTx({
       connectionId: autoTxData.connectionId ? autoTxData.connectionId : "",
       owner,
       msgs,
       label: autoTxData.label ? autoTxData.label : "",
       duration,
       interval,
-      startAt: startAt.toString(),
+      startAt,
       // dependsOnTxIds,
       feeFunds,
     },
-
-      { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
+      { gasLimit: 130_000 }
     )
   )
 
@@ -114,7 +101,7 @@ export class AutoTxData {
   dependsOnTxIds?: number[]
   msgs: string[]
   retries: number
-  withAuthZ: boolean
+  icaAddressForAuthZGrant?: string
   label?: string
   feeFunds?: number
 }

@@ -7,7 +7,7 @@ export const useTrustlessChainClient = () => {
   const [chainInfo] = useChainInfo()
 
   const { data } = useQuery(
-    '@cosmwasm-client',
+    '@trustless-chain-client',
     () => trustlessChainClientRouter.connect(chainInfo.rpc, chainInfo.chainId),
     { enabled: Boolean(chainInfo?.rpc) }
   )

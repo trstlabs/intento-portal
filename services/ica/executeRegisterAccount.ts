@@ -5,7 +5,7 @@ import {
 import {
   validateTransactionSuccess,
 } from '../../util/messages'
-import { getICA } from './data'
+
 
 type ExecuteRegisterAccountArgs = {
   owner: string
@@ -13,44 +13,17 @@ type ExecuteRegisterAccountArgs = {
   client: TrustlessChainClient
 }
 
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+
 export const executeRegisterAccount = async ({
   client,
   connectionId,
   owner,
 }: ExecuteRegisterAccountArgs): Promise<any> => {
-  let tx = await client.tx.auto_tx.register_account({
+  let tx = await client.tx.autoTx.registerAccount({
     connectionId, owner,
   },
-    { gasLimit: Number(process.env.NEXT_PUBLIC_GAS_LIMIT_MORE) }
+    { gasLimit: 200_000 }
   )
   validateTransactionSuccess(tx)
-  await sleep(30000)
-  let acc = await getICA({ owner, connectionId, client })
-  if (acc != "") {
-    return acc
-  }
-  await sleep(20000)
-  acc = await getICA({ owner, connectionId, client })
-  if (acc != "") {
-    return acc
-  }
-  await sleep(15000)
-  acc = await getICA({ owner, connectionId, client })
-  if (acc != "") {
-    return acc
-  }
-  await sleep(5000)
-  acc = await getICA({ owner, connectionId, client })
-  if (acc != "") {
-    return acc
-  }
-  await sleep(5000)
-  acc = await getICA({ owner, connectionId, client })
-  if (acc != "") {
-    return acc
-  }
-  return undefined
+ 
 }

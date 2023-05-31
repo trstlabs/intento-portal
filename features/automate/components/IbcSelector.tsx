@@ -1,4 +1,3 @@
-
 import {
   Button,
   IconWrapper,
@@ -6,19 +5,17 @@ import {
   styled,
   Union,
   useOnClickOutside,
-
 } from 'junoblocks'
 import React, { useRef, useState } from 'react'
 
 import { IbcSelectorToggle } from './IbcSelectorToggle'
 import { ConnectionOptionsList } from './ConnectionOptionsList'
 
-
 type IbcSelectorProps = {
   readOnly?: boolean
   disabled?: boolean
   connectionId: string
-  onChange: (ibc_info: { connection; prefix, denom, name, symbol }) => void
+  onChange: (ibc_info: { connection; prefix; denom; name; symbol }) => void
   size?: 'small' | 'large'
 }
 
@@ -34,12 +31,17 @@ export const IbcSelector = ({
 
   const [isConnectionListShowing, setConnectionListShowing] = useState(false)
 
-
   const [chainLogoURI, setChainLogoURI] = useState('')
   const [chainName, setChainName] = useState('')
 
-
-  const handleSelectConnection = (connection: string, uri: string, name: string, prefix: string, denom: string, symbol: string) => {
+  const handleSelectConnection = (
+    connection: string,
+    uri: string,
+    name: string,
+    prefix: string,
+    denom: string,
+    symbol: string
+  ) => {
     setChainLogoURI(uri)
     setChainName(name)
     onChange({ connection, prefix, denom, name, symbol })
@@ -53,7 +55,8 @@ export const IbcSelector = ({
 
   if (size === 'small') {
     return (
-      <StyledDivForContainer css={{ padding: '$24 $24', margin: '$24 $12 ' }}
+      <StyledDivForContainer
+        css={{ padding: '$24 $24', margin: '$24 $12 ' }}
         ref={wrapperRef}
       >
         {!isConnectionListShowing && (
@@ -74,10 +77,17 @@ export const IbcSelector = ({
         {isConnectionListShowing && (
           <ConnectionOptionsList
             activeConnection={connectionId}
-            onSelect={(slct) => handleSelectConnection(slct.connection, slct.logoURI, slct.name, slct.prefix, slct.denom, slct.symbol)}
+            onSelect={(slct) =>
+              handleSelectConnection(
+                slct.connection,
+                slct.logoURI,
+                slct.name,
+                slct.prefix,
+                slct.denom,
+                slct.symbol
+              )
+            }
             css={{ padding: '$2 $3 $6' }}
-
-
             visibleNumberOfTokensInViewport={4.5}
           />
         )}
@@ -86,12 +96,9 @@ export const IbcSelector = ({
   }
 
   return (
-    <StyledDivForContainer
-      ref={wrapperRef}
-    >
+    <StyledDivForContainer ref={wrapperRef}>
       <StyledDivForWrapper>
         <StyledDivForSelector>
-
           {!isConnectionListShowing && (
             <IbcSelectorToggle
               connection={connectionId}
@@ -105,15 +112,15 @@ export const IbcSelector = ({
               }
             />
           )}
-
         </StyledDivForSelector>
         <StyledDivForAmountWrapper>
           {isConnectionListShowing && (
-            <Button css={{ padding: '$0 $0 $0' }}
+            <Button
+              css={{ padding: '$0 $0 $0' }}
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
               size="small"
-              onClick={() => handleSelectConnection('', '', '', '', '', '',)}
+              onClick={() => handleSelectConnection('', '', '', '', '', '')}
               iconColor="tertiary"
             />
           )}
@@ -133,7 +140,16 @@ export const IbcSelector = ({
       {isConnectionListShowing && (
         <ConnectionOptionsList
           activeConnection={connectionId}
-          onSelect={(slct) => handleSelectConnection(slct.connection, slct.logoURI, slct.name, slct.prefix, slct.denom, slct.symbol)}
+          onSelect={(slct) =>
+            handleSelectConnection(
+              slct.connection,
+              slct.logoURI,
+              slct.name,
+              slct.prefix,
+              slct.denom,
+              slct.symbol
+            )
+          }
           css={{ padding: '$2 $4 $2' }}
         />
       )}
@@ -143,23 +159,22 @@ export const IbcSelector = ({
 
 const StyledDivForWrapper = styled('div', {
   padding: '$4 $10 $4 $6',
-  display: 'flex',
+  //  display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   position: 'relative',
   zIndex: 0,
-
 })
 
 const StyledDivForSelector = styled('div', {
-  display: 'flex',
+  //  display: 'flex',
   alignItems: 'center',
   position: 'relative',
   zIndex: 1,
 })
 
 const StyledDivForAmountWrapper = styled('div', {
-  display: 'flex',
+  //  display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
   position: 'relative',
@@ -175,12 +190,10 @@ const StyledDivForOverlay = styled('div', {
   zIndex: 0,
   backgroundColor: '$colors$dark0',
   transition: 'background-color .1s ease-out',
-
 })
 
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
-  display: 'flex',
+  //  display: 'flex',
   transition: 'box-shadow .1s ease-out',
-
 })

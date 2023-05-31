@@ -11,6 +11,7 @@ export type TokenInfo = {
   denom: string
   native: boolean
   channel?: string
+  channel_to_trst?: string
   connection_id?: string
   prefix?: string
   trst_denom?: string

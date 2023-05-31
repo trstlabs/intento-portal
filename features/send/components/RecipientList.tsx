@@ -1,4 +1,4 @@
-import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyIcon, Button, styled, Text, Column, convertDenomToMicroDenom } from 'junoblocks'
+import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyIcon, Button, styled, Text, Column, convertDenomToMicroDenom, ImageForTokenLogo } from 'junoblocks'
 
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
@@ -24,7 +24,7 @@ type RecipientsInputProps = {
   tokenSymbol: string
   onRecipientsChange: (recipients: RecipientInfo[]) => void
   onRemoveRecipient: (recipient: RecipientInfo) => void
-  //onTokenSymbolChange: (symbol: string) => void
+
 } & HTMLProps<HTMLInputElement>
 
 export const RecipientList = ({
@@ -32,21 +32,19 @@ export const RecipientList = ({
   tokenSymbol,
   onRecipientsChange,
   onRemoveRecipient,
-  // onTokenSymbolChange, 
-  //...inputProps
+
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
-
+  const [prefix, setPrefix] = useState("trust")
   const [requestedSend, setRequestedSend] = useState(false)
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  // set default times
+  // set default fields
   let data = new AutoTxData()
   data.duration = 14 * 86400000;
   data.interval = 86400000;
   data.msgs = [""]
-  data.typeUrls = [""]
   const [autoTxData, setAutoTxData] = useState(data)
   const { address, status } = useRecoilValue(walletState)
   const { mutate: connectWallet } = useConnectWallet()
@@ -93,10 +91,19 @@ export const RecipientList = ({
     if (status === WalletStatusType.connected) {
       let msgs = []
       for (let recipient of recipients) {
-        let sendMsg = sendObject
-        sendObject.value.fromAddress = address,
-          sendObject.value.toAddress = recipient.recipient,
-          sendObject.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
+        let sendMsg;
+        if (recipient.channelID) {
+          sendMsg = transferObject
+          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }
+          sendMsg.value.sender = address
+          sendMsg.value.receiver = recipient.recipient
+          sendMsg.value.sourceChannel = recipient.channelID
+        } else {
+          sendMsg = sendObject;
+          sendMsg.value.fromAddress = address
+          sendMsg.value.toAddress = recipient.recipient
+          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
+        }
 
         msgs.push(JSON.stringify(sendMsg))
       }
@@ -127,6 +134,8 @@ export const RecipientList = ({
       channelID: channelInfo.channelID
     }
     console.log(newRecipients)
+
+    setPrefix(channelInfo.prefix)
     //onTokenSymbolChange(channelInfo.symbol)
 
     onRecipientsChange(newRecipients)
@@ -193,7 +202,7 @@ export const RecipientList = ({
 
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
-    status !== WalletStatusType.connected || !recipients[0].recipient || (recipients[0].recipient && recipients[0].recipient.length < 44) || (Number(recipients[0].amount) == 0)
+    status !== WalletStatusType.connected || !recipients[0].recipient || (recipients[0].recipient && recipients[0].recipient.length < 40) || (Number(recipients[0].amount) == 0)
 
 
 
@@ -211,7 +220,7 @@ export const RecipientList = ({
                       variant="caption">
                       Recipient</Text>
                     <Text>  <StyledInput
-                      placeholder="trust1..."
+                      placeholder={prefix + "1..."}
                       value={recipient.recipient}
                       onChange={handleChange(index, 'recipient')}
                     /></Text>
@@ -249,13 +258,13 @@ export const RecipientList = ({
                   <Text align="center"
                     variant="caption">
                     To Chain (Optional)</Text>
-                  <Text>  <ChannelSelector
+                  <ChannelSelector
                     channel={recipient.channelID}
                     onChange={(updateChannel) => {
                       handleChannelChange(index, updateChannel)
                     }}
                     size={'large'}
-                  /></Text></Row></Column>
+                  /></Row></Column>
 
               </CardContent>
             </Card>
@@ -271,7 +280,7 @@ export const RecipientList = ({
           </div>))
         }
       </Card>
-      {recipients[0].recipient && recipients[0].recipient.length >= 44 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+      {recipients[0].recipient && recipients[0].recipient.length >= 40 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
           <Text align="left"
             variant="header">
@@ -281,18 +290,22 @@ export const RecipientList = ({
         {/* <Divider offsetTop="$5" offsetBottom="$2" /> */}
 
         {recipients.map((recipient, index) => (
-
-
-          <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={"a" + index}>      <Text>
-              {(recipient.amount != 0) && (<div>
-                <div>Recipient {index + 1}: <i >{recipient.recipient}</i></div>
-                <Text>Amount: <i> {recipient.amount} {tokenSymbol}</i></Text>
-                {recipient.channelID && (<Text>Channel ID: <i >{recipient.channelID}</i></Text>)}
-                {recipient.memo && (<Text>Memo: <i >{recipient.memo}</i></Text>)}
+          recipient.amount != "0" && <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
+            <div key={"a" + index}>       <Text variant="legend" css={{ wordBreak: "break-all", paddingBottom: '$5', marginBottom: '$4', }}>
+              {(recipient.amount != "0") && (<div>
+                <Row>Recipient {index + 1}: </Row> <i>{recipient.recipient}</i>
+                <Row>Amount {recipient.amount} <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
+                  logoURI={ibcAsset.logoURI}
+                  size="medium"
+                  alt={ibcAsset.symbol}
+                  loading="lazy"
+                /> </Row>
+                {recipient.channelID && (<Row>Channel ID: <i >{recipient.channelID}</i></Row>)}
+                {recipient.memo && (<Row>Memo: <i >{recipient.memo}</i></Row>)}
               </div>)}</Text>
             </div>
           </CardContent>
+
         ))}
       </Card>)}
       <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
@@ -320,14 +333,15 @@ export const RecipientList = ({
             })
           }
         >
-          {isExecutingTransaction ? <Spinner instant /> : 'Schedule Recurrence'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Schedule Recurrence'}
         </Button>
 
       </Inline>
       <SubmitAutoTxDialog
+        isLoading={isExecutingSchedule}
         // label="Recurring Send"
         autoTxData={autoTxData}
-        isShowing={isScheduleDialogShowing}
+        isDialogShowing={isScheduleDialogShowing}
         /* initialActionType={actionType} */
         onRequestClose={() =>
           setScheduleDialogState({
@@ -341,9 +355,10 @@ export const RecipientList = ({
 }
 
 const StyledInput = styled('input', {
-  width: '100%',
+  minWidth: '180px',
+  maxWidth: '400px',
   color: 'inherit',
-  // fontSize: `20px`,
+  fontSize: `12px`,
   padding: '$2',
   margin: '$2',
 })
@@ -384,5 +399,19 @@ const sendObject = {
     }],
     "fromAddress": "trust1....",
     "toAddress": "trust1..."
+  }
+}
+
+const transferObject = {
+  "typeUrl": "/ibc.applications.transfer.v1.MsgTransfer",
+  "value": {
+    "token": {},
+    "sender": "trust1....",
+    "receiver": "trust1...",
+    "sourcePort": "transfer",
+    "sourceChannel": "",
+    "timeoutHeight": "0",
+    "timeoutTimestamp": "0",
+    "memo": "",
   }
 }

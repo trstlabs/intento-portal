@@ -3,14 +3,17 @@ import {
     ErrorIcon,
     formatSdkErrorMessage,
 
+    IconWrapper,
+
     Toast,
     UpRightArrow,
+    Valid,
 
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeRegisterAccount } from '../../../services/ica'
+import { executeRegisterAccount, getICA } from '../../../services/ica'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -33,10 +36,10 @@ export const useRegisterAccount = ({
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries(['tokenBalance', `interchainAccount/${connectionId}`])
 
     return useMutation(
-        'registerRA',
+        'registerICA',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
@@ -46,20 +49,55 @@ export const useRegisterAccount = ({
                   throw new Error('connection id not found')
               } */
 
-            return await executeRegisterAccount({
+            await executeRegisterAccount({
                 owner: address,
                 connectionId,
                 client,
             })
+            toast.custom((t) => (
+                <Toast
+                    icon={<IconWrapper icon={<Valid />} color="primary" />}
+                    title="Now registering on destination chain"
+                    body={`Created an Interchain Account on Trustless Hub`}
+                    onClose={() => toast.dismiss(t.id)}
+                />
+            ))
+            await sleep(30000)
+            let acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(20000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(15000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(5000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            await sleep(5000)
+            acc = await getICA({ owner: address, connectionId, client })
+            if (acc != "") {
+                return acc
+            }
+            return undefined
 
         },
         {
             onSuccess(data) {
                 console.log(data)
+                toast.success("Succesfully registered account on destination chain")
                 if (data) {
                     popConfetti(true)
                 }
-                
+
                 refetchQueries()
             },
             onError(e) {
@@ -91,3 +129,8 @@ export const useRegisterAccount = ({
         }
     )
 }
+
+
+async function sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }

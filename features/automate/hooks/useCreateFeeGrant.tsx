@@ -9,7 +9,7 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
+import {  useRecoilValue, useSetRecoilState } from 'recoil'
 import { executeCreateFeeGrant } from '../../../services/ica'
 import {
     TransactionStatus,
@@ -18,7 +18,6 @@ import {
 import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { particleState } from '../../../state/atoms/particlesAtoms'
 import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
 
 type UseCreateFeeGrantParams = {
@@ -35,7 +34,6 @@ export const useCreateFeeGrant = ({
         useRecoilValue(ibcWalletState)
 
     const setTransactionState = useSetRecoilState(transactionStatusState)
-    const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
 
@@ -57,7 +55,7 @@ export const useCreateFeeGrant = ({
         {
             onSuccess(data) {
                 console.log(data)
-                popConfetti(true)
+                toast.success("Succesfully created fee grant")
                 
                 refetchQueries()
             },

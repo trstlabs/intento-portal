@@ -18,9 +18,8 @@ import { TokenOptionsList } from './TokenOptionsList'
 type TokenSelectorProps = {
   readOnly?: boolean
   disabled?: boolean
-
   tokenSymbol: string
-  onChange: (tokenSymbol: string) => void
+  onChange: (token: { tokenSymbol }) => void
   size?: 'small' | 'large'
 }
 
@@ -38,11 +37,11 @@ export const TokenSelector = ({
 
   const { balance: availableAmount } = useTokenBalance(tokenSymbol)
   const [tokenSearchQuery, setTokenSearchQuery] = useState('')
-  const [_, setInputForSearchFocused] = useState(false)
+  const [isInputForSearchFocused, setInputForSearchFocused] = useState(false)
 
 
   const handleSelectToken = (selectedTokenSymbol) => {
-    onChange(selectedTokenSymbol)
+    onChange({ tokenSymbol: selectedTokenSymbol })
     setTokenListShowing(false)
   }
 
@@ -103,7 +102,10 @@ export const TokenSelector = ({
   }
 
   return (
-    <div>
+    <StyledDivForContainer
+    selected={isInputForSearchFocused}
+    ref={wrapperRef}
+  >
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {isTokenListShowing && (
@@ -164,7 +166,7 @@ export const TokenSelector = ({
           emptyStateLabel={`No result for “${tokenSearchQuery}”`}
         />
       )}
-    </div>
+       </StyledDivForContainer>
   )
 }
 
@@ -201,6 +203,25 @@ const StyledDivForOverlay = styled('div', {
   zIndex: 0,
   backgroundColor: '$colors$dark0',
 
- 
+
+})
+
+
+const selectedVariantForInputWrapper = {
+  true: {
+    boxShadow: '0 0 0 $space$1 $borderColors$selected',
+  },
+  false: {
+    boxShadow: '0 0 0 $space$1 $colors$dark0',
+  },
+}
+
+
+const StyledDivForContainer = styled('div', {
+  borderRadius: '$2',
+  transition: 'box-shadow .1s ease-out',
+  variants: {
+    selected: selectedVariantForInputWrapper,
+  },
 })
 

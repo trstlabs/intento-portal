@@ -7,9 +7,9 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-import { useIBCAssetInfo } from './useIBCAssetInfo'
-import { IBCAssetInfo, /* useIBCAssetList */ } from './useIBCAssetList'
-import {  getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
+import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
+import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
+import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
 
 import { useTrustlessChainClient } from './useTrustlessChainClient'
@@ -17,7 +17,7 @@ import { getBalanceForAcc } from '../services/chain-info'
 
 async function fetchTokenBalance({
   client,
-  token: { denom, native, token_address, decimals },
+  token: { denom, trst_denom, native, token_address, decimals },
   address,
 }: {
   client: TrustlessChainClient
@@ -26,6 +26,7 @@ async function fetchTokenBalance({
     token_address?: string
     native?: boolean
     decimals?: number
+    trst_denom?: string
   }
   address: string
 }) {
@@ -34,7 +35,6 @@ async function fetchTokenBalance({
       `No denom or token_address were provided to fetch the balance.`
     )
   }
-
   /*
    * if this is a native asset or an ibc asset that has trst_denom
    *  */
@@ -43,7 +43,12 @@ async function fetchTokenBalance({
     const amount = resp ? Number(resp.balance.amount) : 0
     return convertMicroDenomToDenom(amount, decimals)
   }
+  if (trst_denom) {
+    const resp = await client.query.bank.balance({ address, denom: trst_denom })
+    const amount = resp ? Number(resp.balance.amount) : 0
+    return convertMicroDenomToDenom(amount, decimals)
 
+  }
   /*
    * everything else
    *  */
@@ -57,6 +62,7 @@ async function fetchTokenBalance({
 }
 
 const mapIbcTokenToNative = (ibcToken?: IBCAssetInfo) => {
+
   if (ibcToken?.trst_denom) {
     return {
       ...ibcToken,
@@ -72,6 +78,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
 
   const tokenInfo = useTokenInfo(tokenSymbol)
   const ibcAssetInfo = useIBCAssetInfo(tokenSymbol)
+
 
   const { data: balance = 0, isLoading } = useQuery(
     ['tokenBalance', tokenSymbol, address],
@@ -98,7 +105,7 @@ export const useTokenBalance = (tokenSymbol: string) => {
 export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   const { address, status, client } = useRecoilValue(walletState)
   const [tokenList] = useTokenList()
-  // const [ibcAssetsList] = useIBCAssetList()
+  const [ibcAssetsList] = useIBCAssetList()
 
   const queryKey = useMemo(
     () => `multipleTokenBalances/${tokenSymbols?.join('+')}`,
@@ -116,7 +123,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
             token:
               getTokenInfoFromTokenList(tokenSymbol, tokenList.tokens) ||
               mapIbcTokenToNative(
-                useIBCAssetInfo(tokenSymbol)
+                getIBCAssetInfoFromList(tokenSymbol, ibcAssetsList?.tokens)
               ) ||
               {},
           })
