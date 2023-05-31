@@ -27,7 +27,7 @@ export const ContractCard = ({
    
 }: contractInfoWithDetails) => {
     
-    const isActive = contractInfo.endTime && contractInfo.execTime && (contractInfo.endTime.seconds > contractInfo.execTime.seconds);
+    const isActive = contractInfo.endTime && contractInfo.execTime && (contractInfo.endTime.seconds >= contractInfo.execTime.seconds);
     return (
         <Link href={`/contracts/${contractAddress}`} passHref>
             <Card variant="secondary" active={isActive}>
