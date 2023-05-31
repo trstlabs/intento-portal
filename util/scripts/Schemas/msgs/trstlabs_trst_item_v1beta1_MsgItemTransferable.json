@@ -1,0 +1,23 @@
+{
+  "$ref": "#/definitions/MsgItemTransferable",
+  "definitions": {
+    "MsgItemTransferable": {
+      "properties": {
+        "seller": {
+          "type": "string"
+        },
+        "transferableMsg": {
+          "type": "string",
+          "format": "binary",
+          "binaryEncoding": "base64"
+        },
+        "itemid": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Item Transferable"
+    }
+  }
+}

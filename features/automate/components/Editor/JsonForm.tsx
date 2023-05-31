@@ -10,8 +10,6 @@ import {
   IconButtonProps,
   TitleFieldProps,
   DescriptionFieldProps,
-  /*   SubmitButtonProps,
-  getSubmitButtonOptions, */
 } from '@rjsf/utils'
 import { Validator } from 'jsonschema'
 import {

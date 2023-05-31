@@ -1,0 +1,42 @@
+{
+  "$ref": "#/definitions/MsgExitPool",
+  "definitions": {
+    "MsgExitPool": {
+      "properties": {
+        "sender": {
+          "type": "string"
+        },
+        "poolId": {
+          "type": "string"
+        },
+        "shareInAmount": {
+          "type": "string"
+        },
+        "tokenOutMins": {
+          "items": {
+            "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Exit Pool",
+      "description": "===================== MsgExitPool"
+    },
+    "cosmos.base.v1beta1.Coin": {
+      "properties": {
+        "denom": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Coin",
+      "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+    }
+  }
+}

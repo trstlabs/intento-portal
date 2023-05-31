@@ -1,0 +1,21 @@
+{
+  "$ref": "#/definitions/MsgUpdateBuyer",
+  "definitions": {
+    "MsgUpdateBuyer": {
+      "properties": {
+        "buyer": {
+          "type": "string"
+        },
+        "itemid": {
+          "type": "string"
+        },
+        "deposit": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Update Buyer"
+    }
+  }
+}

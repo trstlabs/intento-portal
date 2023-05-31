@@ -1,0 +1,21 @@
+{
+  "$ref": "#/definitions/MsgItemShipping",
+  "definitions": {
+    "MsgItemShipping": {
+      "properties": {
+        "seller": {
+          "type": "string"
+        },
+        "tracking": {
+          "type": "boolean"
+        },
+        "itemid": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Item Shipping"
+    }
+  }
+}

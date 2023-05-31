@@ -1,0 +1,24 @@
+{
+  "$ref": "#/definitions/MsgItemRating",
+  "definitions": {
+    "MsgItemRating": {
+      "properties": {
+        "buyer": {
+          "type": "string"
+        },
+        "itemid": {
+          "type": "string"
+        },
+        "rating": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Item Rating"
+    }
+  }
+}
