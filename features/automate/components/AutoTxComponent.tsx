@@ -4,14 +4,12 @@ import {
   Spinner,
   CardContent,
   Button,
-  /*  styled,  */ Text,
+  Text,
   Column,
   styled,
   IconWrapper,
   PlusIcon,
   convertDenomToMicroDenom,
-  OpenIcon,
-  ToggleSwitch,
   Info,
   Union,
 } from 'junoblocks'
@@ -33,7 +31,6 @@ import {
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
-import { CodeMirrorWrapper } from './Editor/CodeMirrorWrapper'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 
 type AutoTxsInputProps = {
@@ -53,7 +50,6 @@ export const AutoTxComponent = ({
   const [chainSymbol, setChainSymbol] = useState('TRST')
   const [showWarning, hideWarning] = useState(true)
   const [isJsonValid, setIsJsonValid] = useState(true)
-  const [showJsonForm, setShowJsonForm] = useState(true)
 
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
@@ -303,140 +299,107 @@ export const AutoTxComponent = ({
 
   return (
     <StyledDivForContainer>
-      <Card variant="secondary" disabled css={{ margin: '$6' }}>
-        <Card variant="secondary" disabled css={{ padding: '$2' }}>
-          <CardContent size="medium">
-            <Column>
-              <Row>
-                <Text align="center" variant="caption">
-                  Chain
-                </Text>{' '}
-                <IbcSelector
-                  connectionId={autoTxData.connectionId}
-                  onChange={(update) => {
-                    handleChainChange(
-                      update.connection,
-                      update.prefix,
-                      update.denom,
-                      update.name,
-                      update.symbol
-                    )
-                  }}
-                  size={'large'}
-                />{' '}
+      <Card variant="secondary" disabled css={{ padding: '$2' }}>
+        <CardContent size="medium">
+          <Column>
+            <Row>
+              <Text align="center" variant="caption">
+                Chain
+              </Text>{' '}
+              <IbcSelector
+                connectionId={autoTxData.connectionId}
+                onChange={(update) => {
+                  handleChainChange(
+                    update.connection,
+                    update.prefix,
+                    update.denom,
+                    update.name,
+                    update.symbol
+                  )
+                }}
+                size={'large'}
+              />{' '}
+              {
+                /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
+                  !isIcaLoading &&
+                  autoTxData.connectionId != '' && (
+                    <>
+                      <Button
+                        css={{
+                          margin: '$2',
+                          overflow: 'hidden',
+                          float: 'left',
+                        }}
+                        variant="secondary"
+                        onClick={() => handleRegisterAccountClick()}
+                      >
+                        {' '}
+                        {isExecutingRegisterICA ? (
+                          <Spinner instant />
+                        ) : (
+                          'Register Interchain Account '
+                        )}
+                      </Button>
+                      {/*  {isExecutingRegisterICA && isIcaLoading && <Text variant="legend">Retrieving Interchain Account on {chainName}. This takes approx. 30 seconds. It can take up to a minute.</Text>} */}
+                    </>
+                  )
+              }
+            </Row>
+            {chainName &&
+              (isIcaLoading ? (
+                <Spinner size={18} style={{ margin: 0 }} />
+              ) : (
                 <>
-                  {
-                    /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
-                      !isIcaLoading &&
-                      autoTxData.connectionId != '' && (
-                        <>
-                          <Button
-                            css={{
-                              margin: '$2',
-                              overflow: 'hidden',
-                              float: 'left',
-                            }}
-                            variant="secondary"
-                            onClick={() => handleRegisterAccountClick()}
-                          >
-                            {' '}
-                            {isExecutingRegisterICA ? (
-                              <Spinner instant />
-                            ) : (
-                              'Register Interchain Account '
-                            )}
-                          </Button>
-                          {/*  {isExecutingRegisterICA && isIcaLoading && <Text variant="legend">Retrieving Interchain Account on {chainName}. This takes approx. 30 seconds. It can take up to a minute.</Text>} */}
-                        </>
-                      )
-                  }
+                  {!icaAddress ? (
+                    <Text variant="caption">
+                      No Interchain Account for this chain: {chainName}.
+                    </Text>
+                  ) : (
+                    <IcaCard
+                      icaAddress={icaAddress}
+                      chainSymbol={chainSymbol}
+                      feeFundsHostChain={feeFundsHostChain}
+                      icaBalance={icaBalance}
+                      isIcaBalanceLoading={isIcaBalanceLoading}
+                      isAuthzGrantsLoading={isAuthzGrantsLoading}
+                      icaAuthzGrants={icaAuthzGrants}
+                      shouldDisableAuthzGrantButton={
+                        shouldDisableAuthzGrantButton
+                      }
+                      shouldDisableSendFundsButton={
+                        shouldDisableSendFundsButton
+                      }
+                      isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
+                      isExecutingAuthzGrant={isExecutingAuthzGrant}
+                      isExecutingSendAndAuthzGrant={
+                        isExecutingSendAndAuthzGrant
+                      }
+                      setFeeFundsHostChain={setFeeFundsHostChain}
+                      handleSendFundsOnHostClick={handleSendFundsOnHostClick}
+                      handleCreateAuthzGrantClick={(withFunds) =>
+                        handleCreateAuthzGrantClick(withFunds)
+                      }
+                    />
+                  )}
                 </>
-              </Row>
-              {chainName &&
-                (isIcaLoading ? (
-                  <Spinner size={18} style={{ margin: 0 }} />
-                ) : (
-                  <>
-                    {!icaAddress ? (
-                      <Text variant="caption">
-                        No Interchain Account for this chain: {chainName}.
-                      </Text>
-                    ) : (
-                      <IcaCard
-                        icaAddress={icaAddress}
-                        chainSymbol={chainSymbol}
-                        feeFundsHostChain={feeFundsHostChain}
-                        icaBalance={icaBalance}
-                        isIcaBalanceLoading={isIcaBalanceLoading}
-                        isAuthzGrantsLoading={isAuthzGrantsLoading}
-                        icaAuthzGrants={icaAuthzGrants}
-                        shouldDisableAuthzGrantButton={
-                          shouldDisableAuthzGrantButton
-                        }
-                        shouldDisableSendFundsButton={
-                          shouldDisableSendFundsButton
-                        }
-                        isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                        isExecutingAuthzGrant={isExecutingAuthzGrant}
-                        isExecutingSendAndAuthzGrant={
-                          isExecutingSendAndAuthzGrant
-                        }
-                        setFeeFundsHostChain={setFeeFundsHostChain}
-                        handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                        handleCreateAuthzGrantClick={(withFunds) =>
-                          handleCreateAuthzGrantClick(withFunds)
-                        }
-                      />
-                    )}
-                  </>
-                ))}
-            </Column>
-            <Inline css={{ display: 'grid', margin: '$4' }}>
-              <Button
-                iconLeft={<OpenIcon />}
-                variant="ghost"
-                size="large"
-                onClick={() => setShowJsonForm((show) => !show)}
-                iconRight={
-                  <ToggleSwitch
-                    id="theme-toggle"
-                    name="dark-theme"
-                    onChange={() => setShowJsonForm((show) => !show)}
-                    checked={!showJsonForm}
-                    optionLabels={['Dark theme', 'Light theme']}
-                  />
-                }
-              >
-                Advanced mode
-              </Button>
-            </Inline>
-            {autoTxData.msgs.map((msg, index) => (
-              <div key={index}>
-                {showJsonForm ? (
-                  <JsonFormWrapper
-                    index={index}
-                    chainSymbol={chainSymbol}
-                    msg={msg}
-                    setExample={setExample}
-                    handleRemoveMsg={handleRemoveMsg}
-                    handleChangeMsg={handleChangeMsg}
-                    setIsJsonValid={setIsJsonValid}
-                  />
-                ) : (
-                  <CodeMirrorWrapper
-                    index={index}
-                    chainSymbol={chainSymbol}
-                    msg={msg}
-                    setExample={setExample}
-                    handleRemoveMsg={handleRemoveMsg}
-                    handleChangeMsg={handleChangeMsg}
-                    setIsJsonValid={setIsJsonValid}
-                  />
-                )}
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+              ))}
+          </Column>
+          {autoTxData.msgs.map((msg, index) => (
+            <div key={index}>
+              <JsonFormWrapper
+                index={index}
+                chainSymbol={chainSymbol}
+                msg={msg}
+                setExample={setExample}
+                handleRemoveMsg={handleRemoveMsg}
+                handleChangeMsg={handleChangeMsg}
+                setIsJsonValid={setIsJsonValid}
+              />
+            </div>
+          ))}{' '}
+        </CardContent>
+      </Card>
+      <Card variant="secondary" disabled css={{ margin: '$6' }}>
         {
           <Column>
             <Button
@@ -450,89 +413,97 @@ export const AutoTxComponent = ({
         }
       </Card>
       {isJsonValid && autoTxData.msgs[0] && autoTxData.msgs[0].length > 3 && (
-        <Card
-          css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }}
-          variant="secondary"
-          disabled
-        >
-          <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-            <Text css={{ paddingBottom: '$4' }} align="center">
-              Preview
-            </Text>
+        <Column>
+          <Card
+            css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }}
+            variant="secondary"
+            disabled
+          >
+            <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+              <Text css={{ paddingBottom: '$4' }} align="center">
+                Preview
+              </Text>
 
-            {showWarning && (
-              <Card css={{ padding: '$4' }}>
-                <Inline>
-                  <IconWrapper icon={<Info />} color="primary" />
-                  <Text variant="caption" align="left">
-                    {' '}
-                    You may lose funds if message values are incorrect. Do not
-                    interact if you do not know what you are doing. Always
-                    review messages before submitting.
-                  </Text>
-                  <Button
-                    variant="ghost"
-                    onClick={() => hideWarning(!showWarning)}
-                  >
-                    <Union />
-                  </Button>
-                </Inline>
-              </Card>
-            )}
-          </CardContent>
+              {showWarning && (
+                <Card css={{ padding: '$4' }}>
+                  <Inline>
+                    <IconWrapper icon={<Info />} color="primary" />
+                    <Text variant="caption" align="left">
+                      {' '}
+                      You may lose funds if message values are incorrect. Do not
+                      interact if you do not know what you are doing. Always
+                      review messages before submitting.
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      onClick={() => hideWarning(!showWarning)}
+                    >
+                      <Union />
+                    </Button>
+                  </Inline>
+                </Card>
+              )}
+            </CardContent>
 
-          {autoTxData.msgs &&
-            autoTxData.msgs.map((msgToDisplay, i) => (
-              <div key={msgToDisplay}>
-                {' '}
-                <CardContent
-                  size="medium"
-                  css={{ display: 'inline-block', overflow: 'hidden' }}
-                >
-                  <Text
-                    variant="legend"
-                    align="left"
-                    css={{ paddingBottom: '$10' }}
+            {autoTxData.msgs &&
+              autoTxData.msgs.map((msgToDisplay, i) => (
+                <div key={msgToDisplay}>
+                  {' '}
+                  <CardContent
+                    size="medium"
+                    css={{ display: 'inline-block', overflow: 'hidden' }}
                   >
-                    Message {i + 1}: <pre>{msgToDisplay}</pre>
-                  </Text>{' '}
-                  <SubmitAutoTxDialog
-                    chainSymbol={chainSymbol}
-                    icaBalance={icaBalance}
-                    hasIcaAuthzGrant={
-                      icaAuthzGrants && icaAuthzGrants[0] != undefined
-                    }
-                    icaAddress={icaAddress}
-                    autoTxData={autoTxData}
-                    isDialogShowing={isSubmitAutoTxDialogShowing}
-                    onRequestClose={() =>
-                      setSubmitAutoTxDialogState({
-                        isShowing: false,
-                      })
-                    }
-                    isLoading={isExecutingSchedule}
-                    feeFundsHostChain={feeFundsHostChain}
-                    shouldDisableSendFundsButton={shouldDisableSendFundsButton}
-                    isExecutingAuthzGrant={isExecutingAuthzGrant}
-                    isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                    shouldDisableAuthzGrantButton={
-                      shouldDisableAuthzGrantButton
-                    }
-                    setFeeFundsHostChain={setFeeFundsHostChain}
-                    handleSubmitAutoTx={(autoTxData) =>
-                      handleSubmitAutoTxButtonClick(autoTxData)
-                    }
-                    handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
-                    handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                  />
-                </CardContent>
-              </div>
-            ))}
-        </Card>
+                    <Text
+                      variant="legend"
+                      align="left"
+                      css={{ paddingBottom: '$10' }}
+                    >
+                      Message {i + 1}: <pre>{msgToDisplay}</pre>
+                    </Text>{' '}
+                    <SubmitAutoTxDialog
+                      chainSymbol={chainSymbol}
+                      icaBalance={icaBalance}
+                      hasIcaAuthzGrant={
+                        icaAuthzGrants && icaAuthzGrants[0] != undefined
+                      }
+                      icaAddress={icaAddress}
+                      autoTxData={autoTxData}
+                      isDialogShowing={isSubmitAutoTxDialogShowing}
+                      onRequestClose={() =>
+                        setSubmitAutoTxDialogState({
+                          isShowing: false,
+                        })
+                      }
+                      isLoading={isExecutingSchedule}
+                      feeFundsHostChain={feeFundsHostChain}
+                      shouldDisableSendFundsButton={
+                        shouldDisableSendFundsButton
+                      }
+                      isExecutingAuthzGrant={isExecutingAuthzGrant}
+                      isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
+                      shouldDisableAuthzGrantButton={
+                        shouldDisableAuthzGrantButton
+                      }
+                      setFeeFundsHostChain={setFeeFundsHostChain}
+                      handleSubmitAutoTx={(autoTxData) =>
+                        handleSubmitAutoTxButtonClick(autoTxData)
+                      }
+                      handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
+                      handleSendFundsOnHostClick={handleSendFundsOnHostClick}
+                    />
+                  </CardContent>
+                </div>
+              ))}
+          </Card>
+        </Column>
       )}
 
       <Inline
-        css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}
+        css={{
+          margin: '$4 $6 $8',
+          padding: '$5 $5 $8',
+          justifyContent: 'end',
+        }}
       >
         <Button
           css={{ marginRight: '$4' }}

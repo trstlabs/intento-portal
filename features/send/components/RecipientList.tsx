@@ -208,11 +208,11 @@ export const RecipientList = ({
 
   return (
     <div >
-      <Card variant="secondary" disabled css={{ margin: '$6' }}>
+      <Card variant="secondary" disabled css={{ margin: '$2' }}>
         {recipients.map((recipient, index) => (
           <div key={index}>
 
-            <Card variant="secondary" disabled css={{ padding: '$2' }}>
+            <Card variant="secondary" disabled css={{ marginBottom: '$2' }}>
               <CardContent size="medium" css={{ paddingTop: '$2' }}>
                 <Column>
                   <Row>

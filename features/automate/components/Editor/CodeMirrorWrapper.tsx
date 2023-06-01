@@ -22,7 +22,6 @@ export const CodeMirrorWrapper = ({
   setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>;
 }): JSX.Element => {
   return <Column>
-    <Divider offsetY='$10' />
     {/* {autoTxData.typeUrls && autoTxData.typeUrls[index] && <Row> <Text css={{ padding: '$4', textAlign: "center" }} variant="title">{autoTxData.typeUrls[index]}</Text></Row>} */}
     <Inline css={{ display: 'inline' }}><Text css={{ paddingBottom: '$4' }} variant="legend"> Examples</Text>
       {generalExamples.map((example, ei) => (
