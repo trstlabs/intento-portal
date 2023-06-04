@@ -352,7 +352,7 @@ export const AutoTxComponent = ({
                 <>
                   {!icaAddress ? (
                     <Text variant="caption">
-                      No Interchain Account for this chain: {chainName}.
+                      No Interchain Account for selected chain: {chainName}.
                     </Text>
                   ) : (
                     <IcaCard
