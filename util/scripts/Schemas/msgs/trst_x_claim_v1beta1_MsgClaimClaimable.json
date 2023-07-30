@@ -1,0 +1,15 @@
+{
+  "$ref": "#/definitions/MsgClaimClaimable",
+  "definitions": {
+    "MsgClaimClaimable": {
+      "properties": {
+        "sender": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Claim Claimable"
+    }
+  }
+}

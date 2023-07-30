@@ -69,7 +69,7 @@ export const AutoTxInfoBreakdown = ({
     const [showICAHostButtons, setShowICAHostButtons] = useState(false)
     const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddress)
     const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
-    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
+    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds >= autoTxInfo.execTime.seconds);
     const latestExecWasError = autoTxInfo.autoTxHistory.length > 0 && autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ""
     //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
 

@@ -1,0 +1,51 @@
+{
+  "$ref": "#/definitions/MsgExecuteContract",
+  "definitions": {
+    "MsgExecuteContract": {
+      "properties": {
+        "sender": {
+          "type": "string"
+        },
+        "contract": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string",
+          "format": "binary",
+          "binaryEncoding": "base64"
+        },
+        "codeHash": {
+          "type": "string"
+        },
+        "funds": {
+          "items": {
+            "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+          },
+          "type": "array"
+        },
+        "callbackSig": {
+          "type": "string",
+          "format": "binary",
+          "binaryEncoding": "base64"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Execute Contract"
+    },
+    "cosmos.base.v1beta1.Coin": {
+      "properties": {
+        "denom": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Coin",
+      "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+    }
+  }
+}

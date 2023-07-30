@@ -1,0 +1,18 @@
+{
+  "$ref": "#/definitions/MsgDeleteItem",
+  "definitions": {
+    "MsgDeleteItem": {
+      "properties": {
+        "seller": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Delete Item"
+    }
+  }
+}

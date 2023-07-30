@@ -21,14 +21,14 @@ export const TestnetDialog = () => {
       <DialogContent>
         {' '}
         <Text css={{ paddingBottom: '$12' }} variant="body">
-          <b> To mess around, get some testnet tokens from our Discord! </b>
+          <b> To mess around, get some tokens from our Discord! </b>
         </Text>{' '}
       </DialogContent>
       <DialogContent css={{ paddingBottom: '$12' }}>
         <Text css={{ paddingBottom: '$12' }} variant="body">
-          This app is currently in beta and operating in demo mode. The app
-          serves only the presentation and testing purposes. You will not be
-          able to trade real assets.
+          This app is currently operating in demo mode. The app serves only the
+          presentation and testing purposes. You will not be able to automate
+          real assets.
         </Text>
 
         <Button css={{ width: '100%' }} size="large" onClick={requestClose}>

@@ -1,12 +1,8 @@
-
 import { AppLayout, PageHeader } from 'components'
 
-import {
-  styled,
-} from 'junoblocks'
+import { styled } from 'junoblocks'
 import React from 'react'
 import { AutomateModule } from 'features/automate'
-
 
 const StyledContainer = styled('div', {
   //maxWidth: '53.75rem',
@@ -25,13 +21,10 @@ export default function Automate() {
       <StyledContainer>
         <PageHeader
           title="Automate"
-          subtitle={`Automate actions on IBC-enabled chains using Interchain Accounts`}
+          subtitle={`Create Time-based actions on IBC-enabled chains, executed by your unique Interchain Account`}
         />
-        <AutomateModule
-        initialExample={getInitialExampleFromSearchParams()}
-        />
+        <AutomateModule initialExample={getInitialExampleFromSearchParams()} />
       </StyledContainer>
     </AppLayout>
   )
 }
-

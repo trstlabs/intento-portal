@@ -1,0 +1,43 @@
+{
+  "$ref": "#/definitions/MsgStoreCode",
+  "definitions": {
+    "MsgStoreCode": {
+      "properties": {
+        "sender": {
+          "type": "string"
+        },
+        "wasmByteCode": {
+          "type": "string",
+          "description": "WASMByteCode can be raw or gzip compressed",
+          "format": "binary",
+          "binaryEncoding": "base64"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source is a valid absolute HTTPS URI to the contract's source code, optional"
+        },
+        "builder": {
+          "type": "string",
+          "description": "Builder is a valid docker image name with tag, optional"
+        },
+        "defaultDuration": {
+          "type": "string",
+          "description": "InstantiatePermission to apply on contract creation, optional  AccessConfig InstantiatePermission = 5;"
+        },
+        "defaultInterval": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Store Code",
+      "description": "StoreCode is used so we can upload code for testing, will be removed on mainnet"
+    }
+  }
+}

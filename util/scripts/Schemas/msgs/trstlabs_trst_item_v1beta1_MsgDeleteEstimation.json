@@ -1,0 +1,23 @@
+{
+  "$ref": "#/definitions/MsgDeleteEstimation",
+  "definitions": {
+    "MsgDeleteEstimation": {
+      "properties": {
+        "estimator": {
+          "type": "string"
+        },
+        "itemid": {
+          "type": "string"
+        },
+        "deleteMsg": {
+          "type": "string",
+          "format": "binary",
+          "binaryEncoding": "base64"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Delete Estimation"
+    }
+  }
+}
