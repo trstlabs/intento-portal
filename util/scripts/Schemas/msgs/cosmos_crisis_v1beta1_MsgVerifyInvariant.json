@@ -1,0 +1,22 @@
+{
+  "$ref": "#/definitions/MsgVerifyInvariant",
+  "definitions": {
+    "MsgVerifyInvariant": {
+      "properties": {
+        "sender": {
+          "type": "string"
+        },
+        "invariantModuleName": {
+          "type": "string"
+        },
+        "invariantRoute": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Verify Invariant",
+      "description": "MsgVerifyInvariant represents a message to verify a particular invariance."
+    }
+  }
+}

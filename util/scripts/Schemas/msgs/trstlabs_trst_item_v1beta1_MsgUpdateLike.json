@@ -1,0 +1,21 @@
+{
+  "$ref": "#/definitions/MsgUpdateLike",
+  "definitions": {
+    "MsgUpdateLike": {
+      "properties": {
+        "estimator": {
+          "type": "string"
+        },
+        "itemid": {
+          "type": "string"
+        },
+        "interested": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Update Like"
+    }
+  }
+}

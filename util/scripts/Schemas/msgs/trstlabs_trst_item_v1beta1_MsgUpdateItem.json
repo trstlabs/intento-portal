@@ -1,0 +1,30 @@
+{
+  "$ref": "#/definitions/MsgUpdateItem",
+  "definitions": {
+    "MsgUpdateItem": {
+      "properties": {
+        "seller": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "shippingCost": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "shippingRegion": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Update Item"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$ref": "#/definitions/MsgItemResell",
+  "definitions": {
+    "MsgItemResell": {
+      "properties": {
+        "seller": {
+          "type": "string"
+        },
+        "itemid": {
+          "type": "string"
+        },
+        "shippingCost": {
+          "type": "string"
+        },
+        "discount": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "shippingRegion": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Item Resell"
+    }
+  }
+}

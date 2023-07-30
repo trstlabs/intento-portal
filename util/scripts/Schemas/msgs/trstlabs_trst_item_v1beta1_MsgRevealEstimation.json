@@ -1,0 +1,23 @@
+{
+  "$ref": "#/definitions/MsgRevealEstimation",
+  "definitions": {
+    "MsgRevealEstimation": {
+      "properties": {
+        "creator": {
+          "type": "string"
+        },
+        "itemid": {
+          "type": "string"
+        },
+        "revealMsg": {
+          "type": "string",
+          "format": "binary",
+          "binaryEncoding": "base64"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Reveal Estimation"
+    }
+  }
+}

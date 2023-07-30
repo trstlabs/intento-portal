@@ -26,7 +26,7 @@ export const AutoTxCard = ({
 
 }: autoTxInfoWithDetails) => {
     const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
-    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds > autoTxInfo.execTime.seconds);
+    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds >= autoTxInfo.execTime.seconds);
     // const msgData = new TextDecoder().decode(autoTxInfo.data).split(".")
     // const data = msgData.find((data) => data.includes("Msg")).split(",")
     return (
