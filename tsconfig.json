@@ -28,6 +28,6 @@
       "": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/s"],
   "exclude": ["node_modules", "util/scripts/Trustless-Hub"] // *** The files to not type check ***
 }

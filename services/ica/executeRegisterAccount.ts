@@ -1,29 +1,41 @@
+import { validateTransactionSuccess } from '../../util/messages'
 
-import {
-  TrustlessChainClient,
-} from 'trustlessjs'
-import {
-  validateTransactionSuccess,
-} from '../../util/messages'
-
+import { SigningStargateClient } from '@cosmjs/stargate'
+import { trst } from 'trustlessjs'
 
 type ExecuteRegisterAccountArgs = {
   owner: string
   connectionId: string
-  client: TrustlessChainClient
+  client: SigningStargateClient
 }
-
 
 export const executeRegisterAccount = async ({
   client,
   connectionId,
   owner,
 }: ExecuteRegisterAccountArgs): Promise<any> => {
-  let tx = await client.tx.autoTx.registerAccount({
-    connectionId, owner,
-  },
-    { gasLimit: 200_000 }
+  //todo
+  // const versionObject = {
+  //   version: "ics-27",
+  //   controller_connection_id: connectionId,
+  //   host_connection_id: counterpartyConnectionId,
+  //   encoding: "proto3",
+  //   tx_type: "sdk_multi_sig"
+
+  // }
+  // const version = JSON.stringify(versionObject)
+
+  const msgRegisterAccount =
+    trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.registerAccount({
+      version: "",
+      connectionId,
+      owner,
+    })
+
+  return validateTransactionSuccess(
+    await client.signAndBroadcast(owner, [msgRegisterAccount], {
+      amount: [],
+      gas: '190_000',
+    })
   )
-  validateTransactionSuccess(tx)
- 
 }

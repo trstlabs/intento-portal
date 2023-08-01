@@ -153,7 +153,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     <Text css={{ padding: '$8' }} variant="title">
                       {' '}
                       {convertMicroDenomToDenom(
-                        triggerParams.AutoTxConstantFee,
+                        triggerParams.AutoTxConstantFee.toNumber(),
                         6
                       ) + ' '}
                       TRST{' '}
@@ -162,7 +162,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     <Text css={{ padding: '$8' }} variant="title">
                       {' '}
                       {convertMicroDenomToDenom(
-                        triggerParams.AutoTxFlexFeeMul,
+                        triggerParams.AutoTxFlexFeeMul.toNumber(),
                         6
                       ) + ' '}
                       TRST{' '}

@@ -1,18 +1,19 @@
-import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
+// import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
 import { convertMicroDenomToDenom } from 'junoblocks'
 
-import { TrustlessChainClient } from 'trustlessjs'
+// import { SigningStargateClient } from '@cosmjs/stargate'
 
-import { Params } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
+import { Params } from 'trustlessjs/types/codegen/trst/autoibctx/v1beta1/types'
 import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
+// import { Coin } from 'trustlessjs/types/codegen/cosmos/base/v1beta1/coin'
 
 export interface BaseQueryInput {
-  client: TrustlessChainClient
+  client: any
 }
 
 export const getValidators = async ({ client }: BaseQueryInput) => {
   try {
-    const resp = await client.query.staking.validators({})
+    const resp = await client.cosmos.staking.v1beta1.validators({})
 
     return resp.validators
   } catch (e) {
@@ -20,17 +21,17 @@ export const getValidators = async ({ client }: BaseQueryInput) => {
   }
 }
 
-export interface BalanceQueryInput {
+export interface BaseQueryInput {
   address: string
-  client: TrustlessChainClient
+  client: any
 }
 
 export const getBalanceForAcc = async ({
   address,
   client,
-}: BalanceQueryInput) => {
+}: BaseQueryInput) => {
   try {
-    const response = await client.query.bank.allBalances({ address })
+    const response = await client.getAllBalances( address )
 
     return response
   } catch (e) {
@@ -38,26 +39,14 @@ export const getBalanceForAcc = async ({
   }
 }
 
-export const getValidator = async ({ address, client }: BalanceQueryInput) => {
-  try {
-    const resp = await client.query.staking.validator({
-      validatorAddr: address,
-    })
-    return resp.validator
-  } catch (e) {
-    console.error('err(getValidator):', e)
-  }
-}
 
 export const getStakeBalanceForAcc = async ({
   address,
   client,
-}: BalanceQueryInput) => {
+}: BaseQueryInput) => {
   try {
     let stakingBalanceAmount = 0
-    const resp = await client.query.staking.delegatorDelegations({
-      delegatorAddr: address,
-    })
+    const resp = client.cosmos.staking.v1beta1.delegatorDelegations({delegatorAddr: address})
     const delegationResponse = resp.delegationResponses
     let validators = []
     for (const delegation of delegationResponse) {
@@ -75,7 +64,7 @@ export const getStakeBalanceForAcc = async ({
 }
 
 export const getAPR = async (
-  client: TrustlessChainClient,
+  client: any,
   moduleState: ParamsState
 ) => {
   try {
@@ -106,18 +95,18 @@ export const getAPR = async (
   }
 }
 
-export const getModuleParams = async (client: TrustlessChainClient) => {
+export const getModuleParams = async (cosmosClient: any, trstClient: any, ) => {
   try {
-    const annualProvision = await getAnnualProvisions(client)
-    const mintModuleParams = (await getMintParams(client)).params
+    const annualProvision = await getAnnualProvisions(trstClient)
+    const mintModuleParams = (await getMintParams(trstClient)).params
 
-    const stakingModuleParams = await getStakingParams(client)
+    const stakingModuleParams = await getStakingParams(cosmosClient)
 
-    const allocModuleParams = await getAllocParams(client)
+    const allocModuleParams = await getAllocParams(trstClient)
 
-    const distrModuleParams = (await getDistributionParams(client)).params
+    const distrModuleParams = (await getDistributionParams(cosmosClient)).params
       .params
-    const stakingProvision = await getStakeProvisionPercent(client)
+    const stakingProvision = await getStakeProvisionPercent(cosmosClient)
 
     return {
       distrModuleParams,
@@ -133,7 +122,7 @@ export const getModuleParams = async (client: TrustlessChainClient) => {
 }
 
 /* 
-export const getAPRForAcc = async (client: TrustlessChainClient) => {
+export const getAPRForAcc = async (client: any) => {
     try {
         const annualProvision = (await getAnnualProvisions(client))
 
@@ -151,7 +140,7 @@ export const getAPRForAcc = async (client: TrustlessChainClient) => {
 }
  */
 export const getAPY = async (
-  client: TrustlessChainClient,
+  client: any,
   paramsState: ParamsState,
   intervalSeconds: number
 ) => {
@@ -175,7 +164,7 @@ export const getAPY = async (
 export const getAPYForAutoCompound = async (
   triggerParams: Params,
   paramsState: ParamsState,
-  client: TrustlessChainClient,
+  client: any,
   durationSeconds: number,
   intervalSeconds: number,
   stakingBalanceAmount: number,
@@ -250,7 +239,7 @@ type BlockParams = {
   currentBlockHeight: number
 }
 
-async function getBlockParams(client: TrustlessChainClient) {
+async function getBlockParams(client: any) {
   try {
     const currentBlock = await client.query.tendermint.getLatestBlock({})
 
@@ -294,7 +283,7 @@ async function getBlockParams(client: TrustlessChainClient) {
   }
 }
 
-async function getStakingParams(client: TrustlessChainClient) {
+async function getStakingParams(client: any) {
   try {
     const staking = await client.query.staking.params({})
     // const unbondingTime = parseInt(staking.params.unbondingTime.seconds)
@@ -307,7 +296,7 @@ async function getStakingParams(client: TrustlessChainClient) {
   }
 }
 
-async function getAllocParams(client: TrustlessChainClient) {
+async function getAllocParams(client: any) {
   try {
     const alloc = await client.query.allocation.params({})
     // const unbondingTime = parseInt(staking.params.unbondingTime.seconds)
@@ -320,9 +309,9 @@ async function getAllocParams(client: TrustlessChainClient) {
   }
 }
 
-async function getBondedTokens(client: TrustlessChainClient) {
+async function getBondedTokens(client: any) {
   try {
-    const pool = await client.query.staking.pool({})
+    const pool = await client.cosmos.staking.v1beta1.pool({})
     const bondedTokens = Number(pool.pool.bondedTokens)
     return bondedTokens
   } catch (e) {
@@ -330,9 +319,9 @@ async function getBondedTokens(client: TrustlessChainClient) {
   }
 }
 
-export async function getDistributionParams(client: TrustlessChainClient) {
+export async function getDistributionParams(client: any) {
   try {
-    const distribution = await client.query.distribution.params({})
+    const distribution = await client.cosmos.distribution.v1beta1.params({})
     //   const communityTax = parseFloat(distribution.params.community_tax)
     return {
       communityTax: distribution.params.communityTax,
@@ -343,9 +332,9 @@ export async function getDistributionParams(client: TrustlessChainClient) {
   }
 }
 
-async function getMintParams(client: TrustlessChainClient) {
+async function getMintParams(client: any) {
   try {
-    const mint = await client.query.mint.params({})
+    const mint = await client.cosmos.mint.v1beta1.params({})
     //   const communityTax = parseFloat(distribution.params.community_tax)
     return { params: mint.params }
   } catch (e) {
@@ -353,9 +342,9 @@ async function getMintParams(client: TrustlessChainClient) {
   }
 }
 
-async function getAnnualProvisions(client: TrustlessChainClient) {
+async function getAnnualProvisions(client: any) {
   try {
-    const annualProvisions = await client.query.mint.annualProvisions({})
+    const annualProvisions = await client.trst.mint.v1beta1.annualProvisions({})
     // decode the protobuf-encoded bytes into a string
     const decString = new TextDecoder().decode(
       annualProvisions.annualProvisions
@@ -366,9 +355,9 @@ async function getAnnualProvisions(client: TrustlessChainClient) {
   }
 }
 
-export async function getAutoTxParams(client: TrustlessChainClient) {
+export async function getAutoTxParams(client: any) {
   try {
-    const resp = await client.query.auto_tx.params({})
+    const resp = await client.trst.autoibctx.v1beta1.params({})
     // console.log(resp)
     // const communityTax = parseFloat(distribution.params.community_tax)
     return resp.params
@@ -377,9 +366,9 @@ export async function getAutoTxParams(client: TrustlessChainClient) {
   }
 }
 
-async function getStakeProvisionPercent(client: TrustlessChainClient) {
+async function getStakeProvisionPercent(client: any) {
   try {
-    const resp = await client.query.allocation.params({})
+    const resp = await client.trst.allocation.params({})
     const stakeProvision = protoDecimalToJson(
       resp.params.distributionProportions.staking
     )
@@ -388,4 +377,10 @@ async function getStakeProvisionPercent(client: TrustlessChainClient) {
   } catch (e) {
     console.error('err(getStakeProvisionPercent):', e)
   }
+}
+import { Decimal } from "@cosmjs/math";
+ function protoDecimalToJson(decimal: string): string {
+  const parsed = Decimal.fromAtomics(decimal, 18);
+  const [whole, fractional] = parsed.toString().split(".");
+  return `${whole}.${(fractional ?? "").padEnd(18, "0")}`;
 }

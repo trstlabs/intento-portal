@@ -1,9 +1,5 @@
-import {
-
-  TrustlessChainClient,
-
-} from 'trustlessjs'
-
+import { getTrstSigningClientOptions, trstAccountParser } from 'trustlessjs'
+import { SigningStargateClient } from '@cosmjs/stargate'
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
@@ -35,16 +31,21 @@ export const useConnectWallet = (
       await window.keplr.experimentalSuggestChain(chainInfo)
       await window.keplr.enable(chainInfo.chainId)
 
-      const offlineSigner = await window.keplr.getOfflineSignerAuto(chainInfo.chainId)
+      const offlineSigner = await window.keplr.getOfflineSignerAuto(
+        chainInfo.chainId
+      )
       const [{ address }] = await offlineSigner.getAccounts()
-      let utils = window.keplr.getEnigmaUtils(chainInfo.chainId)
-      const trstChainClient = await TrustlessChainClient.create({
-        grpcWebUrl: chainInfo.rpc,
-        wallet: offlineSigner,
-        chainId: chainInfo.chainId,
-        encryptionUtils: utils,
-        walletAddress: address
-      }
+
+      const { registry, aminoTypes } = getTrstSigningClientOptions()
+
+      const trstChainClient = await SigningStargateClient.connectWithSigner(
+        chainInfo.rpc,
+        offlineSigner,
+        {
+          registry,
+          aminoTypes,
+          accountParser: trstAccountParser,
+        }
       )
 
       const key = await window.keplr.getKey(chainInfo.chainId)
@@ -57,7 +58,6 @@ export const useConnectWallet = (
         status: WalletStatusType.connected,
       })
     } catch (e) {
-
       /* set the error state */
       setWalletState({
         key: null,

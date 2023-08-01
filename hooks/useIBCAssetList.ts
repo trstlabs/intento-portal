@@ -8,7 +8,7 @@ export type IBCAssetInfo = {
   rpc: string
   denom: string
   decimals: number
-  trst_denom: string
+  denom_on_trst: string
   channel_to_trst: string
   channel: string
   logoURI: string

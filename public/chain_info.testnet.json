@@ -1,8 +1,8 @@
 {
   "chainId": "trstdev-1",
   "chainName": "Trustless Hub Testnet",
-  "rpc": "https://opengrpc.trustlesshub.com/",
-  "rest": "https://openapi.trustlesshub.com/",
+  "rpc": "https://trst-rpc.trustlesshub.com/",
+  "rest": "https://trst-api.trustlesshub.com/",
   "stakeCurrency": {
     "coinDenom": "TRST",
     "coinMinimalDenom": "utrst",

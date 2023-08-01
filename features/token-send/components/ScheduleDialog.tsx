@@ -17,9 +17,9 @@ import {
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { usePrevious } from 'react-use'
-//import { Coin } from 'trustlessjs'
+//import { Coin } from '@cosmjs/stargate'
 
-import { StateSwitchButtons } from '../../liquidity/components/StateSwitchButtons'
+import { StateSwitchButtons } from 'components/Input/StateSwitchButtons'
 
 export class AutoExecData {
     duration: number

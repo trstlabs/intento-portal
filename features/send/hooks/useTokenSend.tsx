@@ -58,7 +58,7 @@ export const useTokenSend = ({
 
             console.log(address)
             return await executeDirectSend({
-                denom: ibcAsset.trst_denom,
+                denom: ibcAsset.denom_on_trst,
                 senderAddress: address,
                 recipientInfos: convertedInfos,
                 client,

@@ -1,21 +1,24 @@
 import { QueryClient, setupAuthzExtension } from '@cosmjs/stargate'
-import { TrustlessChainClient } from 'trustlessjs'
+
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { Grant } from "cosmjs-types/cosmos/authz/v1beta1/authz";
+
 
 export interface ICAQueryInput {
     owner: string,
     connectionId: string,
-    client: TrustlessChainClient
+    rpcClient: any
 }
 
 export const getICA = async ({
     owner,
     connectionId,
-    client,
+    rpcClient,
 }: ICAQueryInput) => {
+   
+
     try {
-        const response = await client.query.auto_tx.interchainAccountFromAddress({ owner, connectionId })
+        const response = await rpcClient.trst.autoibctx.v1beta1.interchainAccountFromAddress({ owner, connectionId })
         return response.interchainAccountAddress
     } catch (e) {
         if (e.message.includes("account found")) {
@@ -27,34 +30,11 @@ export const getICA = async ({
     }
 }
 
-/* 
-export interface IsICAActiveQueryInput {
-    channnelId: string,
-    portId: string,
-    client: TrustlessChainClient
-}
-
-export const getIsActiveICA = async ({
-    channnelId,
-    portId,
-    client,
-}: IsICAActiveQueryInput) => {
-    try {
-        console.log(portId)
-        const response = await client.query.ibc_channel.channel({ channnelId,portId })
-        console.log("response")
-        console.log(response)
-        return response
-    } catch (e) {
-        console.error('err(getIsActiveICA):', e)
-    }
-} */
-
 
 export interface GrantQueryInput {
     grantee: string,
     granter: string,
-    rpc: string
+    rpc: any
     msgTypeUrl?: string,
 }
 
@@ -94,7 +74,7 @@ export const getAuthZGrants = async ({
 
 
 export interface GrantResponse {
-    grants: Grant,
+    grants: any,
     msgTypeUrl: string,
 }
 
@@ -103,7 +83,7 @@ export interface FeeGrantQueryInput {
     grantee: string,
     granter: string,
 
-    client: TrustlessChainClient
+    client: any
 }
 
 export const getFeeGrantAllowance = async ({

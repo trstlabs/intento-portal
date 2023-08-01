@@ -13,7 +13,7 @@ import {
 import Link from 'next/link'
 
 import { __POOL_REWARDS_ENABLED__ } from 'util/constants'
-import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
+import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo';
 
 export declare type autoTxInfoWithDetails = {
@@ -26,7 +26,7 @@ export const AutoTxCard = ({
 
 }: autoTxInfoWithDetails) => {
     const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
-    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds >= autoTxInfo.execTime.seconds);
+    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.getSeconds() >= autoTxInfo.execTime.getSeconds());
     // const msgData = new TextDecoder().decode(autoTxInfo.data).split(".")
     // const data = msgData.find((data) => data.includes("Msg")).split(",")
     return (

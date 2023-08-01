@@ -9,7 +9,7 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
-import { useTrustlessChainClient } from './useTrustlessChainClient'
+import {  useTrstClient } from './useRPCClient'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
 
@@ -18,17 +18,17 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     accAddr = address
   }
 
-  const client = useTrustlessChainClient()
+  const rpcClient = useTrstClient()
   const { data: ica, isLoading } = useQuery(
     [`interchainAccount/${connectionId}`, connectionId],
     async () => {
 
-      const resp: string = await getICA({ owner: accAddr, connectionId, client })
+      const resp: string = await getICA({ owner: accAddr, connectionId, rpcClient })
       return resp
 
     },
     {
-      enabled: Boolean(connectionId != "" && connectionId != undefined && client),
+      enabled: Boolean(connectionId != "" && connectionId != undefined && rpcClient),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -115,19 +115,19 @@ export const useAuthZGrantsForUser = (granter: string, tokenSymbol: string, auto
 
 
 export const useFeeGrantAllowanceForUser = (granter: string) => {
-  const { status, client } = useRecoilValue(walletState)
+  const { status, client, address } = useRecoilValue(walletState)
 
   const { data, isLoading } = useQuery(
     ['granter', granter],
     async () => {
 
-      const resp = await getFeeGrantAllowance({ grantee: client.address, granter, client })
+      const resp = await getFeeGrantAllowance({ grantee: address, granter, client })
       console.log("feegrant: ", resp)
       return resp
 
     },
     {
-      enabled: Boolean(granter != "" && status === WalletStatusType.connected && client && client.address),
+      enabled: Boolean(granter != "" && status === WalletStatusType.connected && client && address),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,

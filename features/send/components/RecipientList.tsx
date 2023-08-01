@@ -94,7 +94,7 @@ export const RecipientList = ({
         let sendMsg;
         if (recipient.channelID) {
           sendMsg = transferObject
-          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }
+          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.denom_on_trst }
           sendMsg.value.sender = address
           sendMsg.value.receiver = recipient.recipient
           sendMsg.value.sourceChannel = recipient.channelID
@@ -102,7 +102,7 @@ export const RecipientList = ({
           sendMsg = sendObject;
           sendMsg.value.fromAddress = address
           sendMsg.value.toAddress = recipient.recipient
-          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
+          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.denom_on_trst }]
         }
 
         msgs.push(JSON.stringify(sendMsg))

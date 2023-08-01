@@ -32,7 +32,6 @@ export class AutoTxData {
   icaAddressForAuthZGrant?: string
   // typeUrls?: string[]
   recurrences: number
-  retries: number
   useSubmitAutoTx?: boolean
   feeFunds?: number
   label?: string
@@ -265,7 +264,7 @@ export const SubmitAutoTxDialog = ({
       recurrences,
       connectionId: autoTxData.connectionId,
       dependsOnTxIds: autoTxData.dependsOnTxIds,
-      retries: autoTxData.retries,
+      // retries: autoTxData.retries,
       msgs: autoTxData.msgs,
       icaAddressForAuthZGrant,
       feeFunds,

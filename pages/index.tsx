@@ -23,7 +23,7 @@ import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
-import Contracts from './index_contracts'
+// import Contracts from './index_contracts'
 import { useSetModuleParams } from '../hooks/useChainInfo'
 
 
@@ -153,7 +153,7 @@ export default function Home() {
         )}
       </StyledDivForAutoTxsGrid>
 
-      {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />}
+      {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout >
   )
 }

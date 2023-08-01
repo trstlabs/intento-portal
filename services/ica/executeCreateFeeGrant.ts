@@ -1,15 +1,12 @@
 import { SigningStargateClient, assertIsDeliverTxSuccess } from '@cosmjs/stargate'
 
-import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
 
-import { MsgGrantAllowance } from 'trustlessjs/dist/tx/feegrant'
-
-import { isTxBodyEncodeObject } from '@cosmjs/proto-signing'
+import { MsgGrantAllowance } from "cosmjs-types/cosmos/feegrant/v1beta1/tx";
 
 type ExecuteCreateFeeGrantArgs = {
   granter: string
   grantee: string
-  allowance: BasicAllowance
+  allowance: any
   client: SigningStargateClient
 }
 
@@ -21,17 +18,16 @@ export const executeCreateFeeGrant = async ({
 }: ExecuteCreateFeeGrantArgs): Promise<any> => {
   console.log(grantee)
   console.log(granter)
-  let msgFeeGrant = new MsgGrantAllowance({
-    grantee, granter, allowance
-  })
-  isTxBodyEncodeObject
-  const MsgGrantAllowanceObject = {
+
+  const msgGrantAllowance = {
     typeUrl: "/cosmos.feegrant.v1beta1.MsgGrantAllowance",
-    value: msgFeeGrant,
-  }
+    value: MsgGrantAllowance.fromPartial({
+      grantee, granter, allowance
+    }),
+  };
   // let converters = createFeegrantAminoConverters()
   // let aminoMsg = await msgFeeGrant.toProto()
-  let response = await client.signAndBroadcast(granter, [MsgGrantAllowanceObject], "auto");
+  let response = await client.signAndBroadcast(granter, [msgGrantAllowance], "auto");
   console.log(response)
 
   return assertIsDeliverTxSuccess(response)

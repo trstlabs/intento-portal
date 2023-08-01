@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 import { MessageSelectList } from './MessageSelectList'
 
-import { QueryInput } from '../../../swap/components/QueryInput'
+import { QueryInput } from 'components//Input/QueryInput'
 
 
 export const CosmosMessageSelector: React.FC<{

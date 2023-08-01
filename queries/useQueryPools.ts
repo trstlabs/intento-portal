@@ -3,7 +3,7 @@ import { useMemo } from 'react'
 import { useQueries } from 'react-query'
 import { useRecoilValue } from 'recoil'
 
-import { useTrustlessChainClient } from '../hooks/useTrustlessChainClient'
+import { useTrstClient } from '../hooks/useRPCClient'
 import { walletState } from '../state/atoms/walletAtoms'
 import {
   __POOL_REWARDS_ENABLED__,
@@ -59,7 +59,7 @@ export const useQueryMultiplePoolsLiquidity = ({
     useGetTokenDollarValueQuery()
 
   const { address, client: signingClient } = useRecoilValue(walletState)
-  const client = useTrustlessChainClient()
+  const client = useTrstClient()
 
   const context = {
     client,

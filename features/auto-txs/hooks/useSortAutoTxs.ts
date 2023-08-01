@@ -1,6 +1,6 @@
 // import { AutoTxInfo } from 'queries/useQueryAutoTxs'
 import { useMemo } from 'react'
-import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
+import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 
 export type SortParameters = 'exec_time' | 'id' |  'label'
 export type SortDirections = 'asc' | 'desc'

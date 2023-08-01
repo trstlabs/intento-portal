@@ -14,7 +14,7 @@ export type TokenInfo = {
   channel_to_trst?: string
   connection_id?: string
   prefix?: string
-  trst_denom?: string
+  denom_on_trst?: string
 }
 
 export type TokenInfoWithReward = TokenInfo & {

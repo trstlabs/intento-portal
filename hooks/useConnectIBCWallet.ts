@@ -3,7 +3,7 @@ import {
   AminoTypes,
   createAuthzAminoConverters,
   createIbcAminoConverters,
-  defaultRegistryTypes as defaultStargateTypes,
+  defaultRegistryTypes as defaultTypes,
   GasPrice,
   SigningStargateClient,
 } from '@cosmjs/stargate'
@@ -13,11 +13,8 @@ import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { GAS_PRICE } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
-import { MsgGrant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/tx'
 
-import { Registry } from '@cosmjs/proto-signing'
-
-
+import { getTrstSigningClientOptions } from 'trustlessjs'
 
 /* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
@@ -56,12 +53,14 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-
       const { chain_id, rpc } = assetInfo
 
       console.log(chain_id)
-      const customRegistry = new Registry(defaultStargateTypes);
-      customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
+
+      const { registry, aminoTypes } = getTrstSigningClientOptions({
+        defaultTypes,
+      })
+
       await window.keplr.enable(chain_id)
 
       const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
@@ -75,18 +74,11 @@ export const useConnectIBCWallet = (
            * passing ibc amino types for all the amino signers (eg ledger, wallet connect)
            * to enable ibc & wasm transactions
            * */
-          aminoTypes: new AminoTypes(
-            Object.assign(
-              createIbcAminoConverters(),
-              createAuthzAminoConverters(),
-              //createWasmAminoConverters()
-            )
-          ),
-          registry: customRegistry,
-        },
-
+          aminoTypes: aminoTypes,
+          registry: registry,
+        }
       )
-    
+
       const [{ address }] = await offlineSigner.getAccounts()
 
       /* successfully update the wallet state */

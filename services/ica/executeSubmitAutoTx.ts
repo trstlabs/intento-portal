@@ -1,20 +1,15 @@
 import { convertDenomToMicroDenom } from 'junoblocks'
-import {
-  Coin,
-  msgRegistry, Registry,
-  toUtf8,
-  TrustlessChainClient,
-} from 'trustlessjs'
-
-import {
-
-  validateTransactionSuccess,
-} from '../../util/messages'
+import { Long } from "trustlessjs/dist/codegen/helpers";
+import { Coin } from '@cosmjs/stargate'
+import { SigningStargateClient } from '@cosmjs/stargate'
+import { toUtf8 } from '@cosmjs/encoding'
+import { trst } from 'trustlessjs'
+import { validateTransactionSuccess } from '../../util/messages'
 
 type ExecuteSubmitAutoTxArgs = {
   owner: string
   autoTxData: AutoTxData
-  client: TrustlessChainClient
+  client: SigningStargateClient
 }
 
 export const executeSubmitAutoTx = async ({
@@ -22,33 +17,34 @@ export const executeSubmitAutoTx = async ({
   autoTxData,
   owner,
 }: ExecuteSubmitAutoTxArgs): Promise<any> => {
-  let startAt = 0
+  let startAtInt = 0
   if (autoTxData.startTime && autoTxData.startTime > 0) {
-    startAt = (Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000);
+    startAtInt = Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000
   }
-
-  let duration = autoTxData.duration + "ms"
-  let interval = autoTxData.interval + "ms"
+  let startAt = Long.fromNumber(startAtInt) //BigInt(startAtInt)
+  let duration = autoTxData.duration + 'ms'
+  let interval = autoTxData.interval + 'ms'
   let msgs = []
-  const masterRegistry = new Registry(msgRegistry);
-  for (let msg of autoTxData.msgs) {
-    console.log(msg)
+  const masterRegistry = client.registry
 
-    let value = JSON.parse(msg)["value"]
+  for (let msgJSON of autoTxData.msgs) {
+    console.log(msgJSON)
 
-    let typeUrl: string = JSON.parse(msg)["typeUrl"].toString()
+    let value = JSON.parse(msgJSON)['value']
 
-    if (typeUrl.startsWith("/cosmwasm")) {
-      let msg: string = JSON.stringify(value["msg"])
-      console.log(msg)
-      let msg2: Uint8Array = toUtf8(msg)
+    let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
+
+    if (typeUrl.startsWith('/cosmwasm')) {
+      let msgString: string = JSON.stringify(value['msg'])
+      console.log(msgString)
+      let msg2: Uint8Array = toUtf8(msgString)
       console.log(msg2)
-      value["msg"] = msg2
+      value['msg'] = msg2
     }
 
     const encodeObject = {
       typeUrl,
-      value
+      value,
     }
     console.log(encodeObject)
 
@@ -57,41 +53,50 @@ export const executeSubmitAutoTx = async ({
     msgs.push(msgAny)
   }
 
-  if (autoTxData.icaAddressForAuthZGrant && autoTxData.icaAddressForAuthZGrant != "") {
+  if (
+    autoTxData.icaAddressForAuthZGrant &&
+    autoTxData.icaAddressForAuthZGrant != ''
+  ) {
     const encodeObject2 = {
-      typeUrl: "/cosmos.authz.v1beta1.MsgExec",
+      typeUrl: '/cosmos.authz.v1beta1.MsgExec',
       value: {
         msgs,
         grantee: autoTxData.icaAddressForAuthZGrant,
-      }
+      },
     }
     msgs = [masterRegistry.encodeAsAny(encodeObject2)]
     console.log(msgs)
   }
 
-  let feeFunds: Coin[] = [];
+  let feeFunds: Coin[] = []
   if (autoTxData.feeFunds > 0) {
-    feeFunds = [{ denom: "utrst", amount: convertDenomToMicroDenom(autoTxData.feeFunds, 6).toString() }]
+    feeFunds = [
+      {
+        denom: 'utrst',
+        amount: convertDenomToMicroDenom(autoTxData.feeFunds, 6).toString(),
+      },
+    ]
   }
-  console.log("label", autoTxData.label)
-  return validateTransactionSuccess(
-    await client.tx.autoTx.submitAutoTx({
-      connectionId: autoTxData.connectionId ? autoTxData.connectionId : "",
+  console.log('label', autoTxData.label)
+  const msgSubmitAutoTx =
+    trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.submitAutoTx({
+      connectionId: autoTxData.connectionId ? autoTxData.connectionId : '',
       owner,
       msgs,
-      label: autoTxData.label ? autoTxData.label : "",
+      label: autoTxData.label ? autoTxData.label : '',
       duration,
       interval,
       startAt,
-      // dependsOnTxIds,
+      dependsOnTxIds: [],
       feeFunds,
-    },
-      { gasLimit: 130_000 }
-    )
+    })
+  return validateTransactionSuccess(
+    await client.signAndBroadcast(owner, [msgSubmitAutoTx], {
+      amount: [],
+      gas: '130_000',
+    })
   )
-
 }
-
 
 export class AutoTxData {
   duration: number
@@ -100,7 +105,6 @@ export class AutoTxData {
   connectionId?: string
   dependsOnTxIds?: number[]
   msgs: string[]
-  retries: number
   icaAddressForAuthZGrant?: string
   label?: string
   feeFunds?: number

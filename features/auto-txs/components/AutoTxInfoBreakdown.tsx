@@ -1,184 +1,216 @@
-
 import {
-    Button,
-    ChevronIcon,
-    Column,
-    WalletIcon,
-    Inline,
-    Text,
-    ImageForTokenLogo,
-    CardContent,
-    convertDenomToMicroDenom,
-    Spinner,
-    Tooltip,
-    styled,
-    IconWrapper,
-    Chevron,
-    Union
+  Button,
+  ChevronIcon,
+  Column,
+  WalletIcon,
+  Inline,
+  Text,
+  ImageForTokenLogo,
+  CardContent,
+  convertDenomToMicroDenom,
+  Spinner,
+  Tooltip,
+  styled,
+  IconWrapper,
+  Chevron,
+  Union,
 } from 'junoblocks'
 import Link from 'next/link'
 import React from 'react'
 import {
-    __POOL_REWARDS_ENABLED__,
-    __POOL_STAKING_ENABLED__,
+  __POOL_REWARDS_ENABLED__,
+  __POOL_STAKING_ENABLED__,
 } from 'util/constants'
-import { AutoTxInfo } from 'trustlessjs/dist/protobuf/auto-ibc-tx/v1beta1/types'
-// import { useRelativeTimestamp } from '../../liquidity/components/UnbondingLiquidityCard'
+import { AutoTxInfo, MsgUpdateAutoTxParams } from '../../../types/trstTypes'
+
+// import { AutoTxInfo } from 'trustlessjs/types/codegen/trst/autoibctx/v1beta1/types'
+// import { MsgUpdateAutoTx } from 'trustlessjs/types/codegen/trst/autoibctx/v1beta1/tx'
+
 import { useEffect, useState } from 'react'
-import {
-    convertMicroDenomToDenom,
-} from 'util/conversion'
+import { convertMicroDenomToDenom } from 'util/conversion'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
-import { /* useAuthZGrantsForUser,  */useGetICA, /* useIsActiveICAForUser,  */useICATokenBalance } from '../../../hooks/useICA'
+import {
+  /* useAuthZGrantsForUser,  */ useGetICA,
+  /* useIsActiveICAForUser,  */ useICATokenBalance,
+} from '../../../hooks/useICA'
 
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
 import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
-import { MsgUpdateAutoTxParams, Registry, msgRegistry } from 'trustlessjs'
+
 import { JsonCodeMirrorEditor } from '../../automate/components/Editor/CodeMirror'
-import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
+
 import { getDuration, getRelativeTime } from '../../../util/time'
+import { getTrstSigningClientOptions } from 'trustlessjs'
 
-
+import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 // import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx";
-// import { Any } from 'trustlessjs/dist/protobuf/google/protobuf/any'
+import { Any } from 'cosmjs-types/google/protobuf/any'
 
 type AutoTxInfoBreakdownProps = {
-    autoTxInfo: AutoTxInfo,
-    ibcInfo: IBCAssetInfo
+  autoTxInfo: AutoTxInfo
+  ibcInfo: IBCAssetInfo
 }
 
 type InfoHeaderProps = {
-    txId: string
-    owner: string
-    active: boolean
-    latestExecWasError: boolean
+  txId: string
+  owner: string
+  active: boolean
+  latestExecWasError: boolean
 }
 
 export const AutoTxInfoBreakdown = ({
-    autoTxInfo,
-    ibcInfo,
-    //size = 'large',
-}: AutoTxInfoBreakdownProps) => {
+  autoTxInfo,
+  ibcInfo,
+}: //size = 'large',
+AutoTxInfoBreakdownProps) => {
+  const [icaAddress, isIcaLoading] = useGetICA(
+    autoTxInfo.connectionId,
+    autoTxInfo.owner
+  )
+  //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
+  const symbol = ibcInfo ? ibcInfo.symbol : ''
+  const denom = ibcInfo ? ibcInfo.denom : ''
+  const [showICAHostButtons, setShowICAHostButtons] = useState(false)
+  const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
+    symbol,
+    icaAddress
+  )
+  const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
+    autoTxInfo.feeAddress
+  )
+  const isActive =
+    autoTxInfo.endTime &&
+    autoTxInfo.execTime &&
+    autoTxInfo.endTime.seconds >= autoTxInfo.execTime.seconds
+  const latestExecWasError =
+    autoTxInfo.autoTxHistory.length > 0 &&
+    autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ''
+  //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
 
-    const [icaAddress, isIcaLoading] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
-    //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
-    const symbol = ibcInfo ? ibcInfo.symbol : ""
-    const denom = ibcInfo ? ibcInfo.denom : ""
-    const [showICAHostButtons, setShowICAHostButtons] = useState(false)
-    const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(symbol, icaAddress)
-    const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(autoTxInfo.feeAddress)
-    const isActive = autoTxInfo.endTime && autoTxInfo.execTime && (autoTxInfo.endTime.seconds >= autoTxInfo.execTime.seconds);
-    const latestExecWasError = autoTxInfo.autoTxHistory.length > 0 && autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ""
-    //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
-
-    //send funds on host
-    const [feeFundsHostChain, setFeeFundsHostChain] = useState("0.00");
-    const [requestedSendFunds, setRequestedSendFunds] = useState(false)
-    const { mutate: handleSendFundsOnHost, isLoading: isExecutingSendFundsOnHost } =
-        useSendFundsOnHost({ toAddress: icaAddress, coin: { denom, amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString() } })
-    useEffect(() => {
-        const shouldTriggerSendFunds =
-            !isExecutingSendFundsOnHost && requestedSendFunds;
-        if (shouldTriggerSendFunds) {
-            handleSendFundsOnHost(undefined, { onSettled: () => setRequestedSendFunds(false) })
-        }
-    }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
-    const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol)
-    const handleSendFundsOnHostClick = () => {
-        connectExternalWallet(null)
-        return setRequestedSendFunds(true)
+  //send funds on host
+  const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
+  const [requestedSendFunds, setRequestedSendFunds] = useState(false)
+  const {
+    mutate: handleSendFundsOnHost,
+    isLoading: isExecutingSendFundsOnHost,
+  } = useSendFundsOnHost({
+    toAddress: icaAddress,
+    coin: {
+      denom,
+      amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
+    },
+  })
+  useEffect(() => {
+    const shouldTriggerSendFunds =
+      !isExecutingSendFundsOnHost && requestedSendFunds
+    if (shouldTriggerSendFunds) {
+      handleSendFundsOnHost(undefined, {
+        onSettled: () => setRequestedSendFunds(false),
+      })
     }
+  }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol)
+  const handleSendFundsOnHostClick = () => {
+    connectExternalWallet(null)
+    return setRequestedSendFunds(true)
+  }
 
-    function getMsgValueForMsgExec(exMsg: Any) {
-        let msgs = []
-        const msgExecDecoded = new Registry(msgRegistry).decode(exMsg)
-        console.log
-        for (let message of msgExecDecoded.msgs) {
-            let messageValue = new Registry(msgRegistry).decode(message)
-            msgs.push({ typeUrl: message.typeUrl, value: messageValue })
-        }
-        return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
+  const { registry } = getTrstSigningClientOptions({
+    defaultTypes,
+  })
+
+  function getMsgValueForMsgExec(exMsg: Any) {
+    let msgs = []
+
+    const msgExecDecoded = registry.decode(exMsg)
+    console.log
+    for (let message of msgExecDecoded.msgs) {
+      let messageValue = registry.decode(message)
+      msgs.push({ typeUrl: message.typeUrl, value: messageValue })
     }
+    return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
+  }
 
-    //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-    const [isJsonValid, setIsJsonValid] = useState(true);
-    const [editor, setEditor] = useState(true);
-    const [editMsg, setEditMsg] = useState("");
+  //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  const [isJsonValid, setIsJsonValid] = useState(true)
+  const [editor, setEditor] = useState(true)
+  const [editMsg, setEditMsg] = useState('')
 
-    let autoTxParams: MsgUpdateAutoTxParams
-    const [updatedAutoTxParams, setUpdatedAutoTxParams] = useState(autoTxParams);
+  let autoTxParams: MsgUpdateAutoTxParams
+  const [updatedAutoTxParams, setUpdatedAutoTxParams] = useState(autoTxParams)
 
-    function showEditor(show: boolean, msg: Any) {
-        setEditor(show)
-        if (!show) {
-            setEditMsg(JSON.stringify(new Registry(msgRegistry).decode(msg), null, '\t'))
-            return
-        }
-        setEditMsg("")
+  function showEditor(show: boolean, msg: Any) {
+    setEditor(show)
+    if (!show) {
+      setEditMsg(JSON.stringify(registry.decode(msg), null, '\t'))
+      return
     }
-    const [requestedUpdateAutoTx, setRequestedUpdateAutoTx] = useState(false)
-    const { mutate: handleUpdateAutoTx, isLoading: isExecutingUpdateAutoTx } =
-        useUpdateAutoTx({ autoTxParams: updatedAutoTxParams })
-    useEffect(() => {
-        const shouldTriggerUpdateAutoTx =
-            !isExecutingUpdateAutoTx && requestedUpdateAutoTx;
-        if (shouldTriggerUpdateAutoTx) {
-            handleUpdateAutoTx(undefined, { onSettled: () => setRequestedUpdateAutoTx(false) })
-        }
-    }, [isExecutingUpdateAutoTx, requestedUpdateAutoTx, handleUpdateAutoTx])
-
-    const handleUpdateAutoTxMsgClick = (index: number) => {
-        connectExternalWallet(null)
-        if (!isJsonValid) {
-            //alert("Invalid JSON")
-            return
-        }
-        try {
-            let value = JSON.parse(editMsg)
-            console.log(value)
-            if (autoTxInfo.msgs[index].typeUrl == "/cosmos.authz.v1beta1.MsgExec") {
-                //let msgExecMsgs: [];
-                value.msgs.forEach((msgExecMsg, i) => {
-                    console.log("valueA")
-                    console.log(msgExecMsg)
-                    const encodeObject = {
-                        typeUrl: msgExecMsg.typeUrl,
-                        value: msgExecMsg.value
-                    }
-                    console.log(encodeObject)
-                    const msgExecMsgEncoded = new Registry(msgRegistry).encodeAsAny(encodeObject)
-                    console.log(msgExecMsgEncoded)
-
-                    value.msgs[i] = msgExecMsgEncoded
-                })
-
-            }
-            console.log(autoTxInfo.msgs[0])
-            const encodeObject = {
-                typeUrl: autoTxInfo.msgs[index].typeUrl,
-                value
-            }
-            const msgEncoded = new Registry(msgRegistry).encodeAsAny(encodeObject)
-            let params = {
-                txId: Number(autoTxInfo.txId),
-                msgs: [msgEncoded],
-                owner: autoTxInfo.owner
-            }
-            setUpdatedAutoTxParams(params)
-            console.log(params)
-        } catch (e) {
-            console.log(e)
-        }
-        return setRequestedUpdateAutoTx(true)
+    setEditMsg('')
+  }
+  const [requestedUpdateAutoTx, setRequestedUpdateAutoTx] = useState(false)
+  const { mutate: handleUpdateAutoTx, isLoading: isExecutingUpdateAutoTx } =
+    useUpdateAutoTx({ autoTxParams: updatedAutoTxParams })
+  useEffect(() => {
+    const shouldTriggerUpdateAutoTx =
+      !isExecutingUpdateAutoTx && requestedUpdateAutoTx
+    if (shouldTriggerUpdateAutoTx) {
+      handleUpdateAutoTx(undefined, {
+        onSettled: () => setRequestedUpdateAutoTx(false),
+      })
     }
-    const shouldDisableUpdateAutoTxButton = false// !updatedAutoTxParams || !updatedAutoTxParams.txId
+  }, [isExecutingUpdateAutoTx, requestedUpdateAutoTx, handleUpdateAutoTx])
 
-    ////
+  const handleUpdateAutoTxMsgClick = (index: number) => {
+    connectExternalWallet(null)
+    if (!isJsonValid) {
+      //alert("Invalid JSON")
+      return
+    }
+    try {
+      let value = JSON.parse(editMsg)
+      console.log(value)
+      if (autoTxInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
+        //let msgExecMsgs: [];
+        value.msgs.forEach((msgExecMsg, i) => {
+          console.log('valueA')
+          console.log(msgExecMsg)
+          const encodeObject = {
+            typeUrl: msgExecMsg.typeUrl,
+            value: msgExecMsg.value,
+          }
+          console.log(encodeObject)
+          const msgExecMsgEncoded = registry.encodeAsAny(encodeObject)
+          console.log(msgExecMsgEncoded)
 
-    // const [icaUpdateAutoTxs, isUpdateAutoTxsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, autoTxInfo)
-    /*  if (size === 'small') {
+          value.msgs[i] = msgExecMsgEncoded
+        })
+      }
+      console.log(autoTxInfo.msgs[0])
+      const encodeObject = {
+        typeUrl: autoTxInfo.msgs[index].typeUrl,
+        value,
+      }
+      const msgEncoded = registry.encodeAsAny(encodeObject)
+      let params = {
+        txId: Number(autoTxInfo.txId),
+        msgs: [msgEncoded],
+        owner: autoTxInfo.owner,
+      }
+      setUpdatedAutoTxParams(params)
+      console.log(params)
+    } catch (e) {
+      console.log(e)
+    }
+    return setRequestedUpdateAutoTx(true)
+  }
+  const shouldDisableUpdateAutoTxButton = false // !updatedAutoTxParams || !updatedAutoTxParams.txId
+
+  ////
+
+  // const [icaUpdateAutoTxs, isUpdateAutoTxsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, autoTxInfo)
+  /*  if (size === 'small') {
          return (
              <>
                  <InfoHeader
@@ -203,59 +235,78 @@ export const AutoTxInfoBreakdown = ({
              </>
          )
      } */
-    return (
-        <>
-            <InfoHeader
-                txId={autoTxInfo.txId}
-                owner={autoTxInfo.owner}
-                active={isActive}
-                latestExecWasError={latestExecWasError}
-            />
-            <Row>
-                <CardContent>
-                    <Column align="center">
-                        {ibcInfo && (
-                            <ImageForTokenLogo
-                                size="big"
-                                logoURI={ibcInfo.logoURI}
-                                alt={ibcInfo.symbol}
-                            />
-                        )}
-                        <Text
-                            variant="caption"
-                            align="center"
-                            css={{ padding: '$8', }}
-                        >  {latestExecWasError ? <>🔴</> : <>🟢 </>}</Text><Text>{autoTxInfo.label != "" ? <> Trigger: {autoTxInfo.label}</> : <>Trigger ID: {autoTxInfo.txId}</>}  </Text>
-                        <Column align="center"> <Text variant="title">
-                            <> Message Type: {autoTxInfo.msgs[0].typeUrl.split(".").find((data) => data.includes("Msg")).split(",")[0]}</>
-                        </Text></Column>
-                    </Column>
-                </CardContent>
-            </Row >
+  return (
+    <>
+      <InfoHeader
+        txId={autoTxInfo.txId}
+        owner={autoTxInfo.owner}
+        active={isActive}
+        latestExecWasError={latestExecWasError}
+      />
+      <Row>
+        <CardContent>
+          <Column align="center">
+            {ibcInfo && (
+              <ImageForTokenLogo
+                size="big"
+                logoURI={ibcInfo.logoURI}
+                alt={ibcInfo.symbol}
+              />
+            )}
+            <Text variant="caption" align="center" css={{ padding: '$8' }}>
+              {' '}
+              {latestExecWasError ? <>🔴</> : <>🟢 </>}
+            </Text>
+            <Text>
+              {autoTxInfo.label != '' ? (
+                <> Trigger: {autoTxInfo.label}</>
+              ) : (
+                <>Trigger ID: {autoTxInfo.txId}</>
+              )}{' '}
+            </Text>
+            <Column align="center">
+              {' '}
+              <Text variant="title">
+                <>
+                  {' '}
+                  Message Type:{' '}
+                  {
+                    autoTxInfo.msgs[0].typeUrl
+                      .split('.')
+                      .find((data) => data.includes('Msg'))
+                      .split(',')[0]
+                  }
+                </>
+              </Text>
+            </Column>
+          </Column>
+        </CardContent>
+      </Row>
 
-            <>
-                <Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
-
-                        <Text variant="legend" color="secondary" align="left">
-                            Owner
-                        </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{autoTxInfo.owner} </Text>
-                        </Inline>
-                    </Column>
-                </Row>
-                {autoTxInfo.portId && /* (icaActive && !isIcaActiveLoading ?  */ <Row>
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
-
-                        <Text variant="legend" color="secondary" align="left">
-                            IBC Port
-                        </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{autoTxInfo.portId} </Text>
-                        </Inline>
-                    </Column>
-                </Row>/*  : //for this to work there has to be a query for GetActiveChannelID
+      <>
+        <Row>
+          <Column gap={8} align="flex-start" justifyContent="flex-start">
+            <Text variant="legend" color="secondary" align="left">
+              Owner
+            </Text>
+            <Inline gap={2}>
+              <Text variant="body">{autoTxInfo.owner} </Text>
+            </Inline>
+          </Column>
+        </Row>
+        {
+          autoTxInfo.portId && (
+            /* (icaActive && !isIcaActiveLoading ?  */ <Row>
+              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                <Text variant="legend" color="secondary" align="left">
+                  IBC Port
+                </Text>
+                <Inline gap={2}>
+                  <Text variant="body">{autoTxInfo.portId} </Text>
+                </Inline>
+              </Column>
+            </Row>
+          ) /*  : //for this to work there has to be a query for GetActiveChannelID
                     <Row>
                         <Column gap={8} align="flex-start" justifyContent="flex-start">
 
@@ -264,250 +315,461 @@ export const AutoTxInfoBreakdown = ({
                             </Text>
 
                         </Column>
-                    </Row>)*/}
-                {!isIcaLoading && !isIcaBalanceLoading && autoTxInfo.connectionId && (<Row>
-                    <Column style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", }} gap={8} align="flex-start" justifyContent="flex-start">
-
-                        <Text variant="legend" color="secondary" align="left">
-                            Interchain Account   </Text>
-                        <Inline gap={2}>
-                            <Text variant="body">{icaAddress} </Text>
-                        </Inline>
-                        {!isIcaBalanceLoading && <Text variant="legend"> Balance:  <Text variant="caption"> {icaBalance} {ibcInfo.symbol}</Text> </Text>}
-                        <Button css={{ justifyContent: "flex-end !important" }}
-                            variant="ghost"
-                            onClick={() => setShowICAHostButtons(!showICAHostButtons)}
-                            icon={
-                                <IconWrapper
-                                    size="medium"
-                                    rotation="-90deg"
-                                    color="tertiary"
-                                    icon={showICAHostButtons ? <Union /> : <Chevron />}
-                                />
-                            }
-                        />
-                        {showICAHostButtons && <Row>
-                            <Column gap={8} align="flex-start" justifyContent="flex-start">
-                                <Text variant="legend"><StyledInput step=".01"
-                                    placeholder="0.00" type="number"
-                                    value={feeFundsHostChain}
-                                    onChange={({ target: { value } }) => setFeeFundsHostChain(value)}
-                                />{ibcInfo.symbol}</Text>
-
-                                <Tooltip
-                                    label="Fund the interchain account on the host chain. Only use this for fees. The tokens may be lost on the interchain account."
-                                    aria-label="Fee Funds "
-                                ><Text variant="legend" color="disabled"> Top up balance of  {icaBalance} {ibcInfo.symbol} </Text></Tooltip>
-
-
-                                {feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "0.00" && feeFundsHostChain != "0" && feeFundsHostChain != "" && <Button
-                                    variant="primary"
-                                    size="small"
-                                    onClick={() =>
-                                        handleSendFundsOnHostClick()
-                                    }
-                                >
-                                    {isExecutingSendFundsOnHost && (<Spinner instant />)}  {('Send')}
-                                </Button>}</Column>
-                        </Row>}
-                    </Column>
-                </Row>)}
+                    </Row>)*/
+        }
+        {!isIcaLoading && !isIcaBalanceLoading && autoTxInfo.connectionId && (
+          <Row>
+            <Column
+              style={{
+                display: 'inline-block',
+                whiteSpace: 'pre-wrap',
+                overflow: 'hidden',
+                float: 'left',
+              }}
+              gap={8}
+              align="flex-start"
+              justifyContent="flex-start"
+            >
+              <Text variant="legend" color="secondary" align="left">
+                Interchain Account{' '}
+              </Text>
+              <Inline gap={2}>
+                <Text variant="body">{icaAddress} </Text>
+              </Inline>
+              {!isIcaBalanceLoading && (
+                <Text variant="legend">
+                  {' '}
+                  Balance:{' '}
+                  <Text variant="caption">
+                    {' '}
+                    {icaBalance} {ibcInfo.symbol}
+                  </Text>{' '}
+                </Text>
+              )}
+              <Button
+                css={{ justifyContent: 'flex-end !important' }}
+                variant="ghost"
+                onClick={() => setShowICAHostButtons(!showICAHostButtons)}
+                icon={
+                  <IconWrapper
+                    size="medium"
+                    rotation="-90deg"
+                    color="tertiary"
+                    icon={showICAHostButtons ? <Union /> : <Chevron />}
+                  />
+                }
+              />
+              {showICAHostButtons && (
                 <Row>
-
-                    <Column gap={8} align="flex-start" justifyContent="flex-start">
-                        <Text variant="legend" color="secondary" align="left">
-                            Fee Address
-                        </Text>
-                        <Inline gap={2}>
-                            <Text css={{ wordBreak: "break-all" }} variant="body">{autoTxInfo.feeAddress} </Text>
-                        </Inline>
-                        {!isFeeBalanceLoading && feeBalance > 0 && <Text variant="legend"> Balance:  <Text variant="caption"> {feeBalance} TRST</Text> </Text>}
-                    </Column>
-                </Row>
-                {autoTxInfo.msgs.map((msg, index) => (
-                    <div key={index}>
-                        <Row>
-                            <Column gap={8} align="flex-start" justifyContent="flex-start">
-
-                                <Text variant="legend" color="secondary" align="left">
-                                    Message Type
-                                </Text>
-                                <Inline gap={2}>
-                                    <Text variant="body">{msg.typeUrl} </Text>
-                                </Inline>
-                            </Column>
-                        </Row>
-                        {msg.typeUrl != "/cosmos.authz.v1beta1.MsgExec" ? <Button
-                            variant="ghost"
-                            size="small"
-                            onClick={() =>
-                                showEditor(!editor, msg)
-                            }>
-                            {editor ? "Edit" : "Discard"}
-                        </Button> :
-                            <Button
-                                variant="ghost"
-                                size="small"
-                                onClick={() => {
-                                    setEditor(!editor);
-                                    setEditMsg(getMsgValueForMsgExec(msg))
-                                }
-                                }>
-                                {editor ? "Edit" : "Discard"}
-                            </Button>
+                  <Column
+                    gap={8}
+                    align="flex-start"
+                    justifyContent="flex-start"
+                  >
+                    <Text variant="legend">
+                      <StyledInput
+                        step=".01"
+                        placeholder="0.00"
+                        type="number"
+                        value={feeFundsHostChain}
+                        onChange={({ target: { value } }) =>
+                          setFeeFundsHostChain(value)
                         }
-                        <Row>
-                            <Column gap={8} align="flex-start" justifyContent="flex-start">
-                                {editor ? <>
-                                    <Text variant="legend" color="secondary" align="left">
-                                        Message Value
-                                    </Text>
-                                    {msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec" ?
+                      />
+                      {ibcInfo.symbol}
+                    </Text>
 
-                                        <Inline gap={2}>
-                                            <Text css={{ wordBreak: "break-word" }} variant="body"><pre style={{ display: "inline-block", whiteSpace: "pre-wrap", overflow: "hidden", float: "left", fontSize: '0.8rem' }}>{getMsgValueForMsgExec(msg)} </pre></Text>
-                                        </Inline> :
-                                        <Inline gap={2}> <Text css={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }} variant="body"><pre style={{ display: "inline-block", overflow: "hidden", float: "left", fontSize: "0.8rem" }}>{JSON.stringify(new Registry(msgRegistry).decode(msg), null, 2)} </pre></Text>
-                                        </Inline>
-                                    }
-                                </> : <>
-                                    <JsonCodeMirrorEditor
-                                        jsonValue={editMsg}
-                                        onChange={setEditMsg/* (val) => {handleChangeMsg(index, val, msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec")} */}
-                                        onValidate={setIsJsonValid} />
-                                    <Button css={{ marginTop: '$8', margin: '$2' }}
-                                        variant="secondary"
-                                        size="small"
-                                        disabled={shouldDisableUpdateAutoTxButton}
-                                        onClick={() =>
-                                            handleUpdateAutoTxMsgClick(index)
-                                        }
-                                    >
-                                        {isExecutingUpdateAutoTx ? <Spinner instant /> : 'Update Message'}
-                                    </Button>
-                                </>}
-                            </Column>
-                        </Row>
-                    </div>))}
+                    <Tooltip
+                      label="Fund the interchain account on the host chain. Only use this for fees. The tokens may be lost on the interchain account."
+                      aria-label="Fee Funds "
+                    >
+                      <Text variant="legend" color="disabled">
+                        {' '}
+                        Top up balance of {icaBalance} {ibcInfo.symbol}{' '}
+                      </Text>
+                    </Tooltip>
 
-                {Number(autoTxInfo.startTime.seconds) > 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">
-                    {
-                        autoTxInfo.startTime && (<><Tooltip label={"Start time is the time the trigger was started. Execution starts at start time when a custom start time in the future is provided at trigger submission"}><Text variant="legend" color="secondary" align="left">
-                            Start Time
-                        </Text></Tooltip>
-                            <Inline gap={2}>
-                                <Text variant="body">{getRelativeTime(autoTxInfo.startTime.seconds)}</Text>
-
-                            </Inline></>)
-                    }
-                    <Tooltip label={"Execution time is the time the next execution takes place. In case a trigger has ended, the execution time is the time of the last execution"}><Text variant="legend" color="secondary" align="left">
-                        Execution Time
-                    </Text></Tooltip>
-                    <Inline gap={2}>
-                        <Text variant="body">{getRelativeTime(autoTxInfo.execTime.seconds)}</Text>
-                    </Inline>
-                    {
-                        autoTxInfo.interval.seconds != "0" && (<> <Tooltip label={"Interval is the fixed time between 2 executions"}><Text variant="legend" color="secondary" align="left">
-                            Interval
-                        </Text></Tooltip>
-                            <Inline gap={2}>
-                                <Text variant="body">{getDuration(Number(autoTxInfo.interval.seconds))}</Text>
-
-                            </Inline></>)
-                    }
-                    {autoTxInfo.endTime.seconds && (<><Tooltip label={"End time is the time last time execution can place"}>< Text variant="legend" color="secondary" align="left">
-                        End time
-                    </Text></Tooltip>
-                        <Inline gap={2}>
-                            <Text variant="body">{getRelativeTime(autoTxInfo.endTime.seconds)}</Text>
-
-                        </Inline>
-                    </>)}
-                </Column>
+                    {feeFundsHostChain != '0.00' &&
+                      feeFundsHostChain != '0' &&
+                      feeFundsHostChain != '0.00' &&
+                      feeFundsHostChain != '0' &&
+                      feeFundsHostChain != '' && (
+                        <Button
+                          variant="primary"
+                          size="small"
+                          onClick={() => handleSendFundsOnHostClick()}
+                        >
+                          {isExecutingSendFundsOnHost && <Spinner instant />}{' '}
+                          {'Send'}
+                        </Button>
+                      )}
+                  </Column>
                 </Row>
+              )}
+            </Column>
+          </Row>
+        )}
+        <Row>
+          <Column gap={8} align="flex-start" justifyContent="flex-start">
+            <Text variant="legend" color="secondary" align="left">
+              Fee Address
+            </Text>
+            <Inline gap={2}>
+              <Text css={{ wordBreak: 'break-all' }} variant="body">
+                {autoTxInfo.feeAddress}{' '}
+              </Text>
+            </Inline>
+            {!isFeeBalanceLoading && feeBalance > 0 && (
+              <Text variant="legend">
+                {' '}
+                Balance: <Text variant="caption"> {feeBalance} TRST</Text>{' '}
+              </Text>
+            )}
+          </Column>
+        </Row>
+        {autoTxInfo.msgs.map((msg, index) => (
+          <div key={index}>
+            <Row>
+              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                <Text variant="legend" color="secondary" align="left">
+                  Message Type
+                </Text>
+                <Inline gap={2}>
+                  <Text variant="body">{msg.typeUrl} </Text>
+                </Inline>
+              </Column>
+            </Row>
+            {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={() => showEditor(!editor, msg)}
+              >
+                {editor ? 'Edit' : 'Discard'}
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="small"
+                onClick={() => {
+                  setEditor(!editor)
+                  setEditMsg(getMsgValueForMsgExec(msg))
+                }}
+              >
+                {editor ? 'Edit' : 'Discard'}
+              </Button>
+            )}
+            <Row>
+              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {editor ? (
+                  <>
+                    <Text variant="legend" color="secondary" align="left">
+                      Message Value
+                    </Text>
+                    {msg.typeUrl == '/cosmos.authz.v1beta1.MsgExec' ? (
+                      <Inline gap={2}>
+                        <Text css={{ wordBreak: 'break-word' }} variant="body">
+                          <pre
+                            style={{
+                              display: 'inline-block',
+                              whiteSpace: 'pre-wrap',
+                              overflow: 'hidden',
+                              float: 'left',
+                              fontSize: '0.8rem',
+                            }}
+                          >
+                            {getMsgValueForMsgExec(msg)}{' '}
+                          </pre>
+                        </Text>
+                      </Inline>
+                    ) : (
+                      <Inline gap={2}>
+                        {' '}
+                        <Text
+                          css={{
+                            wordBreak: 'break-all',
+                            whiteSpace: 'pre-wrap',
+                          }}
+                          variant="body"
+                        >
+                          <pre
+                            style={{
+                              display: 'inline-block',
+                              overflow: 'hidden',
+                              float: 'left',
+                              fontSize: '0.8rem',
+                            }}
+                          >
+                            {JSON.stringify(registry.decode(msg), null, 2)}{' '}
+                          </pre>
+                        </Text>
+                      </Inline>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <JsonCodeMirrorEditor
+                      jsonValue={editMsg}
+                      onChange={
+                        setEditMsg /* (val) => {handleChangeMsg(index, val, msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec")} */
+                      }
+                      onValidate={setIsJsonValid}
+                    />
+                    <Button
+                      css={{ marginTop: '$8', margin: '$2' }}
+                      variant="secondary"
+                      size="small"
+                      disabled={shouldDisableUpdateAutoTxButton}
+                      onClick={() => handleUpdateAutoTxMsgClick(index)}
+                    >
+                      {isExecutingUpdateAutoTx ? (
+                        <Spinner instant />
+                      ) : (
+                        'Update Message'
+                      )}
+                    </Button>
+                  </>
                 )}
+              </Column>
+            </Row>
+          </div>
+        ))}
 
-                {autoTxInfo.updateHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+        {Number(autoTxInfo.startTime.seconds) > 0 && (
+          <Row>
+            {' '}
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              {autoTxInfo.startTime && (
+                <>
+                  <Tooltip
+                    label={
+                      'Start time is the time the trigger was started. Execution starts at start time when a custom start time in the future is provided at trigger submission'
+                    }
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Start Time
+                    </Text>
+                  </Tooltip>
+                  <Inline gap={2}>
+                    <Text variant="body">
+                      {getRelativeTime(autoTxInfo.startTime.seconds.toString())}
+                    </Text>
+                  </Inline>
+                </>
+              )}
+              <Tooltip
+                label={
+                  'Execution time is the time the next execution takes place. In case a trigger has ended, the execution time is the time of the last execution'
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Execution Time
+                </Text>
+              </Tooltip>
+              <Inline gap={2}>
+                <Text variant="body">
+                  {getRelativeTime(autoTxInfo.execTime.seconds.toString())}
+                </Text>
+              </Inline>
+              {autoTxInfo.interval.seconds.toString() != '0' && (
+                <>
+                  {' '}
+                  <Tooltip
+                    label={'Interval is the fixed time between 2 executions'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Interval
+                    </Text>
+                  </Tooltip>
+                  <Inline gap={2}>
+                    <Text variant="body">
+                      {getDuration(Number(autoTxInfo.interval.seconds))}
+                    </Text>
+                  </Inline>
+                </>
+              )}
+              {autoTxInfo.endTime.seconds && (
+                <>
+                  <Tooltip
+                    label={'End time is the time last time execution can place'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      End time
+                    </Text>
+                  </Tooltip>
+                  <Inline gap={2}>
+                    <Text variant="body">
+                      {getRelativeTime(autoTxInfo.endTime.seconds.toString())}
+                    </Text>
+                  </Inline>
+                </>
+              )}
+            </Column>
+          </Row>
+        )}
+
+        {autoTxInfo.updateHistory.length != 0 && (
+          <>
+            {' '}
+            <Row>
+              {' '}
+              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {' '}
+                <Inline>
+                  <Text variant="legend" color="secondary" align="left">
                     Update History
-                </Text></Inline>
-                    {autoTxInfo.updateHistory?.map((entry, index) => <div key={index}>
-                        <Column gap={2} align="flex-start" justifyContent="flex-start">
-                            <Text variant="body">At {getRelativeTime(entry.seconds)} </Text>
-                        </Column>
-                    </div>)}</Column></Row></>)}
+                  </Text>
+                </Inline>
+                {autoTxInfo.updateHistory?.map((entry, index) => (
+                  <div key={index}>
+                    <Column
+                      gap={2}
+                      align="flex-start"
+                      justifyContent="flex-start"
+                    >
+                      <Text variant="body">
+                        At {getRelativeTime(entry.seconds.toString())}{' '}
+                      </Text>
+                    </Column>
+                  </div>
+                ))}
+              </Column>
+            </Row>
+          </>
+        )}
 
-                {autoTxInfo.autoTxHistory.length != 0 && (<>  <Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+        {autoTxInfo.autoTxHistory.length != 0 && (
+          <>
+            {' '}
+            <Row>
+              {' '}
+              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {' '}
+                <Inline>
+                  <Text variant="legend" color="secondary" align="left">
                     Execution History
-                </Text></Inline>
-                    {autoTxInfo.autoTxHistory?.slice(0).reverse().map(({ execFee, actualExecTime, scheduledExecTime, executed, error, timedOut }, index) => <div key={index}>
-                        <Column gap={2} align="flex-start" justifyContent="flex-start">
-                            <Column>
-                                <Text variant="body">At {getRelativeTime(scheduledExecTime.seconds)} </Text>
-                            </Column><Column>
-                                <Text variant="caption">Actual Time was {getRelativeTime(actualExecTime.seconds)}</Text> </Column><Column>
-                                <Text variant="caption">Execution Fee was {convertMicroDenomToDenom(execFee.amount, 6)} TRST</Text>
+                  </Text>
+                </Inline>
+                {autoTxInfo.autoTxHistory
+                  ?.slice(0)
+                  .reverse()
+                  .map(
+                    (
+                      {
+                        execFee,
+                        actualExecTime,
+                        scheduledExecTime,
+                        executed,
+                        error,
+                        timedOut,
+                      },
+                      index
+                    ) => (
+                      <div key={index}>
+                        <Column
+                          gap={2}
+                          align="flex-start"
+                          justifyContent="flex-start"
+                        >
+                          <Column>
+                            <Text variant="body">
+                              At {getRelativeTime(scheduledExecTime.seconds.toString())}{' '}
+                            </Text>
+                          </Column>
+                          <Column>
+                            <Text variant="caption">
+                              Actual Time was{' '}
+                              {getRelativeTime(actualExecTime.seconds.toString())}
+                            </Text>{' '}
+                          </Column>
+                          <Column>
+                            <Text variant="caption">
+                              Execution Fee was{' '}
+                              {convertMicroDenomToDenom(execFee.amount, 6)} TRST
+                            </Text>
 
-                                {/* {result && <Text variant="caption">Result: {result}</Text>} */}
-                                {error ? <Text variant="caption">🔴 Execution Error: {error}</Text> : <Text variant="caption">Executed: {executed ? <>🟢</> : <>🔴</>}</Text>}
-                                {timedOut && <Text variant="caption">Execution on the destination chain did not happen because it timed out</Text>}
-                            </Column>
-
+                            {/* {result && <Text variant="caption">Result: {result}</Text>} */}
+                            {error ? (
+                              <Text variant="caption">
+                                🔴 Execution Error: {error}
+                              </Text>
+                            ) : (
+                              <Text variant="caption">
+                                Executed: {executed ? <>🟢</> : <>🔴</>}
+                              </Text>
+                            )}
+                            {timedOut && (
+                              <Text variant="caption">
+                                Execution on the destination chain did not
+                                happen because it timed out
+                              </Text>
+                            )}
+                          </Column>
                         </Column>
-                    </div>)}</Column></Row></>)}
-                {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds && autoTxInfo.autoTxHistory.length == 0 && (<Row> <Column gap={8} align="flex-start" justifyContent="flex-start">  <Inline><Text variant="legend" color="secondary" align="left">
+                      </div>
+                    )
+                  )}
+              </Column>
+            </Row>
+          </>
+        )}
+        {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds &&
+          autoTxInfo.autoTxHistory.length == 0 && (
+            <Row>
+              {' '}
+              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {' '}
+                <Inline>
+                  <Text variant="legend" color="secondary" align="left">
                     Execution History not available (yet)
-                </Text></Inline>
-                </Column></Row>)}
-            </>
-        </>
-    )
+                  </Text>
+                </Inline>
+              </Column>
+            </Row>
+          )}
+      </>
+    </>
+  )
 }
 
 function Row({ children }) {
-    const baseCss = { padding: '$10 $16' }
-    return (
-        <Inline
-            css={{
-                ...baseCss,
-                display: 'flex',
-                justifyContent: 'space-between',
-                backgroundColor: '$colors$dark10',
-                borderRadius: '$2',
-                marginBottom: '$14',
-            }}
-        >
-            {children}
-        </Inline>
-    )
+  const baseCss = { padding: '$10 $16' }
+  return (
+    <Inline
+      css={{
+        ...baseCss,
+        display: 'flex',
+        justifyContent: 'space-between',
+        backgroundColor: '$colors$dark10',
+        borderRadius: '$2',
+        marginBottom: '$14',
+      }}
+    >
+      {children}
+    </Inline>
+  )
 }
 
-
 const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
-    <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
-        <Inline gap={6}>
-            <Link href="/triggers" passHref>
-                <Button
-                    as="a"
-                    variant="ghost"
-                    size="large"
-                    iconLeft={<WalletIcon />}
-
-                >
-                    <Inline css={{ paddingLeft: '$4' }}>All Triggers</Inline>
-                </Button>
-            </Link>
-            <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
-        </Inline>
-        <Text variant="caption" color="secondary">
-            {latestExecWasError ? <>🔴</> : active && <>🟢</>}Trigger ID: {txId}
-        </Text>
+  <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
+    <Inline gap={6}>
+      <Link href="/triggers" passHref>
+        <Button as="a" variant="ghost" size="large" iconLeft={<WalletIcon />}>
+          <Inline css={{ paddingLeft: '$4' }}>All Triggers</Inline>
+        </Button>
+      </Link>
+      <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
+    <Text variant="caption" color="secondary">
+      {latestExecWasError ? <>🔴</> : active && <>🟢</>}Trigger ID: {txId}
+    </Text>
+  </Inline>
 )
 
 const StyledInput = styled('input', {
-    width: '100%',
-    color: 'inherit',
-    // fontSize: `20px`,
-    padding: '$2',
-    margin: '$2',
+  width: '100%',
+  color: 'inherit',
+  // fontSize: `20px`,
+  padding: '$2',
+  margin: '$2',
 })

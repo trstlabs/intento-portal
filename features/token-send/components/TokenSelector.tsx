@@ -10,8 +10,7 @@ import {
 } from 'junoblocks'
 import React, { useRef, useState } from 'react'
 
-import { QueryInput } from '../../swap/components/QueryInput'
-
+import { QueryInput } from 'components//Input/QueryInput'
 import { SelectorToggle } from './SelectorToggle'
 import { TokenOptionsList } from './TokenOptionsList'
 

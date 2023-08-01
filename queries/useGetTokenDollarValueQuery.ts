@@ -1,6 +1,6 @@
 import { protectAgainstNaN } from 'junoblocks'
 
-import { useTrustlessChainClient } from '../hooks/useTrustlessChainClient'
+import { useTrstClient } from '../hooks/useRPCClient'
 import { useTokenDollarValue } from '../hooks/useTokenDollarValue'
 import { useBaseTokenInfo } from '../hooks/useTokenInfo'
 import { tokenToTokenPriceQueryWithPools } from './tokenToTokenPriceQuery'
@@ -12,7 +12,7 @@ import { useGetQueryMatchingPoolForSwap } from './useQueryMatchingPoolForSwap'
  * */
 export const useGetTokenDollarValueQuery = () => {
   const tokenA = useBaseTokenInfo()
-  const client = useTrustlessChainClient()
+  const client = useTrstClient()
   const [tokenADollarPrice, fetchingDollarPrice] = useTokenDollarValue(
     tokenA?.symbol
   )

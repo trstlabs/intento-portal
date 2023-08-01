@@ -1,4 +1,4 @@
-import { TrustlessChainClient } from 'trustlessjs'
+
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { Key } from '@keplr-wallet/types'
 import { atom } from 'recoil'
@@ -45,7 +45,7 @@ function createWalletState<TClient = any, TState = {}>({
     dangerouslyAllowMutability: true,
     effects_UNSTABLE: [
       ({ onSet, setSelf }) => {
-        const CACHE_KEY = `@wasmswap/wallet-state/type-${key}`
+        const CACHE_KEY = `@triggerportal/wallet-state/type-${key}`
 
         const savedValue = localStorage.getItem(CACHE_KEY)
 
@@ -81,7 +81,7 @@ function createWalletState<TClient = any, TState = {}>({
 }
 
 export const walletState = createWalletState<
-  TrustlessChainClient,
+SigningStargateClient,
   { key?: Key }
 >({
   key: 'internal-wallet',

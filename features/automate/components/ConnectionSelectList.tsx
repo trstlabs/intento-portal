@@ -31,7 +31,7 @@ export class IBCInfo {
 export type ConnectionSelectListProps = {
   activeConnection?: string
   //todo refactor
-  connectionList: Array<Pick<TokenInfo, 'connection_id' | 'chain_id' | 'symbol' | 'logoURI' | 'name' | 'prefix' | 'denom' | 'trst_denom' | 'id'>>
+  connectionList: Array<Pick<TokenInfo, 'connection_id' | 'chain_id' | 'symbol' | 'logoURI' | 'name' | 'prefix' | 'denom' | 'denom_on_trst' | 'id'>>
   onSelect: (connectionInfo: IBCInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -56,7 +56,7 @@ export const ConnectionSelectList = ({
     selectedConnection.denom = selectedInfo.denom
     selectedConnection.symbol = selectedInfo.symbol
     selectedConnection.prefix = selectedInfo.prefix
-    selectedConnection.trstDenom = selectedInfo.trst_denom
+    selectedConnection.trstDenom = selectedInfo.denom_on_trst
     console.log(selectedConnection)
     return selectedConnection
   }

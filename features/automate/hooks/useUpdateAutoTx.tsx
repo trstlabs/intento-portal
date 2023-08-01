@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeUpdateAutoTx } from '../../../services/auto-ibc-tx'
+import { executeUpdateAutoTx } from '../../../services/ica'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -19,7 +19,8 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
-import { MsgUpdateAutoTxParams } from 'trustlessjs'
+
+import { MsgUpdateAutoTxParams } from '../../../types/trstTypes'
 
 
 type UseUpdateAutoTxArgs = {
@@ -29,7 +30,7 @@ type UseUpdateAutoTxArgs = {
 export const useUpdateAutoTx = ({
     autoTxParams,
 }: UseUpdateAutoTxArgs) => {
-    const { client, status } = useRecoilValue(walletState)
+    const { client, status, address } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
@@ -40,8 +41,8 @@ export const useUpdateAutoTx = ({
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            if (client.address !== autoTxParams.owner) {
-                throw new Error('This feature is only available for the owner: '+ autoTxParams.owner)
+            if (address !== autoTxParams.owner) {
+                throw new Error('This feature will only work for the owner: '+ autoTxParams.owner)
             }
 
             return await executeUpdateAutoTx({
