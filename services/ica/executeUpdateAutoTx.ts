@@ -6,7 +6,7 @@ import {
 } from '../../util/messages'
 import { trst } from 'trustlessjs'
 import { MsgUpdateAutoTxParams } from '../../types/trstTypes'
-import { Long } from "trustlessjs/dist/codegen/helpers";
+
 
 type executeUpdateAutoTxArgs = {
   autoTxParams: MsgUpdateAutoTxParams
@@ -20,14 +20,14 @@ export const executeUpdateAutoTx = async ({
   console.log(autoTxParams)
   const msgUpdateAutoTx =
     trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.updateAutoTx({
-      txId: Long.fromNumber(autoTxParams.txId),
+      txId: BigInt(autoTxParams.txId),
       owner: autoTxParams.owner,
       connectionId: autoTxParams.connectionId ? autoTxParams.connectionId : "",
       msgs: autoTxParams.msgs ? autoTxParams.msgs : [],
-      endTime: autoTxParams.endTime ? Long.fromNumber(autoTxParams.endTime) : Long.fromNumber(0),
+      endTime: autoTxParams.endTime ? BigInt(autoTxParams.endTime) : BigInt(0),
       label: autoTxParams.label ? autoTxParams.label : "",
       interval: autoTxParams.interval ? autoTxParams.interval : "",
-      startAt: autoTxParams.startAt ? Long.fromNumber(autoTxParams.startAt) : Long.fromNumber(0),
+      startAt: autoTxParams.startAt ? BigInt(autoTxParams.startAt) : BigInt(0),
       dependsOnTxIds: /* autoTxParams.dependsOnTxId ? autoTxParams.dependsOnTxIds || */ [],
       feeFunds: autoTxParams.feeFunds ? autoTxParams.feeFunds : [],
     })

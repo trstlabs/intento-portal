@@ -4,7 +4,7 @@ export {}
 // import { usePoolsListQuery } from '../queries/usePoolsListQuery'
 // import { getSwapInfo, InfoResponse } from '../services/swap'
 // import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-// import { useTrstClient } from './useRPCClient'
+// import { useTrstRpcClient } from './useRPCClient'
 
 // export type SwapInfo = Pick<
 //   InfoResponse,
@@ -28,7 +28,7 @@ export {}
 //   refetchInBackground,
 // }: UseMultipleSwapInfoArgs) => {
 //   const { data: poolsListResponse } = usePoolsListQuery()
-//   const client = useTrstClient()
+//   const client = useTrstRpcClient()
 
 //   const { data, isLoading } = useQuery<SwapInfo>(
 //     `swapInfo/${poolId}`,

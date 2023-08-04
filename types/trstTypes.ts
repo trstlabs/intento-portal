@@ -48,3 +48,21 @@ export interface AutoTxHistoryEntry {
     /** uint64 retries = 6; */
     error: string;
   }
+
+  export type TokenInfo = {
+    id: string
+    chain_id: string
+    token_address: string
+    symbol: string
+    name: string
+    decimals: number
+    logo_uri: string
+    denom: string
+    native: boolean
+    channel?: string
+    channel_to_trst?: string
+    connection_id?: string
+    counterparty_connection_id?: string
+    prefix?: string
+    denom_on_trst?: string
+  }

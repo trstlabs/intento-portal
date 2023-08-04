@@ -1,4 +1,4 @@
-import { getTrstSigningClientOptions, trstAccountParser } from 'trustlessjs'
+import { getTrstSigningClientOptions } from 'trustlessjs'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
@@ -44,7 +44,6 @@ export const useConnectWallet = (
         {
           registry,
           aminoTypes,
-          accountParser: trstAccountParser,
         }
       )
 

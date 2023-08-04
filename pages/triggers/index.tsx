@@ -47,8 +47,8 @@ export default function AutoTxs() {
 
   const pageHeaderContents = (
     <PageHeader
-      title="Triggers"
-      subtitle="View Trustless Triggers and interact with them"
+      title="Intent-Centric Triggers"
+      subtitle="View Intent-Centric Triggers and interact with them"
     />
   )
 

@@ -1,5 +1,5 @@
 import { convertDenomToMicroDenom } from 'junoblocks'
-import { Long } from "trustlessjs/dist/codegen/helpers";
+
 import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
@@ -21,7 +21,7 @@ export const executeSubmitAutoTx = async ({
   if (autoTxData.startTime && autoTxData.startTime > 0) {
     startAtInt = Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000
   }
-  let startAt = Long.fromNumber(startAtInt) //BigInt(startAtInt)
+  let startAt = BigInt(startAtInt) //BigInt(startAtInt)
   let duration = autoTxData.duration + 'ms'
   let interval = autoTxData.interval + 'ms'
   let msgs = []
@@ -93,7 +93,7 @@ export const executeSubmitAutoTx = async ({
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitAutoTx], {
       amount: [],
-      gas: '130_000',
+      gas: "300000",
     })
   )
 }

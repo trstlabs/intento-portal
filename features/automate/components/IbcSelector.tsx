@@ -15,7 +15,15 @@ type IbcSelectorProps = {
   readOnly?: boolean
   disabled?: boolean
   connectionId: string
-  onChange: (ibc_info: { connection; prefix; denom; name; symbol }) => void
+  onChange: (IbcInfo: {
+    chain_id
+    connection_id
+    counterparty_connection_id
+    prefix
+    denom
+    name
+    symbol
+  }) => void
   size?: 'small' | 'large'
 }
 
@@ -35,7 +43,9 @@ export const IbcSelector = ({
   const [chainName, setChainName] = useState('')
 
   const handleSelectConnection = (
-    connection: string,
+    chain_id: string,
+    connection_id: string,
+    counterparty_connection_id: string,
     uri: string,
     name: string,
     prefix: string,
@@ -44,7 +54,15 @@ export const IbcSelector = ({
   ) => {
     setChainLogoURI(uri)
     setChainName(name)
-    onChange({ connection, prefix, denom, name, symbol })
+    onChange({
+      chain_id,
+      connection_id,
+      counterparty_connection_id,
+      prefix,
+      denom,
+      name,
+      symbol,
+    })
 
     setConnectionListShowing(false)
   }
@@ -62,7 +80,7 @@ export const IbcSelector = ({
         {!isConnectionListShowing && (
           <Inline>
             <IbcSelectorToggle
-              connection={connectionId}
+              connectionId={connectionId}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
               isSelecting={isConnectionListShowing}
@@ -79,7 +97,9 @@ export const IbcSelector = ({
             activeConnection={connectionId}
             onSelect={(slct) =>
               handleSelectConnection(
-                slct.connection,
+                slct.chain_id,
+                slct.connection_id,
+                slct.counterparty_connection_id,
                 slct.logoURI,
                 slct.name,
                 slct.prefix,
@@ -101,7 +121,7 @@ export const IbcSelector = ({
         <StyledDivForSelector>
           {!isConnectionListShowing && (
             <IbcSelectorToggle
-              connection={connectionId}
+              connectionId={connectionId}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
               isSelecting={isConnectionListShowing}
@@ -120,7 +140,7 @@ export const IbcSelector = ({
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
               size="small"
-              onClick={() => handleSelectConnection('', '', '', '', '', '')}
+              onClick={() => handleSelectConnection('', '','', '', '', '', '', '')}
               iconColor="tertiary"
             />
           )}
@@ -142,7 +162,9 @@ export const IbcSelector = ({
           activeConnection={connectionId}
           onSelect={(slct) =>
             handleSelectConnection(
-              slct.connection,
+              slct.chain_id,
+              slct.connection_id,
+              slct.counterparty_connection_id,
               slct.logoURI,
               slct.name,
               slct.prefix,

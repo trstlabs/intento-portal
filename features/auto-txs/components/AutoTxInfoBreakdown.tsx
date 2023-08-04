@@ -21,9 +21,9 @@ import {
   __POOL_REWARDS_ENABLED__,
   __POOL_STAKING_ENABLED__,
 } from 'util/constants'
-import { AutoTxInfo, MsgUpdateAutoTxParams } from '../../../types/trstTypes'
+import { MsgUpdateAutoTxParams } from '../../../types/trstTypes'
 
-// import { AutoTxInfo } from 'trustlessjs/types/codegen/trst/autoibctx/v1beta1/types'
+import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 // import { MsgUpdateAutoTx } from 'trustlessjs/types/codegen/trst/autoibctx/v1beta1/tx'
 
 import { useEffect, useState } from 'react'
@@ -71,6 +71,7 @@ AutoTxInfoBreakdownProps) => {
   )
   //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
   const symbol = ibcInfo ? ibcInfo.symbol : ''
+  const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
   const [showICAHostButtons, setShowICAHostButtons] = useState(false)
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
@@ -83,7 +84,7 @@ AutoTxInfoBreakdownProps) => {
   const isActive =
     autoTxInfo.endTime &&
     autoTxInfo.execTime &&
-    autoTxInfo.endTime.seconds >= autoTxInfo.execTime.seconds
+    autoTxInfo.endTime.getTime() >= autoTxInfo.execTime.getTime()
   const latestExecWasError =
     autoTxInfo.autoTxHistory.length > 0 &&
     autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ''
@@ -111,7 +112,7 @@ AutoTxInfoBreakdownProps) => {
       })
     }
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol)
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainId, symbol)
   const handleSendFundsOnHostClick = () => {
     connectExternalWallet(null)
     return setRequestedSendFunds(true)
@@ -238,7 +239,7 @@ AutoTxInfoBreakdownProps) => {
   return (
     <>
       <InfoHeader
-        txId={autoTxInfo.txId}
+        txId={autoTxInfo.txId.toString()}
         owner={autoTxInfo.owner}
         active={isActive}
         latestExecWasError={latestExecWasError}
@@ -249,7 +250,7 @@ AutoTxInfoBreakdownProps) => {
             {ibcInfo && (
               <ImageForTokenLogo
                 size="big"
-                logoURI={ibcInfo.logoURI}
+                logoURI={ibcInfo.logo_uri}
                 alt={ibcInfo.symbol}
               />
             )}
@@ -535,7 +536,7 @@ AutoTxInfoBreakdownProps) => {
           </div>
         ))}
 
-        {Number(autoTxInfo.startTime.seconds) > 0 && (
+        {autoTxInfo.startTime.getTime() > 0 && (
           <Row>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -552,7 +553,7 @@ AutoTxInfoBreakdownProps) => {
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(autoTxInfo.startTime.seconds.toString())}
+                      {getRelativeTime(autoTxInfo.startTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -568,7 +569,7 @@ AutoTxInfoBreakdownProps) => {
               </Tooltip>
               <Inline gap={2}>
                 <Text variant="body">
-                  {getRelativeTime(autoTxInfo.execTime.seconds.toString())}
+                  {getRelativeTime(autoTxInfo.execTime.getTime())}
                 </Text>
               </Inline>
               {autoTxInfo.interval.seconds.toString() != '0' && (
@@ -588,7 +589,7 @@ AutoTxInfoBreakdownProps) => {
                   </Inline>
                 </>
               )}
-              {autoTxInfo.endTime.seconds && (
+              {autoTxInfo.endTime.getTime() && (
                 <>
                   <Tooltip
                     label={'End time is the time last time execution can place'}
@@ -599,7 +600,7 @@ AutoTxInfoBreakdownProps) => {
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(autoTxInfo.endTime.seconds.toString())}
+                      {getRelativeTime(autoTxInfo.endTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -628,7 +629,7 @@ AutoTxInfoBreakdownProps) => {
                       justifyContent="flex-start"
                     >
                       <Text variant="body">
-                        At {getRelativeTime(entry.seconds.toString())}{' '}
+                        At {getRelativeTime(entry.getTime())}{' '}
                       </Text>
                     </Column>
                   </div>
@@ -638,7 +639,7 @@ AutoTxInfoBreakdownProps) => {
           </>
         )}
 
-        {autoTxInfo.autoTxHistory.length != 0 && (
+        {autoTxInfo.autoTxHistory.length > 10 && (
           <>
             {' '}
             <Row>
@@ -673,13 +674,13 @@ AutoTxInfoBreakdownProps) => {
                         >
                           <Column>
                             <Text variant="body">
-                              At {getRelativeTime(scheduledExecTime.seconds.toString())}{' '}
+                              At {getRelativeTime(scheduledExecTime.getTime())}{' '}
                             </Text>
                           </Column>
                           <Column>
                             <Text variant="caption">
                               Actual Time was{' '}
-                              {getRelativeTime(actualExecTime.seconds.toString())}
+                              {getRelativeTime(actualExecTime.getTime())}
                             </Text>{' '}
                           </Column>
                           <Column>
@@ -713,7 +714,7 @@ AutoTxInfoBreakdownProps) => {
             </Row>
           </>
         )}
-        {autoTxInfo.startTime.seconds < autoTxInfo.endTime.seconds &&
+        {autoTxInfo.startTime < autoTxInfo.endTime &&
           autoTxInfo.autoTxHistory.length == 0 && (
             <Row>
               {' '}

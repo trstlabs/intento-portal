@@ -19,16 +19,18 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
-import { useTrstClient } from '../../../hooks/useRPCClient'
+import { useTrstRpcClient } from '../../../hooks/useRPCClient'
 
 type UseRegisterAccountParams = {
   connectionId: string
+  counterpartyConnectionId: string
 }
 
 export const useRegisterAccount = ({
   connectionId,
+  counterpartyConnectionId,
 }: UseRegisterAccountParams) => {
-  const rpcClient = useTrstClient()
+  const rpcClient = useTrstRpcClient()
   const { client, address, status } = useRecoilValue(walletState)
   const setTransactionState = useSetRecoilState(transactionStatusState)
   const [_, popConfetti] = useRecoilState(particleState)
@@ -45,13 +47,14 @@ export const useRegisterAccount = ({
         throw new Error('Please connect your wallet.')
       }
 
-      /*   if (connectionId == undefined) {
-                  throw new Error('connection id not found')
-              } */
+      if (rpcClient.trst == undefined) {
+        throw new Error('client')
+      }
 
       await executeRegisterAccount({
         owner: address,
         connectionId,
+        counterpartyConnectionId,
         client,
       })
       toast.custom((t) => (

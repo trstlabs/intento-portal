@@ -1,1 +1,0 @@
-export { TokenSendModule } from './components'

@@ -59,7 +59,7 @@ export const AssetSelector = ({
         <StyledDivForTokenContent>
           <ImageForTokenLogo
             size="big"
-            logoURI={assetInfo.logoURI}
+            logoURI={assetInfo.logo_uri}
             alt={activeTokenSymbol}
           />
           <div>

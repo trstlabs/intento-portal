@@ -2,6 +2,8 @@ import { QueryClient, setupAuthzExtension } from '@cosmjs/stargate'
 
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { Grant } from "cosmjs-types/cosmos/authz/v1beta1/authz";
+// import { QueryGrantsResponse } from 'trustlessjs/dist/codegen/cosmos/authz/v1beta1/query';
+import { QueryInterchainAccountFromAddressResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query';
 
 
 export interface ICAQueryInput {
@@ -18,7 +20,7 @@ export const getICA = async ({
    
 
     try {
-        const response = await rpcClient.trst.autoibctx.v1beta1.interchainAccountFromAddress({ owner, connectionId })
+        const response: QueryInterchainAccountFromAddressResponse = await rpcClient.trst.autoibctx.v1beta1.interchainAccountFromAddress({ owner, connectionId })
         return response.interchainAccountAddress
     } catch (e) {
         if (e.message.includes("account found")) {

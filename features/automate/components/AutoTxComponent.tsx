@@ -47,7 +47,9 @@ export const AutoTxComponent = ({
   const [prefix, setPrefix] = useState('trust')
   const [denom, setDenom] = useState('utrst')
   const [chainName, setChainName] = useState('')
+  const [counterpartyConnectionId, setCounterpartyConnectionId] = useState('')
   const [chainSymbol, setChainSymbol] = useState('TRST')
+  const [chainId, setChainId] = useState('TRST')
   const [showWarning, hideWarning] = useState(true)
   const [isJsonValid, setIsJsonValid] = useState(true)
 
@@ -74,7 +76,7 @@ export const AutoTxComponent = ({
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
     useSubmitAutoTx({ autoTxData })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
-    useRegisterAccount({ connectionId: autoTxData.connectionId })
+    useRegisterAccount({ connectionId: autoTxData.connectionId, counterpartyConnectionId })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -110,7 +112,7 @@ export const AutoTxComponent = ({
   }
 
   //////////////////////////////////////// ICA funds \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol, {
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol, chainId, {
     onError(error) {
       console.log(error)
     },
@@ -215,7 +217,9 @@ export const AutoTxComponent = ({
   }
 
   function handleChainChange(
+    chainId: string,
     connectionId: string,
+    counterpartyConnectionId: string,
     newPrefix: string,
     newDenom: string,
     name: string,
@@ -239,7 +243,9 @@ export const AutoTxComponent = ({
     onAutoTxChange(newAutoTx)
     setDenom(newDenom)
     setChainName(name)
+    setCounterpartyConnectionId(counterpartyConnectionId)
     setChainSymbol(chainSymbol)
+    setChainId(chainId)
     setPrefix(newPrefix)
     connectExternalWallet(null)
     refetchICA()
@@ -310,7 +316,9 @@ export const AutoTxComponent = ({
                 connectionId={autoTxData.connectionId}
                 onChange={(update) => {
                   handleChainChange(
-                    update.connection,
+                    update.chain_id,
+                    update.connection_id,
+                    update.counterparty_connection_id,
                     update.prefix,
                     update.denom,
                     update.name,

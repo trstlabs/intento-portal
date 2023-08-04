@@ -52,7 +52,7 @@ export default function Home() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="View chain info and manage your on-chain triggers"
+      subtitle="View and manage your Intent-Centric Triggers"
     />
   )
 
@@ -92,7 +92,7 @@ export default function Home() {
           </Text>
         </Inline>
       </Column>)}
-      <Text variant="title" css={{ paddingLeft:'$2', padding: '$8' }} ><Tooltip label="Trustless Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub " ><span>Trustless Triggers</span></Tooltip></Text>
+      <Text variant="title" css={{ paddingLeft:'$2', padding: '$8' }} ><Tooltip label="Intent-Centric Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub " ><span>Intent-Centric Triggers</span></Tooltip></Text>
       {shouldRenderAutoTxs && (
         <>
           {Boolean(myAutoTxs?.length) && (

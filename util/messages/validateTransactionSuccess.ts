@@ -1,6 +1,6 @@
-import { Tx } from 'trustlessjs'
+import { DeliverTxResponse } from '@cosmjs/stargate'
 
-export function validateTransactionSuccess(result: Tx) {
+export function validateTransactionSuccess(result: DeliverTxResponse) {
   if (result.code != 0) {
     console.log(result)
     throw new Error(

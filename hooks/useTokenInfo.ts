@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 
 
-import { TokenInfo } from '../queries/usePoolsListQuery'
+import { TokenInfo } from '../types/trstTypes'
 import { useTokenList } from './useTokenList'
 
 /* token selector functions */

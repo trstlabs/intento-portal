@@ -1,6 +1,7 @@
 import { useQuery } from 'react-query'
 
-import { TokenInfo, usePoolsListQuery } from '../queries/usePoolsListQuery'
+import { usePoolsListQuery } from '../queries/usePoolsListQuery'
+import { TokenInfo } from '../types/trstTypes'
 
 export type TokenList = {
   base_token: TokenInfo
@@ -9,7 +10,7 @@ export type TokenList = {
 }
 
 export const useTokenList = () => {
-  const { data: poolsListResponse } = usePoolsListQuery()
+   const { data: poolsListResponse } = usePoolsListQuery()
 
   /* generate token list off pool list and store it in cache */
   const { data } = useQuery<TokenList>(

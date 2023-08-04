@@ -98,6 +98,7 @@ export const RecipientList = ({
           sendMsg.value.sender = address
           sendMsg.value.receiver = recipient.recipient
           sendMsg.value.sourceChannel = recipient.channelID
+          sendMsg.value.timeoutTimestamp = Math.floor(new Date().getTime() + 60*1000).toString()
         } else {
           sendMsg = sendObject;
           sendMsg.value.fromAddress = address
@@ -295,7 +296,7 @@ export const RecipientList = ({
               {(recipient.amount != "0") && (<div>
                 <Row>Recipient {index + 1}: </Row> <i>{recipient.recipient}</i>
                 <Row>Amount {recipient.amount} <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
-                  logoURI={ibcAsset.logoURI}
+                  logoURI={ibcAsset.logo_uri}
                   size="medium"
                   alt={ibcAsset.symbol}
                   loading="lazy"

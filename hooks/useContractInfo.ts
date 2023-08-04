@@ -2,12 +2,12 @@ export {}
 // import { useQuery } from 'react-query'
 // import { getContractInfo, getContractInfos } from '../services/contracts'
 // import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-// import { useTrstClient } from './useRPCClient'
+// import { useTrstRpcClient } from './useRPCClient'
 
 
 
 // export const useContractInfo = (contract) => {
-//     const client = useTrstClient()
+//     const client = useTrstRpcClient()
 //     const { data, isLoading } = useQuery(
 //         ['contract', contract],
 //         async () => {
@@ -28,7 +28,7 @@ export {}
 
 
 // export const useContractInfos = (codeId: number) => {
-//     const client = useTrstClient()
+//     const client = useTrstRpcClient()
 //     const { data, isLoading } = useQuery(
 //         ['codeId', codeId],
 //         async () => {
@@ -52,7 +52,7 @@ export {}
 
 
 // export const useContractInfosMulti = (codeIds: Array<number>) => {
-//     const client = useTrstClient()
+//     const client = useTrstRpcClient()
 
 //     const { data, isLoading } = useQuery(
 //         ['codeIds', codeIds],

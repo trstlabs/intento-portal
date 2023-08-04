@@ -7,7 +7,7 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 import { cosmos } from 'trustlessjs'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 
-import { useTrstClient, useCosmosClient } from './useRPCClient'
+import { useTrstRpcClient, useCosmosRpcClient } from './useRPCClient'
 import {
   getStakeBalanceForAcc,
   getAPR,
@@ -49,6 +49,22 @@ export const useChainInfo = () => {
   return [data, isLoading] as const
 }
 
+export const useIBCChainInfo = (chainId: string) => {
+  const { data, isLoading } = useQuery<ChainInfo>(
+    '@chain-info',
+    async () => {
+      const response = await fetch('/chain_info.local' + chainId + '.json')
+      return await response.json()
+    },
+    {
+      onError(e) {
+        console.error('Error loading chain info:', e)
+      },
+    }
+  )
+  return [data, isLoading] as const
+}
+
 export const useGetExpectedAutoTxFee = (
   durationSeconds: number,
   autoTxData: AutoTxData,
@@ -58,24 +74,30 @@ export const useGetExpectedAutoTxFee = (
   const [triggerModuleParams, setTriggerModuleData] = useRecoilState(
     triggerModuleParamsAtom
   )
-  const client = useTrstClient()
+  const client = useTrstRpcClient()
 
   const { data, isLoading } = useQuery(
     'expectedAutoTxFee',
     async () => {
-      const triggerModuleParams = getAutoTxParams(client)
+      const triggerModuleParams = await getAutoTxParams(client)
+      setTriggerModuleData(triggerModuleParams)
+      console.log(triggerModuleParams)
       const fee = getExpectedAutoTxFee(
         triggerModuleParams,
         durationSeconds,
         autoTxData.msgs.length,
         intervalSeconds
       )
-      setTriggerModuleData(triggerModuleParams)
+
       return fee
     },
     {
       enabled: Boolean(
-        client && durationSeconds && autoTxData.msgs && isDialogShowing
+        client &&
+          client.trst &&
+          durationSeconds &&
+          autoTxData.msgs &&
+          isDialogShowing
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
@@ -91,7 +113,7 @@ export const useGetExpectedAutoTxFee = (
 }
 
 export const useGetAllValidators = () => {
-  const client = useCosmosClient()
+  const client = useCosmosRpcClient()
 
   const { data, isLoading } = useQuery(
     'getAllValidators',
@@ -100,7 +122,7 @@ export const useGetAllValidators = () => {
         status: cosmos.staking.v1beta1.bondStatusToJSON(
           cosmos.staking.v1beta1.BondStatus.BOND_STATUS_BONDED
         ),
-        pagination: null,
+        pagination: undefined,
       })
     },
     {
@@ -116,9 +138,9 @@ export const useGetAllValidators = () => {
 
 export const useGetStakeBalanceForAcc = () => {
   const { address, status } = useRecoilValue(walletState)
-  const client = useTrstClient()
+  const client = useTrstRpcClient()
   const { data, isLoading } = useQuery(
-    'useGetStakeBalanceForAcc',
+    'getStakeBalanceForAcc',
     async () => {
       const resp = await getStakeBalanceForAcc({ address, client })
       resp.stakingBalanceAmount = convertMicroDenomToDenom(
@@ -142,13 +164,14 @@ export const useGetStakeBalanceForAcc = () => {
 }
 
 export const useGetAPR = () => {
-  const client = useCosmosClient()
+  const cosmosClient = useCosmosRpcClient()
+  const { client } = useRecoilValue(walletState)
   const paramsState = useRecoilValue(paramsStateAtom)
 
   const { data, isLoading } = useQuery(
-    'useGetAPR',
+    'getAPR',
     async () => {
-      const resp = await getAPR(client, paramsState)
+      const resp = await getAPR(cosmosClient, client, paramsState)
       return resp
     },
     {
@@ -163,14 +186,15 @@ export const useGetAPR = () => {
 }
 
 export const useSetModuleParams = () => {
-  const trstClient = useTrstClient()
-  const cosmosClient = useCosmosClient()
+  const trstClient = useTrstRpcClient()
+  const cosmosClient = useCosmosRpcClient()
   const [paramsState, setParamsState] = useRecoilState(paramsStateAtom)
 
   const { data, isLoading } = useQuery(
-    'useGetAPR',
+    'getModuleParams',
     async () => {
       const resp = await getModuleParams(cosmosClient, trstClient)
+
       setParamsState(resp)
     },
     {
@@ -197,16 +221,21 @@ export const useGetAPYForWithFees = (
     triggerModuleParamsAtom
   )
   const paramsState = useRecoilValue(paramsStateAtom)
-  const client = useTrstClient()
+  const cosmosClient = useCosmosRpcClient()
+  const trstClient = useTrstRpcClient()
+  const { client } = useRecoilValue(walletState)
 
   const { data, isLoading } = useQuery(
-    'useGetAPYForCompound',
+    'useGetAPYForWithFees',
     async () => {
-      const triggerModuleParams = await getAutoTxParams(client)
+      const triggerModuleParams = await getAutoTxParams(trstClient)
+      console.log('triggerModuleParams', triggerModuleParams)
       setTriggerModuleData(triggerModuleParams)
+
       return getAPYForAutoCompound(
         triggerModuleParams,
         paramsState,
+        cosmosClient,
         client,
         duration,
         interval,
@@ -215,7 +244,7 @@ export const useGetAPYForWithFees = (
       )
     },
     {
-      enabled: Boolean(client && paramsState),
+      enabled: Boolean(client && cosmosClient && trstClient && paramsState),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -231,12 +260,18 @@ export const useGetAPYForWithFees = (
 }
 
 export const useGetAPY = (intervalSeconds: number) => {
-  const client = useTrstClient()
+  const cosmosClient = useCosmosRpcClient()
+  const { client } = useRecoilValue(walletState)
   const paramsState = useRecoilValue(paramsStateAtom)
   const { data, isLoading } = useQuery(
     'useGetAPY',
     async () => {
-      const resp = await getAPY(client, paramsState, intervalSeconds)
+      const resp = await getAPY(
+        cosmosClient,
+        client,
+        paramsState,
+        intervalSeconds
+      )
       return resp
     },
     {

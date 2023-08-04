@@ -11,7 +11,6 @@ import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
 import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
 
-import { useTrstClient } from './useRPCClient'
 import { getBalanceForAcc } from '../services/chain-info'
 
 async function fetchTokenBalance({
@@ -154,13 +153,13 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
 }
 
 export const useGetBalanceForAcc = (address: string) => {
-  const client = useTrstClient()
+  const { client } = useRecoilValue(walletState)
 
   const { data, isLoading } = useQuery(
     ['address', address],
     async () => {
       const resp = await getBalanceForAcc({ address, client })
-      return convertMicroDenomToDenom(resp.balances[0].amount, 6)
+      return convertMicroDenomToDenom(resp[0].amount, 6)
     },
     {
       enabled: Boolean(client),

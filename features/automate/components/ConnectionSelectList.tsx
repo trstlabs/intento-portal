@@ -7,7 +7,7 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef } from 'react'
 
-import { TokenInfo } from '../../../queries/usePoolsListQuery'
+import { TokenInfo } from '../../../types/trstTypes'
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
 
 const StyledDivForScrollContainer = styled('div', {
@@ -19,7 +19,8 @@ const StyledDivForScrollContainer = styled('div', {
 export class IBCInfo {
   name: string;
   logoURI: string;
-  connection: string;
+  connectionId: string;
+  counterpartyConnectionId: string;
   prefix: string;
   denom: string;
   trstDenom: string;
@@ -31,7 +32,7 @@ export class IBCInfo {
 export type ConnectionSelectListProps = {
   activeConnection?: string
   //todo refactor
-  connectionList: Array<Pick<TokenInfo, 'connection_id' | 'chain_id' | 'symbol' | 'logoURI' | 'name' | 'prefix' | 'denom' | 'denom_on_trst' | 'id'>>
+  connectionList:  Array<Pick<TokenInfo, 'connection_id'| 'counterparty_connection_id' | 'chain_id' | 'symbol' | 'logo_uri' | 'name' | 'prefix' | 'denom' | 'denom_on_trst' | 'id'>>
   onSelect: (connectionInfo: IBCInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -50,14 +51,14 @@ export const ConnectionSelectList = ({
   //todo refactor
   function passIBCInfo(selectedInfo) {
     let selectedConnection = new IBCInfo();
-    selectedConnection.connection = selectedInfo.connection_id
+    selectedConnection.connectionId = selectedInfo.connection_id
+    selectedConnection.counterpartyConnectionId = selectedInfo.counterparty_connection_id
     selectedConnection.name = selectedInfo.id
     selectedConnection.logoURI = selectedInfo.logoURI
     selectedConnection.denom = selectedInfo.denom
     selectedConnection.symbol = selectedInfo.symbol
     selectedConnection.prefix = selectedInfo.prefix
-    selectedConnection.trstDenom = selectedInfo.denom_on_trst
-    console.log(selectedConnection)
+    selectedConnection.trstDenom = selectedInfo.denom_on_trst 
     return selectedConnection
   }
 
@@ -85,7 +86,7 @@ export const ConnectionSelectList = ({
             >
               <StyledDivForColumn kind="token">
                 <ImageForTokenLogo
-                  logoURI={chainInfo.logoURI}
+                  logoURI={chainInfo.logo_uri}
                   size="large"
                   alt={chainInfo.symbol}
                   loading="lazy"

@@ -14,10 +14,10 @@ export const getDuration = (seconds: number) => {
 
     return seconds + ' seconds';
 };
-export const getRelativeTime = (seconds: String) => {
+export const getRelativeTime = (miliseconds: number) => {
     /* parse the actual dates */
     const inPrefix = "In ";
-    const date = dayjs(Number(seconds) * 1000);
+    const date = dayjs(miliseconds);
 
     const now = dayjs();
 

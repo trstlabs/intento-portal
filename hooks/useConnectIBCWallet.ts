@@ -3,7 +3,7 @@ import {
   AminoTypes,
   createAuthzAminoConverters,
   createIbcAminoConverters,
-  defaultRegistryTypes as defaultTypes,
+  defaultRegistryTypes as defaultStargateTypes,
   GasPrice,
   SigningStargateClient,
 } from '@cosmjs/stargate'
@@ -13,18 +13,21 @@ import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { GAS_PRICE } from '../util/constants'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
-
-import { getTrstSigningClientOptions } from 'trustlessjs'
+import { registry } from 'trustlessjs/dist/codegen/cosmos/authz/v1beta1/tx.registry'
+import { Registry } from '@cosmjs/proto-signing'
+import { useIBCChainInfo } from './useChainInfo'
 
 /* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
   tokenSymbol: string,
+  chainId: string,
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
   const [{ status, tokenSymbol: storedTokenSymbol }, setWalletState] =
     useRecoilState(ibcWalletState)
 
   const assetInfo = useIBCAssetInfo(tokenSymbol || storedTokenSymbol)
+  const [chainInfo] = useIBCChainInfo(chainId)
 
   const mutation = useMutation(async () => {
     if (window && !window?.keplr) {
@@ -55,12 +58,14 @@ export const useConnectIBCWallet = (
     try {
       const { chain_id, rpc } = assetInfo
 
-      console.log(chain_id)
+      await window.keplr.experimentalSuggestChain(chainInfo)
+      await window.keplr.enable(chain_id)
 
-      const { registry, aminoTypes } = getTrstSigningClientOptions({
-        defaultTypes,
-      })
-
+      const customRegistry = new Registry([
+        ...defaultStargateTypes,
+        ...registry,
+      ])
+      // customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
       await window.keplr.enable(chain_id)
 
       const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
@@ -74,8 +79,14 @@ export const useConnectIBCWallet = (
            * passing ibc amino types for all the amino signers (eg ledger, wallet connect)
            * to enable ibc & wasm transactions
            * */
-          aminoTypes: aminoTypes,
-          registry: registry,
+          aminoTypes: new AminoTypes(
+            Object.assign(
+              createIbcAminoConverters(),
+              createAuthzAminoConverters()
+              //createWasmAminoConverters()
+            )
+          ),
+          registry: customRegistry,
         }
       )
 

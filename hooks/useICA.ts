@@ -9,7 +9,7 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
-import {  useTrstClient } from './useRPCClient'
+import {  useTrstRpcClient } from './useRPCClient'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
 
@@ -18,7 +18,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     accAddr = address
   }
 
-  const rpcClient = useTrstClient()
+  const rpcClient = useTrstRpcClient()
   const { data: ica, isLoading } = useQuery(
     [`interchainAccount/${connectionId}`, connectionId],
     async () => {

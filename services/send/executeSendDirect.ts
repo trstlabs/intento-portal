@@ -1,13 +1,13 @@
-import {
-  TrustlessChainClient, Coin, MsgTransfer, MsgSend,
-} from 'trustlessjs'
+import { ibc } from 'trustlessjs'
+import { cosmos } from 'trustlessjs'
+import { SigningStargateClient, StdFee } from '@cosmjs/stargate'
 import { validateTransactionSuccess } from '../../util/messages'
 
 type ExecuteSendDirectArgs = {
   denom: string
   senderAddress: string
   recipientInfos: RecipientInfo[]
-  client: TrustlessChainClient
+  client: SigningStargateClient
 }
 
 export const executeDirectSend = async ({
@@ -16,85 +16,83 @@ export const executeDirectSend = async ({
   recipientInfos,
   senderAddress,
 }: ExecuteSendDirectArgs): Promise<any> => {
-
   //if one direct
   if (!recipientInfos[1]) {
     console.log(recipientInfos[0])
     if (recipientInfos[0].channelID) {
-      return validateTransactionSuccess(await client.tx.ibc.transfer({
-        sourcePort: 'transfer',
-        sourceChannel: recipientInfos[0].channelID,
-        sender: senderAddress,
-        timeoutTimestampSec: (Math.floor(new Date().getTime() / 1000) + 600).toString(),
-        receiver: recipientInfos[0].recipient,
-        token: { denom, amount: recipientInfos[0].amount.toString() },
-      }, {
-        gasLimit: 120_000,
-        memo: recipientInfos[0].memo
-      },))
-    }
-    return validateTransactionSuccess(await client.tx.bank.send(
-      {
-        fromAddress: senderAddress,
-        toAddress: recipientInfos[0].recipient,
-        amount: [{ denom, amount: recipientInfos[0].amount.toString() }],
+      const transferMsg =
+        ibc.applications.transfer.v1.MessageComposer.withTypeUrl.transfer({
+          sourcePort: 'transfer',
+          sourceChannel: recipientInfos[0].channelID,
+          sender: senderAddress,
+          timeoutTimestamp: BigInt(
+            Math.floor(new Date().getTime() / 1000) + 600
+          ),
+          receiver: recipientInfos[0].recipient,
+          token: { denom, amount: recipientInfos[0].amount.toString() },
+          timeoutHeight: undefined,
+        })
 
-      },
-      {
-        gasLimit: 30_000,
-        memo: recipientInfos[0].memo
-      },
-    ))
+      return validateTransactionSuccess(
+        await client.signAndBroadcast(
+          senderAddress,
+          [transferMsg],
+          'auto',
+          recipientInfos[0].memo
+        )
+      )
+    }
+    return validateTransactionSuccess(
+      await client.sendTokens(
+        senderAddress,
+        recipientInfos[0].recipient,
+        [{ denom, amount: recipientInfos[0].amount.toString() }],
+        { gas: '30_000', amount: undefined } as StdFee,
+        recipientInfos[0].memo
+      )
+    )
   }
 
   //if multiple direct
   const msgs = []
-  recipientInfos.forEach(recipient => {
-
+  recipientInfos.forEach((recipient) => {
     if (recipient.channelID) {
-
-      const transferMsg = new MsgTransfer({
+      const transferMsg =
+        ibc.applications.transfer.v1.MessageComposer.withTypeUrl.transfer({
         sourcePort: 'transfer',
         sourceChannel: recipient.channelID,
         sender: senderAddress,
-        // timeoutTimestampSec: (Math.floor(new Date().getTime() / 1000) + 600).toString(),
+        timeoutTimestamp: BigInt(Math.floor(new Date().getTime() + 60*1000)),
+        timeoutHeight: undefined,
         receiver: recipient.recipient,
         token: { denom, amount: recipient.amount.toString() },
       })
       msgs.push(transferMsg)
       //return await client.tx.ibc.transfer(
-
     } else {
-      const sendMsg = new MsgSend({
+      const sendMsg = cosmos.bank.v1beta1.MessageComposer.withTypeUrl.send({
         fromAddress: senderAddress,
         toAddress: recipient.recipient,
         amount: [{ denom, amount: recipient.amount.toString() }],
       })
       msgs.push(sendMsg)
     }
-  }
-  )
-  return validateTransactionSuccess(await client.signAndBroadcast(msgs))
-
+  })
+  return validateTransactionSuccess(await client.signAndBroadcast(senderAddress, msgs, 'auto'))
 }
 
 
-/** Output models transaction outputs for MsgMultiSend. */
-export class Output {
-  address: string;
-  coins: Coin[];
-};
 
 export class RecipientInfo {
-  recipient: string;
-  amount: string | number;
-  channelID?: string;
-  memo: string;
+  recipient: string
+  amount: string | number
+  channelID?: string
+  memo: string
 }
 
 export class RecipientInfoDirect {
-  recipient: string;
-  amount: string | number;
-  channelID?: string;
-  memo: string;
+  recipient: string
+  amount: string | number
+  channelID?: string
+  memo: string
 }

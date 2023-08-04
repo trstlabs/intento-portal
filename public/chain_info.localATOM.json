@@ -1,0 +1,44 @@
+{
+  "chainId": "GAIA",
+  "chainName": "Gaia - Test",
+  "rpc": "http://gaia-rpc.trustlesshub.com/",
+  "rest": "http://gaia-api.trustlesshub.com/",
+  "stakeCurrency": {
+    "coinDenom": "ATOM",
+    "coinMinimalDenom": "uatom",
+    "coinDecimals": 6
+  },
+  "bip44": {
+    "coinType": 118
+  },
+  "bech32Config": {
+    "bech32PrefixAccAddr": "cosmos",
+    "bech32PrefixAccPub": "cosmospub",
+    "bech32PrefixValAddr": "cosmosvaloper",
+    "bech32PrefixValPub": "cosmosvaloperpub",
+    "bech32PrefixConsAddr": "cosmosvalcons",
+    "bech32PrefixConsPub": "cosmosvalconspub"
+  },
+  "currencies": [
+    {
+      "coinDenom": "ATOM",
+      "coinMinimalDenom": "uatom",
+      "coinDecimals": 6,
+      "coinGeckoId": "cosmos-hub"
+    }
+  ],
+  "feeCurrencies": [
+    {
+      "coinDenom": "ATOM",
+      "coinMinimalDenom": "uatom",
+      "coinDecimals": 6,
+      "coinGeckoId": "cosmos-hub"
+    }
+  ],
+  "coinType": 118,
+  "gasPriceStep": {
+    "low": 0.025,
+    "average": 0.05,
+    "high": 0.1
+  }
+}

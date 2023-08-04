@@ -24,7 +24,7 @@ export const SelectorToggle = ({
   availableAmount,
   tokenSymbol,
 }: SelectorToggleProps) => {
-  const { logoURI } = useIBCAssetInfo(tokenSymbol) || {}
+  const { logo_uri } = useIBCAssetInfo(tokenSymbol) || {}
 
   const formattedAvailableAmount = formatTokenBalance(availableAmount, {
     includeCommaSeparation: true,
@@ -51,7 +51,7 @@ export const SelectorToggle = ({
       )}
       {!isSelecting && hasTokenSelected && (
         <>
-          <ImageForTokenLogo logoURI={logoURI} size="big" alt={tokenSymbol} />
+          <ImageForTokenLogo logoURI={logo_uri} size="big" alt={tokenSymbol} />
           <div>
             <Text variant="body">{tokenSymbol}</Text>
             <Text variant="secondary">

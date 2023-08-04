@@ -1,28 +1,26 @@
 import { useQuery } from 'react-query'
-// import { useRecoilValue } from 'recoil'
-// import { getAutoTxInfo, getAutoTxInfos, /* getAutoTxInfosForOwner */ } from '../services/auto-ibc-tx'
-// import { walletState } from '../state/atoms/walletAtoms'
+
 import {
   DEFAULT_REFETCH_INTERVAL,
   AUTOTX_REFETCH_INTERVAL,
 } from '../util/constants'
-import { useTrstClient } from './useRPCClient'
+import { useTrstRpcClient } from './useRPCClient'
+import { QueryAutoTxsResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query'
 
 export const useAutoTxInfos = () => {
-  const client = useTrstClient()
+  const client = useTrstRpcClient()
 
   const { data, isLoading } = useQuery(
     'useAutoTxInfos',
     async () => {
-      const resp = await client.trst.autoibctx.v1beta1.autoTxs({
-        pagination: null,
-      }) //getAutoTxInfos(client)
-
-      console.log(resp)
-      return resp.autoTxInfos
+      const resp: QueryAutoTxsResponse =
+        await client.trst.autoibctx.v1beta1.autoTxs({
+          pagination: undefined,
+        })
+            return resp.autoTxInfos
     },
     {
-      enabled: Boolean(client),
+      enabled: Boolean(client && client.trst),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -33,16 +31,16 @@ export const useAutoTxInfos = () => {
 }
 
 export const useAutoTxInfo = (id) => {
-  const client = useTrstClient()
+  const client = useTrstRpcClient()
   const { data, isLoading } = useQuery(
     ['autoTxId', id],
     async () => {
-      const info = await client.trst.autoibctx.v1beta1.autoTx({ id }) //getAutoTxInfo(id, client)
+      const info = await client.trst.autoibctx.v1beta1.autoTx({ id })
       //console.log(info)
       return info.autoTxInfo
     },
     {
-      enabled: Boolean(id != '' || client),
+      enabled: Boolean(id != '' || (client && client.trst)),
       refetchOnMount: 'always',
       refetchInterval: AUTOTX_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,

@@ -11,7 +11,7 @@ export type IBCAssetInfo = {
   denom_on_trst: string
   channel_to_trst: string
   channel: string
-  logoURI: string
+  logo_uri: string
   connection_id?: string
   deposit_gas_fee?: number
   external_deposit_uri?: string
