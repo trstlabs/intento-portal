@@ -76,7 +76,10 @@ export const AutoTxComponent = ({
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
     useSubmitAutoTx({ autoTxData })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
-    useRegisterAccount({ connectionId: autoTxData.connectionId, counterpartyConnectionId })
+    useRegisterAccount({
+      connectionId: autoTxData.connectionId,
+      counterpartyConnectionId,
+    })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -112,11 +115,15 @@ export const AutoTxComponent = ({
   }
 
   //////////////////////////////////////// ICA funds \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainSymbol, chainId, {
-    onError(error) {
-      console.log(error)
-    },
-  })
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(
+    chainSymbol,
+    chainId,
+    {
+      onError(error) {
+        console.log(error)
+      },
+    }
+  )
 
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -180,9 +187,10 @@ export const AutoTxComponent = ({
     useState(false)
 
   const handleCreateAuthzGrantClick = (withFunds?: boolean) => {
-    setRequestedSendAndAuthzGrant(withFunds)
     connectExternalWallet(null)
-    return setRequestedCreateAuthzGrant(true)
+    return withFunds
+      ? setRequestedSendAndAuthzGrant(withFunds)
+      : setRequestedCreateAuthzGrant(true)
   }
   const shouldDisableAuthzGrantButton =
     autoTxData.msgs && autoTxData.msgs[0].length < 10
@@ -261,7 +269,6 @@ export const AutoTxComponent = ({
     //newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
 
     onAutoTxChange(newAutoTxData)
-    console.log('setExample')
   }
 
   function handleAddMsg() {
@@ -316,16 +323,15 @@ export const AutoTxComponent = ({
                 connectionId={autoTxData.connectionId}
                 onChange={(update) => {
                   handleChainChange(
-                    update.chain_id,
-                    update.connection_id,
-                    update.counterparty_connection_id,
+                    update.chainId,
+                    update.connectionId,
+                    update.counterpartyConnectionId,
                     update.prefix,
                     update.denom,
                     update.name,
                     update.symbol
                   )
                 }}
-                size={'large'}
               />{' '}
               {
                 /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
@@ -384,9 +390,7 @@ export const AutoTxComponent = ({
                       }
                       setFeeFundsHostChain={setFeeFundsHostChain}
                       handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                      handleCreateAuthzGrantClick={(withFunds) =>
-                        handleCreateAuthzGrantClick(withFunds)
-                      }
+                      handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
                     />
                   )}
                 </>
@@ -565,6 +569,7 @@ const ChipContainer = styled('div', {
   padding: '0.5em 0.75em',
   margin: '0.25em 0.4em',
   cursor: 'pointer',
+  border: '1px solid $colors$light95',
   '&:hover': {
     backgroundColor: '$colors$light60',
     border: '1px solid $borderColors$selected',

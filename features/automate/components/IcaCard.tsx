@@ -8,6 +8,8 @@ import {
   Text,
   Chevron,
   IconWrapper,
+  Divider,
+  useMedia,
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { Row, StyledInput } from './AutoTxComponent'
@@ -48,45 +50,51 @@ export const IcaCard = ({
   handleSendFundsOnHostClick,
   handleCreateAuthzGrantClick,
 }: IcaCardProps) => {
-  const [showICAInfo, hideICAInfo] = useState(true)
-
+  const [showICAInfo, setShowICAInfo] = useState(false)
+  const isMobile = useMedia('sm')
   return (
-    <Card variant="secondary" disabled css={{ padding: '$2' }}>
-      <CardContent css={{ margin: '$4 $3' }} size="medium">
-        <Inline justifyContent={'space-between'}>
-          <Text variant="body">Interchain Account </Text>
-
-          <Button
-            variant="ghost"
-            onClick={() => hideICAInfo((showICAInfo) => !showICAInfo)}
-          >
-            {' '}
-            {showICAInfo ? (
-              <IconWrapper
-                size="medium"
-                rotation="90deg"
-                color="tertiary"
-                icon={<Chevron />}
-              />
-            ) : (
-              <IconWrapper
-                size="medium"
-                rotation="-90deg"
-                color="tertiary"
-                icon={<Chevron />}
-              />
-            )}
-          </Button>
-        </Inline>
-      </CardContent>
+    <>
+      <Button
+        variant="ghost"
+        css={{ margin: '$2 $1' }}
+        size="medium"
+        onClick={() => setShowICAInfo((showICAInfo) => !showICAInfo)}
+        iconRight={
+          showICAInfo ? (
+            <IconWrapper
+              size="medium"
+              rotation="90deg"
+              color="tertiary"
+              icon={<Chevron />}
+            />
+          ) : (
+            <IconWrapper
+              size="medium"
+              rotation="-90deg"
+              color="tertiary"
+              icon={<Chevron />}
+            />
+          )
+        }
+      >
+      
+        <Text variant="body"> { showICAInfo ? ( <span >Hide</span>):(
+        <span>View</span>)}{' '}Interchain Account Details </Text>
+      </Button>
 
       {showICAInfo && (
-        <CardContent>
+        <>
+          <Divider offsetY="$4" />
           <Text variant="legend"> Address </Text>
-          <Text css={{ padding: '$4' }} variant="caption">
-            {' '}
-            {icaAddress}
-          </Text>
+          {isMobile ? (
+            <Text wrap={true} css={{ padding: '$4' }} variant="caption">
+              {icaAddress.substring(0, 33) + '..'}
+            </Text>
+          ) : (
+            <Text wrap={true} css={{ padding: '$4' }} variant="caption">
+              {icaAddress}
+            </Text>
+          )}
           {!isIcaBalanceLoading && (
             <>
               {' '}
@@ -204,8 +212,8 @@ export const IcaCard = ({
               </Row>
             </>
           )}
-        </CardContent>
+        </>
       )}
-    </Card>
+    </>
   )
 }

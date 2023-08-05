@@ -12,11 +12,10 @@ import { getPropsForInteractiveElement } from '../../../util/getPropsForInteract
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
-  border: '2px solid $borderColors$default',
-  borderRadius: '4px',
 })
 
 export class IBCInfo {
+  chainId: string;
   name: string;
   logoURI: string;
   connectionId: string;
@@ -46,15 +45,14 @@ export const ConnectionSelectList = ({
   visibleNumberOfTokensInViewport = 2.5,
   ...props
 }: ConnectionSelectListProps) => {
-
-
-  //todo refactor
   function passIBCInfo(selectedInfo) {
+    console.log("selectedInfo", selectedInfo)
     let selectedConnection = new IBCInfo();
     selectedConnection.connectionId = selectedInfo.connection_id
+    selectedConnection.chainId = selectedInfo.chain_id
     selectedConnection.counterpartyConnectionId = selectedInfo.counterparty_connection_id
     selectedConnection.name = selectedInfo.id
-    selectedConnection.logoURI = selectedInfo.logoURI
+    selectedConnection.logoURI = selectedInfo.logo_uri
     selectedConnection.denom = selectedInfo.denom
     selectedConnection.symbol = selectedInfo.symbol
     selectedConnection.prefix = selectedInfo.prefix
@@ -67,7 +65,7 @@ export const ConnectionSelectList = ({
       <StyledDivForScrollContainer
         {...props}
         css={{
-          height: `${visibleNumberOfTokensInViewport * 2.5}rem`,
+          flex: 1,
           ...(props.css ? props.css : {}),
         }}
       >
@@ -80,6 +78,7 @@ export const ConnectionSelectList = ({
               selected={chainInfo.connection_id === activeConnection}
               {...getPropsForInteractiveElement({
                 onClick() {
+                  console.log("click")
                   onSelect(passIBCInfo(chainInfo))
                 },
               })}
@@ -117,7 +116,6 @@ const StyledButtonForRow = styled(ButtonForWrapper, {
   '&:last-child': {
     marginBottom: 0,
   },
-  //border: '2px solid $borderColors$default',
 })
 
 const StyledDivForColumn = styled('div', {

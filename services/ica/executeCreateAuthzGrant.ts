@@ -23,11 +23,11 @@ export const executeCreateAuthzGrant = async ({
   expirationDurationMs,
   coin,
 }: ExecuteCreateAuthzGrantArgs): Promise<any> => {
-  let expireAt = ((Date.now() + 31556926000) / 1000).toFixed() //31556926000=1year in ms
-  if (expirationDurationMs != undefined) {
-    expireAt = ((Date.now() + expirationDurationMs) / 1000).toFixed()
-  }
-
+  // let expireAt = ((Date.now() + 31556926000) / 1000).toFixed() //31556926000=1year in ms
+  // if (expirationDurationMs != undefined) {
+  //   expireAt = ((Date.now() + expirationDurationMs) / 1000).toFixed()
+  // }
+  console.log(expirationDurationMs)
   const msgObjects = []
   for (let msg of msgs) {
     let msgAuthzGrant = MsgGrant.fromPartial({
@@ -40,18 +40,19 @@ export const executeCreateAuthzGrant = async ({
             msg: JSON.parse(msg)['typeUrl'].toString(),
           }).finish(),
         },
-        expiration: { seconds: expireAt.toString() },
+        //expiration: { seconds: undefined },
       },
     })
     const MsgGrantAllowanceObject = {
       typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
       value: msgAuthzGrant,
     }
+    console.log(msgAuthzGrant)
     console.log(MsgGrantAllowanceObject)
     msgObjects.push(MsgGrantAllowanceObject)
   }
 
-  console.log(client)
+
 
   if (coin) {
     let sendMsg = MsgSend.fromPartial({

@@ -76,8 +76,8 @@ const StyledDivForSelector = styled(ButtonForWrapper, {
   transition: 'background-color .1s ease-out',
   userSelect: 'none',
   whiteSpace: 'pre',
-  marginTop: '$12',
-  marginBottom: '$12',
+  marginTop: '$4',
+  marginBottom: '$4',
   variants: {
     state: {
       selected: {

@@ -28,7 +28,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 
     },
     {
-      enabled: Boolean(connectionId != "" && connectionId != undefined && rpcClient),
+      enabled: Boolean(connectionId != "" && connectionId != undefined && rpcClient && rpcClient.trst),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,

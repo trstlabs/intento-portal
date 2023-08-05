@@ -34,8 +34,6 @@ export const useCreateAuthzGrant = ({
 }: UseCreateAuthzGrantParams) => {
   const { address, client, status } = useRecoilValue(ibcWalletState)
 
-  /*   const { address, client, status } =
-        useRecoilValue(walletState)*/
   const setTransactionState = useSetRecoilState(transactionStatusState)
 
   const refetchQueries = useRefetchQueries(['tokenBalance', 'userAuthZGrants'])
@@ -49,7 +47,7 @@ export const useCreateAuthzGrant = ({
       if (coin.amount == '0') {
         coin = undefined
       }
-
+      console.log(client)
       return await executeCreateAuthzGrant({
         client,
         grantee,

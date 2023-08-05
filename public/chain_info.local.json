@@ -39,7 +39,5 @@
         "high": 0.1
       }
     }
-  ],
-  "coinType": 118,
-  "features": ["cosmwasm"]
+  ]
 }
