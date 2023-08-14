@@ -1,36 +1,33 @@
-import { useChainInfo } from './useChainInfo'
-import { trst } from 'trustlessjs'
-import { cosmos } from 'trustlessjs'
+import { trst, cosmos, tendermint } from 'trustlessjs'
+
 import { useQuery } from 'react-query'
 
+import { StargateClient } from '@cosmjs/stargate'
 
 export const useTrstRpcClient = () => {
-  const [chainInfo] = useChainInfo()
-
   const { data } = useQuery(
     '@trst-querier',
     async () => {
+      console.log("useTrstRpcClient")
       return trst.ClientFactory.createRPCQueryClient({
-        rpcEndpoint: chainInfo.rpc,
+        rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
       })
     },
-    { enabled: Boolean(chainInfo?.rpc) }
+    { enabled: true}
   )
 
   return data
 }
 
 export const useCosmosRpcClient = () => {
-  const [chainInfo] = useChainInfo()
-
   const { data } = useQuery(
     '@cosmos-querier',
     () => {
       return cosmos.ClientFactory.createRPCQueryClient({
-        rpcEndpoint: chainInfo.rpc,
+       rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
       })
     },
-    { enabled: Boolean(chainInfo?.rpc) }
+    { enabled: cosmos != undefined}
   )
 
   return data
@@ -38,18 +35,17 @@ export const useCosmosRpcClient = () => {
 
 
 
-// export const useCosmosRpcClient = () => {
-//   const [chainInfo] = useChainInfo()
+export const useTMRpcClient = () => {
+  const { data } = useQuery(
+    '@client-querier',
+    () => {
+      return StargateClient.connect(
+       process.env.NEXT_PUBLIC_TRST_RPC,
+      )
+    },
+    { enabled: tendermint != undefined}
+  )
 
-//   const { data } = useQuery(
-//     '@cosmos-querier',
-//     () => {
-//       return tendermint.abci..ClientFactory.createRPCQueryClient({
-//         rpcEndpoint: chainInfo.rpc,
-//       })
-//     },
-//     { enabled: Boolean(chainInfo?.rpc) }
-//   )
+  return data
+}
 
-//   return data
-// }

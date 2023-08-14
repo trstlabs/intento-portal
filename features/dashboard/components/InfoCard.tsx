@@ -24,11 +24,11 @@ import {
   useGetAPYForWithFees,
   useGetAPY,
   useGetStakeBalanceForAcc,
+  useSetModuleParams,
 } from '../../../hooks/useChainInfo'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useRecoilValue } from 'recoil'
 import {
-  paramsStateAtom,
   triggerModuleParamsAtom,
 } from '../../../state/atoms/moduleParamsAtoms'
 import IssuanceChart from './Chart'
@@ -39,7 +39,7 @@ type InfoCardProps = {
 }
 
 export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
-  const params = useRecoilValue(paramsStateAtom)
+  const [params, _] = useSetModuleParams()
   const triggerParams = useRecoilValue(triggerModuleParamsAtom)
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   let data = new AutoTxData()
@@ -347,7 +347,6 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
           handleSubmitAutoTx={(autoTxData) =>
             handleSubmitAutoTxButtonClick(autoTxData)
           }
-
         />
       </StyledDivForInfoGrid>
     </StyledDivForContainer>

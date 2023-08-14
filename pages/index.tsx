@@ -14,23 +14,17 @@ import {
   Spinner,
   styled,
   Text,
-  Button,
   Tooltip,
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
-
 import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
-// import Contracts from './index_contracts'
-import { useSetModuleParams } from '../hooks/useChainInfo'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
-  const { isWalletConnected, connect, address } = useChain('trustlesshub')
-
-  // const { address, key } = useRecoilValue(walletState)
+  const { /* isWalletConnected, connect, */ address } = useChain('trustlesshub')
   const [autoTxs, isLoading] = useAutoTxInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
@@ -45,7 +39,7 @@ export default function Home() {
       [sortParameter, sortDirection]
     ),
   })
-  useSetModuleParams()
+
   const shouldShowAutoCompound =
     !myAutoTxs?.length ||
     myAutoTxs.find((tx) => tx.label === 'Autocompound') == undefined
@@ -62,7 +56,7 @@ export default function Home() {
   return (
     <AppLayout>
       {pageHeaderContents}
-      {!isWalletConnected && (
+      {/* {!isWalletConnected && (
         <Button
           onClick={async () => {
             await connect()
@@ -70,7 +64,7 @@ export default function Home() {
         >
           Connect Wallet
         </Button>
-      )}
+      )} */}
       {shouldShowFetchingState && (
         <>
           <Column

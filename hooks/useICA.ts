@@ -102,7 +102,8 @@ export const useAuthZGrantsForUser = (
     ['userAuthZGrants', grantee],
     async () => {
       let grants: GrantResponse[] = []
-      const { rpc } = ibcAsset
+     const { symbol } = ibcAsset
+      const rpc = process.env[`NEXT_PUBLIC_${symbol}_RPC`];
       const ganteeGrants = await getAuthZGrantsForGrantee({
         grantee,
         granter: ibcState.address,

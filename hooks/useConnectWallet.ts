@@ -4,7 +4,6 @@ import { useRecoilState } from 'recoil'
 
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
-import { useChainInfo } from './useChainInfo'
 import { useChain } from '@cosmos-kit/react'
 
 export const useAfterConnectWallet = (
@@ -18,8 +17,6 @@ export const useAfterConnectWallet = (
   } = useChain('trustlesshub')
 
   const [{ status }, setWalletState] = useRecoilState(walletState)
-
-  const [chainInfo] = useChainInfo()
 
   const mutation = useMutation(async () => {
     /* set the fetching state */
@@ -60,12 +57,12 @@ export const useAfterConnectWallet = (
   useEffect(
     function restoreWalletConnectionIfHadBeenConnectedBefore() {
       /* restore wallet connection if the state has been set with the */
-      if (chainInfo?.rpc && status === WalletStatusType.restored) {
+      if (process.env.NEXT_PUBLIC_TRST_RPC && status === WalletStatusType.restored) {
         connect()
         mutation.mutate(null)
       }
     }, // eslint-disable-next-line
-    [status, chainInfo?.rpc]
+    [status, process.env.NEXT_PUBLIC_TRST_RPC]
   )
 
   useEffect(

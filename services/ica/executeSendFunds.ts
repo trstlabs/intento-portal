@@ -15,5 +15,5 @@ export const executeSendFunds = async ({
   fromAddress,
   coin,
 }: ExecuteSendFundsArgs): Promise<any> => {
-  return await client.sendTokens(fromAddress, toAddress, [coin], 'auto')
+  return await client.sendTokens(fromAddress, toAddress, [coin], {amount: [], gas: "100000"})
 }

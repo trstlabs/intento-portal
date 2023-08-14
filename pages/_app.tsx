@@ -137,7 +137,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
         apis: {
           rpc: [
             {
-              address: 'http://trst-rpc.trustlesshub.com',
+              address: process.env.NEXT_PUBLIC_TRST_RPC,
               provider: 'trsttest',
             },
           ],
@@ -173,7 +173,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
         let chain = chainList.find((i) => i.chain_name == asset.registry_name)
 
         // console.log(chain)
-        chain.apis.rpc = [{ address: asset.rpc, provider: 'trsttest' }]
+        chain.apis.rpc = [{ address: process.env[`NEXT_PUBLIC_${asset.symbol}_RPC`], provider: 'trsttest' }]
         chain.fees = {
           fee_tokens: [
             {
@@ -288,18 +288,18 @@ function TrstApp({ Component, pageProps }: AppProps) {
                   endpoints: {
                     trustlesshub: {
                       isLazy: true,
-                      rpc: ['http://trst-rpc.trustlesshub.com'],
-                      rest: ['http://trst-api.trustlesshub.com'],
+                      rpc: [process.env.NEXT_PUBLIC_TRST_RPC],
+                      rest: [process.env.NEXT_PUBLIC_TRST_API],
                     },
                     cosmoshub: {
                       isLazy: true,
-                      rpc: ['http://gaia-rpc.trustlesshub.com'],
-                      rest: ['http://gaia-api.trustlesshub.com'],
+                      rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
+                      rest: [process.env.NEXT_PUBLIC_ATOM_API],
                     },
                     osmosis: {
                       isLazy: true,
-                      rpc: ['http://osmosis-rpc.trustlesshub.com'],
-                      rest: ['http://osmosis-api.trustlesshub.com'],
+                      rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
+                      rest: [process.env.NEXT_PUBLIC_OSMO_API],
                     },
                   },
                 }}

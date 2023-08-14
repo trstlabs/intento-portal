@@ -7,7 +7,7 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 import { cosmos } from 'trustlessjs'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 
-import { useTrstRpcClient, useCosmosRpcClient } from './useRPCClient'
+import { useTrstRpcClient, useCosmosRpcClient, useTMRpcClient } from './useRPCClient'
 import {
   getStakeBalanceForAcc,
   getAPR,
@@ -32,22 +32,6 @@ export const unsafelyReadChainInfoCache = () =>
   queryClient.getQueryCache().find(chainInfoQueryKey)?.state?.data as
     | ChainInfo
     | undefined
-
-export const useChainInfo = () => {
-  const { data, isLoading } = useQuery<ChainInfo>(
-    '@chain-info',
-    async () => {
-      const response = await fetch(process.env.NEXT_PUBLIC_CHAIN_INFO_URL)
-      return await response.json()
-    },
-    {
-      onError(e) {
-        console.error('Error loading chain info:', e)
-      },
-    }
-  )
-  return [data, isLoading] as const
-}
 
 export const useIBCChainInfo = (chainId: string) => {
   const { data, isLoading } = useQuery<ChainInfo>(
@@ -165,13 +149,15 @@ export const useGetStakeBalanceForAcc = () => {
 
 export const useGetAPR = () => {
   const cosmosClient = useCosmosRpcClient()
-  const { client } = useRecoilValue(walletState)
+  const client = useTMRpcClient()
   const paramsState = useRecoilValue(paramsStateAtom)
 
   const { data, isLoading } = useQuery(
     'getAPR',
     async () => {
+      console.log("useGetAPR", useGetAPR)
       const resp = await getAPR(cosmosClient, client, paramsState)
+      console.log("APR", resp)
       return resp
     },
     {
@@ -194,12 +180,14 @@ export const useSetModuleParams = () => {
     'getModuleParams',
     async () => {
       const resp = await getModuleParams(cosmosClient, trstClient)
-
+      console.log("MODULE", resp)
       setParamsState(resp)
+      return resp
     },
     {
       enabled: Boolean(cosmosClient && trstClient),
-      refetchIntervalInBackground: false,
+      refetchIntervalInBackground: true,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchOnMount: 'always',
     }
   )

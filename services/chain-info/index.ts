@@ -1,6 +1,6 @@
 import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
 import { convertMicroDenomToDenom } from 'junoblocks'
-import { SigningStargateClient } from '@cosmjs/stargate'
+import { StargateClient } from '@cosmjs/stargate'
 
 import { Params } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 import { Params as DistrModuleParams } from 'trustlessjs/dist/codegen/cosmos/distribution/v1beta1/distribution'
@@ -71,7 +71,7 @@ export const getStakeBalanceForAcc = async ({
 
 export const getAPR = async (
   cosmosClient: any,
-  client: SigningStargateClient,
+  client: StargateClient,
   moduleState: ParamsState
 ) => {
   try {
@@ -89,7 +89,7 @@ export const getAPR = async (
 
     const yearlyStakingProvision =
       moduleState.stakingProvision * annualProvisionNumber
-
+    console.log("yearlyStakingProvision", yearlyStakingProvision)
     return blockInfoAndCalculateApr(
       yearlyStakingProvision,
       bondedTokens,
@@ -156,7 +156,7 @@ export const getAPRForAcc = async (client: any) => {
  */
 export const getAPY = async (
   cosmosClient: any,
-  client: SigningStargateClient,
+  client: StargateClient,
   paramsState: ParamsState,
   intervalSeconds: number
 ) => {
@@ -181,7 +181,7 @@ export const getAPYForAutoCompound = async (
   triggerParams: Params,
   paramsState: ParamsState,
   cosmosClient: any,
-  client: SigningStargateClient,
+  client: StargateClient,
   durationSeconds: number,
   intervalSeconds: number,
   stakingBalanceAmount: number,
@@ -255,7 +255,7 @@ type BlockParams = {
   currentBlockHeight: number
 }
 
-async function getBlockParams(client: SigningStargateClient) {
+async function getBlockParams(client: StargateClient) {
   try {
     const height = await client.getHeight()
     const currentBlock = await client.getBlock(height)
