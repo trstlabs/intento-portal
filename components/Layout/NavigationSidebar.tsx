@@ -57,6 +57,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       address: '',
       key: null,
       client: null,
+      rpc: '',
     })
   }
 

@@ -42,8 +42,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
       enabled: Boolean(
         connectionId != '' &&
           connectionId != undefined &&
-          rpcClient &&
-          rpcClient.trst
+          rpcClient
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
@@ -59,16 +58,18 @@ export const useICATokenBalance = (
   nativeWalletAddress: string
 ) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
+  const ibcState = useRecoilValue(ibcWalletState)
   const { data, isLoading } = useQuery(
     [`icaTokenBalance/${tokenSymbol}`, nativeWalletAddress],
     async () => {
-      const { denom, decimals, chain_id, rpc } = ibcAsset
+     
+      const { denom, decimals } = ibcAsset
 
-      await window.keplr.enable(chain_id)
+      //await window.keplr.enable(chain_id)
       //const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
 
       const chainClient = await SigningStargateClient.connect(
-        rpc
+        ibcState.rpc
         //offlineSigner
       )
 
@@ -80,10 +81,10 @@ export const useICATokenBalance = (
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(tokenSymbol && nativeWalletAddress && ibcAsset),
+      enabled: Boolean(tokenSymbol && nativeWalletAddress && ibcAsset && ibcState),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
+      refetchIntervalInBackground: true,
     }
   )
 
@@ -92,22 +93,24 @@ export const useICATokenBalance = (
 
 export const useAuthZGrantsForUser = (
   grantee: string,
-  tokenSymbol: string,
   autoTxData?: AutoTxData
 ) => {
-  const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  let ibcState = useRecoilValue(ibcWalletState)
+
+  const ibcState = useRecoilValue(ibcWalletState)
   // console.log('granter ', ibcState.address, 'grantee ', grantee)
   const { data, isLoading } = useQuery(
     ['userAuthZGrants', grantee],
     async () => {
       let grants: GrantResponse[] = []
-     const { symbol } = ibcAsset
-      const rpc = process.env[`NEXT_PUBLIC_${symbol}_RPC`];
+
+    //  ibcState.client.
+    //  console.log(ibcAsset)
+      //const rpc = process.env[`NEXT_PUBLIC_ATOM_RPC`];
+      //console.log(rpc)
       const ganteeGrants = await getAuthZGrantsForGrantee({
         grantee,
         granter: ibcState.address,
-        rpc,
+        rpc: ibcState.rpc,
       })
 
       for (const msg of autoTxData.msgs) {
@@ -133,9 +136,6 @@ export const useAuthZGrantsForUser = (
     {
       enabled: Boolean(
         grantee &&
-          ibcAsset &&
-          ibcState.address.includes(ibcAsset.prefix) &&
-          grantee.includes(ibcAsset.prefix) &&
           autoTxData.msgs[0] &&
           autoTxData.msgs[0].includes('typeUrl') &&
           ibcState.status === WalletStatusType.connected &&

@@ -96,26 +96,30 @@ export const IcaCard = ({
               {icaAddress}
             </Text>
           )}
-          {!isIcaBalanceLoading && (
-            <>
-              {' '}
-              <Text variant="legend"> Balance </Text>{' '}
-              <Text css={{ padding: '$4' }} variant="caption">
+          {icaBalance &&
+            (!isIcaBalanceLoading ? (
+              <>
                 {' '}
-                {icaBalance} {chainSymbol}
-              </Text>
-            </>
-          )}
+                <Text variant="legend"> Balance </Text>{' '}
+                <Text css={{ padding: '$4' }} variant="caption">
+                  {' '}
+                  {icaBalance} {chainSymbol}
+                </Text>
+              </>
+            ) : (
+              <Spinner instant />
+            ))}
           <Text variant="legend"> Grants</Text>
           {
-            !isAuthzGrantsLoading &&icaAuthzGrants && (
+            !isAuthzGrantsLoading && icaAuthzGrants && (
               <>
                 {icaAuthzGrants.map((grant) =>
                   grant.hasGrant ? (
                     <Text css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✓ Trigger Account is granted for type:{' '}
-                      {grant.msgTypeUrl}{' '}
+                      ✓ Trigger Account is granted for type: {
+                        grant.msgTypeUrl
+                      }{' '}
                       {/* {grant.expiration && (
                       <span> and expires in {grant.expiration.seconds}</span>
                     )} */}
@@ -197,7 +201,8 @@ export const IcaCard = ({
                         disabled={shouldDisableAuthzGrantButton}
                         onClick={() => handleCreateAuthzGrantClick(false)}
                       >
-                        {isExecutingAuthzGrant  && !requestedSendAndAuthzGrant? (
+                        {isExecutingAuthzGrant &&
+                        !requestedSendAndAuthzGrant ? (
                           <Spinner instant />
                         ) : (
                           'Create AuthZ Grant'

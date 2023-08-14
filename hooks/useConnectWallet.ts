@@ -39,6 +39,7 @@ export const useAfterConnectWallet = (
         address,
         client: trstChainClient,
         status: WalletStatusType.connected,
+        rpc: ''
       })
     } catch (e) {
       /* set the error state */
@@ -47,6 +48,7 @@ export const useAfterConnectWallet = (
         address: '',
         client: null,
         status: WalletStatusType.error,
+        rpc: ''
       })
 
       /* throw the error for the UI */

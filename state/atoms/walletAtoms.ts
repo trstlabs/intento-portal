@@ -1,5 +1,5 @@
 
-import { SigningStargateClient } from '@cosmjs/stargate'
+import { SigningStargateClient, HttpEndpoint } from '@cosmjs/stargate'
 
 import { atom } from 'recoil'
 
@@ -23,6 +23,7 @@ type GeneratedWalletState<
   client: TClient | null
   status: WalletStatusType
   address: string
+  rpc: string | HttpEndpoint
 }
 
 type CreateWalletStateArgs<TState = {}> = {
@@ -40,6 +41,7 @@ function createWalletState<TClient = any, TState = {}>({
       status: WalletStatusType.idle,
       client: null,
       address: '',
+      rpc: '',
       ...defaultState,
     },
     dangerouslyAllowMutability: true,

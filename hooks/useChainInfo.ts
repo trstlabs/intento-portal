@@ -65,7 +65,6 @@ export const useGetExpectedAutoTxFee = (
     async () => {
       const triggerModuleParams = await getAutoTxParams(client)
       setTriggerModuleData(triggerModuleParams)
-      console.log(triggerModuleParams)
       const fee = getExpectedAutoTxFee(
         triggerModuleParams,
         durationSeconds,
@@ -155,9 +154,7 @@ export const useGetAPR = () => {
   const { data, isLoading } = useQuery(
     'getAPR',
     async () => {
-      console.log("useGetAPR", useGetAPR)
       const resp = await getAPR(cosmosClient, client, paramsState)
-      console.log("APR", resp)
       return resp
     },
     {
@@ -180,7 +177,6 @@ export const useSetModuleParams = () => {
     'getModuleParams',
     async () => {
       const resp = await getModuleParams(cosmosClient, trstClient)
-      console.log("MODULE", resp)
       setParamsState(resp)
       return resp
     },
@@ -217,7 +213,6 @@ export const useGetAPYForWithFees = (
     'useGetAPYForWithFees',
     async () => {
       const triggerModuleParams = await getAutoTxParams(trstClient)
-      console.log('triggerModuleParams', triggerModuleParams)
       setTriggerModuleData(triggerModuleParams)
 
       return getAPYForAutoCompound(

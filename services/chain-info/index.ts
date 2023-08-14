@@ -372,8 +372,6 @@ export async function getAutoTxParams(client: any) {
   try {
     const resp: QueryAutoTxParamsResponse =
       await client.trst.autoibctx.v1beta1.params({})
-    console.log(resp)
-    // const communityTax = parseFloat(distribution.params.community_tax)
     return resp.params
   } catch (e) {
     console.error('err(getAutoTxParams):', e)

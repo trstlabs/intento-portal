@@ -65,7 +65,6 @@ export const AutoTxComponent = ({
   )
   const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
     icaAddress,
-    chainSymbol,
     autoTxData
   )
   const hasAllIcaAuthzGrants = icaAuthzGrants

@@ -23,7 +23,7 @@ export const useConnectIBCWallet = (
 
   // console.log('assetInfo', assetInfo.registry_name)
   const chainName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
-  const { getSigningStargateClient, connect, address } = useChain(chainName)
+  const { getSigningStargateClient, connect, address, getRpcEndpoint } = useChain(chainName)
   // const [chainInfo] = useIBCChainInfo(chainId)
 
   // chains.push({
@@ -46,7 +46,6 @@ export const useConnectIBCWallet = (
   //   },
 
   // })
-  
 
   const mutation = useMutation(async () => {
     // if (window && !window?.keplr) {
@@ -65,7 +64,6 @@ export const useConnectIBCWallet = (
         'Asset info for the provided `tokenSymbol` was not found. Check your internet connection.'
       )
     }
-    console.log('setWalletState')
     /* set the fetching state */
     setWalletState((value) => ({
       ...value,
@@ -75,17 +73,12 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-      // const { chain_id, rpc } = assetInfo
-      console.log('assetInfo.registry_name', assetInfo.registry_name)
-
       await connect()
       await sleep(500)
-      
-      const ibcChainClient = await getSigningStargateClient()
-     
-      console.log('ibcChainClient', ibcChainClient)
 
-     
+      const ibcChainClient = await getSigningStargateClient()
+
+      console.log('ibcChainClient', ibcChainClient)
 
       //const { address } = useChain(assetInfo.registry_name)
       // await window.keplr.experimentalSuggestChain(chainInfo)
@@ -121,13 +114,15 @@ export const useConnectIBCWallet = (
       // )
 
       // const [{ address }] = await offlineSigner.getAccounts()
-
+      const rpc = await getRpcEndpoint(true)
+      console.log(rpc)
       /* successfully update the wallet state */
       setWalletState({
         tokenSymbol,
         address,
         client: ibcChainClient,
         status: WalletStatusType.connected,
+        rpc,
       })
     } catch (e) {
       /* set the error state */
@@ -136,6 +131,7 @@ export const useConnectIBCWallet = (
         address: '',
         client: null,
         status: WalletStatusType.error,
+        rpc: ''
       })
 
       throw e

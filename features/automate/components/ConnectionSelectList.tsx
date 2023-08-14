@@ -46,7 +46,6 @@ export const ConnectionSelectList = ({
   ...props
 }: ConnectionSelectListProps) => {
   function passIBCInfo(selectedInfo) {
-    console.log("selectedInfo", selectedInfo)
     let selectedConnection = new IBCInfo();
     selectedConnection.connectionId = selectedInfo.connection_id
     selectedConnection.chainId = selectedInfo.chain_id
