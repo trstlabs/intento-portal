@@ -1,39 +1,57 @@
 //import { AminoConverters } from 'trustlessjs'
-import {
-  AminoTypes,
-  createAuthzAminoConverters,
-  createIbcAminoConverters,
-  defaultRegistryTypes as defaultStargateTypes,
-  GasPrice,
-  SigningStargateClient,
-} from '@cosmjs/stargate'
+
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { GAS_PRICE } from '../util/constants'
+
 import { useIBCAssetInfo } from './useIBCAssetInfo'
-import { MsgGrant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/tx'
 
-import { Registry } from '@cosmjs/proto-signing'
-
-
+import { useChain } from '@cosmos-kit/react'
 
 /* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
   tokenSymbol: string,
+  _chainId: string,
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
+  // console.log('useConnectIBCWallet', tokenSymbol)
   const [{ status, tokenSymbol: storedTokenSymbol }, setWalletState] =
     useRecoilState(ibcWalletState)
 
   const assetInfo = useIBCAssetInfo(tokenSymbol || storedTokenSymbol)
 
+  // console.log('assetInfo', assetInfo.registry_name)
+  const chainName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
+  const { getSigningStargateClient, connect, address, getRpcEndpoint } = useChain(chainName)
+  // const [chainInfo] = useIBCChainInfo(chainId)
+
+  // chains.push({
+  //   chain_name: chainInfo.chainName,
+  //   chain_id: chainId,
+  //   status: "live",
+  //   network_type: 'testnet',
+  //   pretty_name: chainInfo.chainName+'Trustless Hub Testnet',
+  //   bech32_prefix: assetInfo.prefix,
+  //   slip44: 118,
+  //   fees: {
+  //     fee_tokens: [
+  //       {
+  //         denom: assetInfo.denom,
+  //         low_gas_price: 0.025,
+  //         average_gas_price: 0.05,
+  //         high_gas_price: 0.1,
+  //       },
+  //     ],
+  //   },
+
+  // })
+
   const mutation = useMutation(async () => {
-    if (window && !window?.keplr) {
-      alert('Please install Keplr extension and refresh the page.')
-      return
-    }
+    // if (window && !window?.keplr) {
+    //   alert('Please install Keplr extension and refresh the page.')
+    //   return
+    // }
 
     if (!tokenSymbol && !storedTokenSymbol) {
       throw new Error(
@@ -46,7 +64,6 @@ export const useConnectIBCWallet = (
         'Asset info for the provided `tokenSymbol` was not found. Check your internet connection.'
       )
     }
-
     /* set the fetching state */
     setWalletState((value) => ({
       ...value,
@@ -56,45 +73,56 @@ export const useConnectIBCWallet = (
     }))
 
     try {
+      await connect()
+      await sleep(500)
 
-      const { chain_id, rpc } = assetInfo
+      const ibcChainClient = await getSigningStargateClient()
 
-      console.log(chain_id)
-      const customRegistry = new Registry(defaultStargateTypes);
-      customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
-      await window.keplr.enable(chain_id)
+      console.log('ibcChainClient', ibcChainClient)
 
-      const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
-      //console.log(offlineSigner)
-      const ibcChainClient = await SigningStargateClient.connectWithSigner(
-        rpc,
-        offlineSigner,
-        {
-          gasPrice: GasPrice.fromString(GAS_PRICE),
-          /*
-           * passing ibc amino types for all the amino signers (eg ledger, wallet connect)
-           * to enable ibc & wasm transactions
-           * */
-          aminoTypes: new AminoTypes(
-            Object.assign(
-              createIbcAminoConverters(),
-              createAuthzAminoConverters(),
-              //createWasmAminoConverters()
-            )
-          ),
-          registry: customRegistry,
-        },
+      //const { address } = useChain(assetInfo.registry_name)
+      // await window.keplr.experimentalSuggestChain(chainInfo)
+      // await window.keplr.enable(chain_id)
 
-      )
-    
-      const [{ address }] = await offlineSigner.getAccounts()
+      // const customRegistry = new Registry([
+      //   ...defaultStargateTypes,
+      //   ...registry,
+      // ])
+      // // customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
+      // await window.keplr.enable(chain_id)
 
+      // const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
+      // //console.log(offlineSigner)
+      // const ibcChainClient = await SigningStargateClient.connectWithSigner(
+      //   rpc,
+      //   offlineSigner,
+      //   {
+      //     gasPrice: GasPrice.fromString(GAS_PRICE),
+      //     /*
+      //      * passing ibc amino types for all the amino signers (eg ledger, wallet connect)
+      //      * to enable ibc & wasm transactions
+      //      * */
+      //     aminoTypes: new AminoTypes(
+      //       Object.assign(
+      //         createIbcAminoConverters(),
+      //         createAuthzAminoConverters()
+      //         //createWasmAminoConverters()
+      //       )
+      //     ),
+      //     registry: customRegistry,
+      //   }
+      // )
+
+      // const [{ address }] = await offlineSigner.getAccounts()
+      const rpc = await getRpcEndpoint(true)
+      console.log(rpc)
       /* successfully update the wallet state */
       setWalletState({
         tokenSymbol,
         address,
         client: ibcChainClient,
         status: WalletStatusType.connected,
+        rpc,
       })
     } catch (e) {
       /* set the error state */
@@ -103,6 +131,7 @@ export const useConnectIBCWallet = (
         address: '',
         client: null,
         status: WalletStatusType.error,
+        rpc: ''
       })
 
       throw e
@@ -114,6 +143,8 @@ export const useConnectIBCWallet = (
   useEffect(() => {
     /* restore wallet connection */
     if (status === WalletStatusType.restored && assetInfo) {
+      // const { connect } = useChain(assetInfo.registry_name)
+      connect()
       connectWallet(null)
     }
   }, [status, connectWallet, assetInfo])
@@ -121,6 +152,7 @@ export const useConnectIBCWallet = (
   useEffect(() => {
     function reconnectWallet() {
       if (assetInfo && status === WalletStatusType.connected) {
+        connect()
         connectWallet(null)
       }
     }
@@ -132,4 +164,8 @@ export const useConnectIBCWallet = (
   }, [connectWallet, status, assetInfo])
 
   return mutation
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

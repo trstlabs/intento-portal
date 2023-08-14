@@ -13,7 +13,7 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
-import { Coin } from 'trustlessjs'
+import { Coin } from '@cosmjs/stargate'
 
 
 type UseSendFundsParams = {

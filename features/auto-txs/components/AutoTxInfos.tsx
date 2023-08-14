@@ -8,7 +8,7 @@ import {
 } from 'junoblocks'
 import React, { useRef, useState } from 'react'
 
-import { QueryInput } from '../../swap/components/QueryInput'
+import { QueryInput } from 'components//Input/QueryInput'
 
 type AutoTxInfosProps = {
   readOnly?: boolean

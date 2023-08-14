@@ -7,7 +7,7 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef } from 'react'
 
-import { TokenInfo } from '../../../queries/usePoolsListQuery'
+import { TokenInfo } from '../../../types/trstTypes'
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
 
 const StyledDivForScrollContainer = styled('div', {
@@ -21,14 +21,14 @@ export class ChannelInfo {
   denom: string;
   symbol: string
   connectionID: string;
-  trst_denom: string;
+  denom_on_trst: string;
   prefix: string
 }
 
 
 export type ChannelSelectListProps = {
   activeChannel?: string
-  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'trst_denom' | 'logoURI' | 'name' | 'symbol'| 'connection_id'>>
+  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'denom_on_trst' | 'logo_uri' | 'name' | 'symbol'| 'connection_id'>>
   onSelect: (channelInfo: ChannelInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -51,7 +51,7 @@ export const ChannelSelectList = ({
     selectedChannel.name = selectedInfo.id
     selectedChannel.logoURI = selectedInfo.logoURI
     selectedChannel.denom = selectedInfo.denom
-    selectedChannel.trst_denom = selectedInfo.trst_denom
+    selectedChannel.denom_on_trst = selectedInfo.denom_on_trst
     selectedChannel.symbol = selectedInfo.symbol
     selectedChannel.connectionID = selectedInfo.connectionID
     selectedChannel.prefix = selectedInfo.prefix
@@ -85,7 +85,7 @@ export const ChannelSelectList = ({
             >
               <StyledDivForColumn kind="token">
                 <ImageForTokenLogo
-                  logoURI={chainInfo.logoURI}
+                  logoURI={chainInfo.logo_uri}
                   size="large"
                   alt={chainInfo.symbol}
                   loading="lazy"

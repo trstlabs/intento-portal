@@ -1,69 +1,54 @@
-import {
-
-  TrustlessChainClient,
-
-} from 'trustlessjs'
-
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
-import { useChainInfo } from './useChainInfo'
+import { useChain } from '@cosmos-kit/react'
 
-export const useConnectWallet = (
+export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
+  const {
+    connect,
+    getSigningStargateClient,
+    address,
+    username,
+  } = useChain('trustlesshub')
+
   const [{ status }, setWalletState] = useRecoilState(walletState)
-  const [chainInfo] = useChainInfo()
 
   const mutation = useMutation(async () => {
-    if (!window?.keplr) {
-      alert('Please install Keplr extension and refresh the page.')
-      return
-    }
-
     /* set the fetching state */
     setWalletState((value) => ({
       ...value,
       client: null,
       state: WalletStatusType.connecting,
     }))
-
+    await sleep(500)
     try {
-      await window.keplr.experimentalSuggestChain(chainInfo)
-      await window.keplr.enable(chainInfo.chainId)
+      
+      console.log('address', address)
 
-      const offlineSigner = await window.keplr.getOfflineSignerAuto(chainInfo.chainId)
-      const [{ address }] = await offlineSigner.getAccounts()
-      let utils = window.keplr.getEnigmaUtils(chainInfo.chainId)
-      const trstChainClient = await TrustlessChainClient.create({
-        grpcWebUrl: chainInfo.rpc,
-        wallet: offlineSigner,
-        chainId: chainInfo.chainId,
-        encryptionUtils: utils,
-        walletAddress: address
-      }
-      )
-
-      const key = await window.keplr.getKey(chainInfo.chainId)
+      const trstChainClient = await getSigningStargateClient()
+      console.log('trstChainClient', trstChainClient)
 
       /* successfully update the wallet state */
       setWalletState({
-        key,
+        key: username,
         address,
         client: trstChainClient,
         status: WalletStatusType.connected,
+        rpc: ''
       })
     } catch (e) {
-
       /* set the error state */
       setWalletState({
         key: null,
         address: '',
         client: null,
         status: WalletStatusType.error,
+        rpc: ''
       })
 
       /* throw the error for the UI */
@@ -74,17 +59,19 @@ export const useConnectWallet = (
   useEffect(
     function restoreWalletConnectionIfHadBeenConnectedBefore() {
       /* restore wallet connection if the state has been set with the */
-      if (chainInfo?.rpc && status === WalletStatusType.restored) {
+      if (process.env.NEXT_PUBLIC_TRST_RPC && status === WalletStatusType.restored) {
+        connect()
         mutation.mutate(null)
       }
     }, // eslint-disable-next-line
-    [status, chainInfo?.rpc]
+    [status, process.env.NEXT_PUBLIC_TRST_RPC]
   )
 
   useEffect(
     function listenToWalletAddressChangeInKeplr() {
       function reconnectWallet() {
         if (status === WalletStatusType.connected) {
+          connect()
           mutation.mutate(null)
         }
       }
@@ -99,4 +86,8 @@ export const useConnectWallet = (
   )
 
   return mutation
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }

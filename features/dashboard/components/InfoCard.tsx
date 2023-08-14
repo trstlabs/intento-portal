@@ -24,11 +24,11 @@ import {
   useGetAPYForWithFees,
   useGetAPY,
   useGetStakeBalanceForAcc,
+  useSetModuleParams,
 } from '../../../hooks/useChainInfo'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useRecoilValue } from 'recoil'
 import {
-  paramsStateAtom,
   triggerModuleParamsAtom,
 } from '../../../state/atoms/moduleParamsAtoms'
 import IssuanceChart from './Chart'
@@ -39,7 +39,7 @@ type InfoCardProps = {
 }
 
 export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
-  const params = useRecoilValue(paramsStateAtom)
+  const [params, _] = useSetModuleParams()
   const triggerParams = useRecoilValue(triggerModuleParamsAtom)
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   let data = new AutoTxData()
@@ -142,35 +142,33 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 {getRelativeTime(params.mintModuleParams.startTime.seconds)}
               </Text> */}
             </Card>
-            <Column>
-              <Text variant="title" css={{ padding: '$8' }}>
-                <span> Fee Info</span>
-              </Text>
-              <Card variant="secondary" disabled css={{ padding: '$12' }}>
-                {triggerParams && (
+            {triggerParams && (
+              <Column>
+                <Text variant="title" css={{ padding: '$8' }}>
+                  <span> Fee Info</span>
+                </Text>
+                <Card variant="secondary" disabled css={{ padding: '$12' }}>
                   <>
                     <Text variant="legend"> Trigger Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
-                      {' '}
                       {convertMicroDenomToDenom(
-                        triggerParams.AutoTxConstantFee,
+                        Number(triggerParams.AutoTxConstantFee),
                         6
-                      ) + ' '}
+                      )}{' '}
                       TRST{' '}
                     </Text>
-                    <Text variant="legend"> Trigger Flex Fee (per minute)</Text>
+                    <Text variant="legend"> Trigger Flex Fee per hour</Text>
                     <Text css={{ padding: '$8' }} variant="title">
-                      {' '}
                       {convertMicroDenomToDenom(
-                        triggerParams.AutoTxFlexFeeMul,
+                        Number(triggerParams.AutoTxFlexFeeMul) * 60,
                         6
                       ) + ' '}
                       TRST{' '}
                     </Text>
                   </>
-                )}
-              </Card>
-            </Column>
+                </Card>
+              </Column>
+            )}
           </Column>
         )}
         <Column css={{ paddingBottom: '$6' }}>

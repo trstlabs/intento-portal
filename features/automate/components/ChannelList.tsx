@@ -1,9 +1,8 @@
-import { useWalletConnectionStatus } from 'hooks/useWalletConnectionStatus'
 import { styled, Text, useDelayedAppearanceFlag } from 'junoblocks'
-import { walletState } from 'state/atoms/walletAtoms'
 import { __TRANSFERS_ENABLED__ } from 'util/constants'
 import { AssetCard, AssetCardState } from '../../assets/components/AssetCard'
 import { useGetIBCAssetsBalances } from '../../assets/hooks/useGetSupportedAssetsBalances'
+import { useChain } from '@cosmos-kit/react'
 
 
 
@@ -11,7 +10,8 @@ export const ChannelList = ({ onActionClick }) => {
   const [loadingBalances, [myTokens, allTokens]] =
   useGetIBCAssetsBalances()
 
-  const { isConnecting, isConnected } = useWalletConnectionStatus(walletState)
+  const { isWalletConnected: isConnected, isWalletConnecting: isConnecting } =
+  useChain('trustlesshub')
 
   /* isLoading state is true if either we connect the wallet or loading balances */
   const isLoading = isConnecting || loadingBalances

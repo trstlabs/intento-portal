@@ -1,10 +1,6 @@
 import { SigningStargateClient } from '@cosmjs/stargate'
 
-import {
-  Coin,
-  MsgSend,
-
-} from 'trustlessjs'
+import { Coin } from '@cosmjs/stargate'
 
 type ExecuteSendFundsArgs = {
   fromAddress: string
@@ -19,11 +15,5 @@ export const executeSendFunds = async ({
   fromAddress,
   coin,
 }: ExecuteSendFundsArgs): Promise<any> => {
-    let sendMsg = new MsgSend({ fromAddress, toAddress, amount: [coin] })
-    const MsgSendObject = {
-      typeUrl: "/cosmos.bank.v1beta1.MsgSend",
-      value: sendMsg,
-    }
-    return await client.signAndBroadcast(fromAddress, [MsgSendObject], "auto");
+  return await client.sendTokens(fromAddress, toAddress, [coin], {amount: [], gas: "100000"})
 }
-

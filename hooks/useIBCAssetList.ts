@@ -3,15 +3,16 @@ import { useQuery } from 'react-query'
 export type IBCAssetInfo = {
   id: string
   name: string
+  registry_name: string
   symbol: string
   chain_id: string
   rpc: string
   denom: string
   decimals: number
-  trst_denom: string
+  denom_on_trst: string
   channel_to_trst: string
   channel: string
-  logoURI: string
+  logo_uri: string
   connection_id?: string
   deposit_gas_fee?: number
   external_deposit_uri?: string
@@ -33,9 +34,10 @@ export const useIBCAssetList = () => {
       onError(e) {
         console.error('Error loading ibc asset list:', e)
       },
-      refetchOnMount: false,
-      refetchIntervalInBackground: true,
-      refetchInterval: 1000 * 60,
+      refetchOnMount: true,
+      refetchIntervalInBackground: false,
+      // refetchIntervalInBackground: true,
+      // refetchInterval: 1000 * 60,
     }
   )
 

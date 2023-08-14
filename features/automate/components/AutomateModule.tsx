@@ -11,13 +11,13 @@ type AutomateModuleProps = {
 
 export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
   let data = new AutoTxData()
-  data.duration = 14 * 86400000;
-  data.interval = 86400000;
+  data.duration = 14 * 86400000
+  data.interval = 86400000
   data.msgs = [JSON.stringify(generalExamples[0], null, 2)]
+
   //data.typeUrls = [""]
   //works faster than without array for some reason
   const [autoTxDatas, setAutoTxDatas] = useState([data])
-
 
   const initialExampleValue = useRef(initialExample).current
 
@@ -25,10 +25,12 @@ export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
     function setInitialExampleIfProvided() {
       if (initialExampleValue) {
         const exampleIndex = initialExampleValue
-        autoTxDatas[0].msgs[0] = JSON.stringify(generalExamples[exampleIndex], null, "\t")
-        setAutoTxDatas(
-          autoTxDatas
+        autoTxDatas[0].msgs[0] = JSON.stringify(
+          generalExamples[exampleIndex],
+          null,
+          '\t'
         )
+        setAutoTxDatas(autoTxDatas)
       }
     },
     [initialExampleValue, setAutoTxDatas]
@@ -36,14 +38,13 @@ export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
 
   return (
     <StyledDivForWrapper>
-      <AutoTxComponent autoTxData={autoTxDatas[0]}
-        onAutoTxChange={((autoTx) => setAutoTxDatas([autoTx]))}
-
+      <AutoTxComponent
+        autoTxData={autoTxDatas[0]}
+        onAutoTxChange={(autoTx) => setAutoTxDatas([autoTx])}
       />
     </StyledDivForWrapper>
   )
 }
-
 
 const StyledDivForWrapper = styled('div', {
   borderRadius: '16px',

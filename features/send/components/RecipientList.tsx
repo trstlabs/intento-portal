@@ -2,7 +2,7 @@ import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyI
 
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
-import { useConnectWallet } from '../../../hooks/useConnectWallet';
+
 import { useTokenSend } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
@@ -47,7 +47,7 @@ export const RecipientList = ({
   data.msgs = [""]
   const [autoTxData, setAutoTxData] = useState(data)
   const { address, status } = useRecoilValue(walletState)
-  const { mutate: connectWallet } = useConnectWallet()
+
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ ibcAsset, recipientInfos: recipients, })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
@@ -83,7 +83,6 @@ export const RecipientList = ({
       return setRequestedSend(true)
     }
 
-    connectWallet(null)
   }
 
   const handleScheduleButtonClick = (txData: AutoTxData) => {
@@ -94,15 +93,16 @@ export const RecipientList = ({
         let sendMsg;
         if (recipient.channelID) {
           sendMsg = transferObject
-          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }
+          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.denom_on_trst }
           sendMsg.value.sender = address
           sendMsg.value.receiver = recipient.recipient
           sendMsg.value.sourceChannel = recipient.channelID
+          sendMsg.value.timeoutTimestamp = Math.floor(new Date().getTime() + 60*1000).toString()
         } else {
           sendMsg = sendObject;
           sendMsg.value.fromAddress = address
           sendMsg.value.toAddress = recipient.recipient
-          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.trst_denom }]
+          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.denom_on_trst }]
         }
 
         msgs.push(JSON.stringify(sendMsg))
@@ -113,7 +113,6 @@ export const RecipientList = ({
       return setRequestedSchedule(true)
     }
 
-    connectWallet(null)
   }
 
   const handleChange = (index: number, key: keyof RecipientInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -295,7 +294,7 @@ export const RecipientList = ({
               {(recipient.amount != "0") && (<div>
                 <Row>Recipient {index + 1}: </Row> <i>{recipient.recipient}</i>
                 <Row>Amount {recipient.amount} <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
-                  logoURI={ibcAsset.logoURI}
+                  logoURI={ibcAsset.logo_uri}
                   size="medium"
                   alt={ibcAsset.symbol}
                   loading="lazy"

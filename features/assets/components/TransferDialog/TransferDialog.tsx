@@ -41,10 +41,9 @@ export const TransferDialog = ({
   onRequestClose,
   onTokenSelect,
 }: TransferDialogProps) => {
-
-  const tokenInfo = useIBCAssetInfo(tokenSymbol)
-  const deposit_gas_fee = tokenInfo.deposit_gas_fee
-    ? tokenInfo.deposit_gas_fee
+  const ibcAssetInfo = useIBCAssetInfo(tokenSymbol)
+  const deposit_gas_fee = ibcAssetInfo.deposit_gas_fee
+    ? ibcAssetInfo.deposit_gas_fee
     : 0.01
 
   const { balance: externalIbcAssetBalance } = useIBCTokenBalance(tokenSymbol)
@@ -56,7 +55,7 @@ export const TransferDialog = ({
   const { isLoading, mutate: mutateTransferAsset } = useTransferAssetMutation({
     transactionKind,
     tokenAmount,
-    tokenInfo,
+    ibcAssetInfo,
 
     onSuccess() {
       // reset cache

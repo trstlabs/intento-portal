@@ -13,7 +13,7 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef, useMemo } from 'react'
 
-import { TokenInfo } from '../queries/usePoolsListQuery'
+import { TokenInfo } from '../types/trstTypes'
 import { getPropsForInteractiveElement } from '../util/getPropsForInteractiveElement'
 
 const StyledDivForScrollContainer = styled('div', {
@@ -22,7 +22,7 @@ const StyledDivForScrollContainer = styled('div', {
 
 export type TokenSelectListProps = {
   activeTokenSymbol?: string
-  tokenList: Array<Pick<TokenInfo, 'symbol' | 'logoURI' | 'name'>>
+  tokenList: Array<Pick<TokenInfo, 'symbol' | 'logo_uri' | 'name'>>
   onSelect: (tokenSymbol: string) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -98,7 +98,7 @@ export const TokenSelectList = ({
             >
               <StyledDivForColumn kind="token">
                 <ImageForTokenLogo
-                  logoURI={tokenInfo.logoURI}
+                  logoURI={tokenInfo.logo_uri}
                   size="big"
                   alt={tokenInfo.symbol}
                   loading="lazy"

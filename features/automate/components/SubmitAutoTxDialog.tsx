@@ -32,7 +32,6 @@ export class AutoTxData {
   icaAddressForAuthZGrant?: string
   // typeUrls?: string[]
   recurrences: number
-  retries: number
   useSubmitAutoTx?: boolean
   feeFunds?: number
   label?: string
@@ -44,7 +43,7 @@ type SubmitAutoTxDialogProps = {
   chainSymbol?: string
   icaAddress?: string
   icaBalance?: number
-  hasIcaAuthzGrant?: boolean
+  hasAllIcaAuthzGrants?: boolean
   customLabel?: string
   feeFundsHostChain?: string
   isLoading: boolean
@@ -54,7 +53,7 @@ type SubmitAutoTxDialogProps = {
   shouldDisableSendFundsButton?: boolean
   onRequestClose: () => void
   handleSubmitAutoTx: (data: AutoTxData) => void
-  handleCreateAuthzGrantClick?: () => void
+  handleCreateAuthzGrantClick?: (withFunds: boolean) => void
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
 }
@@ -63,7 +62,7 @@ export const SubmitAutoTxDialog = ({
   isDialogShowing,
   icaAddress,
   icaBalance,
-  hasIcaAuthzGrant,
+  hasAllIcaAuthzGrants,
   customLabel,
   chainSymbol,
   autoTxData,
@@ -79,6 +78,9 @@ export const SubmitAutoTxDialog = ({
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
+  if (!isDialogShowing) {
+    return
+  }
   const [startTime, setStartTime] = useState(0)
   const [duration, setDuration] = useState(14 * 86400000)
 
@@ -265,7 +267,7 @@ export const SubmitAutoTxDialog = ({
       recurrences,
       connectionId: autoTxData.connectionId,
       dependsOnTxIds: autoTxData.dependsOnTxIds,
-      retries: autoTxData.retries,
+      // retries: autoTxData.retries,
       msgs: autoTxData.msgs,
       icaAddressForAuthZGrant,
       feeFunds,
@@ -274,16 +276,10 @@ export const SubmitAutoTxDialog = ({
   }
   return (
     <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
-      <DialogHeader paddingBottom={canSchedule ? '$8' : '$12'}>
+      <DialogHeader paddingBottom={canSchedule ? '$4' : '6'}>
         <Text variant="header">Automate Transaction</Text>
       </DialogHeader>
 
-      <DialogContent>
-        <Text variant="body" css={{ paddingBottom: '$2' }}>
-          Set the recurrence of the AutoTx. Trigger time-based actions on
-          IBC-enabled chains.
-        </Text>
-      </DialogContent>
 
       <DialogContent>
         <StyledDivForInputs>
@@ -294,7 +290,7 @@ export const SubmitAutoTxDialog = ({
             <Inline justifyContent={'space-between'} align="center">
               <div className="chips">
                 <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Select an interval
+                  Interval
                 </Text>
                 <ChipSelected
                   label={displayInterval}
@@ -364,7 +360,7 @@ export const SubmitAutoTxDialog = ({
             <Inline justifyContent={'space-between'} align="center">
               <div className="chips">
                 <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Select until when to trigger
+                  Duration
                 </Text>
                 {startTime != 0 ? (
                   <ChipSelected
@@ -438,14 +434,10 @@ export const SubmitAutoTxDialog = ({
                 </Inline>
               )}
             </Inline>
-            <DialogDivider offsetY="$4" />
-            <Text css={{ margin: '$4' }} align="center" variant="legend">
-              Optional Settings{' '}
-            </Text>
             <Inline justifyContent={'space-between'} align="center">
               <div className="chips">
                 <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Specify a start time for the trigger (optional)
+                  Start Time
                 </Text>
                 <ChipSelected
                   label={'In ' + displayStartTime}
@@ -513,11 +505,8 @@ export const SubmitAutoTxDialog = ({
                 </Inline>
               )}
             </Inline>
-            <Column css={{ padding: '$8 0' }}>
-              <DialogDivider offsetTop="$4" />
-              <Text css={{ margin: '$4' }} align="center" variant="legend">
-                Execution Settings{' '}
-              </Text>
+            <Column css={{ padding: '$6 0' }}>
+              <DialogDivider offsetBottom="$4" />
 
               {chainSymbol && (
                 <>
@@ -539,40 +528,17 @@ export const SubmitAutoTxDialog = ({
                     </Text>
                     <Tooltip
                       label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
-                      aria-label="Fee Funds - "
+                      aria-label="Execution Funds  "
                     >
                       <Text variant="legend" color="disabled">
                         {' '}
-                        Top up balance of {icaBalance} {chainSymbol}{' '}
-                        {icaBalance > suggestedFunds ? (
-                          <>(optional)</>
-                        ) : (
-                          <>(important)</>
-                        )}{' '}
+                        Balance: {icaBalance} {chainSymbol}
                       </Text>
                     </Tooltip>
                   </Inline>
                   {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
                   {!isExecutingAuthzGrant && (
-                    <>
-                      {!hasIcaAuthzGrant && (
-                        <Button
-                          css={{ marginTop: '$8', margin: '$2' }}
-                          variant="primary"
-                          size="small"
-                          disabled={shouldDisableAuthzGrantButton}
-                          onClick={() => handleCreateAuthzGrantClick()}
-                        >
-                          {isExecutingAuthzGrant && <Spinner instant />}{' '}
-                          {Number(feeFundsHostChain) != 0
-                            ? 'Send ' +
-                              feeFundsHostChain +
-                              ' ' +
-                              chainSymbol +
-                              ' + Grant'
-                            : 'Create Grant'}
-                        </Button>
-                      )}
+                    <Inline justifyContent={'space-between'} align="center">
                       {feeFundsHostChain != '0.00' &&
                         feeFundsHostChain != '0' &&
                         feeFundsHostChain != '0.00' &&
@@ -580,8 +546,7 @@ export const SubmitAutoTxDialog = ({
                         feeFundsHostChain != '' && (
                           <Button
                             css={{ margin: '$2' }}
-                            variant="primary"
-                            size="small"
+                            variant="secondary"
                             disabled={shouldDisableSendFundsButton}
                             onClick={() => handleSendFundsOnHostClick()}
                           >
@@ -589,54 +554,70 @@ export const SubmitAutoTxDialog = ({
                             {'Send ' + feeFundsHostChain + ' ' + chainSymbol}
                           </Button>
                         )}
-                    </>
+                      {!hasAllIcaAuthzGrants && (
+                        <Button
+                          css={{ marginTop: '$8', margin: '$2' }}
+                          variant="secondary"
+                          disabled={shouldDisableAuthzGrantButton}
+                          onClick={() => handleCreateAuthzGrantClick(Number(feeFundsHostChain) != 0)}
+                        >
+                          {isExecutingAuthzGrant && <Spinner instant />}{' '}
+                          {Number(feeFundsHostChain) != 0
+                            ? 'Send ' + ' + Grant'
+                            : 'Create Grant'}
+                        </Button>
+                      )}
+                    </Inline>
                   )}
                 </>
               )}
-              <Inline justifyContent={'flex-start'}>
+              <Tooltip
+                label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If set to 0, your local balance will be used"
+                aria-label="Fund Trigger - TRST (Optional)"
+              >
+                <Text align="center" css={{ margin: '$4' }} variant="caption">
+                  Fee Funds - TRST
+                </Text>
+              </Tooltip>
+              {recurrences > 0 && !isSuggestedFundsLoading && (
+                <Text
+                  align="center"
+                  color="disabled"
+                  wrap={false}
+                  variant="caption"
+                >
+                  Estimated at {suggestedFunds} TRST
+                </Text>
+              )}
+              <Inline justifyContent={'space-between'}>
+                <Text wrap={false} css={{ padding: '$4' }} variant="caption">
+                  Deduct fees from balance
+                </Text>{' '}
                 <StyledInput
                   type="checkbox"
                   checked={checkedFeeAcc}
                   onChange={handleChangeFeeAcc}
                 />
-                <Text css={{ padding: '$4' }} variant="caption">
-                  Deduct TRST fees from local account
-                </Text>{' '}
               </Inline>
+
               {!checkedFeeAcc && (
-                <>
-                  <Tooltip
-                    label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If set to 0, your local balance will be used"
-                    aria-label="Fund Trigger - TRST (Optional)"
-                  >
-                    <Text
-                      align="center"
-                      css={{ marginTop: '$4' }}
-                      variant="caption"
-                    >
-                      Fee Funds - TRST
-                    </Text>
-                  </Tooltip>
-                  <Inline>
-                    <Text variant="legend">
-                      <StyledInput
-                        step=".01"
-                        placeholder="0.00"
-                        type="number"
-                        value={feeFunds}
-                        onChange={({ target: { value } }) =>
-                          setFeeAmount(Number(value))
-                        }
-                      />
-                      TRST
-                    </Text>
-                  </Inline>
-                </>
-              )}
-              {recurrences > 0 && !isSuggestedFundsLoading && (
-                <Text color="disabled" wrap={false} variant="legend">
-                  Estimated AutoTx fees: {suggestedFunds} TRST
-                </Text>
+                <Inline justifyContent={'space-between'}>
+                  <Text wrap={false} css={{ padding: '$4' }} variant="caption">
+                    Send TRST to Trigger Account
+                  </Text>{' '}
+                  <Text variant="legend">
+                    <StyledInput
+                      step=".01"
+                      placeholder="0.00"
+                      type="number"
+                      value={feeFunds}
+                      onChange={({ target: { value } }) =>
+                        setFeeAmount(Number(value))
+                      }
+                    />
+                    TRST
+                  </Text>
+                </Inline>
               )}
 
               <DialogDivider offsetY="$10" />
@@ -708,7 +689,7 @@ export const SubmitAutoTxDialog = ({
       >
         {autoTxData.connectionId && (
           <Button
-            disabled={!hasIcaAuthzGrant}
+            disabled={!hasAllIcaAuthzGrants}
             variant="secondary"
             onClick={() => (isLoading ? undefined : handleData(icaAddress))}
           >
@@ -758,8 +739,8 @@ const StyledDivForInputs = styled('div', {
 })
 const StyledInput = styled('input', {
   color: 'inherit',
-  padding: '$2',
-  margin: '$2',
+  padding: '$1',
+  margin: '$1',
 })
 
 const StyledInputWithBorder = styled('input', {
@@ -778,6 +759,7 @@ const ChipContainer = styled('div', {
   color: '$colors$black',
   borderRadius: '$2',
   backgroundColor: '$colors$light95',
+  border: '1px solid $colors$light95',
   padding: '0.5em 0.75em',
   margin: '0.25em 0.4em',
   cursor: 'pointer',

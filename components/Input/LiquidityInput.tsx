@@ -27,7 +27,7 @@ export const LiquidityInput: FC<LiquidityInputProps> = ({
   const [focusedOnInput, setFocusedOnInput] = useState(false)
   const inputRef = useRef<HTMLInputElement>()
 
-  const { name: tokenName, logoURI } = useTokenInfo(tokenSymbol)
+  const { name: tokenName, logo_uri } = useTokenInfo(tokenSymbol)
 
   const handleAmountChange = (value: number) => onAmountChange(value)
 
@@ -39,7 +39,7 @@ export const LiquidityInput: FC<LiquidityInputProps> = ({
       active={focusedOnInput}
     >
       <StyledDivForColumn kind="info">
-        <ImageForTokenLogo logoURI={logoURI} alt={tokenName} size="big" />
+        <ImageForTokenLogo logoURI={logo_uri} alt={tokenName} size="big" />
         <div data-token-info="">
           <Text variant="title" transform="uppercase">
             {tokenName}

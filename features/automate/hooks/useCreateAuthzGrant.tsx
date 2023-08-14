@@ -8,7 +8,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeCreateAuthzGrant } from '../../../services/ica'
+import { executeCreateAuthzGrant, GrantResponse } from '../../../services/ica'
 import {
   TransactionStatus,
   transactionStatusState,
@@ -17,28 +17,31 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
-import { Coin } from 'trustlessjs'
+import { Coin } from '@cosmjs/stargate'
 
 type UseCreateAuthzGrantParams = {
   grantee: string
-  msgs: string[]
+  grantInfos: GrantResponse[]
   coin?: Coin
   expirationDurationMs?: number
 }
 
 export const useCreateAuthzGrant = ({
   grantee,
-  msgs,
+  grantInfos,
   expirationDurationMs,
   coin,
 }: UseCreateAuthzGrantParams) => {
   const { address, client, status } = useRecoilValue(ibcWalletState)
 
-  /*   const { address, client, status } =
-        useRecoilValue(walletState)*/
   const setTransactionState = useSetRecoilState(transactionStatusState)
 
   const refetchQueries = useRefetchQueries(['tokenBalance', 'userAuthZGrants'])
+
+  let typeUrls = []
+  for (const grant of grantInfos){
+    typeUrls.push(grant.msgTypeUrl)
+  }
 
   return useMutation(
     'createAuthzGrant',
@@ -46,15 +49,13 @@ export const useCreateAuthzGrant = ({
       if (status !== WalletStatusType.connected) {
         throw new Error('Please connect your wallet.')
       }
-      if (coin.amount == '0') {
-        coin = undefined
-      }
-
+     
+      console.log(client)
       return await executeCreateAuthzGrant({
         client,
         grantee,
         granter: address,
-        msgs,
+        typeUrls,
         expirationDurationMs,
         coin,
       })

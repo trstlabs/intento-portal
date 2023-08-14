@@ -1,21 +1,7 @@
-import { useQuery } from 'react-query'
 
-export type TokenInfo = {
-  id: string
-  chain_id: string
-  token_address: string
-  symbol: string
-  name: string
-  decimals: number
-  logoURI: string
-  denom: string
-  native: boolean
-  channel?: string
-  channel_to_trst?: string
-  connection_id?: string
-  prefix?: string
-  trst_denom?: string
-}
+
+import { useQuery } from 'react-query'
+import { TokenInfo } from '../types/trstTypes'
 
 export type TokenInfoWithReward = TokenInfo & {
   rewards_address: string

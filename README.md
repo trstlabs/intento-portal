@@ -51,7 +51,10 @@ NEXT_PUBLIC_CHAIN_INFO_URL=https://raw.githubusercontent.com/Wasmswap/asset-list
 
 ### Provide token configuration
 
-You will need to provide a token list json file for the available assets. By default, the platform has example tokens based on the Juno Uni-1 testnet. Refer to the token list [example](https://github.com/Wasmswap/wasmswap-interface/blob/develop/public/token_list.testnet.json) for more information.
+You will need to provide a token list json file for the available assets. 
+
+You may configure chain_info.localgaia.json using this tool:
+https://docs.axelar.dev/resources/keplr
 
 Similarly to `NEXT_PUBLIC_CHAIN_INFO_URL` variable, the config will be loaded dynamically.
 

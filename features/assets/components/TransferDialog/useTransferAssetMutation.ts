@@ -1,11 +1,9 @@
-import { TrustlessChainClient, MsgTransfer, Tx } from 'trustlessjs'
-import {
-  Coin
-} from '@cosmjs/stargate'
-
-import { Height } from 'trustlessjs'
+// import { TrustlessChainClient, MsgTransfer, Tx,  } from 'trustlessjs'
+import { Coin } from '@cosmjs/stargate'
+import { Height } from 'trustlessjs/dist/codegen/ibc/core/client/v1/client'
+import { ibc } from 'trustlessjs'
 import { IBCAssetInfo } from 'hooks/useIBCAssetList'
-
+import { SigningStargateClient, DeliverTxResponse } from '@cosmjs/stargate'
 import { useMutation } from 'react-query'
 import { useRecoilValue } from 'recoil'
 import { ibcWalletState, walletState } from 'state/atoms/walletAtoms'
@@ -16,7 +14,7 @@ import { TransactionKind } from './types'
 type UseTransferAssetMutationArgs = {
   transactionKind: TransactionKind
   tokenAmount: number
-  tokenInfo: IBCAssetInfo
+  ibcAssetInfo: IBCAssetInfo
 } & Parameters<typeof useMutation>[2]
 
 // const sendIbcTokens = (
@@ -32,7 +30,7 @@ type UseTransferAssetMutationArgs = {
 //   client: TrustlessChainClient
 // ): Promise<DeliverTxResponse> => {
 //   const timeoutTimestampNanoseconds = timeoutTimestamp
-//     ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
+//     ? BigInt(timeoutTimestamp).multiply(1_000_000_000)
 //     : undefined
 //   const transferMsg = MsgTransfer.fromPartial({
 
@@ -58,28 +56,29 @@ const sendIbcTokens = (
   /** timeout in seconds */
   timeoutTimestamp: number | undefined,
   // memo = '',
-  client: TrustlessChainClient
-): Promise<Tx> => {
+  client: SigningStargateClient
+): Promise<DeliverTxResponse> => {
   // const timeoutTimestampNanoseconds = timeoutTimestamp
-  //   ? Long.fromNumber(timeoutTimestamp).multiply(1_000_000_000)
+  //   ? BigInt(timeoutTimestamp).multiply(1_000_000_000)
   //   : undefined
-  const transferMsg = new MsgTransfer({
-    sourcePort,
-    sourceChannel,
-    sender: senderAddress,
-    receiver: recipientAddress,
-    token: transferAmount,
-    timeoutHeight: timeoutHeight,
-    timeoutTimestampSec: timeoutTimestamp.toString(),
 
-  })
-  return client.signAndBroadcast([transferMsg])
+  const transferMsg =
+    ibc.applications.transfer.v1.MessageComposer.withTypeUrl.transfer({
+      sourcePort,
+      sourceChannel,
+      sender: senderAddress,
+      receiver: recipientAddress,
+      token: transferAmount,
+      timeoutHeight: timeoutHeight,
+      timeoutTimestamp: BigInt(timeoutTimestamp),
+    })
+  return client.signAndBroadcast(senderAddress, [transferMsg], 'auto')
 }
 
 export const useTransferAssetMutation = ({
   transactionKind,
   tokenAmount,
-  tokenInfo,
+  ibcAssetInfo,
   ...mutationArgs
 }: UseTransferAssetMutationArgs) => {
   const { address, client } = useRecoilValue(walletState)
@@ -96,12 +95,12 @@ export const useTransferAssetMutation = ({
         {
           amount: convertDenomToMicroDenom(
             tokenAmount,
-            tokenInfo.decimals
+            ibcAssetInfo.decimals
           ).toString(),
-          denom: tokenInfo.denom,
+          denom: ibcAssetInfo.denom,
         },
         'transfer',
-        tokenInfo.channel,
+        ibcAssetInfo.channel,
         undefined,
         timeout,
         'auto'
@@ -115,12 +114,12 @@ export const useTransferAssetMutation = ({
         {
           amount: convertDenomToMicroDenom(
             tokenAmount,
-            tokenInfo.decimals
+            ibcAssetInfo.decimals
           ).toString(),
-          denom: tokenInfo.trst_denom,
+          denom: ibcAssetInfo.denom_on_trst,
         },
         'transfer',
-        tokenInfo.channel_to_trst,
+        ibcAssetInfo.channel_to_trst,
         undefined,
         timeout,
         //'',

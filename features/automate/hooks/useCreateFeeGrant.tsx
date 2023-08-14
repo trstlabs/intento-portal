@@ -18,11 +18,11 @@ import {
 import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { BasicAllowance } from 'trustlessjs/dist/protobuf/cosmos/feegrant/v1beta1/feegrant'
+
 
 type UseCreateFeeGrantParams = {
     grantee: string
-    allowance: BasicAllowance
+    allowance: any
 }
 
 

@@ -56,7 +56,7 @@ export default function Send() {
                     <StyledDivForTokenLogos>
                       <ImageForTokenLogo
                         size="big"
-                        logoURI={ibcInfo.logoURI}
+                        logoURI={ibcInfo.logo_uri}
                         alt={ibcInfo.symbol}
                       />
                     </StyledDivForTokenLogos>

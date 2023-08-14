@@ -7,19 +7,19 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef } from 'react'
 
-import { TokenInfo } from '../../../queries/usePoolsListQuery'
+import { TokenInfo } from '../../../types/trstTypes'
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
-  border: '2px solid $borderColors$default',
-  borderRadius: '4px',
 })
 
 export class IBCInfo {
+  chainId: string;
   name: string;
   logoURI: string;
-  connection: string;
+  connectionId: string;
+  counterpartyConnectionId: string;
   prefix: string;
   denom: string;
   trstDenom: string;
@@ -31,7 +31,7 @@ export class IBCInfo {
 export type ConnectionSelectListProps = {
   activeConnection?: string
   //todo refactor
-  connectionList: Array<Pick<TokenInfo, 'connection_id' | 'chain_id' | 'symbol' | 'logoURI' | 'name' | 'prefix' | 'denom' | 'trst_denom' | 'id'>>
+  connectionList:  Array<Pick<TokenInfo, 'connection_id'| 'counterparty_connection_id' | 'chain_id' | 'symbol' | 'logo_uri' | 'name' | 'prefix' | 'denom' | 'denom_on_trst' | 'id'>>
   onSelect: (connectionInfo: IBCInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -45,19 +45,17 @@ export const ConnectionSelectList = ({
   visibleNumberOfTokensInViewport = 2.5,
   ...props
 }: ConnectionSelectListProps) => {
-
-
-  //todo refactor
   function passIBCInfo(selectedInfo) {
     let selectedConnection = new IBCInfo();
-    selectedConnection.connection = selectedInfo.connection_id
+    selectedConnection.connectionId = selectedInfo.connection_id
+    selectedConnection.chainId = selectedInfo.chain_id
+    selectedConnection.counterpartyConnectionId = selectedInfo.counterparty_connection_id
     selectedConnection.name = selectedInfo.id
-    selectedConnection.logoURI = selectedInfo.logoURI
+    selectedConnection.logoURI = selectedInfo.logo_uri
     selectedConnection.denom = selectedInfo.denom
     selectedConnection.symbol = selectedInfo.symbol
     selectedConnection.prefix = selectedInfo.prefix
-    selectedConnection.trstDenom = selectedInfo.trst_denom
-    console.log(selectedConnection)
+    selectedConnection.trstDenom = selectedInfo.denom_on_trst 
     return selectedConnection
   }
 
@@ -66,7 +64,7 @@ export const ConnectionSelectList = ({
       <StyledDivForScrollContainer
         {...props}
         css={{
-          height: `${visibleNumberOfTokensInViewport * 2.5}rem`,
+          flex: 1,
           ...(props.css ? props.css : {}),
         }}
       >
@@ -79,13 +77,14 @@ export const ConnectionSelectList = ({
               selected={chainInfo.connection_id === activeConnection}
               {...getPropsForInteractiveElement({
                 onClick() {
+                  console.log("click")
                   onSelect(passIBCInfo(chainInfo))
                 },
               })}
             >
               <StyledDivForColumn kind="token">
                 <ImageForTokenLogo
-                  logoURI={chainInfo.logoURI}
+                  logoURI={chainInfo.logo_uri}
                   size="large"
                   alt={chainInfo.symbol}
                   loading="lazy"
@@ -116,7 +115,6 @@ const StyledButtonForRow = styled(ButtonForWrapper, {
   '&:last-child': {
     marginBottom: 0,
   },
-  //border: '2px solid $borderColors$default',
 })
 
 const StyledDivForColumn = styled('div', {

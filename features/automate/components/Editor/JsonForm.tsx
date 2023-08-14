@@ -10,6 +10,7 @@ import {
   IconButtonProps,
   TitleFieldProps,
   DescriptionFieldProps,
+  UiSchema,
 } from '@rjsf/utils'
 import { Validator } from 'jsonschema'
 import {
@@ -42,7 +43,9 @@ export const JsonFormEditor = ({
       console.log('formData error', e)
       return
     }
-    console.log('formData', form.formData)
+    if (JSON.parse(jsonValue) == form.formData) {
+      return
+    }
     let newJSON = JSON.parse(jsonValue)
     newJSON['value'] = form.formData
     const val = JSON.stringify(newJSON, null, 2)
@@ -73,20 +76,15 @@ export const JsonFormEditor = ({
   if (!jsonValue) {
     return
   }
-  console.log(jsonValue)
+
   const formDataItem = JSON.parse(jsonValue)['value']
 
-  const uiSchema = {
+  const uischema: UiSchema = {
     'ui:options': {
       addable: false,
     },
     'ui:submitButtonOptions': {
-      props: {
-        disabled: true,
-        className: 'btn btn-info',
-      },
       norender: true,
-      submitText: 'Submit',
     },
   }
 
@@ -166,7 +164,6 @@ export const JsonFormEditor = ({
   }
   function DescriptionFieldTemplate(props: DescriptionFieldProps) {
     const { description, id } = props
-
     return (
       <>
         {' '}
@@ -186,7 +183,7 @@ export const JsonFormEditor = ({
       <StyledFormWrapper>
         <Form
           className="rjsf-form"
-          uiSchema={uiSchema}
+          uiSchema={uischema}
           schema={exampleSchema as JSONSchema7}
           formData={formDataItem}
           onChange={handleChange}

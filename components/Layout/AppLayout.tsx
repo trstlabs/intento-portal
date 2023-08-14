@@ -14,12 +14,12 @@ import { particleState } from '../../state/atoms/particlesAtoms'
 
 export const AppLayout = ({
   navigationSidebar = <NavigationSidebar />,
-/*   extensionSidebar = <ExtensionSidebar />, */
+  /*   extensionSidebar = <ExtensionSidebar />, */
   footerBar = <FooterBar />,
   children,
 }) => {
   const isSmallScreen = useMedia('sm')
-/*   const isMediumScreen = useMedia('md') */
+  /*   const isMediumScreen = useMedia('md') */
   const themeController = useControlTheme()
 
   ///let isConfetti = useRecoilValue(particleState)
@@ -93,7 +93,7 @@ export const AppLayout = ({
 const StyledWrapper = styled('div', {
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-evenly',
+  justifyContent: 'flex-start',
   minHeight: '100vh',
   backgroundColor: '$backgroundColors$base',
   width: APP_MAX_WIDTH,

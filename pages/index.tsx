@@ -1,13 +1,12 @@
 import { AppLayout, PageHeader } from 'components'
 
-import { useRecoilValue } from 'recoil'
 import {
-  SortDirections, ButtonWithDropdownForSorting,
+  SortDirections,
+  ButtonWithDropdownForSorting,
   SortParameters,
-  useSortAutoTxs
+  useSortAutoTxs,
 } from 'features/auto-txs'
 import {
-  Card,
   Column,
   ConnectIcon,
   Inline,
@@ -15,21 +14,17 @@ import {
   Spinner,
   styled,
   Text,
-  Tooltip
+  Tooltip,
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
-import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
-import Contracts from './index_contracts'
-import { useSetModuleParams } from '../hooks/useChainInfo'
-
+import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
-
-  const { address, key } = useRecoilValue(walletState)
+  const { /* isWalletConnected, connect, */ address } = useChain('trustlesshub')
   const [autoTxs, isLoading] = useAutoTxInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
@@ -44,26 +39,32 @@ export default function Home() {
       [sortParameter, sortDirection]
     ),
   })
-  useSetModuleParams()
-  const shouldShowAutoCompound = !myAutoTxs?.length || (myAutoTxs.find(tx => tx.label === "Autocompound") == undefined);
-  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
+
+  const shouldShowAutoCompound =
+    !myAutoTxs?.length ||
+    myAutoTxs.find((tx) => tx.label === 'Autocompound') == undefined
+  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
 
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="View chain info and manage your on-chain triggers"
+      subtitle="View and manage your Intent-Centric Triggers"
     />
   )
 
   return (
     <AppLayout>
       {pageHeaderContents}
-      {!key &&
-        <Card css={{ marginBottom: '$12', padding: '$12' }} disabled variant="secondary"><Text variant="header" >
-          Connect a wallet
-        </Text></Card>
-      }
+      {/* {!isWalletConnected && (
+        <Button
+          onClick={async () => {
+            await connect()
+          }}
+        >
+          Connect Wallet
+        </Button>
+      )} */}
       {shouldShowFetchingState && (
         <>
           <Column
@@ -75,42 +76,47 @@ export default function Home() {
           </Column>
         </>
       )}
-      <Column
-        css={{ paddingTop: '12' }}>
+      <Column css={{ paddingTop: '12' }}>
         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>
-      {!isLoading && isSorting && address && (<Column
-        justifyContent="center"
-        align="center"
-        css={{ paddingTop: '$24' }}>
-        <Inline gap={2}>
-          <ConnectIcon color="secondary" />
-          <Text variant="primary">
-            {
-              "Finding your triggers..."
-            }
-          </Text>
-        </Inline>
-      </Column>)}
-      <Text variant="title" css={{ paddingLeft:'$2', padding: '$8' }} ><Tooltip label="Trustless Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub " ><span>Trustless Triggers</span></Tooltip></Text>
+      {!isLoading && isSorting && address && (
+        <Column
+          justifyContent="center"
+          align="center"
+          css={{ paddingTop: '$24' }}
+        >
+          <Inline gap={2}>
+            <ConnectIcon color="secondary" />
+            <Text variant="primary">{'Finding your triggers...'}</Text>
+          </Inline>
+        </Column>
+      )}
+      <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
+        <Tooltip label="Intent-Centric Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub ">
+          <span>Intent-Centric Triggers</span>
+        </Tooltip>
+      </Text>
       {shouldRenderAutoTxs && (
         <>
           {Boolean(myAutoTxs?.length) && (
             <>
-
-            <Text variant="caption" css={{ padding: '$4' }}>  {myAutoTxs.length > 1 ?  <span> Your Triggers({myAutoTxs.length})</span>: <span> Your Trigger (1)</span> }</Text>
+              <Text variant="caption" css={{ padding: '$4' }}>
+                {' '}
+                {myAutoTxs.length > 1 ? (
+                  <span> Your Triggers({myAutoTxs.length})</span>
+                ) : (
+                  <span> Your Trigger (1)</span>
+                )}
+              </Text>
 
               <StyledDivForAutoTxsGrid>
-
-                {myAutoTxs.map(
-                  (autoTxInfo, index) => (
-                    <AutoTxCard
-                      key={index}
-                      //structuredClone does not work on ios
-                      autoTxInfo={structuredClone(autoTxInfo)}
-                    />
-                  )
-                )}
+                {myAutoTxs.map((autoTxInfo, index) => (
+                  <AutoTxCard
+                    key={index}
+                    //structuredClone does not work on ios
+                    autoTxInfo={structuredClone(autoTxInfo)}
+                  />
+                ))}
               </StyledDivForAutoTxsGrid>
             </>
           )}
@@ -126,35 +132,43 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              <Text variant="caption" css={{ padding: '$4' }}>  {allAutoTxs.length > 1 ?  <span> All Triggers({allAutoTxs.length})</span>: <span> Other trigger (1)</span> }</Text>
-       
+              <Text variant="caption" css={{ padding: '$4' }}>
+                {' '}
+                {allAutoTxs.length > 1 ? (
+                  <span> All Triggers({allAutoTxs.length})</span>
+                ) : (
+                  <span> Other trigger (1)</span>
+                )}
+              </Text>
+
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}
                 onSortParameterChange={setSortParameter}
                 onSortDirectionChange={setSortDirection}
               />
-
             </Inline>
-          ) : <Text variant="caption" css={{ padding: '$4' }}> No Triggers found</Text>
-        }
+          ) : (
+            <Text variant="caption" css={{ padding: '$4' }}>
+              {' '}
+              No Triggers found
+            </Text>
+          )}
         </>
       </StyledDivForAutoTxsGrid>
 
       <StyledDivForAutoTxsGrid>
-        {allAutoTxs.map(
-          (autoTxInfo, index) => (
-            <AutoTxCard
-              key={index}
-              //structuredClone does not work on ios
-              autoTxInfo={structuredClone(autoTxInfo)}
-            />
-          )
-        )}
+        {allAutoTxs.map((autoTxInfo, index) => (
+          <AutoTxCard
+            key={index}
+            //structuredClone does not work on ios
+            autoTxInfo={structuredClone(autoTxInfo)}
+          />
+        ))}
       </StyledDivForAutoTxsGrid>
 
-      {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />}
-    </AppLayout >
+      {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
+    </AppLayout>
   )
 }
 
@@ -193,7 +207,6 @@ const StyledDivForAutoTxsGrid = styled('div', {
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',
   rowGap: '$8',
-
 
   '@media (max-width: 1360px)': {
     gridTemplateColumns: '1fr',

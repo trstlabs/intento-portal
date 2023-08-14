@@ -1,9 +1,9 @@
 import { useIBCAssetInfo } from 'hooks/useIBCAssetInfo'
-import { useTokenDollarValue } from 'hooks/useTokenDollarValue'
+// import { useTokenDollarValue } from 'hooks/useTokenDollarValue'
 import {
   ArrowUpIcon,
   Button,
-  dollarValueFormatterWithDecimals,
+  // dollarValueFormatterWithDecimals,
   ImageForTokenLogo,
   styled,
   Text,
@@ -35,12 +35,12 @@ export const AssetCard = ({
   state,
   ...htmlProps
 }: AssetCardProps) => {
-  const { symbol, logoURI, external_deposit_uri } =
+  const { symbol, logo_uri, external_deposit_uri } =
     useIBCAssetInfo(tokenSymbol) || {}
   const [showingRedirectDepositDialog, setShowingRedirectDepositDialog] =
     useState(false)
  
-  const [dollarValue] = useTokenDollarValue(tokenSymbol)
+  //const [dollarValue] = useTokenDollarValue(tokenSymbol)
 
   const shouldPerformDepositOutsideApp = Boolean(external_deposit_uri)
 
@@ -86,19 +86,19 @@ export const AssetCard = ({
       >
         <StyledElementForCard kind="content">
           <StyledElementForToken>
-            <ImageForTokenLogo logoURI={logoURI} size="big" />
+            <ImageForTokenLogo logoURI={logo_uri} size="big" />
             <div>
               <Text variant="primary">
                 {rendersActiveAppearance ? balance : null} {tokenSymbol}
               </Text>
-              {rendersActiveAppearance && (
+              {/* {rendersActiveAppearance && (
                 <Text variant="caption" css={{ paddingTop: '$1' }}>
                   $
                   {dollarValueFormatterWithDecimals(dollarValue * balance, {
                     includeCommaSeparation: true,
                   })}
                 </Text>
-              )}
+              )} */}
             </div>
           </StyledElementForToken>
         </StyledElementForCard>

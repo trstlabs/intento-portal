@@ -1,22 +1,20 @@
 import {
   Button,
   IconWrapper,
-  Inline,
   styled,
   Union,
-  useOnClickOutside,
 } from 'junoblocks'
 import React, { useRef, useState } from 'react'
 
 import { IbcSelectorToggle } from './IbcSelectorToggle'
 import { ConnectionOptionsList } from './ConnectionOptionsList'
+import { IBCInfo } from './ConnectionSelectList'
 
 type IbcSelectorProps = {
   readOnly?: boolean
   disabled?: boolean
   connectionId: string
-  onChange: (ibc_info: { connection; prefix; denom; name; symbol }) => void
-  size?: 'small' | 'large'
+  onChange: (IbcInfo: IBCInfo) => void
 }
 
 export const IbcSelector = ({
@@ -24,7 +22,6 @@ export const IbcSelector = ({
   disabled,
   connectionId,
   onChange,
-  size = 'large',
 }: IbcSelectorProps) => {
   const wrapperRef = useRef<HTMLDivElement>()
   const inputRef = useRef<HTMLInputElement>()
@@ -34,74 +31,20 @@ export const IbcSelector = ({
   const [chainLogoURI, setChainLogoURI] = useState('')
   const [chainName, setChainName] = useState('')
 
-  const handleSelectConnection = (
-    connection: string,
-    uri: string,
-    name: string,
-    prefix: string,
-    denom: string,
-    symbol: string
-  ) => {
-    setChainLogoURI(uri)
-    setChainName(name)
-    onChange({ connection, prefix, denom, name, symbol })
-
+  const handleSelectConnection = (ibcInfo: IBCInfo) => {
+    setChainLogoURI(ibcInfo.logoURI)
+    setChainName(ibcInfo.name)
+    onChange(ibcInfo)
     setConnectionListShowing(false)
-  }
-
-  useOnClickOutside([wrapperRef], () => {
-    setConnectionListShowing(false)
-  })
-
-  if (size === 'small') {
-    return (
-      <StyledDivForContainer
-        css={{ padding: '$24 $24', margin: '$24 $12 ' }}
-        ref={wrapperRef}
-      >
-        {!isConnectionListShowing && (
-          <Inline>
-            <IbcSelectorToggle
-              connection={connectionId}
-              chainLogoURI={chainLogoURI}
-              chainName={chainName}
-              isSelecting={isConnectionListShowing}
-              onToggle={
-                !disabled
-                  ? () => setConnectionListShowing((isShowing) => !isShowing)
-                  : undefined
-              }
-            />
-          </Inline>
-        )}
-        {isConnectionListShowing && (
-          <ConnectionOptionsList
-            activeConnection={connectionId}
-            onSelect={(slct) =>
-              handleSelectConnection(
-                slct.connection,
-                slct.logoURI,
-                slct.name,
-                slct.prefix,
-                slct.denom,
-                slct.symbol
-              )
-            }
-            css={{ padding: '$2 $3 $6' }}
-            visibleNumberOfTokensInViewport={4.5}
-          />
-        )}
-      </StyledDivForContainer>
-    )
   }
 
   return (
-    <StyledDivForContainer ref={wrapperRef}>
+    <StyledDivForContainer ref={wrapperRef} css={{ position: 'relative', zIndex: 1 }}>
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {!isConnectionListShowing && (
             <IbcSelectorToggle
-              connection={connectionId}
+              connectionId={connectionId}
               chainLogoURI={chainLogoURI}
               chainName={chainName}
               isSelecting={isConnectionListShowing}
@@ -120,7 +63,7 @@ export const IbcSelector = ({
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
               size="small"
-              onClick={() => handleSelectConnection('', '', '', '', '', '')}
+              onClick={() => handleSelectConnection(new IBCInfo())}
               iconColor="tertiary"
             />
           )}
@@ -140,16 +83,7 @@ export const IbcSelector = ({
       {isConnectionListShowing && (
         <ConnectionOptionsList
           activeConnection={connectionId}
-          onSelect={(slct) =>
-            handleSelectConnection(
-              slct.connection,
-              slct.logoURI,
-              slct.name,
-              slct.prefix,
-              slct.denom,
-              slct.symbol
-            )
-          }
+          onSelect={(slct) => handleSelectConnection(slct)}
           css={{ padding: '$2 $4 $2' }}
         />
       )}

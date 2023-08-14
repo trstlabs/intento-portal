@@ -1,8 +1,6 @@
-
 import {
   ButtonForWrapper,
   Chevron,
-
   IconWrapper,
   ImageForTokenLogo,
   styled,
@@ -14,7 +12,7 @@ import { getPropsForInteractiveElement } from 'util/getPropsForInteractiveElemen
 type IbcSelectorToggleProps = {
   isSelecting: boolean
   onToggle: () => void
-  connection: string
+  connectionId: string
   chainLogoURI: string
   chainName: string
   /*   availableAmount: number */
@@ -26,34 +24,36 @@ export const IbcSelectorToggle = ({
   chainLogoURI,
   chainName,
   /*   availableAmount, */
-  connection,
+  connectionId,
 }: IbcSelectorToggleProps) => {
-  
-  const hasTokenSelected = Boolean(connection)
+  const connectionSelected = Boolean(connectionId)
 
   return (
     <StyledDivForSelector
-      state={isSelecting || !connection ? 'selecting' : 'selected'}
+      state={isSelecting || !connectionId ? 'selecting' : 'selected'}
       {...getPropsForInteractiveElement({ onClick: onToggle })}
       variant="ghost"
     >
-      {(isSelecting || !hasTokenSelected) && (
+      {(isSelecting || !connectionSelected) && (
         <>
           <Text variant="body">Select a Chain</Text>
           <IconWrapper
             size="large"
-            rotation={connection ? '90deg' : '-90deg'}
+            rotation={connectionId ? '90deg' : '-90deg'}
             color="tertiary"
             icon={<Chevron />}
           />
         </>
       )}
-      {!isSelecting && hasTokenSelected && (
+      {!isSelecting && connectionSelected && (
         <>
-          <ImageForTokenLogo logoURI={chainLogoURI} size="big" alt={connection} />
+          <ImageForTokenLogo
+            logoURI={chainLogoURI}
+            size="big"
+            alt={connectionId}
+          />
 
           <Text variant="body">{chainName}</Text>
-
 
           <IconWrapper
             size="medium"
@@ -76,8 +76,8 @@ const StyledDivForSelector = styled(ButtonForWrapper, {
   transition: 'background-color .1s ease-out',
   userSelect: 'none',
   whiteSpace: 'pre',
-  marginTop: '$12',
-  marginBottom: '$12',
+  marginTop: '$4',
+  marginBottom: '$4',
   variants: {
     state: {
       selected: {

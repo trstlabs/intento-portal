@@ -4,10 +4,11 @@ import {
   CardContent,
   Tooltip,
   Button,
-  /*  styled,  */ Inline,
   Text,
   Chevron,
   IconWrapper,
+  Divider,
+  useMedia,
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { Row, StyledInput } from './AutoTxComponent'
@@ -25,8 +26,8 @@ interface IcaCardProps {
   shouldDisableSendFundsButton: boolean
   isExecutingSendFundsOnHost: boolean
   isExecutingAuthzGrant: boolean
-  isExecutingSendAndAuthzGrant: boolean
-  setFeeFundsHostChain: React.Dispatch<React.SetStateAction<string>>
+  requestedSendAndAuthzGrant: boolean
+  setFeeFundsHostChain: (fees: string) => void
   handleSendFundsOnHostClick: () => void
   handleCreateAuthzGrantClick: (withFunds: boolean) => void
 }
@@ -43,81 +44,106 @@ export const IcaCard = ({
   shouldDisableSendFundsButton,
   isExecutingSendFundsOnHost,
   isExecutingAuthzGrant,
-  isExecutingSendAndAuthzGrant,
+  requestedSendAndAuthzGrant,
   setFeeFundsHostChain,
   handleSendFundsOnHostClick,
   handleCreateAuthzGrantClick,
 }: IcaCardProps) => {
-  const [showICAInfo, hideICAInfo] = useState(true)
-
+  const [showICAInfo, setShowICAInfo] = useState(false)
+  const isMobile = useMedia('sm')
   return (
-    <Card variant="secondary" disabled css={{ padding: '$2' }}>
-      <CardContent css={{ margin: '$4 $3' }} size="medium">
-        <Inline justifyContent={'space-between'}>
-          <Text variant="body">Interchain Account </Text>
-
-          <Button
-            variant="ghost"
-            onClick={() => hideICAInfo((showICAInfo) => !showICAInfo)}
-          >
-            {' '}
-            {showICAInfo ? (
-              <IconWrapper
-                size="medium"
-                rotation="90deg"
-                color="tertiary"
-                icon={<Chevron />}
-              />
-            ) : (
-              <IconWrapper
-                size="medium"
-                rotation="-90deg"
-                color="tertiary"
-                icon={<Chevron />}
-              />
-            )}
-          </Button>
-        </Inline>
-      </CardContent>
+    <>
+      <Button
+        variant="ghost"
+        css={{ margin: '$2 $1' }}
+        size="medium"
+        onClick={() => setShowICAInfo((showICAInfo) => !showICAInfo)}
+        iconRight={
+          showICAInfo ? (
+            <IconWrapper
+              size="medium"
+              rotation="90deg"
+              color="tertiary"
+              icon={<Chevron />}
+            />
+          ) : (
+            <IconWrapper
+              size="medium"
+              rotation="-90deg"
+              color="tertiary"
+              icon={<Chevron />}
+            />
+          )
+        }
+      >
+        <Text variant="body">
+          {' '}
+          {showICAInfo ? <span>Hide</span> : <span>View</span>} Interchain
+          Account Details{' '}
+        </Text>
+      </Button>
 
       {showICAInfo && (
-        <CardContent>
+        <>
+          <Divider offsetY="$4" />
           <Text variant="legend"> Address </Text>
-          <Text css={{ padding: '$4' }} variant="caption">
-            {' '}
-            {icaAddress}
-          </Text>
-          {!isIcaBalanceLoading && (
-            <>
-              {' '}
-              <Text variant="legend"> Balance </Text>{' '}
-              <Text css={{ padding: '$4' }} variant="caption">
-                {' '}
-                {icaBalance} {chainSymbol}
-              </Text>
-            </>
+          {isMobile ? (
+            <Text wrap={true} css={{ padding: '$4' }} variant="caption">
+              {icaAddress.substring(0, 33) + '..'}
+            </Text>
+          ) : (
+            <Text wrap={true} css={{ padding: '$4' }} variant="caption">
+              {icaAddress}
+            </Text>
           )}
-          <Text variant="legend"> Grants</Text>
-          {!isAuthzGrantsLoading &&
-          icaAuthzGrants &&
-          icaAuthzGrants[0] &&
-          icaAuthzGrants[0].msgTypeUrl ? (
-            <>
-              {icaAuthzGrants.map((grant) => (
+          {icaBalance &&
+            (!isIcaBalanceLoading ? (
+              <>
+                {' '}
+                <Text variant="legend"> Balance </Text>{' '}
                 <Text css={{ padding: '$4' }} variant="caption">
                   {' '}
-                  Has grant for message type: '{grant.msgTypeUrl}'{' '}
-                  {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}
+                  {icaBalance} {chainSymbol}
                 </Text>
-              ))}
-            </>
-          ) : (
-            !icaAuthzGrants && (
+              </>
+            ) : (
+              <Spinner instant />
+            ))}
+          <Text variant="legend"> Grants</Text>
+          {
+            !isAuthzGrantsLoading && icaAuthzGrants && (
+              <>
+                {icaAuthzGrants.map((grant) =>
+                  grant.hasGrant ? (
+                    <Text css={{ padding: '$4' }} variant="caption">
+                      {' '}
+                      ✓ Trigger Account is granted for type: {
+                        grant.msgTypeUrl
+                      }{' '}
+                      {/* {grant.expiration && (
+                      <span> and expires in {grant.expiration.seconds}</span>
+                    )} */}
+                      {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}
+                    </Text>
+                  ) : (
+                    <Text css={{ padding: '$4' }} variant="caption">
+                      {' '}
+                      ✘ Trigger Account is not granted for type:{' '}
+                      {grant.msgTypeUrl}{' '}
+                      {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}
+                    </Text>
+                  )
+                )}
+              </>
+            ) /* : (
+            !icaAuthzGrants &&
+            !isAuthzGrantsLoading &&  (
               <Text css={{ padding: '$4' }} variant="caption">
                 No AuthZ grants for specified message types (yet)
               </Text>
             )
-          )}
+          )} */
+          }
           {!shouldDisableAuthzGrantButton && (
             <>
               <Card
@@ -162,7 +188,7 @@ export const IcaCard = ({
                 </CardContent>
               </Card>
               <Row>
-                {!isAuthzGrantsLoading && !icaAuthzGrants && (
+                {!isAuthzGrantsLoading && icaAuthzGrants && (
                   <>
                     <Tooltip
                       label="An AuthZ grant allows the Interchain Account that automates your transaction to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"
@@ -175,7 +201,8 @@ export const IcaCard = ({
                         disabled={shouldDisableAuthzGrantButton}
                         onClick={() => handleCreateAuthzGrantClick(false)}
                       >
-                        {isExecutingAuthzGrant && !isExecutingAuthzGrant ? (
+                        {isExecutingAuthzGrant &&
+                        !requestedSendAndAuthzGrant ? (
                           <Spinner instant />
                         ) : (
                           'Create AuthZ Grant'
@@ -193,7 +220,7 @@ export const IcaCard = ({
                       }
                       onClick={() => handleCreateAuthzGrantClick(true)}
                     >
-                      {isExecutingSendAndAuthzGrant ? (
+                      {isExecutingAuthzGrant && requestedSendAndAuthzGrant ? (
                         <Spinner instant />
                       ) : (
                         'AuthZ Grant + Send'
@@ -204,8 +231,8 @@ export const IcaCard = ({
               </Row>
             </>
           )}
-        </CardContent>
+        </>
       )}
-    </Card>
+    </>
   )
 }

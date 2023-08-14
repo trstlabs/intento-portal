@@ -1,8 +1,9 @@
-import { TrustlessChainClient } from 'trustlessjs'
+export {} 
+// import { TrustlessChainClient } from 'trustlessjs'
 
-import { useGetTokenDollarValueQuery } from './useGetTokenDollarValueQuery'
+// import { useGetTokenDollarValueQuery } from './useGetTokenDollarValueQuery'
 
-export type InternalQueryContext = {
-  client: TrustlessChainClient
-  getTokenDollarValue: ReturnType<typeof useGetTokenDollarValueQuery>[0]
-}
+// export type InternalQueryContext = {
+//   client: TrustlessChainClient
+//   getTokenDollarValue: ReturnType<typeof useGetTokenDollarValueQuery>[0]
+// }

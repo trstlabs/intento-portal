@@ -1,4 +1,3 @@
-import { useConnectWallet } from 'hooks/useConnectWallet'
 import { Logo, LogoText, PoolsIcon, GearIcon } from 'icons'
 import {
   Button,
@@ -27,15 +26,14 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { ReactNode, useState } from 'react'
-import { useRecoilState } from 'recoil'
-import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { TrustlessChainClient, TxResultCode } from 'trustlessjs'
+import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
 // import { setKeyring } from '../../hooks/useSetKeyring'
 import { SwapIcon } from '../../icons/Swap'
 import { TransferIcon } from '../../icons/Transfer'
-import { ConnectedWalletButton } from '../ConnectedWalletButton'
-import { SetKeyringButton } from '../SetKeyringButton'
+import { WalletButton } from '../Wallet/WalletButton'
+import { useRecoilState } from 'recoil'
+import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -43,47 +41,34 @@ type NavigationSidebarProps = {
 }
 
 export function NavigationSidebar(_: NavigationSidebarProps) {
-  const { mutate: connectWallet } = useConnectWallet()
-
-  const [{ key, address, client }, setWalletState] = useRecoilState(walletState)
-
+  const [{ status }, setWalletState] = useRecoilState(walletState)
   const themeController = useControlTheme()
 
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
 
+  const { isWalletConnected, connect, disconnect, username, address } =
+    useChain('trustlesshub')
+
   function resetWalletConnection() {
+    disconnect()
     setWalletState({
       status: WalletStatusType.idle,
       address: '',
       key: null,
       client: null,
+      rpc: '',
     })
-  }
-  function remove() {
-    localStorage.removeItem('vk' + address)
-    location.reload()
-  }
-  async function connectKeyring() {
-    setKeyring(address, client)
   }
 
   const walletButton = (
-    <ConnectedWalletButton
-      connected={Boolean(key?.name)}
-      walletName={key?.name}
-      onConnect={() => connectWallet(null)}
+    <WalletButton
+      connected={isWalletConnected && status === WalletStatusType.connected}
+      walletName={username}
+      address={address}
+      onConnect={connect}
       onDisconnect={resetWalletConnection}
       css={{ marginBottom: '$8' }}
-    />
-  )
-
-  const keyringButton = (
-    <SetKeyringButton
-      connected={Boolean(key?.name)}
-      onConnect={() => connectKeyring()}
-      css={{ marginBottom: '$8' }}
-      onRemove={() => remove()}
     />
   )
 
@@ -263,15 +248,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             </Link>
             {triggerMenuButton}
           </Inline>
-          {isOpen && (
-            <Column css={{ padding: '$12 $12 0' }}>
-              {walletButton}
-              {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == 'true' && {
-                keyringButton,
-              }}
-              {menuLinks}
-            </Column>
-          )}
+
           <Divider />
         </Column>
       </StyledWrapperForMobile>
@@ -298,9 +275,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Link>
 
         {walletButton}
-        {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == 'true' && {
-          keyringButton,
-        }}
+
         {menuLinks}
       </StyledMenuContainer>
       <Column>
@@ -384,58 +359,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       </Column>
     </StyledWrapper>
   )
-}
-
-async function setKeyring(address: string, client: TrustlessChainClient) {
-  if (!client) {
-    console.log('sadgfsadf')
-  }
-  try {
-    let vk = localStorage.getItem('vk' + address)
-    if (vk != undefined) {
-      try {
-        await client.query.compute.queryContractPrivateState({
-          contractAddress: process.env.NEXT_PUBLIC_KEYRING_ADDR,
-          codeHash: process.env.NEXT_PUBLIC_KEYRING_CODE_HASH,
-          query: { balance: { key: vk, address: address } },
-        })
-      } catch (e) {
-        console.log(e)
-        localStorage.removeItem('vk' + address)
-        alert('Setting viewing key failed')
-      }
-    } else {
-      vk = prompt(`Please specify a viewing key for this address to continue.`)
-      console.log(process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM)
-      let resp = await client.tx.compute.executeContract(
-        {
-          sender: address,
-          contract: process.env.NEXT_PUBLIC_KEYRING_ADDR,
-          codeHash: process.env.NEXT_PUBLIC_KEYRING_CODE_HASH,
-          msg: {
-            set_viewing_key: {
-              key: vk,
-            },
-          },
-        },
-        {
-          gasLimit: +process.env.NEXT_PUBLIC_GAS_LIMIT_MEDIUM,
-        }
-      )
-      console.log(resp)
-      if (resp.code !== TxResultCode.Success) {
-        console.error(resp.rawLog)
-        alert('Broadcasting viewing key failed')
-        return
-      }
-      localStorage.setItem('vk' + address, vk)
-      location.reload()
-    }
-  } catch (e) {
-    console.log('Error setting keyring')
-    /* throw the error for the UI */
-    throw e
-  }
 }
 
 const StyledWrapper = styled('div', {
