@@ -63,7 +63,7 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                Trigger ID: {autoTxInfo.txId}{' '}
+                Trigger ID: {autoTxInfo.txId.toString()}{' '}
               </StyledText>
             )}
             {autoTxInfo.msgs && (
@@ -147,3 +147,4 @@ const StyledSpanForHighlight = styled('span', {
     color: '$textColors$brand',
 })
  */
+

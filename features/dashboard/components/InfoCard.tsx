@@ -1,6 +1,5 @@
 import {
   Inline,
-  Card,
   Spinner,
   /* IconWrapper, PlusIcon, */ Button,
   /*  ImageForTokenLogo, styled,  */ Text,
@@ -28,9 +27,7 @@ import {
 } from '../../../hooks/useChainInfo'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useRecoilValue } from 'recoil'
-import {
-  triggerModuleParamsAtom,
-} from '../../../state/atoms/moduleParamsAtoms'
+import { triggerModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
 import IssuanceChart from './Chart'
 import { getDuration } from '../../../util/time'
 
@@ -108,7 +105,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               <span> Chain Info</span>
             </Text>
 
-            <Card variant="secondary" disabled css={{ padding: '$12' }}>
+            <Card css={{ padding: '$12' }}>
               <Text variant="legend"> Token Issuance </Text>
               <Text css={{ padding: '$8' }} variant="title">
                 {(
@@ -147,7 +144,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 <Text variant="title" css={{ padding: '$8' }}>
                   <span> Fee Info</span>
                 </Text>
-                <Card variant="secondary" disabled css={{ padding: '$12' }}>
+                <Card css={{ padding: '$12' }}>
                   <>
                     <Text variant="legend"> Trigger Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
@@ -182,7 +179,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
           </Text>
           {!isAPRLoading && APR ? (
             <>
-              <Card variant="secondary" disabled css={{ padding: '$8' }}>
+              <Card css={{ padding: '$8' }}>
                 <>
                   {' '}
                   <Inline>
@@ -220,7 +217,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   Autocompound
                 </Text>
               </Tooltip>
-              <Card variant="secondary" disabled css={{ padding: '$8' }}>
+              <Card css={{ padding: '$8' }}>
                 {!isWeeklyAPYLoading && weeklyAPY && (
                   <>
                     <Inline>
@@ -283,7 +280,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               </Card>
             </>
           ) : (
-            <Card variant="secondary" disabled css={{ padding: '$12' }}>
+            <Card css={{ padding: '$12' }}>
               <Text>Retrieving info...</Text>
               <Spinner size={40} style={{ margin: 0 }} />
             </Card>
@@ -397,4 +394,17 @@ const StyledDivForInfoGrid = styled('div', {
     gridTemplateColumns: '1fr',
     rowGap: '$8',
   },
+})
+
+const Card = styled('div', {
+  background: '$colors$dark10',
+  borderRadius: '18px',
+  padding: '$12 $16',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  position: 'relative',
+  overflow: 'hidden',
+  boxShadow: '$light',
+  border: '1px solid $borderColors$default',
+  backgroundColor: '$base',
 })

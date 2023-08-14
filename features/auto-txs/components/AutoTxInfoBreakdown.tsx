@@ -262,7 +262,7 @@ AutoTxInfoBreakdownProps) => {
               {autoTxInfo.label != '' ? (
                 <> Trigger: {autoTxInfo.label}</>
               ) : (
-                <>Trigger ID: {autoTxInfo.txId}</>
+                <>Trigger ID: {autoTxInfo.txId.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">

@@ -1,6 +1,6 @@
 
-import { SigningStargateClient, HttpEndpoint } from '@cosmjs/stargate'
-
+import { SigningStargateClient } from '@cosmjs/stargate'
+import { ExtendedHttpEndpoint } from '@cosmos-kit/core'
 import { atom } from 'recoil'
 
 export enum WalletStatusType {
@@ -23,7 +23,7 @@ type GeneratedWalletState<
   client: TClient | null
   status: WalletStatusType
   address: string
-  rpc: string | HttpEndpoint
+  rpc: string | ExtendedHttpEndpoint
 }
 
 type CreateWalletStateArgs<TState = {}> = {
