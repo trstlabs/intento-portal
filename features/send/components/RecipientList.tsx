@@ -2,7 +2,7 @@ import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyI
 
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
-import { useConnectWallet } from '../../../hooks/useConnectWallet';
+
 import { useTokenSend } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
@@ -47,7 +47,7 @@ export const RecipientList = ({
   data.msgs = [""]
   const [autoTxData, setAutoTxData] = useState(data)
   const { address, status } = useRecoilValue(walletState)
-  const { mutate: connectWallet } = useConnectWallet()
+
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ ibcAsset, recipientInfos: recipients, })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
@@ -83,7 +83,6 @@ export const RecipientList = ({
       return setRequestedSend(true)
     }
 
-    connectWallet(null)
   }
 
   const handleScheduleButtonClick = (txData: AutoTxData) => {
@@ -114,7 +113,6 @@ export const RecipientList = ({
       return setRequestedSchedule(true)
     }
 
-    connectWallet(null)
   }
 
   const handleChange = (index: number, key: keyof RecipientInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {

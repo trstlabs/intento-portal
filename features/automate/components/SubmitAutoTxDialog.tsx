@@ -43,7 +43,7 @@ type SubmitAutoTxDialogProps = {
   chainSymbol?: string
   icaAddress?: string
   icaBalance?: number
-  hasIcaAuthzGrant?: boolean
+  hasAllIcaAuthzGrants?: boolean
   customLabel?: string
   feeFundsHostChain?: string
   isLoading: boolean
@@ -53,7 +53,7 @@ type SubmitAutoTxDialogProps = {
   shouldDisableSendFundsButton?: boolean
   onRequestClose: () => void
   handleSubmitAutoTx: (data: AutoTxData) => void
-  handleCreateAuthzGrantClick?: () => void
+  handleCreateAuthzGrantClick?: (withFunds: boolean) => void
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
 }
@@ -62,7 +62,7 @@ export const SubmitAutoTxDialog = ({
   isDialogShowing,
   icaAddress,
   icaBalance,
-  hasIcaAuthzGrant,
+  hasAllIcaAuthzGrants,
   customLabel,
   chainSymbol,
   autoTxData,
@@ -554,12 +554,12 @@ export const SubmitAutoTxDialog = ({
                             {'Send ' + feeFundsHostChain + ' ' + chainSymbol}
                           </Button>
                         )}
-                      {!hasIcaAuthzGrant && (
+                      {!hasAllIcaAuthzGrants && (
                         <Button
                           css={{ marginTop: '$8', margin: '$2' }}
                           variant="secondary"
                           disabled={shouldDisableAuthzGrantButton}
-                          onClick={() => handleCreateAuthzGrantClick()}
+                          onClick={() => handleCreateAuthzGrantClick(Number(feeFundsHostChain) != 0)}
                         >
                           {isExecutingAuthzGrant && <Spinner instant />}{' '}
                           {Number(feeFundsHostChain) != 0
@@ -689,7 +689,7 @@ export const SubmitAutoTxDialog = ({
       >
         {autoTxData.connectionId && (
           <Button
-            disabled={!hasIcaAuthzGrant}
+            disabled={!hasAllIcaAuthzGrants}
             variant="secondary"
             onClick={() => (isLoading ? undefined : handleData(icaAddress))}
           >

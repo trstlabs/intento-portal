@@ -35,7 +35,7 @@ export const executeUpdateAutoTx = async ({
   return validateTransactionSuccess(
     await client.signAndBroadcast(autoTxParams.owner, [msgUpdateAutoTx], {
       amount: [],
-      gas: '130_000',
+      gas: '130000',
     })
   )
 

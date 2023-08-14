@@ -347,6 +347,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
           handleSubmitAutoTx={(autoTxData) =>
             handleSubmitAutoTxButtonClick(autoTxData)
           }
+
         />
       </StyledDivForInfoGrid>
     </StyledDivForContainer>

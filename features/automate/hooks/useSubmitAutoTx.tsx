@@ -28,6 +28,7 @@ export const useSubmitAutoTx = ({
     autoTxData,
 }: UseSubmitAutoTxArgs) => {
     const { client, address, status } = useRecoilValue(walletState)
+    
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 

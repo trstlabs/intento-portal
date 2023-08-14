@@ -1,4 +1,3 @@
-import { useConnectWallet } from 'hooks/useConnectWallet'
 import { Logo, LogoText, PoolsIcon, GearIcon } from 'icons'
 import {
   Button,
@@ -27,15 +26,14 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { ReactNode, useState } from 'react'
-import { useRecoilState } from 'recoil'
-import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-
+import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
 // import { setKeyring } from '../../hooks/useSetKeyring'
 import { SwapIcon } from '../../icons/Swap'
 import { TransferIcon } from '../../icons/Transfer'
-import { ConnectedWalletButton } from '../ConnectedWalletButton'
-
+import { WalletButton } from '../Wallet/WalletButton'
+import { useRecoilState } from 'recoil'
+import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -43,16 +41,17 @@ type NavigationSidebarProps = {
 }
 
 export function NavigationSidebar(_: NavigationSidebarProps) {
-  const { mutate: connectWallet } = useConnectWallet()
-
-  const [{ key }, setWalletState] = useRecoilState(walletState)
-
+  const [{ status }, setWalletState] = useRecoilState(walletState)
   const themeController = useControlTheme()
 
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
 
+  const { isWalletConnected, connect, disconnect, username, address } =
+    useChain('trustlesshub')
+
   function resetWalletConnection() {
+    disconnect()
     setWalletState({
       status: WalletStatusType.idle,
       address: '',
@@ -62,10 +61,11 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   }
 
   const walletButton = (
-    <ConnectedWalletButton
-      connected={Boolean(key?.name)}
-      walletName={key?.name}
-      onConnect={() => connectWallet(null)}
+    <WalletButton
+      connected={isWalletConnected && status === WalletStatusType.connected}
+      walletName={username}
+      address={address}
+      onConnect={connect}
       onDisconnect={resetWalletConnection}
       css={{ marginBottom: '$8' }}
     />
@@ -247,7 +247,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             </Link>
             {triggerMenuButton}
           </Inline>
-      
+
           <Divider />
         </Column>
       </StyledWrapperForMobile>
@@ -274,7 +274,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Link>
 
         {walletButton}
-  
+
         {menuLinks}
       </StyledMenuContainer>
       <Column>

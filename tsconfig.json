@@ -25,8 +25,10 @@
     "jsx": "preserve",
     "typeRoots": ["./node_modules/@types", "./types"],
     "paths": {
-      "": ["./*"]
+      "": ["./*"],
+      "react": [ "./node_modules/@types/react" ]
     }
+    
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/s"],
   "exclude": ["node_modules", "util/scripts/Trustless-Hub"] // *** The files to not type check ***

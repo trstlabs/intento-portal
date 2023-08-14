@@ -16,32 +16,34 @@ import {
   Valid, Connect,
 } from 'junoblocks'
 import React from 'react'
-import { useRecoilValue } from 'recoil'
-import { walletState } from 'state/atoms/walletAtoms'
 
-type ConnectedWalletButtonProps = { css?: CSS } & {
+
+type WalletButtonProps = { css?: CSS } & {
   walletName?: string
-  onConnect: () => void
+  address: string
+  onConnect: (sync) => void
   onDisconnect: () => void
   connected: boolean
 }
 
-export const ConnectedWalletButton = ({
-  onConnect,
-  connected,
-  onDisconnect,
+export const WalletButton = ({
   walletName,
+  connected,
+  address,
+  onConnect,
+  onDisconnect,
   ...props
-}: ConnectedWalletButtonProps) => {
+}: WalletButtonProps) => {
   const baseToken = useBaseTokenInfo()
+
   const { balance } = useTokenBalance(baseToken?.symbol)
-  const { address } = useRecoilValue(walletState)
+
 
   if (!connected) {
     return (
       <Column css={{ paddingBottom: '$6' }}>
         <Button onClick={onConnect} size="large" variant="primary" {...props}>
-          Connect Keplr
+          Connect Wallet
         </Button>
       </Column>
     )

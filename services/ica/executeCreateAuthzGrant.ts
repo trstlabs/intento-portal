@@ -9,7 +9,7 @@ import { GenericAuthorization } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
 type ExecuteCreateAuthzGrantArgs = {
   granter: string
   grantee: string
-  msgs: string[]
+  typeUrls: string[]
   expirationDurationMs?: number
   client: SigningStargateClient
   coin?: Coin
@@ -19,7 +19,7 @@ export const executeCreateAuthzGrant = async ({
   client,
   grantee,
   granter,
-  msgs,
+  typeUrls,
   expirationDurationMs,
   coin,
 }: ExecuteCreateAuthzGrantArgs): Promise<any> => {
@@ -29,7 +29,7 @@ export const executeCreateAuthzGrant = async ({
   // }
   console.log(expirationDurationMs)
   const msgObjects = []
-  for (let msg of msgs) {
+  for (let typeUrl of typeUrls) {
     let msgAuthzGrant = MsgGrant.fromPartial({
       granter,
       grantee,
@@ -37,24 +37,25 @@ export const executeCreateAuthzGrant = async ({
         authorization: {
           typeUrl: '/cosmos.authz.v1beta1.GenericAuthorization',
           value: GenericAuthorization.encode({
-            msg: JSON.parse(msg)['typeUrl'].toString(),
+            msg: typeUrl,
           }).finish(),
         },
         //expiration: { seconds: undefined },
       },
     })
+    // console.log(msgAuthzGrant)
     const MsgGrantAllowanceObject = {
       typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
       value: msgAuthzGrant,
     }
-    console.log(msgAuthzGrant)
-    console.log(MsgGrantAllowanceObject)
+    // console.log(msgAuthzGrant)
+    // console.log(MsgGrantAllowanceObject)
     msgObjects.push(MsgGrantAllowanceObject)
   }
 
 
 
-  if (coin) {
+  if (coin && Number(coin.amount) > 0) {
     let sendMsg = MsgSend.fromPartial({
       fromAddress: granter,
       toAddress: grantee,
@@ -66,5 +67,6 @@ export const executeCreateAuthzGrant = async ({
     }
     msgObjects.push(MsgSendObject)
   }
-  return await client.signAndBroadcast(granter, msgObjects, 'auto')
+
+  return await client.signAndBroadcast(granter, msgObjects, { gas: msgObjects.length == 0 ? "50000" : "100000", amount: []} )
 }

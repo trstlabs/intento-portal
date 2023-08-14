@@ -21,7 +21,9 @@ export const executeSubmitAutoTx = async ({
   if (autoTxData.startTime && autoTxData.startTime > 0) {
     startAtInt = Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000
   }
-  let startAt = BigInt(startAtInt) //BigInt(startAtInt)
+  console.log(startAtInt)
+  let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt("0") //BigInt(startAtInt)
+  console.log(startAt.toString())
   let duration = autoTxData.duration + 'ms'
   let interval = autoTxData.interval + 'ms'
   let msgs = []
@@ -93,7 +95,7 @@ export const executeSubmitAutoTx = async ({
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitAutoTx], {
       amount: [],
-      gas: "300000",
+      gas: '300000',
     })
   )
 }

@@ -96,7 +96,7 @@ export const JsonFormWrapper = ({
         {showJsonForm ? (
           <div style={{ margin: '$4', padding: '$4' }}>
             <Inline css={{ display: 'inline' }}>
-              <Text css={{ paddingBottom: '$4' }} variant="legend">
+              <Text css={{ paddingLeft: '$4', paddingBottom: '$4' }} variant="legend">
                 {' '}
                 Examples
               </Text>

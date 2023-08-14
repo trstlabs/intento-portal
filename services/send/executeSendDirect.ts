@@ -47,7 +47,7 @@ export const executeDirectSend = async ({
         senderAddress,
         recipientInfos[0].recipient,
         [{ denom, amount: recipientInfos[0].amount.toString() }],
-        { gas: '30_000', amount: undefined } as StdFee,
+        { gas: '50000', amount: [] } as StdFee,
         recipientInfos[0].memo
       )
     )

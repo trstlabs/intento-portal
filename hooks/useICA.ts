@@ -1,19 +1,28 @@
 import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
 
-import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
+import {
+  ibcWalletState,
+  walletState,
+  WalletStatusType,
+} from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
-import { getICA, /* getIsActiveICA, */ getAuthZGrants, getFeeGrantAllowance, AutoTxData, GrantResponse } from '../services/ica'
+import {
+  getICA,
+  /* getIsActiveICA, */ getAuthZGrantsForGrantee,
+  getFeeGrantAllowance,
+  AutoTxData,
+  GrantResponse,
+} from '../services/ica'
 // import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
-import {  useTrstRpcClient } from './useRPCClient'
+import { useTrstRpcClient } from './useRPCClient'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
-
-  if (accAddr === "") {
+  if (accAddr === '') {
     const { address } = useRecoilValue(walletState)
     accAddr = address
   }
@@ -22,26 +31,33 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
   const { data: ica, isLoading } = useQuery(
     [`interchainAccount/${connectionId}`, connectionId],
     async () => {
-
-      const resp: string = await getICA({ owner: accAddr, connectionId, rpcClient })
+      const resp: string = await getICA({
+        owner: accAddr,
+        connectionId,
+        rpcClient,
+      })
       return resp
-
     },
     {
-      enabled: Boolean(connectionId != "" && connectionId != undefined && rpcClient && rpcClient.trst),
+      enabled: Boolean(
+        connectionId != '' &&
+          connectionId != undefined &&
+          rpcClient &&
+          rpcClient.trst
+      ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
-
-    },
+    }
   )
 
   return [ica, isLoading] as const
-
-
 }
 
-export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: string) => {
+export const useICATokenBalance = (
+  tokenSymbol: string,
+  nativeWalletAddress: string
+) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   const { data, isLoading } = useQuery(
     [`icaTokenBalance/${tokenSymbol}`, nativeWalletAddress],
@@ -52,7 +68,7 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
       //const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
 
       const chainClient = await SigningStargateClient.connect(
-        rpc,
+        rpc
         //offlineSigner
       )
 
@@ -74,45 +90,65 @@ export const useICATokenBalance = (tokenSymbol: string, nativeWalletAddress: str
   return [data, isLoading] as const
 }
 
-
-export const useAuthZGrantsForUser = (granter: string, tokenSymbol: string, autoTxData?: AutoTxData) => {
-
+export const useAuthZGrantsForUser = (
+  grantee: string,
+  tokenSymbol: string,
+  autoTxData?: AutoTxData
+) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   let ibcState = useRecoilValue(ibcWalletState)
-
+  // console.log('granter ', ibcState.address, 'grantee ', grantee)
   const { data, isLoading } = useQuery(
-    ['userAuthZGrants', granter],
+    ['userAuthZGrants', grantee],
     async () => {
       let grants: GrantResponse[] = []
       const { rpc } = ibcAsset
-      for (const msg of autoTxData.msgs) {
-        let url = JSON.parse(msg)["typeUrl"];
-        console.log(url)
-        const grant = await getAuthZGrants({ grantee: ibcState.address, granter, msgTypeUrl: url.toString(), rpc })
-        grants.push(grant)
+      const ganteeGrants = await getAuthZGrantsForGrantee({
+        grantee,
+        granter: ibcState.address,
+        rpc,
+      })
 
+      for (const msg of autoTxData.msgs) {
+        let msgTypeUrl = JSON.parse(msg)['typeUrl']
+        console.log(msgTypeUrl)
+        const grantMatch = ganteeGrants.find(
+          (grant) => grant.msgTypeUrl == msgTypeUrl
+        )
+        if (grantMatch == undefined) {
+          grants.push({
+            msgTypeUrl,
+            expiration: undefined,
+            hasGrant: false,
+          })
+        } else {
+          grants.push(grantMatch)
+        }
         // typeUrls.push(grant.msgTypeUrl)
       }
-
-      if (!grants[0]) {
-        return
-      }
-
+      console.log('grants', grants)
       return grants
-
     },
     {
-      enabled: Boolean(granter && ibcAsset && ibcState.address.includes(ibcAsset.prefix) && granter.includes(ibcAsset.prefix) && autoTxData.msgs[0] && autoTxData.msgs[0].includes("typeUrl") && ibcState.status === WalletStatusType.connected && ibcState.client && ibcState.address),
+      enabled: Boolean(
+        grantee &&
+          ibcAsset &&
+          ibcState.address.includes(ibcAsset.prefix) &&
+          grantee.includes(ibcAsset.prefix) &&
+          autoTxData.msgs[0] &&
+          autoTxData.msgs[0].includes('typeUrl') &&
+          ibcState.status === WalletStatusType.connected &&
+          ibcState.client &&
+          ibcState.address
+      ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
-    },
+    }
   )
 
   return [data, isLoading] as const
 }
-
-
 
 export const useFeeGrantAllowanceForUser = (granter: string) => {
   const { status, client, address } = useRecoilValue(walletState)
@@ -120,21 +156,26 @@ export const useFeeGrantAllowanceForUser = (granter: string) => {
   const { data, isLoading } = useQuery(
     ['granter', granter],
     async () => {
-
-      const resp = await getFeeGrantAllowance({ grantee: address, granter, client })
-      console.log("feegrant: ", resp)
+      const resp = await getFeeGrantAllowance({
+        grantee: address,
+        granter,
+        client,
+      })
+      console.log('feegrant: ', resp)
       return resp
-
     },
     {
-      enabled: Boolean(granter != "" && status === WalletStatusType.connected && client && address),
+      enabled: Boolean(
+        granter != '' &&
+          status === WalletStatusType.connected &&
+          client &&
+          address
+      ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
-    },
+    }
   )
 
   return [data, isLoading] as const
-
-
 }

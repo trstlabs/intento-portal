@@ -1,6 +1,6 @@
 
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { Key } from '@keplr-wallet/types'
+
 import { atom } from 'recoil'
 
 export enum WalletStatusType {
@@ -82,7 +82,7 @@ function createWalletState<TClient = any, TState = {}>({
 
 export const walletState = createWalletState<
 SigningStargateClient,
-  { key?: Key }
+  { key?: string }
 >({
   key: 'internal-wallet',
   default: {

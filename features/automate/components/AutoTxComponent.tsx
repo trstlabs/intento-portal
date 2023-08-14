@@ -32,6 +32,7 @@ import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
+import { sleep } from '../../../localtrst/utils'
 
 type AutoTxsInputProps = {
   autoTxData: AutoTxData
@@ -67,6 +68,9 @@ export const AutoTxComponent = ({
     chainSymbol,
     autoTxData
   )
+  const hasAllIcaAuthzGrants = icaAuthzGrants
+    ? icaAuthzGrants.find((grant) => grant.hasGrant == false) === undefined
+    : false
   const refetchGrants = useRefetchQueries(['userAuthZGrants'])
   const refetchICA = useRefetchQueries([
     `interchainAccount/${autoTxData.connectionId}`,
@@ -160,20 +164,23 @@ export const AutoTxComponent = ({
   ////////////////////////////////////////\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   ////////////////////////////////////////ICA Authz Grant / Send funds\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
+  const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
+    useState(false)
+
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
       grantee: icaAddress,
-      msgs: autoTxData.msgs /* , expirationDurationMs: autoTxData.duration */,
-      coin: {
+      grantInfos: icaAuthzGrants? icaAuthzGrants.filter((grant) => grant.hasGrant == false) : [],
+      coin: requestedSendAndAuthzGrant ? {
         denom,
         amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
-      },
+      }: undefined,
     })
   useEffect(() => {
     const shouldTriggerAuthzGrant =
       !isExecutingAuthzGrant && requestedAuthzGrant
     if (shouldTriggerAuthzGrant) {
-      connectExternalWallet(null)
+      // connectExternalWallet(null)
       handleCreateAuthzGrant(undefined, {
         onSettled: () => {
           setRequestedSendAndAuthzGrant(false)
@@ -183,17 +190,14 @@ export const AutoTxComponent = ({
     }
   }, [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant])
 
-  const [isExecutingSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
-    useState(false)
 
-  const handleCreateAuthzGrantClick = (withFunds?: boolean) => {
-    connectExternalWallet(null)
+  const handleCreateAuthzGrantClick = (withFunds: boolean) => {
+    // connectExternalWallet(null)
+    setRequestedCreateAuthzGrant(true)
     return withFunds
-      ? setRequestedSendAndAuthzGrant(withFunds)
-      : setRequestedCreateAuthzGrant(true)
+      && setRequestedSendAndAuthzGrant(true)
+        
   }
-  const shouldDisableAuthzGrantButton =
-    autoTxData.msgs && autoTxData.msgs[0].length < 10
 
   //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
@@ -224,7 +228,7 @@ export const AutoTxComponent = ({
     }
   }
 
-  function handleChainChange(
+  async function handleChainChange(
     chainId: string,
     connectionId: string,
     counterpartyConnectionId: string,
@@ -255,8 +259,11 @@ export const AutoTxComponent = ({
     setChainSymbol(chainSymbol)
     setChainId(chainId)
     setPrefix(newPrefix)
-    connectExternalWallet(null)
     refetchICA()
+
+    await sleep(2000)
+
+    connectExternalWallet(null)
     refetchGrants()
   }
 
@@ -377,18 +384,16 @@ export const AutoTxComponent = ({
                       isIcaBalanceLoading={isIcaBalanceLoading}
                       isAuthzGrantsLoading={isAuthzGrantsLoading}
                       icaAuthzGrants={icaAuthzGrants}
-                      shouldDisableAuthzGrantButton={
-                        shouldDisableAuthzGrantButton
-                      }
+                      shouldDisableAuthzGrantButton={hasAllIcaAuthzGrants}
                       shouldDisableSendFundsButton={
                         shouldDisableSendFundsButton
                       }
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
                       isExecutingAuthzGrant={isExecutingAuthzGrant}
-                      isExecutingSendAndAuthzGrant={
-                        isExecutingSendAndAuthzGrant
+                      requestedSendAndAuthzGrant={
+                        requestedSendAndAuthzGrant
                       }
-                      setFeeFundsHostChain={setFeeFundsHostChain}
+                      setFeeFundsHostChain={(fees) => setFeeFundsHostChain(fees)}
                       handleSendFundsOnHostClick={handleSendFundsOnHostClick}
                       handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
                     />
@@ -475,9 +480,7 @@ export const AutoTxComponent = ({
                     <SubmitAutoTxDialog
                       chainSymbol={chainSymbol}
                       icaBalance={icaBalance}
-                      hasIcaAuthzGrant={
-                        icaAuthzGrants && icaAuthzGrants[0] != undefined
-                      }
+                      hasAllIcaAuthzGrants={hasAllIcaAuthzGrants}
                       icaAddress={icaAddress}
                       autoTxData={autoTxData}
                       isDialogShowing={isSubmitAutoTxDialogShowing}
@@ -493,9 +496,7 @@ export const AutoTxComponent = ({
                       }
                       isExecutingAuthzGrant={isExecutingAuthzGrant}
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                      shouldDisableAuthzGrantButton={
-                        shouldDisableAuthzGrantButton
-                      }
+                      shouldDisableAuthzGrantButton={!hasAllIcaAuthzGrants}
                       setFeeFundsHostChain={setFeeFundsHostChain}
                       handleSubmitAutoTx={(autoTxData) =>
                         handleSubmitAutoTxButtonClick(autoTxData)
@@ -567,7 +568,7 @@ const ChipContainer = styled('div', {
   borderRadius: '$2',
   backgroundColor: '$colors$light95',
   padding: '0.5em 0.75em',
-  margin: '0.25em 0.4em',
+  margin: '0.3em 0.4em',
   cursor: 'pointer',
   border: '1px solid $colors$light95',
   '&:hover': {

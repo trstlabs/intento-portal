@@ -3,6 +3,7 @@ import { useQuery } from 'react-query'
 export type IBCAssetInfo = {
   id: string
   name: string
+  registry_name: string
   symbol: string
   chain_id: string
   rpc: string
@@ -33,9 +34,10 @@ export const useIBCAssetList = () => {
       onError(e) {
         console.error('Error loading ibc asset list:', e)
       },
-      refetchOnMount: false,
-      refetchIntervalInBackground: true,
-      refetchInterval: 1000 * 60,
+      refetchOnMount: true,
+      refetchIntervalInBackground: false,
+      // refetchIntervalInBackground: true,
+      // refetchInterval: 1000 * 60,
     }
   )
 

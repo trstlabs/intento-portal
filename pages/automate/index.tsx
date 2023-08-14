@@ -21,7 +21,7 @@ export default function Automate() {
       <StyledContainer>
         <PageHeader
           title="Automate"
-          subtitle={`Create Time-based actions on IBC-enabled chains, executed by your unique Interchain Account`}
+          subtitle={`Create triggers on any connected chain, executed by your Trigger Account`}
         />
         <AutomateModule initialExample={getInitialExampleFromSearchParams()} />
       </StyledContainer>

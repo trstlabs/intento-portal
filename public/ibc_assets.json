@@ -3,6 +3,7 @@
     {
       "id": "Trustless Hub",
       "name": "Trustless Hub",
+      "registry_name": "trustlesshub",
       "symbol": "TRST",
       "chain_id": "TRST",
       "rpc": "http://trst-rpc.trustlesshub.com",
@@ -15,6 +16,7 @@
     {
       "id": "Cosmos Hub",
       "name": "Cosmos Hub",
+      "registry_name": "cosmoshub",
       "symbol": "ATOM",
       "chain_id": "GAIA",
       "rpc": "http://gaia-rpc.trustlesshub.com",
@@ -33,6 +35,7 @@
       "name": "Osmosis",
       "symbol": "OSMO",
       "chain_id": "OSMO",
+      "registry_name": "osmosis",
       "rpc": "http://osmosis-rpc.trustlesshub.com",
       "denom": "uosmo",
       "decimals": 6,
@@ -47,6 +50,7 @@
     {
       "id": "Trustless Hub Host",
       "name": "Trustless Hub Host(2)",
+      "registry_name": "trustlesshub2",
       "symbol": "COSM",
       "chain_id": "HOST",
       "rpc": "hhttps://host-rpc.trustlesshub.com",

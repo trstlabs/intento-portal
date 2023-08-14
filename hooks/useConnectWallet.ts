@@ -1,5 +1,3 @@
-import { getTrstSigningClientOptions } from 'trustlessjs'
-import { SigningStargateClient } from '@cosmjs/stargate'
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
@@ -7,51 +5,40 @@ import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
 import { useChainInfo } from './useChainInfo'
+import { useChain } from '@cosmos-kit/react'
 
-export const useConnectWallet = (
+export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
+  const {
+    connect,
+    getSigningStargateClient,
+    address,
+    username,
+  } = useChain('trustlesshub')
+
   const [{ status }, setWalletState] = useRecoilState(walletState)
+
   const [chainInfo] = useChainInfo()
 
   const mutation = useMutation(async () => {
-    if (!window?.keplr) {
-      alert('Please install Keplr extension and refresh the page.')
-      return
-    }
-
     /* set the fetching state */
     setWalletState((value) => ({
       ...value,
       client: null,
       state: WalletStatusType.connecting,
     }))
-
+    await sleep(500)
     try {
-      await window.keplr.experimentalSuggestChain(chainInfo)
-      await window.keplr.enable(chainInfo.chainId)
+      
+      console.log('address', address)
 
-      const offlineSigner = await window.keplr.getOfflineSignerAuto(
-        chainInfo.chainId
-      )
-      const [{ address }] = await offlineSigner.getAccounts()
-
-      const { registry, aminoTypes } = getTrstSigningClientOptions()
-
-      const trstChainClient = await SigningStargateClient.connectWithSigner(
-        chainInfo.rpc,
-        offlineSigner,
-        {
-          registry,
-          aminoTypes,
-        }
-      )
-
-      const key = await window.keplr.getKey(chainInfo.chainId)
+      const trstChainClient = await getSigningStargateClient()
+      console.log('trstChainClient', trstChainClient)
 
       /* successfully update the wallet state */
       setWalletState({
-        key,
+        key: username,
         address,
         client: trstChainClient,
         status: WalletStatusType.connected,
@@ -74,6 +61,7 @@ export const useConnectWallet = (
     function restoreWalletConnectionIfHadBeenConnectedBefore() {
       /* restore wallet connection if the state has been set with the */
       if (chainInfo?.rpc && status === WalletStatusType.restored) {
+        connect()
         mutation.mutate(null)
       }
     }, // eslint-disable-next-line
@@ -84,6 +72,7 @@ export const useConnectWallet = (
     function listenToWalletAddressChangeInKeplr() {
       function reconnectWallet() {
         if (status === WalletStatusType.connected) {
+          connect()
           mutation.mutate(null)
         }
       }
@@ -98,4 +87,8 @@ export const useConnectWallet = (
   )
 
   return mutation
+}
+
+async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
