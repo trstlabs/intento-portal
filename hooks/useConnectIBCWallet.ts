@@ -143,8 +143,6 @@ export const useConnectIBCWallet = (
   useEffect(() => {
     /* restore wallet connection */
     if (status === WalletStatusType.restored && assetInfo) {
-      // const { connect } = useChain(assetInfo.registry_name)
-      connect()
       connectWallet(null)
     }
   }, [status, connectWallet, assetInfo])
@@ -152,7 +150,6 @@ export const useConnectIBCWallet = (
   useEffect(() => {
     function reconnectWallet() {
       if (assetInfo && status === WalletStatusType.connected) {
-        connect()
         connectWallet(null)
       }
     }
