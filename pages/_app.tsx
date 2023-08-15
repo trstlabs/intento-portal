@@ -52,12 +52,7 @@ const toasterClassName = css({
   },
 }).toString()
 
-const wallets = [
-  ...keplrWallets,
-  ...cosmostationWallets,
-  ...leapWallets,
-
-]
+const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets]
 
 var chainList = chains
 function TrstApp({ Component, pageProps }: AppProps) {
@@ -76,7 +71,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
             symbol: 'utrst',
             denom_units: [
               { denom: 'utrst', exponent: 0 },
-              { denom: 'trst', exponent: 6 },
+              { denom: 'TRST', exponent: 6 },
             ],
             base: 'utrst',
             logo_URIs: {
@@ -101,7 +96,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
         fees: {
           fee_tokens: [
             {
-              denom: 'TRST',
+              denom: 'utrst',
               low_gas_price: 0.025,
               average_gas_price: 0.05,
               high_gas_price: 0.1,
@@ -157,10 +152,10 @@ function TrstApp({ Component, pageProps }: AppProps) {
       })
 
       chains.push({
-        chain_name: 'trustlesshub2',
+        chain_name: 'host',
         status: 'live',
         network_type: 'testnet',
-        pretty_name: 'Trustless Hub Host Testnet',
+        pretty_name: 'Host TRST chain for Testnet',
         chain_id: 'HOST',
         bech32_prefix: 'trust',
         daemon_name: 'trstd',
@@ -170,7 +165,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
         fees: {
           fee_tokens: [
             {
-              denom: 'COSM',
+              denom: 'ucosm',
               low_gas_price: 0.025,
               average_gas_price: 0.05,
               high_gas_price: 0.1,
@@ -317,6 +312,11 @@ function TrstApp({ Component, pageProps }: AppProps) {
                       isLazy: true,
                       rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
                       rest: [process.env.NEXT_PUBLIC_OSMO_API],
+                    },
+                    host: {
+                      isLazy: true,
+                      rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
+                      rest: [process.env.NEXT_PUBLIC_COSM_API],
                     },
                   },
                 }}
