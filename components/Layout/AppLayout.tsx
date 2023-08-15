@@ -108,7 +108,6 @@ const StyledChildren = styled('div', {
   backgroundColor: '$backgroundColors$base !important',
   position: 'relative',
   zIndex: 1,
-  paddingLeft: '$12',
 })
 
 const StyledContainer = styled('div', {
