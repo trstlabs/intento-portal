@@ -248,10 +248,16 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             </Link>
             {triggerMenuButton}
           </Inline>
-
+          {isOpen && (
+            <Column css={{ padding: '$12 $12 0' }}>
+              {walletButton}
+              {menuLinks}
+            </Column>
+          )}
           <Divider />
         </Column>
       </StyledWrapperForMobile>
+      
     )
   }
 

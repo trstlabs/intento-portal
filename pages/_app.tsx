@@ -14,10 +14,11 @@ import ibcAssetList from './../public/ibc_assets.json'
 import { NextJsAppRoot } from '../components/NextJsAppRoot'
 import { __TEST_MODE__ } from '../util/constants'
 
-import { ChainProvider } from '@cosmos-kit/react'
+import { ChainProvider, useChain } from '@cosmos-kit/react'
 
 import { wallets as keplrWallets } from '@cosmos-kit/keplr-extension'
-import { wallets as cosmostationWallets } from '@cosmos-kit/cosmostation-extension'
+import { wallets as cosmostationWallets } from '@cosmos-kit/cosmostation'
+import { wallets as leapWallets } from '@cosmos-kit/leap'
 
 import { assets, chains } from 'chain-registry'
 import {
@@ -51,7 +52,12 @@ const toasterClassName = css({
   },
 }).toString()
 
-const wallets = [...keplrWallets, ...cosmostationWallets]
+const wallets = [
+  ...keplrWallets,
+  ...cosmostationWallets,
+  ...leapWallets,
+
+]
 
 var chainList = chains
 function TrstApp({ Component, pageProps }: AppProps) {
@@ -141,6 +147,12 @@ function TrstApp({ Component, pageProps }: AppProps) {
               provider: 'trsttest',
             },
           ],
+          rest: [
+            {
+              address: process.env.NEXT_PUBLIC_TRST_API,
+              provider: 'trsttest',
+            },
+          ],
         },
       })
 
@@ -173,7 +185,12 @@ function TrstApp({ Component, pageProps }: AppProps) {
         let chain = chainList.find((i) => i.chain_name == asset.registry_name)
 
         // console.log(chain)
-        chain.apis.rpc = [{ address: process.env[`NEXT_PUBLIC_${asset.symbol}_RPC`], provider: 'trsttest' }]
+        chain.apis.rpc = [
+          {
+            address: process.env[`NEXT_PUBLIC_${asset.symbol}_RPC`],
+            provider: 'trsttest',
+          },
+        ]
         chain.fees = {
           fee_tokens: [
             {
@@ -222,11 +239,11 @@ function TrstApp({ Component, pageProps }: AppProps) {
       setOpen(false)
     }
     const { status } = useRecoilValue(walletState)
-
+    const { isWalletConnected } = useChain('trustlesshub')
     const { mutate: afterConnectWallet } = useAfterConnectWallet()
 
     useEffect(() => {
-      if (status == WalletStatusType.connected) {
+      if (status == WalletStatusType.connected && isWalletConnected) {
         setOpen(false)
       }
     })
@@ -236,7 +253,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
       sync?: boolean
     ) => {
       await connect(sync)
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 200))
       afterConnectWallet(null)
     }
 
@@ -247,7 +264,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
             css={{ fontSize: '22px', paddingBottom: '$8' }}
             variant={'title'}
           >
-            Choose Wallet Provider
+            Choose your wallet provider
           </Text>
           {/* <ModalCloseButton />
            */}

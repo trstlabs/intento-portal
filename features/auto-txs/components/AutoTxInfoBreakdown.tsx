@@ -467,45 +467,24 @@ AutoTxInfoBreakdownProps) => {
                     <Text variant="legend" color="secondary" align="left">
                       Message Value
                     </Text>
-                    {msg.typeUrl == '/cosmos.authz.v1beta1.MsgExec' ? (
-                      <Inline gap={2}>
-                        <Text css={{ wordBreak: 'break-word' }} variant="body">
-                          <pre
-                            style={{
-                              display: 'inline-block',
-                              whiteSpace: 'pre-wrap',
-                              overflow: 'hidden',
-                              float: 'left',
-                              fontSize: '0.8rem',
-                            }}
-                          >
-                            {getMsgValueForMsgExec(msg)}{' '}
-                          </pre>
-                        </Text>
-                      </Inline>
-                    ) : (
-                      <Inline gap={2}>
-                        {' '}
-                        <Text
-                          css={{
-                            wordBreak: 'break-all',
+
+                    <Inline gap={2}>
+                      <Text css={{ wordBreak: 'break-word' }} variant="body">
+                        <pre
+                          style={{
+                            display: 'inline-block',
                             whiteSpace: 'pre-wrap',
+                            overflow: 'hidden',
+                            float: 'left',
+                            fontSize: '0.8rem',
                           }}
-                          variant="body"
                         >
-                          <pre
-                            style={{
-                              display: 'inline-block',
-                              overflow: 'hidden',
-                              float: 'left',
-                              fontSize: '0.8rem',
-                            }}
-                          >
-                            {JSON.stringify(registry.decode(msg), null, 2)}{' '}
-                          </pre>
-                        </Text>
-                      </Inline>
-                    )}
+                          {msg.typeUrl == '/cosmos.authz.v1beta1.MsgExec'
+                            ? getMsgValueForMsgExec(msg)
+                            : JSON.stringify(registry.decode(msg), null, 2)}
+                        </pre>
+                      </Text>
+                    </Inline>
                   </>
                 ) : (
                   <>
