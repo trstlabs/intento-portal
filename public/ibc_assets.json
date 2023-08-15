@@ -47,7 +47,7 @@
     {
       "id": "Trustless Hub Host",
       "name": "Trustless Hub Host(2)",
-      "registry_name": "trustlesshub2",
+      "registry_name": "host",
       "symbol": "COSM",
       "chain_id": "HOST",
       "denom": "ucosm",
