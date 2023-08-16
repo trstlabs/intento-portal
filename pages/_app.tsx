@@ -245,13 +245,14 @@ function TrstApp({ Component, pageProps }: AppProps) {
     })
 
     const handleConnectClick = async (
-      wallet: WalletBase,
+      connect: WalletBase['connect'],
       sync?: boolean
     ) => {
-      await wallet.connect(sync)
-      await new Promise((resolve) => setTimeout(resolve, 100000))
+      await connect(sync)
+      await new Promise((resolve) => setTimeout(resolve, 200))
       afterConnectWallet(null)
     }
+
 
     return (
       <Dialog isShowing={isOpen} onRequestClose={onCloseModal}>
@@ -275,7 +276,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
               key={wallet.walletPrettyName}
               variant="ghost"
               onClick={(sync) => {
-                handleConnectClick(wallet, sync)
+                handleConnectClick(wallet.connect, sync)
               }}
             >
               <StyledPNG src={wallet.walletInfo.logo} /> {wallet.walletPrettyName}
