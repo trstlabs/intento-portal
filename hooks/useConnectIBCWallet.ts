@@ -23,7 +23,7 @@ export const useConnectIBCWallet = (
 
   // console.log('assetInfo', assetInfo.registry_name)
   const chainName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
-  const { getSigningStargateClient, connect, address, getRpcEndpoint } = useChain(chainName)
+  const { isWalletConnected, getSigningStargateClient, connect, address, getRpcEndpoint } = useChain(chainName)
   // const [chainInfo] = useIBCChainInfo(chainId)
 
   // chains.push({
@@ -73,47 +73,17 @@ export const useConnectIBCWallet = (
     }))
 
     try {
+
+      if (!isWalletConnected){
       await connect()
       await sleep(500)
+    }
+    
 
       const ibcChainClient = await getSigningStargateClient()
 
       console.log('ibcChainClient', ibcChainClient)
 
-      //const { address } = useChain(assetInfo.registry_name)
-      // await window.keplr.experimentalSuggestChain(chainInfo)
-      // await window.keplr.enable(chain_id)
-
-      // const customRegistry = new Registry([
-      //   ...defaultStargateTypes,
-      //   ...registry,
-      // ])
-      // // customRegistry.register("/cosmos.authz.v1beta1.MsgGrant", MsgGrant);
-      // await window.keplr.enable(chain_id)
-
-      // const offlineSigner = await window.keplr.getOfflineSignerAuto(chain_id)
-      // //console.log(offlineSigner)
-      // const ibcChainClient = await SigningStargateClient.connectWithSigner(
-      //   rpc,
-      //   offlineSigner,
-      //   {
-      //     gasPrice: GasPrice.fromString(GAS_PRICE),
-      //     /*
-      //      * passing ibc amino types for all the amino signers (eg ledger, wallet connect)
-      //      * to enable ibc & wasm transactions
-      //      * */
-      //     aminoTypes: new AminoTypes(
-      //       Object.assign(
-      //         createIbcAminoConverters(),
-      //         createAuthzAminoConverters()
-      //         //createWasmAminoConverters()
-      //       )
-      //     ),
-      //     registry: customRegistry,
-      //   }
-      // )
-
-      // const [{ address }] = await offlineSigner.getAccounts()
       const rpc = await getRpcEndpoint(true)
       console.log(rpc)
       /* successfully update the wallet state */
@@ -124,6 +94,7 @@ export const useConnectIBCWallet = (
         status: WalletStatusType.connected,
         rpc,
       })
+     
     } catch (e) {
       /* set the error state */
       setWalletState({

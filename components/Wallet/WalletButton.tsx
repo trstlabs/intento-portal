@@ -22,6 +22,7 @@ type WalletButtonProps = { css?: CSS } & {
   walletName?: string
   address: string
   onConnect: (sync) => void
+  onClick: () => void
   onDisconnect: () => void
   connected: boolean
 }
@@ -31,6 +32,7 @@ export const WalletButton = ({
   connected,
   address,
   onConnect,
+  onClick,
   onDisconnect,
   ...props
 }: WalletButtonProps) => {
@@ -52,7 +54,7 @@ export const WalletButton = ({
   return (
     <StyledWalletButton {...props} role="button">
       <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Connect />} />
-      <div data-content="">
+      <div data-content="" onClick={onClick} style={{cursor: "pointer"}} >
         <Text variant="link" color="body">
           {walletName}
         </Text>

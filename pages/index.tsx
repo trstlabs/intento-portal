@@ -56,15 +56,6 @@ export default function Home() {
   return (
     <AppLayout>
       {pageHeaderContents}
-      {/* {!isWalletConnected && (
-        <Button
-          onClick={async () => {
-            await connect()
-          }}
-        >
-          Connect Wallet
-        </Button>
-      )} */}
       {shouldShowFetchingState && (
         <>
           <Column

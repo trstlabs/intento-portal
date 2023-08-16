@@ -1,17 +1,19 @@
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
-
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-
 import { useChain } from '@cosmos-kit/react'
-import toast from 'react-hot-toast'
 
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
-  const { connect, getSigningStargateClient, address, username } =
-    useChain('trustlesshub')
+  let {
+    isWalletConnected,
+    connect,
+    getSigningStargateClient,
+    address,
+    username,
+  } = useChain('trustlesshub')
 
   const [{ status }, setWalletState] = useRecoilState(walletState)
 
@@ -26,10 +28,14 @@ export const useAfterConnectWallet = (
 
     // console.log('connecting')
 
-
     try {
-      console.log('address', address)
+      if (!isWalletConnected) {
+        await connect()
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        address = address
+      }
 
+      console.log('address', address)
       const trstChainClient = await getSigningStargateClient()
 
       // if (address == undefined) {
@@ -47,15 +53,13 @@ export const useAfterConnectWallet = (
           rpc: '',
         })
       }
-        
-      
     } catch (error) {
       /* set the error state */
-      let message
-      if (error instanceof Error) message = error.message
-      else message = String(error)
+      // let message
+      // if (error instanceof Error) message = error.message
+      // else message = String(error)
       // disconnect()
-      toast.error('Could not connect to wallet: ' + message)
+
       setWalletState({
         key: null,
         address: '',

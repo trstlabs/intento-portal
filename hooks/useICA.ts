@@ -41,7 +41,10 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     },
     {
       enabled: Boolean(
-        connectionId != '' && connectionId != undefined && rpcClient
+        connectionId != '' &&
+          connectionId != undefined &&
+          rpcClient &&
+          accAddr != ''
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
@@ -57,16 +60,15 @@ export const useICATokenBalance = (
   nativeWalletAddress: string
 ) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
+  const ibcState = useRecoilValue(ibcWalletState)
 
   const { data, isLoading } = useQuery(
     [`icaTokenBalance/${tokenSymbol}`, nativeWalletAddress],
     async () => {
       const { denom, decimals } = ibcAsset
 
-      const rpcChain = `NEXT_PUBLIC_${tokenSymbol}_RPC`
-
-      const endpoint = process.env[rpcChain]
-      const chainClient = await StargateClient.connect(endpoint)
+     
+      const chainClient = await StargateClient.connect(ibcState.rpc)
 
       const coin = await chainClient.getBalance(nativeWalletAddress, denom)
       console.log(coin)
@@ -95,11 +97,10 @@ export const useAuthZGrantsForUser = (
     ['userAuthZGrants', grantee],
     async () => {
       let grants: GrantResponse[] = []
-
       const ganteeGrants = await getAuthZGrantsForGrantee({
         grantee,
         granter: ibcState.address,
-        rpc: process.env[`NEXT_PUBLIC_${ibcState.tokenSymbol}_RPC`],
+        rpc: ibcState.rpc,
       })
 
       for (const msg of autoTxData.msgs) {

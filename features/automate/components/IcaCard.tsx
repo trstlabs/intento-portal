@@ -113,9 +113,9 @@ export const IcaCard = ({
           {
             !isAuthzGrantsLoading && icaAuthzGrants && (
               <>
-                {icaAuthzGrants.map((grant) =>
+                {icaAuthzGrants.map((grant, index) =>
                   grant.hasGrant ? (
-                    <Text css={{ padding: '$4' }} variant="caption">
+                    <Text key={index} css={{ padding: '$4' }} variant="caption">
                       {' '}
                       ✓ Trigger Account is granted for type: {
                         grant.msgTypeUrl

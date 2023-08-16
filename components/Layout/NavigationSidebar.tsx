@@ -34,6 +34,7 @@ import { TransferIcon } from '../../icons/Transfer'
 import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { useAfterConnectWallet } from '../../hooks/useConnectWallet'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -47,8 +48,16 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
 
-  const { isWalletConnected, connect, disconnect, username, address } =
-    useChain('trustlesshub')
+  const {
+    isWalletConnected,
+    connect,
+    disconnect,
+    username,
+    address,
+    openView,
+  } = useChain('trustlesshub')
+
+  const { mutate: afterConnectWallet } = useAfterConnectWallet()
 
   function resetWalletConnection() {
     disconnect()
@@ -61,12 +70,19 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     })
   }
 
+  async function connectWallet() {
+    await connect()
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+    afterConnectWallet(null)
+  }
+
   const walletButton = (
     <WalletButton
+      onClick={openView}
       connected={isWalletConnected && status === WalletStatusType.connected}
       walletName={username}
       address={address}
-      onConnect={connect}
+      onConnect={connectWallet}
       onDisconnect={resetWalletConnection}
       css={{ marginBottom: '$8' }}
     />
@@ -257,7 +273,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Divider />
         </Column>
       </StyledWrapperForMobile>
-      
     )
   }
 

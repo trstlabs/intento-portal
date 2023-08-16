@@ -1,20 +1,21 @@
 import 'normalize.css'
 import 'styles/globals.scss'
 import 'focus-visible'
+import '@interchain-ui/react/styles'
 import '../features/automate/components/Editor/rjsfform.css'
 import { ErrorBoundary } from 'components/ErrorBoundary'
 import { TestnetDialog } from 'components/TestnetDialog'
 import type { AppProps } from 'next/app'
 import { Toaster } from 'react-hot-toast'
 import { QueryClientProvider } from 'react-query'
-import { RecoilRoot, useRecoilValue } from 'recoil'
+import { RecoilRoot } from 'recoil'
 import { queryClient } from 'services/queryClient'
 import ibcAssetList from './../public/ibc_assets.json'
 
 import { NextJsAppRoot } from '../components/NextJsAppRoot'
 import { __TEST_MODE__ } from '../util/constants'
 
-import { ChainProvider, useChain } from '@cosmos-kit/react'
+import { ChainProvider } from '@cosmos-kit/react'
 
 import { wallets as keplrWallets } from '@cosmos-kit/keplr'
 import { wallets as cosmostationWallets } from '@cosmos-kit/cosmostation'
@@ -27,22 +28,10 @@ import {
 } from 'trustlessjs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 // import { GasPrice } from '@cosmjs/stargate';
-import {
-  Dialog,
-  DialogContent,
-  Text,
-  Button,
-  styled,
-  css,
-  media,
-  useMedia,
-} from 'junoblocks'
-import { SignerOptions, WalletBase, WalletModalProps } from '@cosmos-kit/core'
+import { css, media, useMedia } from 'junoblocks'
+import { SignerOptions } from '@cosmos-kit/core'
 import { Chain } from '@chain-registry/types'
 import { useEffect, useState } from 'react'
-
-import { useAfterConnectWallet } from '../hooks/useConnectWallet'
-import { WalletStatusType, walletState } from '../state/atoms/walletAtoms'
 
 const toasterClassName = css({
   [media.sm]: {
@@ -125,7 +114,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
               cosmwasm_enabled: false,
               consensus: {
                 type: 'tendermint',
-                version: '0.35',
+                version: '0.37',
               },
               ibc_go_version: '7.2.0',
             },
@@ -210,8 +199,6 @@ function TrstApp({ Component, pageProps }: AppProps) {
   // console.log(assets.find((i) => i.chain_name == 'cosmoshub'))
 
   const isSmallScreen = useMedia('sm')
-  const desiredWallets = isSmallScreen ? wallets.filter((w) => w.walletPrettyName.includes("Mobile")) : wallets.filter((w) => !w.walletPrettyName.includes("Mobile"))
-  
   const signerOptions: SignerOptions = {
     signingStargate: (chain: Chain) => {
       if (chain.chain_name == 'trustlesshub') {
@@ -226,67 +213,6 @@ function TrstApp({ Component, pageProps }: AppProps) {
     },
   }
 
-  // Define Modal Component
-  const ConnectModal = ({
-    isOpen,
-    setOpen /* , walletRepo, theme  */,
-  }: WalletModalProps) => {
-    function onCloseModal() {
-      setOpen(false)
-    }
-    const { status } = useRecoilValue(walletState)
-    const { isWalletConnected } = useChain('trustlesshub')
-    const { mutate: afterConnectWallet } = useAfterConnectWallet()
-
-    useEffect(() => {
-      if (status == WalletStatusType.connected && isWalletConnected) {
-        setOpen(false)
-      }
-    })
-
-    const handleConnectClick = async (
-      connect: WalletBase['connect'],
-      sync?: boolean
-    ) => {
-      await connect(sync)
-      await new Promise((resolve) => setTimeout(resolve, 200))
-      afterConnectWallet(null)
-    }
-
-
-    return (
-      <Dialog isShowing={isOpen} onRequestClose={onCloseModal}>
-        <DialogContent css={{ padding: '$12' }}>
-          <Text
-            css={{ fontSize: '22px', paddingBottom: '$8' }}
-            variant={'title'}
-          >
-            Choose your wallet provider
-          </Text>
-          {/* <ModalCloseButton />
-           */}
-          {desiredWallets.map((wallet) => (
-            <Button
-              css={{
-                width: '100%',
-                fontSize: '18px',
-                justifyContent: 'flex-start',
-              }}
-              size="medium"
-              key={wallet.walletPrettyName}
-              variant="ghost"
-              onClick={(sync) => {
-                handleConnectClick(wallet.connect, sync)
-              }}
-            >
-              <StyledPNG src={wallet.walletInfo.logo} /> {wallet.walletPrettyName}
-            </Button>
-          ))}
-        </DialogContent>
-      </Dialog>
-    )
-  }
-
   return (
     <RecoilRoot>
       <QueryClientProvider client={queryClient}>
@@ -294,6 +220,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
           <ErrorBoundary>
             {dataPushed && (
               <ChainProvider
+                logLevel="DEBUG"
                 chains={[...chainList]}
                 assetLists={[...assets]}
                 wallets={wallets}
@@ -324,14 +251,12 @@ function TrstApp({ Component, pageProps }: AppProps) {
                 }}
                 walletConnectOptions={{
                   signClient: {
-                    projectId: "fa03e8566efb5455b17a0e1f888f0e14",
+                    projectId: 'fa03e8566efb5455b17a0e1f888f0e14',
                   },
                 }}
-                // walletModal={undefined} // `modalViews` only counts when `walletModal` is `undefined`
-                // modalViews={{
-                //   Connected: ConnectedView,
-                // }}
-                walletModal={ConnectModal}
+                //walletModal={undefined} // `modalViews` only counts when `walletModal` is `undefined`
+
+                // walletModal={ConnectModal}
               >
                 <Component {...pageProps} />
               </ChainProvider>
@@ -354,14 +279,3 @@ function TrstApp({ Component, pageProps }: AppProps) {
 }
 
 export default TrstApp
-
-const StyledPNG = styled('img', {
-  width: '10%',
-  maxWidth: '200px',
-  maxHeight: '400px',
-  zIndex: '$1',
-  userSelect: 'none',
-  userDrag: 'none',
-  display: 'block',
-  margin: '$6',
-})

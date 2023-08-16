@@ -179,7 +179,7 @@ export const AutoTxComponent = ({
     const shouldTriggerAuthzGrant =
       !isExecutingAuthzGrant && requestedAuthzGrant
     if (shouldTriggerAuthzGrant) {
-      // connectExternalWallet(null)
+      connectExternalWallet(null)
       handleCreateAuthzGrant(undefined, {
         onSettled: () => {
           setRequestedSendAndAuthzGrant(false)
@@ -191,7 +191,7 @@ export const AutoTxComponent = ({
 
 
   const handleCreateAuthzGrantClick = (withFunds: boolean) => {
-    // connectExternalWallet(null)
+    connectExternalWallet(null)
     setRequestedCreateAuthzGrant(true)
     return withFunds
       && setRequestedSendAndAuthzGrant(true)
@@ -219,7 +219,7 @@ export const AutoTxComponent = ({
           ['typeUrl'].split('.')
           .find((data) => data.includes('Msg'))
       ) {
-        connectExternalWallet(null)
+        // connectExternalWallet(null)
         refetchGrants()
       }
     } catch (e) {
