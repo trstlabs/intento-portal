@@ -245,11 +245,11 @@ function TrstApp({ Component, pageProps }: AppProps) {
     })
 
     const handleConnectClick = async (
-      connect: WalletBase['connect'],
+      wallet: WalletBase,
       sync?: boolean
     ) => {
-      await connect(sync)
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      await wallet.connect(sync)
+      await new Promise((resolve) => setTimeout(resolve, 100000))
       afterConnectWallet(null)
     }
 
@@ -264,7 +264,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
           </Text>
           {/* <ModalCloseButton />
            */}
-          {desiredWallets.map(({ walletPrettyName, walletInfo, connect }) => (
+          {desiredWallets.map((wallet) => (
             <Button
               css={{
                 width: '100%',
@@ -272,13 +272,13 @@ function TrstApp({ Component, pageProps }: AppProps) {
                 justifyContent: 'flex-start',
               }}
               size="medium"
-              key={walletPrettyName}
+              key={wallet.walletPrettyName}
               variant="ghost"
               onClick={(sync) => {
-                handleConnectClick(connect, sync)
+                handleConnectClick(wallet, sync)
               }}
             >
-              <StyledPNG src={walletInfo.logo} /> {walletPrettyName}
+              <StyledPNG src={wallet.walletInfo.logo} /> {wallet.walletPrettyName}
             </Button>
           ))}
         </DialogContent>
@@ -319,6 +319,11 @@ function TrstApp({ Component, pageProps }: AppProps) {
                       rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
                       rest: [process.env.NEXT_PUBLIC_COSM_API],
                     },
+                  },
+                }}
+                walletConnectOptions={{
+                  signClient: {
+                    projectId: "fa03e8566efb5455b17a0e1f888f0e14",
                   },
                 }}
                 // walletModal={undefined} // `modalViews` only counts when `walletModal` is `undefined`
