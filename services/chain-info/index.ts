@@ -35,7 +35,7 @@ export interface BaseQueryInput {
 
 export const getBalanceForAcc = async ({ address, client }: BaseQueryInput) => {
   try {
-    const response = await client.getAllBalances(address)
+    const response = await  client.cosmos.bank.v1beta1.allBalances({address, pagination: undefined})
 
     return response
   } catch (e) {

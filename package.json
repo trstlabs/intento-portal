@@ -18,6 +18,7 @@
     "@cosmos-kit/keplr": "2.1.7",
     "@cosmos-kit/leap": "^2.1.7",
     "@cosmos-kit/react": "2.2.2",
+    "@cosmos-kit/walletconnect": "^2.1.7",
     "@keplr-wallet/types": "^0.12.16",
     "@next/bundle-analyzer": "^12.1.0",
     "@react-spring/web": "^9.4.2",

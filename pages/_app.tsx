@@ -16,7 +16,7 @@ import { __TEST_MODE__ } from '../util/constants'
 
 import { ChainProvider, useChain } from '@cosmos-kit/react'
 
-import { wallets as keplrWallets } from '@cosmos-kit/keplr-extension'
+import { wallets as keplrWallets } from '@cosmos-kit/keplr'
 import { wallets as cosmostationWallets } from '@cosmos-kit/cosmostation'
 import { wallets as leapWallets } from '@cosmos-kit/leap'
 
@@ -210,7 +210,8 @@ function TrstApp({ Component, pageProps }: AppProps) {
   // console.log(assets.find((i) => i.chain_name == 'cosmoshub'))
 
   const isSmallScreen = useMedia('sm')
-
+  const desiredWallets = isSmallScreen ? wallets.filter((w) => w.walletPrettyName.includes("Mobile")) : wallets.filter((w) => !w.walletPrettyName.includes("Mobile"))
+  
   const signerOptions: SignerOptions = {
     signingStargate: (chain: Chain) => {
       if (chain.chain_name == 'trustlesshub') {
@@ -263,7 +264,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
           </Text>
           {/* <ModalCloseButton />
            */}
-          {wallets.map(({ walletPrettyName, walletInfo, connect }) => (
+          {desiredWallets.map(({ walletPrettyName, walletInfo, connect }) => (
             <Button
               css={{
                 width: '100%',

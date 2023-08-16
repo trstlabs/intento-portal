@@ -6,6 +6,7 @@ import {
   Inline,
   Text,
   ImageForTokenLogo,
+  Card,
   CardContent,
   convertDenomToMicroDenom,
   Spinner,
@@ -65,10 +66,8 @@ export const AutoTxInfoBreakdown = ({
   ibcInfo,
 }: //size = 'large',
 AutoTxInfoBreakdownProps) => {
-  const [icaAddress, isIcaLoading] = useGetICA(
-    autoTxInfo.connectionId,
-    autoTxInfo.owner
-  )
+  const [icaAddress, _] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
+
   //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
   const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
@@ -78,6 +77,7 @@ AutoTxInfoBreakdownProps) => {
     symbol,
     icaAddress
   )
+
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
     autoTxInfo.feeAddress
   )
@@ -244,7 +244,19 @@ AutoTxInfoBreakdownProps) => {
         active={isActive}
         latestExecWasError={latestExecWasError}
       />
-      <Row>
+      {/* <Row> */}
+
+      <Card
+        variant="secondary"
+        disabled
+        active={isActive}
+        css={{
+          margin: '$6',
+          padding: '$6',
+          border: '1px solid $borderColors$default',
+          borderRadius: '18px',
+        }}
+      >
         <CardContent>
           <Column align="center">
             {ibcInfo && (
@@ -254,11 +266,11 @@ AutoTxInfoBreakdownProps) => {
                 alt={ibcInfo.symbol}
               />
             )}
-            <Text variant="caption" align="center" css={{ padding: '$8' }}>
+            <Text variant="title" align="center" css={{ padding: '$8' }}>
               {' '}
               {latestExecWasError ? <>🔴</> : <>🟢 </>}
             </Text>
-            <Text>
+            <Text variant="legend">
               {autoTxInfo.label != '' ? (
                 <> Trigger: {autoTxInfo.label}</>
               ) : (
@@ -267,7 +279,7 @@ AutoTxInfoBreakdownProps) => {
             </Text>
             <Column align="center">
               {' '}
-              <Text variant="title">
+              <Text variant="legend">
                 <>
                   {' '}
                   Message Type:{' '}
@@ -282,43 +294,36 @@ AutoTxInfoBreakdownProps) => {
             </Column>
           </Column>
         </CardContent>
-      </Row>
-
+      </Card>
+      {/* </Row> */}
       <>
         <Row>
-          <Column gap={8} align="flex-start" justifyContent="flex-start">
-            <Text variant="legend" color="secondary" align="left">
-              Owner
-            </Text>
-            <Inline gap={2}>
-              <Text variant="body">{autoTxInfo.owner} </Text>
-            </Inline>
-          </Column>
-        </Row>
-        {
-          autoTxInfo.portId && (
-            /* (icaActive && !isIcaActiveLoading ?  */ <Row>
-              <Column gap={8} align="flex-start" justifyContent="flex-start">
+          <Inline
+            style={{
+              wordBreak: 'break-word',
+            }}
+          >
+            <Column css={{padding: "$3"}} gap={8}  align="flex-start" justifyContent="flex-start">
+              <Text variant="legend" color="secondary" align="left">
+                Owner
+              </Text>
+
+              <Text  variant="body">{autoTxInfo.owner} </Text>
+            </Column>
+            {autoTxInfo.portId && (
+              /* (icaActive && !isIcaActiveLoading ?  */
+              <Column  css={{padding: "$3"}} gap={8} align="flex-start" justifyContent="flex-start">
                 <Text variant="legend" color="secondary" align="left">
                   IBC Port
                 </Text>
-                <Inline gap={2}>
-                  <Text variant="body">{autoTxInfo.portId} </Text>
-                </Inline>
+
+                <Text  variant="body">{autoTxInfo.portId} </Text>
               </Column>
-            </Row>
-          ) /*  : //for this to work there has to be a query for GetActiveChannelID
-                    <Row>
-                        <Column gap={8} align="flex-start" justifyContent="flex-start">
+            )}
+          </Inline>
+        </Row>
 
-                            <Text variant="legend" color="secondary" align="left">
-                                IBC Port inactive
-                            </Text>
-
-                        </Column>
-                    </Row>)*/
-        }
-        {!isIcaLoading && !isIcaBalanceLoading && autoTxInfo.connectionId && (
+        {icaAddress && icaBalance && autoTxInfo.connectionId && (
           <Row>
             <Column
               style={{
@@ -332,20 +337,20 @@ AutoTxInfoBreakdownProps) => {
               justifyContent="flex-start"
             >
               <Text variant="legend" color="secondary" align="left">
-                Interchain Account{' '}
+                Interchain Account
               </Text>
-              <Inline gap={2}>
-                <Text variant="body">{icaAddress} </Text>
-              </Inline>
+
+              <Text variant="body">{icaAddress} </Text>
+
               {!isIcaBalanceLoading && (
-                <Text variant="legend">
-                  {' '}
-                  Balance:{' '}
-                  <Text variant="caption">
-                    {' '}
+                <>
+                  <Text variant="legend" color="secondary" align="left">
+                    Balance
+                  </Text>
+                  <Text variant="body">
                     {icaBalance} {ibcInfo.symbol}
-                  </Text>{' '}
-                </Text>
+                  </Text>
+                </>
               )}
               <Button
                 css={{ justifyContent: 'flex-end !important' }}
@@ -440,28 +445,29 @@ AutoTxInfoBreakdownProps) => {
                 </Inline>
               </Column>
             </Row>
-            {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
-              <Button
-                variant="ghost"
-                size="small"
-                onClick={() => showEditor(!editor, msg)}
-              >
-                {editor ? 'Edit' : 'Discard'}
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="small"
-                onClick={() => {
-                  setEditor(!editor)
-                  setEditMsg(getMsgValueForMsgExec(msg))
-                }}
-              >
-                {editor ? 'Edit' : 'Discard'}
-              </Button>
-            )}
+
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
+                {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    onClick={() => showEditor(!editor, msg)}
+                  >
+                    {editor ? 'Edit' : 'Discard'}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    onClick={() => {
+                      setEditor(!editor)
+                      setEditMsg(getMsgValueForMsgExec(msg))
+                    }}
+                  >
+                    {editor ? 'Edit' : 'Discard'}
+                  </Button>
+                )}
                 {editor ? (
                   <>
                     <Text variant="legend" color="secondary" align="left">
@@ -618,7 +624,7 @@ AutoTxInfoBreakdownProps) => {
           </>
         )}
 
-        {autoTxInfo.autoTxHistory.length > 10 && (
+        {autoTxInfo.autoTxHistory.length > 0 && (
           <>
             {' '}
             <Row>
@@ -718,11 +724,14 @@ function Row({ children }) {
     <Inline
       css={{
         ...baseCss,
-        display: 'flex',
+        margin: '$6',
         justifyContent: 'space-between',
-        backgroundColor: '$colors$dark10',
-        borderRadius: '$2',
-        marginBottom: '$14',
+        alignItems: 'center',
+        overflow: 'hidden',
+        boxShadow: '$light',
+        borderRadius: '18px',
+        border: '1px solid $borderColors$default',
+        backgroundColor: '$base',
       }}
     >
       {children}

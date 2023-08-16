@@ -35,6 +35,8 @@ export const AppLayout = ({
     await loadFull(engine)
   }, [])
 
+  const isDarkMode = themeController.theme.name === 'dark'
+
   const particlesLoaded = useCallback(
     async (container: Container | undefined) => {
       await console.log(container)
@@ -62,9 +64,11 @@ export const AppLayout = ({
       <StyledWrapper>
         {navigationSidebar}
         <StyledContainer>
-          <main>
-            <StyledChildren> {children}</StyledChildren>
-          </main>
+          {isDarkMode ? (
+            <StyledChildrenDark>{children}</StyledChildrenDark>
+          ) : (
+            <StyledChildrenLight>{children}</StyledChildrenLight>
+          )}
         </StyledContainer>
 
         {/* {!isMediumScreen && extensionSidebar} */}
@@ -77,7 +81,7 @@ export const AppLayout = ({
           loaded={particlesLoaded}
         />
       ) : (
-        themeController.theme.name == 'dark' && (
+        isDarkMode && (
           <Particles
             id="tsparticles"
             init={particlesInit}
@@ -104,10 +108,18 @@ const StyledWrapper = styled('div', {
   },
 })
 
-const StyledChildren = styled('div', {
-  backgroundColor: '$backgroundColors$base !important',
+// Separate styled components for light and dark themes
+const StyledChildrenLight = styled('div', {
+  backgroundColor: 'rgba(255, 255, 255, 0.3) !important',
   position: 'relative',
   zIndex: 1,
+})
+
+const StyledChildrenDark = styled('div', {
+  background: `linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9) 7%, rgba(0, 0, 0, 0.9) 96%, rgba(0, 0, 0, 0.1) 100%) !important`,
+  position: 'relative',
+  zIndex: 1,
+  padding: '$12',
 })
 
 const StyledContainer = styled('div', {

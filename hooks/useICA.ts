@@ -9,13 +9,13 @@ import {
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import {
   getICA,
-  /* getIsActiveICA, */ getAuthZGrantsForGrantee,
+  getAuthZGrantsForGrantee,
   getFeeGrantAllowance,
   AutoTxData,
   GrantResponse,
 } from '../services/ica'
-// import { Grant } from 'trustlessjs/dist/protobuf/cosmos/authz/v1beta1/authz'
-import { SigningStargateClient } from '@cosmjs/stargate'
+
+import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
@@ -36,13 +36,12 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
         connectionId,
         rpcClient,
       })
+      console.log(resp)
       return resp
     },
     {
       enabled: Boolean(
-        connectionId != '' &&
-          connectionId != undefined &&
-          rpcClient
+        connectionId != '' && connectionId != undefined && rpcClient
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
@@ -58,30 +57,25 @@ export const useICATokenBalance = (
   nativeWalletAddress: string
 ) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  const ibcState = useRecoilValue(ibcWalletState)
+
   const { data, isLoading } = useQuery(
     [`icaTokenBalance/${tokenSymbol}`, nativeWalletAddress],
     async () => {
-     
       const { denom, decimals } = ibcAsset
 
-      //await window.keplr.enable(chain_id)
-      //const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
+      const rpcChain = `NEXT_PUBLIC_${tokenSymbol}_RPC`
 
-      const chainClient = await SigningStargateClient.connect(
-        ibcState.rpc
-        //offlineSigner
-      )
+      const endpoint = process.env[rpcChain]
+      const chainClient = await StargateClient.connect(endpoint)
 
-      // const [{ address }] = await offlineSigner.getAccounts()
       const coin = await chainClient.getBalance(nativeWalletAddress, denom)
-      // console.log(coin)
+      console.log(coin)
       const amount = coin ? Number(coin.amount) : 0
 
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(tokenSymbol && nativeWalletAddress && ibcAsset && ibcState),
+      enabled: Boolean(tokenSymbol && nativeWalletAddress != '' && ibcAsset),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -95,7 +89,6 @@ export const useAuthZGrantsForUser = (
   grantee: string,
   autoTxData?: AutoTxData
 ) => {
-
   const ibcState = useRecoilValue(ibcWalletState)
   // console.log('granter ', ibcState.address, 'grantee ', grantee)
   const { data, isLoading } = useQuery(
@@ -103,14 +96,10 @@ export const useAuthZGrantsForUser = (
     async () => {
       let grants: GrantResponse[] = []
 
-    //  ibcState.client.
-    //  console.log(ibcAsset)
-      //const rpc = process.env[`NEXT_PUBLIC_ATOM_RPC`];
-      //console.log(rpc)
       const ganteeGrants = await getAuthZGrantsForGrantee({
         grantee,
         granter: ibcState.address,
-        rpc: ibcState.rpc,
+        rpc: process.env[`NEXT_PUBLIC_${ibcState.tokenSymbol}_RPC`],
       })
 
       for (const msg of autoTxData.msgs) {

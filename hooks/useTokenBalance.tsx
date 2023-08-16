@@ -12,6 +12,7 @@ import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
 import { useTokenList } from './useTokenList'
 
 import { getBalanceForAcc } from '../services/chain-info'
+import { useCosmosRpcClient } from './useRPCClient'
 
 async function fetchTokenBalance({
   client,
@@ -153,8 +154,8 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
 }
 
 export const useGetBalanceForAcc = (address: string) => {
-  const { client } = useRecoilValue(walletState)
-
+  const client = useCosmosRpcClient()
+ 
   const { data, isLoading } = useQuery(
     ['address', address],
     async () => {
