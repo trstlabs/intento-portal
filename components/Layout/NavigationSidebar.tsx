@@ -72,8 +72,12 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   async function connectWallet() {
     await connect()
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 200))
     afterConnectWallet(null)
+    if (!isWalletConnected) {
+      await new Promise((resolve) => setTimeout(resolve, 700))
+      afterConnectWallet(null)
+    }
   }
 
   const walletButton = (
