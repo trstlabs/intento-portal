@@ -276,7 +276,7 @@ async function getBlockParams(client: StargateClient) {
     const actualBlockTime =
       (currentBlockTime - prevBlockTime) /
       (currentBlockHeight - prevBlockHeight)
-    console.log('actualBlockTime', actualBlockTime)
+    console.log('actualBlockTime', actualBlockTime/100)
     ///console.log(actualBlockTime)
     const actualBlocksPerYear = Math.ceil(
       (365 * 24 * 60 * 60 * 1000) / actualBlockTime

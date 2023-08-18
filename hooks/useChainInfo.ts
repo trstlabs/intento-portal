@@ -5,7 +5,7 @@ import { queryClient } from '../services/queryClient'
 // import { Long } from 'trustlessjs/dist/codegen/helpers'
 import { convertMicroDenomToDenom } from 'util/conversion'
 import { cosmos } from 'trustlessjs'
-import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
+import { DEFAULT_REFETCH_INTERVAL, DEFAULT_LONG_REFETCH_INTERVAL } from '../util/constants'
 
 import { useTrstRpcClient, useCosmosRpcClient, useTMRpcClient } from './useRPCClient'
 import {
@@ -111,8 +111,8 @@ export const useGetAllValidators = () => {
     {
       enabled: Boolean(client),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
     }
   )
 
@@ -160,7 +160,7 @@ export const useGetAPR = () => {
     {
       enabled: Boolean(client && paramsState),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -182,8 +182,6 @@ export const useSetModuleParams = () => {
     },
     {
       enabled: Boolean(cosmosClient && trstClient),
-      refetchIntervalInBackground: true,
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchOnMount: 'always',
     }
   )
@@ -229,7 +227,7 @@ export const useGetAPYForWithFees = (
     {
       enabled: Boolean(client && cosmosClient && trstClient && paramsState),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -260,8 +258,8 @@ export const useGetAPY = (intervalSeconds: number) => {
     {
       enabled: Boolean(client && intervalSeconds > 0 && paramsState),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
     }
   )
 

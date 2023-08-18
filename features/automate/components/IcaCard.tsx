@@ -110,40 +110,31 @@ export const IcaCard = ({
               <Spinner instant />
             ))}
           <Text variant="legend"> Grants</Text>
-          {
-            !isAuthzGrantsLoading && icaAuthzGrants && (
-              <>
-                {icaAuthzGrants.map((grant, index) =>
-                  grant.hasGrant ? (
-                    <Text key={index} css={{ padding: '$4' }} variant="caption">
-                      {' '}
-                      ✓ Trigger Account is granted for type: {
-                        grant.msgTypeUrl
-                      }{' '}
-                      {/* {grant.expiration && (
-                      <span> and expires in {grant.expiration.seconds}</span>
-                    )} */}
-                      {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}
-                    </Text>
-                  ) : (
-                    <Text css={{ padding: '$4' }} variant="caption">
-                      {' '}
-                      ✘ Trigger Account is not granted for type:{' '}
-                      {grant.msgTypeUrl}{' '}
-                      {/* that expires in {(relativeTime(grant.expiration.seconds.toNumber() * 1000))}  */}
-                    </Text>
-                  )
-                )}
-              </>
-            ) /* : (
-            !icaAuthzGrants &&
-            !isAuthzGrantsLoading &&  (
-              <Text css={{ padding: '$4' }} variant="caption">
-                No AuthZ grants for specified message types (yet)
-              </Text>
-            )
-          )} */
-          }
+          {isAuthzGrantsLoading && !icaAuthzGrants ? (
+            <Spinner />
+          ) : (
+            <>
+              {icaAuthzGrants && icaAuthzGrants[0] && icaAuthzGrants.map((grant, index) =>
+                grant.hasGrant ? (
+                  <Text key={index} css={{ padding: '$4' }} variant="caption">
+                    {' '}
+                    ✓ Trigger Account is granted for type: {
+                      grant.msgTypeUrl
+                    }{' '}
+                    {grant.expiration && (
+                      <span> and expires on {grant.expiration.toLocaleString()}</span>
+                    )}
+                  </Text>
+                ) : (
+                  <Text css={{ padding: '$4' }} variant="caption">
+                    {' '}
+                    ✘ Trigger Account is not granted for type:{' '}
+                    {grant.msgTypeUrl}{' '}
+                  </Text>
+                )
+              )}
+            </>
+          )}
           {!shouldDisableAuthzGrantButton && (
             <>
               <Card
@@ -188,7 +179,7 @@ export const IcaCard = ({
                 </CardContent>
               </Card>
               <Row>
-                {!isAuthzGrantsLoading && icaAuthzGrants && (
+                {icaAuthzGrants && (
                   <>
                     <Tooltip
                       label="An AuthZ grant allows the Interchain Account that automates your transaction to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"

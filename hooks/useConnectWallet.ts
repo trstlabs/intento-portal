@@ -15,7 +15,7 @@ export const useAfterConnectWallet = (
     username,
   } = useChain('trustlesshub')
 
-  const [{ status }, setWalletState] = useRecoilState(walletState)
+  const [{ status, client}, setWalletState] = useRecoilState(walletState)
 
   const mutation = useMutation(async () => {
     setWalletState((value) => ({
@@ -25,7 +25,7 @@ export const useAfterConnectWallet = (
     }))
 
     try {
-      if (address != undefined) {
+      if (address != undefined && (client == null ||client == undefined)) {
       const trstChainClient = await getSigningStargateClient()
 
       console.log('trstChainClient', trstChainClient)

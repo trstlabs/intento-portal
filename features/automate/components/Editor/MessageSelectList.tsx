@@ -6,8 +6,6 @@ import { ListType } from './JsonFormWrapper'
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
-  border: '2px solid $borderColors$default',
-  borderRadius: '0 0 12px 12px',
   margin: "0 $6"
 })
 
@@ -22,7 +20,7 @@ export const MessageSelectList = ({
   activeMessage,
   messageList,
   onSelect,
-  visibleNumberOfTokensInViewport = 3.5,
+  visibleNumberOfTokensInViewport = 7.5,
   ...props
 }: MessageSelectListProps) => {
   return (
@@ -64,10 +62,10 @@ const StyledButtonForRow = styled(ButtonForWrapper, {
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  padding: '$2 $4 !important',
+  padding: '$4 $4 !important',
   userSelect: 'none',
   cursor: 'pointer',
-  marginBottom: '$1',
+  marginBottom: '$3',
   '&:last-child': {
     marginBottom: 0,
   },

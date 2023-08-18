@@ -115,7 +115,7 @@ const selectedVariantForInputWrapper = {
 }
 
 const StyledDivForContainer = styled(Inline, {
-  borderRadius: '12px',
+  borderRadius: '5px',
   transition: 'box-shadow .1s ease-out',
   variants: {
     selected: selectedVariantForInputWrapper,

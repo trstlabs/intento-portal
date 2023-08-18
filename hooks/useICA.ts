@@ -6,7 +6,10 @@ import {
   walletState,
   WalletStatusType,
 } from '../state/atoms/walletAtoms'
-import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
+import {
+  DEFAULT_REFETCH_INTERVAL,
+  DEFAULT_LONG_REFETCH_INTERVAL,
+} from '../util/constants'
 import {
   getICA,
   getAuthZGrantsForGrantee,
@@ -67,7 +70,6 @@ export const useICATokenBalance = (
     async () => {
       const { denom, decimals } = ibcAsset
 
-     
       const chainClient = await StargateClient.connect(ibcState.rpc)
 
       const coin = await chainClient.getBalance(nativeWalletAddress, denom)
@@ -79,7 +81,7 @@ export const useICATokenBalance = (
     {
       enabled: Boolean(tokenSymbol && nativeWalletAddress != '' && ibcAsset),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -163,7 +165,7 @@ export const useFeeGrantAllowanceForUser = (granter: string) => {
           address
       ),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
     }
   )

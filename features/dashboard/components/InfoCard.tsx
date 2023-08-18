@@ -48,7 +48,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const [APR, isAPRLoading] = useGetAPR()
   const week = 60 * 60 * 24 * 7
 
-  const [weeklyAPY, isWeeklyAPYLoading] = useGetAPY(week)
+  const [weeklyAPY, ___] = useGetAPY(week)
   const [stakeBalance, isStakeBalanceLoading] = useGetStakeBalanceForAcc()
   const [APYWFees, isAPYWFeesLoading] = useGetAPYForWithFees(
     week * 52,
@@ -218,7 +218,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 </Text>
               </Tooltip>
               <Card css={{ padding: '$8' }}>
-                {!isWeeklyAPYLoading && weeklyAPY && (
+                {weeklyAPY && (
                   <>
                     <Inline>
                       <Text variant="legend"> APY (Weekly Compound)</Text>

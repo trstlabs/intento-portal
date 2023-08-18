@@ -35,6 +35,7 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useConnectWallet'
+import { WalletStatus } from '@cosmos-kit/core'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -42,7 +43,7 @@ type NavigationSidebarProps = {
 }
 
 export function NavigationSidebar(_: NavigationSidebarProps) {
-  const [{ status }, setWalletState] = useRecoilState(walletState)
+  const [{ status, client }, setWalletState] = useRecoilState(walletState)
   const themeController = useControlTheme()
 
   const isMobile = useMedia('sm')
@@ -76,6 +77,9 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     await connect()
     let attempts = 0
     while (status !== WalletStatusType.connected && attempts < 30) {
+      if (client != undefined || client != null) {
+        attempts = attempts + 10
+      }
       afterConnectWallet(null)
       await new Promise((resolve) => setTimeout(resolve, 1000))
       attempts++

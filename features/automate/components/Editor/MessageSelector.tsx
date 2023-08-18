@@ -1,4 +1,4 @@
-import { Inline, useOnClickOutside } from 'junoblocks'
+import { Dialog, Inline, useOnClickOutside } from 'junoblocks'
 import React, {
   Dispatch,
   SetStateAction,
@@ -62,24 +62,26 @@ export const MessageSelector = ({
   }
 
   return (
-    <Inline css={{display: 'grid'}}>
+    <Inline css={{ display: 'grid' }}>
       {isMessageListShowing && (
-        <CosmosMessageSelector 
-          isInputForSearchFocused={isInputForSearchFocused}
-          wrapperRef={wrapperRef}
-          messageSearchQuery={messageSearchQuery}
-          msgTypeName={msgTypeName}
-          filteredMessageList={filteredMessageList}
-          index={index}
-          setMessageSearchQuery={setMessageSearchQuery}
-          setInputForSearchFocused={setInputForSearchFocused}
-          setExampleSchema={setExampleSchema}
-          setExample={setExample}
-          setMessageListShowing={setMessageListShowing}
-        />
+        <Dialog isShowing={true} onRequestClose={undefined}>
+          <CosmosMessageSelector
+            isInputForSearchFocused={isInputForSearchFocused}
+            wrapperRef={wrapperRef}
+            messageSearchQuery={messageSearchQuery}
+            msgTypeName={msgTypeName}
+            filteredMessageList={filteredMessageList}
+            index={index}
+            setMessageSearchQuery={setMessageSearchQuery}
+            setInputForSearchFocused={setInputForSearchFocused}
+            setExampleSchema={setExampleSchema}
+            setExample={setExample}
+            setMessageListShowing={setMessageListShowing}
+          />{' '}
+        </Dialog>
       )}
       {!isMessageListShowing && (
-        <MessageSelectorToggle 
+        <MessageSelectorToggle
           messageName={msgTypeName}
           isSelecting={isMessageListShowing}
           onToggle={() => setMessageListShowing((isShowing) => !isShowing)}
