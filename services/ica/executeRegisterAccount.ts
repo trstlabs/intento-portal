@@ -18,11 +18,11 @@ export const executeRegisterAccount = async ({
 }: ExecuteRegisterAccountArgs): Promise<any> => {
   //todo
   const versionObject = {
-    version: "ics-27",
+    version: "ics27-1",
     controller_connection_id: connectionId,
     host_connection_id: counterpartyConnectionId,
     encoding: "proto3",
-    tx_type: "sdk_multi_sig"
+    tx_type: "sdk_multi_msg"
 
   }
   const version = JSON.stringify(versionObject)
