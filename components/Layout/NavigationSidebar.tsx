@@ -35,7 +35,6 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useConnectWallet'
-import { WalletStatus } from '@cosmos-kit/core'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean

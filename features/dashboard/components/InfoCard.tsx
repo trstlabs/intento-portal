@@ -236,7 +236,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                         <Text css={{ paddingTop: '$1' }} variant="caption">
                           {' '}
                           Estimated at {APYWFees.toPrecision(5).toString()}%
-                          with current fees applied and your staked tokens
+                          with current fees applied and your staked balance
                         </Text>
                       )}
                     </Text>
@@ -269,10 +269,10 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                       </>
                     ) : (
                       <>
-                        You hold {formatTokenBalance(balance)} TRST but have not
-                        staked any tokens yet, stake them to secure the network
+                        You hold {formatTokenBalance(balance)} TRST and have not
+                        staked tokens yet, stake to secure the network
                         and earn staking rewards. Staking rewards can be
-                        compounded to earn additonal tokens.
+                        compounded to earn additional yield.
                       </>
                     )}
                   </Text>
