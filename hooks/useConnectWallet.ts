@@ -8,7 +8,7 @@ export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
   let {
-    isWalletConnected,
+
     connect,
     getSigningStargateClient,
     address,
@@ -18,32 +18,18 @@ export const useAfterConnectWallet = (
   const [{ status }, setWalletState] = useRecoilState(walletState)
 
   const mutation = useMutation(async () => {
-    /* set the fetching state */
-    // disconnect()
     setWalletState((value) => ({
       ...value,
       client: null,
       state: WalletStatusType.connecting,
     }))
 
-    // console.log('connecting')
-
     try {
-      if (!isWalletConnected) {
-        await connect()
-        await new Promise((resolve) => setTimeout(resolve, 200))
-        address = address
-      }
-
-      console.log('address', address)
+      if (address != undefined) {
       const trstChainClient = await getSigningStargateClient()
 
-      // if (address == undefined) {
-      //   throw Error("address is undefined after connect")
-
-      // }
       console.log('trstChainClient', trstChainClient)
-      if (address != undefined) {
+      
         /* successfully update the wallet state */
         setWalletState({
           key: username,
@@ -54,12 +40,6 @@ export const useAfterConnectWallet = (
         })
       }
     } catch (error) {
-      /* set the error state */
-      // let message
-      // if (error instanceof Error) message = error.message
-      // else message = String(error)
-      // disconnect()
-
       setWalletState({
         key: null,
         address: '',

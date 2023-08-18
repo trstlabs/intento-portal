@@ -50,13 +50,14 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   const {
     isWalletConnected,
+    isWalletConnecting,
+    status: walletStatus,
     connect,
     disconnect,
     username,
     address,
     openView,
   } = useChain('trustlesshub')
-
   const { mutate: afterConnectWallet } = useAfterConnectWallet()
 
   function resetWalletConnection() {
@@ -68,16 +69,24 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       client: null,
       rpc: '',
     })
+    // window.location.reload()
   }
 
   async function connectWallet() {
     await connect()
-    await new Promise((resolve) => setTimeout(resolve, 200))
-    afterConnectWallet(null)
-    if (!isWalletConnected) {
-      await new Promise((resolve) => setTimeout(resolve, 700))
+    let attempts = 0
+    while (status !== WalletStatusType.connected && attempts < 30) {
       afterConnectWallet(null)
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      attempts++
     }
+    console.log(
+      isWalletConnected,
+      isWalletConnecting,
+      status,
+      walletStatus,
+      address
+    )
   }
 
   const walletButton = (
