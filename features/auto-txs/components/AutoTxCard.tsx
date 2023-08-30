@@ -9,7 +9,7 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 
-import { __POOL_REWARDS_ENABLED__ } from 'util/constants'
+
 import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
 
@@ -25,12 +25,7 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
     autoTxInfo.endTime &&
     autoTxInfo.execTime &&
     autoTxInfo.endTime.getSeconds() >= autoTxInfo.execTime.getSeconds()
-  // const msgData = new TextDecoder().decode(autoTxInfo.data).split(".")
-  // const data = msgData.find((data) => data.includes("Msg")).split(",")
 
-  // var Long = require("long");
-  //const parsedNumber = JSON.stringify(autoTxInfo.txId.toString()) 
-  // as Long
 
   
   return (

@@ -281,8 +281,7 @@ async function getBlockParams(client: StargateClient) {
     const actualBlocksPerYear = Math.ceil(
       (365 * 24 * 60 * 60 * 1000) / actualBlockTime
     )
-    // console.log("actualBlocksPerYear")
-    // console.log(actualBlocksPerYear)
+
     return {
       actualBlockTime,
       actualBlocksPerYear,
@@ -296,10 +295,7 @@ async function getBlockParams(client: StargateClient) {
 async function getStakingParams(client: any) {
   try {
     const staking = await client.cosmos.staking.v1beta1.params({})
-    // const unbondingTime = parseInt(staking.params.unbondingTime.seconds)
-    // const maxValidators = staking.params.maxValidators
-    // const pool = await client.query.staking.pool({})
-    // const bondedTokens = Number(pool.pool.bondedTokens);
+
     return staking.params
   } catch (e) {
     console.error('err(getStakingParams):', e)
@@ -309,10 +305,7 @@ async function getStakingParams(client: any) {
 async function getAllocParams(client: any) {
   try {
     const alloc = await client.trst.alloc.v1beta1.params({})
-    // const unbondingTime = parseInt(staking.params.unbondingTime.seconds)
-    // const maxValidators = staking.params.maxValidators
-    // const pool = await client.query.staking.pool({})
-    // const bondedTokens = Number(pool.pool.bondedTokens);
+
     return alloc.params
   } catch (e) {
     console.error('err(getAllocParams):', e)

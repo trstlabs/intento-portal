@@ -39,7 +39,6 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
         connectionId,
         rpcClient,
       })
-      console.log(resp)
       return resp
     },
     {
@@ -73,7 +72,7 @@ export const useICATokenBalance = (
       const chainClient = await StargateClient.connect(ibcState.rpc)
 
       const coin = await chainClient.getBalance(nativeWalletAddress, denom)
-      console.log(coin)
+
       const amount = coin ? Number(coin.amount) : 0
 
       return convertMicroDenomToDenom(amount, decimals)

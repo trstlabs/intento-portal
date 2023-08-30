@@ -52,13 +52,11 @@ export interface AutoTxHistoryEntry {
   export type TokenInfo = {
     id: string
     chain_id: string
-    token_address: string
     symbol: string
     name: string
     decimals: number
     logo_uri: string
     denom: string
-    native: boolean
     channel?: string
     channel_to_trst?: string
     connection_id?: string

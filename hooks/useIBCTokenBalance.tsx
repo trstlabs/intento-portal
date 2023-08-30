@@ -17,14 +17,10 @@ export const useIBCTokenBalance = (tokenSymbol) => {
     async () => {
       
 
-      // await window.keplr.enable(chain_id)
-      // const offlineSigner = await window.keplr.getOfflineSigner(chain_id)
-
       const chainClient = await SigningStargateClient.connect(
         ibcState.rpc
       )
 
-     // const [{ address }] = await offlineSigner.getAccounts()
       const coin = await chainClient.getBalance(nativeWalletAddress, denom)
 
       const amount = coin ? Number(coin.amount) : 0

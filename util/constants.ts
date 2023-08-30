@@ -11,20 +11,11 @@ export const APP_MAX_WIDTH = '1920px'
 
 export const MAIN_PANE_MAX_WIDTH = '1080px'
 
-export const POOL_TOKENS_DECIMALS = 6
-
 /* the app operates in test mode */
 export const __TEST_MODE__ = !JSON.parse(
   process.env.NEXT_PUBLIC_TEST_MODE_DISABLED
 )
 
-/* feature flags */
-export const __POOL_STAKING_ENABLED__ = JSON.parse(
-  process.env.NEXT_PUBLIC_ENABLE_FEATURE_STAKING
-)
-export const __POOL_REWARDS_ENABLED__ = JSON.parse(
-  process.env.NEXT_PUBLIC_ENABLE_FEATURE_REWARDS
-)
 export const __TRANSFERS_ENABLED__ = JSON.parse(
   process.env.NEXT_PUBLIC_ENABLE_FEATURE_TRANSFERS
 )

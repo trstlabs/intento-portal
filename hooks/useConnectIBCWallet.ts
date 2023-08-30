@@ -15,43 +15,17 @@ export const useConnectIBCWallet = (
   _chainId: string,
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
-  // console.log('useConnectIBCWallet', tokenSymbol)
+
   const [{ status, tokenSymbol: storedTokenSymbol }, setWalletState] =
     useRecoilState(ibcWalletState)
 
   const assetInfo = useIBCAssetInfo(tokenSymbol || storedTokenSymbol)
 
-  // console.log('assetInfo', assetInfo.registry_name)
+
   const chainName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
   const { isWalletConnected, getSigningStargateClient, connect, address, getRpcEndpoint } = useChain(chainName)
-  // const [chainInfo] = useIBCChainInfo(chainId)
-
-  // chains.push({
-  //   chain_name: chainInfo.chainName,
-  //   chain_id: chainId,
-  //   status: "live",
-  //   network_type: 'testnet',
-  //   pretty_name: chainInfo.chainName+'Trustless Hub Testnet',
-  //   bech32_prefix: assetInfo.prefix,
-  //   slip44: 118,
-  //   fees: {
-  //     fee_tokens: [
-  //       {
-  //         denom: assetInfo.denom,
-  //         low_gas_price: 0.025,
-  //         average_gas_price: 0.05,
-  //         high_gas_price: 0.1,
-  //       },
-  //     ],
-  //   },
-
-  // })
 
   const mutation = useMutation(async () => {
-    // if (window && !window?.keplr) {
-    //   alert('Please install Keplr extension and refresh the page.')
-    //   return
-    // }
 
     if (!tokenSymbol && !storedTokenSymbol) {
       throw new Error(
@@ -85,7 +59,6 @@ export const useConnectIBCWallet = (
       console.log('ibcChainClient', ibcChainClient)
 
       const rpc = await getRpcEndpoint(true)
-      console.log(rpc)
       /* successfully update the wallet state */
       setWalletState({
         tokenSymbol,

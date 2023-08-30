@@ -16,8 +16,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import {
-  // __POOL_REWARDS_ENABLED__,
-  // __POOL_STAKING_ENABLED__,
+
   APP_NAME,
 } from 'util/constants'
 import { useAutoTxInfo } from '../../hooks/useAutoTxInfo'

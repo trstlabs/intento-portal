@@ -1,4 +1,4 @@
-import { useTokenList } from 'hooks/useTokenList'
+
 import { styled, useMedia, } from 'junoblocks'
 import { useEffect, useRef, useState } from 'react'
 
@@ -12,6 +12,7 @@ import {
 import { RecipientInfo, RecipientList } from './RecipientList'
 
 import { TokenSelector } from './TokenSelector'
+import { useIBCAssetList } from '../../../hooks/useIBCAssetList'
 
 
 type TokenSendModuleProps = {
@@ -28,7 +29,7 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
   const [tokenRecipientList, setTokenRecipientList] = useState([new RecipientInfo()])
 
   /* fetch token list and set initial state */
-  const [tokenList, isTokenListLoading] = useTokenList()
+  const [tokenList, isTokenListLoading] = useIBCAssetList()
   useEffect(() => {
     const shouldSetDefaultTokenState =
       !tokenSymbol && tokenList

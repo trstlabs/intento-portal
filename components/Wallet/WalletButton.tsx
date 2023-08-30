@@ -40,7 +40,6 @@ export const WalletButton = ({
 
   const { balance } = useTokenBalance(baseToken?.symbol)
 
-
   if (!connected) {
     return (
       <Column css={{ paddingBottom: '$6' }}>

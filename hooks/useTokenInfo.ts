@@ -2,11 +2,10 @@ import { useCallback, useMemo } from 'react'
 
 
 import { TokenInfo } from '../types/trstTypes'
-import { useTokenList } from './useTokenList'
+
+import { useIBCAssetList } from './useIBCAssetList'
 
 /* token selector functions */
-export const getBaseTokenFromTokenList = (tokenList): TokenInfo | undefined =>
-  tokenList?.base_token
 
 export const getTokenInfoFromTokenList = (
   tokenSymbol: string,
@@ -21,7 +20,9 @@ export const getNativeTokenInfoFromTokenList = (
 
 /* returns a selector for getting multiple tokens info at once */
 export const useGetMultipleTokenInfo = () => {
-  const [tokenList] = useTokenList()
+
+
+  const [tokenList] = useIBCAssetList()
   return useCallback(
     (tokenSymbols: Array<string>) =>
       tokenSymbols?.map((tokenSymbol) =>
@@ -47,13 +48,13 @@ export const useTokenInfo = (tokenSymbol: string) => {
 
 /* hook for base token info retrieval */
 export const useBaseTokenInfo = () => {
-  const [tokenList] = useTokenList()
-  return useMemo(() => getBaseTokenFromTokenList(tokenList), [tokenList])
+  const [tokenList] = useIBCAssetList()
+  return  getTokenInfoFromTokenList("TRST", tokenList?.tokens)
 }
 
 
 /* hook for token info retrieval based on `denom` */
 export const useNativeTokenInfo = (denom: string) => {
-  const [tokenList] = useTokenList()
+  const [tokenList] = useIBCAssetList()
   return useMemo(() => getNativeTokenInfoFromTokenList(denom, tokenList?.tokens), [tokenList])
 }

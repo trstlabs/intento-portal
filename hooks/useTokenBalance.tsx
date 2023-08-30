@@ -8,55 +8,43 @@ import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
-import { getTokenInfoFromTokenList, useTokenInfo } from './useTokenInfo'
-import { useTokenList } from './useTokenList'
 
 import { getBalanceForAcc } from '../services/chain-info'
 import { useCosmosRpcClient } from './useRPCClient'
 
 async function fetchTokenBalance({
   client,
-  token: { denom, denom_on_trst, native, token_address, decimals },
+  token: { denom_on_trst, decimals },
   address,
 }: {
   client: SigningStargateClient
   token: {
-    denom?: string
-    token_address?: string
-    native?: boolean
     decimals?: number
     denom_on_trst?: string
   }
   address: string
 }) {
-  if (!denom && !token_address) {
+  if (!denom_on_trst) {
     throw new Error(
-      `No denom or token_address were provided to fetch the balance.`
+      `No denom provided to fetch the balance.`
     )
   }
+
   /*
    * if this is a native asset or an ibc asset that has denom_on_trst
    *  */
-  if (native) {
-    const resp = await client.getBalance(address, denom)
-    const amount = resp ? Number(resp.amount) : 0
-    return convertMicroDenomToDenom(amount, decimals)
-  }
-  if (denom_on_trst) {
+
     const resp = await client.getBalance(address, denom_on_trst)
     const amount = resp ? Number(resp.amount) : 0
     return convertMicroDenomToDenom(amount, decimals)
-  }
-  /*
-   * everything else
-   *  */
-  // if (token_address) {
-  //   const balance = await CW20(client).use(token_address).balance(address, localStorage.getItem("vk" + address))
 
-  //   return convertMicroDenomToDenom(Number(balance), decimals)
+  //  (denom_on_trst) {
+  //   const resp = await client.getBalance(address, denom_on_trst)
+  //   const amount = resp ? Number(resp.amount) : 0
+  //   return convertMicroDenomToDenom(amount, decimals)
   // }
 
-  return 0
+
 }
 
 const mapIbcTokenToNative = (ibcToken?: IBCAssetInfo) => {
@@ -72,37 +60,34 @@ const mapIbcTokenToNative = (ibcToken?: IBCAssetInfo) => {
 
 export const useTokenBalance = (tokenSymbol: string) => {
   const { address, status, client } = useRecoilValue(walletState)
-
-  const tokenInfo = useTokenInfo(tokenSymbol)
   const ibcAssetInfo = useIBCAssetInfo(tokenSymbol)
 
   const { data: balance = 0, isLoading } = useQuery(
     ['tokenBalance', tokenSymbol, address],
     async ({ queryKey: [, symbol] }) => {
-      if (symbol && client && (tokenInfo || ibcAssetInfo)) {
+      if (symbol && client && ibcAssetInfo) {
         return await fetchTokenBalance({
           client,
           address,
-          token: tokenInfo || ibcAssetInfo,
+          token:ibcAssetInfo,
         })
       }
     },
     {
       enabled: Boolean(
-        tokenSymbol && status === WalletStatusType.connected && client
+        tokenSymbol && status === WalletStatusType.connected && client && ibcAssetInfo
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
-
   return { balance, isLoading }
 }
 
 export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   const { address, status, client } = useRecoilValue(walletState)
-  const [tokenList] = useTokenList()
+
   const [ibcAssetsList] = useIBCAssetList()
 
   const queryKey = useMemo(
@@ -119,7 +104,6 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
             client,
             address,
             token:
-              getTokenInfoFromTokenList(tokenSymbol, tokenList.tokens) ||
               mapIbcTokenToNative(
                 getIBCAssetInfoFromList(tokenSymbol, ibcAssetsList?.tokens)
               ) ||
@@ -137,7 +121,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
       enabled: Boolean(
         status === WalletStatusType.connected &&
           tokenSymbols?.length &&
-          tokenList?.tokens
+          ibcAssetsList?.tokens
       ),
 
       refetchOnMount: 'always',

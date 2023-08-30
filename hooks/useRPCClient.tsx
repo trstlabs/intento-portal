@@ -8,7 +8,6 @@ export const useTrstRpcClient = () => {
   const { data } = useQuery(
     '@trst-querier',
     async () => {
-      console.log("useTrstRpcClient")
       return trst.ClientFactory.createRPCQueryClient({
         rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
       })

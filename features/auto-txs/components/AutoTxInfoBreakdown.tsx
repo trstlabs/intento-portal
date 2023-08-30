@@ -18,14 +18,10 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 import React from 'react'
-import {
-  __POOL_REWARDS_ENABLED__,
-  __POOL_STAKING_ENABLED__,
-} from 'util/constants'
+
 import { MsgUpdateAutoTxParams } from '../../../types/trstTypes'
 
 import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
-// import { MsgUpdateAutoTx } from 'trustlessjs/types/codegen/trst/autoibctx/v1beta1/tx'
 
 import { useEffect, useState } from 'react'
 import { convertMicroDenomToDenom } from 'util/conversion'

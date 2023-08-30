@@ -28,13 +28,13 @@ import { useRouter } from 'next/router'
 import React, { ReactNode, useState } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
-// import { setKeyring } from '../../hooks/useSetKeyring'
+
 import { SwapIcon } from '../../icons/Swap'
 import { TransferIcon } from '../../icons/Transfer'
 import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { useAfterConnectWallet } from '../../hooks/useConnectWallet'
+import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
