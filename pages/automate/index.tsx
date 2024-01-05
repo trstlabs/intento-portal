@@ -15,6 +15,13 @@ function getInitialExampleFromSearchParams() {
   return example ? (example as string) : undefined
 }
 
+function getInitialMessageFromSearchParams() {
+  const params = new URLSearchParams(location.search)
+  const message = params.get('message')
+  return message ? (message as string) : undefined
+}
+
+
 export default function Automate() {
   return (
     <AppLayout>
@@ -23,7 +30,7 @@ export default function Automate() {
           title="Automate"
           subtitle={`Create triggers on any connected chain, executed by your Trigger Account`}
         />
-        <AutomateModule initialExample={getInitialExampleFromSearchParams()} />
+        <AutomateModule initialExample={getInitialExampleFromSearchParams()} initialMessage={getInitialMessageFromSearchParams()} />
       </StyledContainer>
     </AppLayout>
   )

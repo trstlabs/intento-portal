@@ -3,7 +3,7 @@ set -o errexit -o nounset -o pipefail
 
 SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-rm -rf "${SCRIPT_PATH}/Schemas"
+rm -rf "${SCRIPT_PATH}/schemas"
 # rm -rf "${SCRIPT_PATH}/Trustless-Hub"
 # git clone --depth 1 https://github.com/trstlabs/Trustless-Hub "${SCRIPT_PATH}/Trustless-Hub"
 
@@ -14,7 +14,7 @@ TRST_THIRD_PARTY_DIR="${SCRIPT_PATH}/Trustless-Hub/third_party/proto"
 
 
 # directory for individual schema files
-MSGS_DIR="${SCRIPT_PATH}/Schemas/msgs"
+MSGS_DIR="${SCRIPT_PATH}/schemas/msgs"
 
 INDEX_FILE="${MSGS_DIR}/index.ts"
 
@@ -52,7 +52,6 @@ find "${TRST_DIR}" "${TRST_THIRD_PARTY_DIR}" -path -prune -o -name '*.proto' -pr
     fi
 done
 
-
 # Loop through all subdirectories in MSGS_DIR
 for dir in "$MSGS_DIR"/*; do
     # Check if it is a directory
@@ -79,6 +78,7 @@ for dir in "$MSGS_DIR"/*; do
         rm -r "$dir"
     fi
 done
+
 
 # cat "${MSGS_DIR}"/*.json > "${OUTPUT_FILE}"
 # Iterate over all JSON files in the msgs directory
@@ -116,7 +116,7 @@ done
 
 
 
-rm updated_json.json
+# rm updated_json.json
 
 
 echo "Generated msg schemas and index.ts file in $MSGS_DIR"

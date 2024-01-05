@@ -1,0 +1,46 @@
+{
+  "$ref": "#/definitions/MsgCreateVestingAccount",
+  "definitions": {
+    "MsgCreateVestingAccount": {
+      "properties": {
+        "fromAddress": {
+          "type": "string"
+        },
+        "toAddress": {
+          "type": "string"
+        },
+        "amount": {
+          "items": {
+            "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+          },
+          "type": "array"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "end of vesting as unix time (in seconds)."
+        },
+        "delayed": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Create Vesting Account",
+      "description": "MsgCreateVestingAccount defines a message that enables creating a vesting account."
+    },
+    "cosmos.base.v1beta1.Coin": {
+      "properties": {
+        "denom": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Coin",
+      "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+    }
+  }
+}

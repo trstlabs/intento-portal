@@ -1,0 +1,67 @@
+{
+  "$ref": "#/definitions/MsgVote",
+  "definitions": {
+    "MsgVote": {
+      "properties": {
+        "proposalId": {
+          "type": "string",
+          "description": "proposal is the unique ID of the proposal."
+        },
+        "voter": {
+          "type": "string",
+          "description": "voter is the voter account address."
+        },
+        "option": {
+          "enum": [
+            "VOTE_OPTION_UNSPECIFIED",
+            0,
+            "VOTE_OPTION_YES",
+            1,
+            "VOTE_OPTION_ABSTAIN",
+            2,
+            "VOTE_OPTION_NO",
+            3,
+            "VOTE_OPTION_NO_WITH_VETO",
+            4
+          ],
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Vote Option",
+          "description": "VoteOption enumerates the valid vote options for a given proposal."
+        },
+        "metadata": {
+          "type": "string",
+          "description": "metadata is any arbitrary metadata attached to the vote."
+        },
+        "exec": {
+          "enum": [
+            "EXEC_UNSPECIFIED",
+            0,
+            "EXEC_TRY",
+            1
+          ],
+          "oneOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Proposals and Voting",
+          "description": "Proposals and Voting  Exec defines modes of execution of a proposal on creation or on new vote."
+        }
+      },
+      "additionalProperties": true,
+      "type": "object",
+      "title": "Msg Vote",
+      "description": "MsgVote is the Msg/Vote request type."
+    }
+  }
+}

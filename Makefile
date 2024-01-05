@@ -2,6 +2,14 @@
 
 .PHONY: run-localtrst
 
+# Generate JSON schemas based on the proto messages from the related repos, clones repos and uses protoc to convert to JSON with camelCase style inputs. 
+generate-schema:
+	(cd util/scripts && ./generate-schema.sh)
+
+# After generating schema, ann agggregate schemas can be used for GPT knowledge base input (cosmos, cosmwasm, ibc, osmosis)
+aggregate-schema:
+	(cd util/scripts && ./aggregate-schema.sh)
+	
 # When you run localtrst again, remove Trustless Hub from kelr and add it again. Encryptionutils has to be defined again. 
 # Otherwise you'll get an error when sending transactions ( enrypted: ). Also unpin and re-add keyring.
 run-localtrst: # CTRL+C to stop

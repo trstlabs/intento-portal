@@ -7,9 +7,13 @@ import { generalExamples } from './ExampleMsgs'
 type AutomateModuleProps = {
   /* will be used if provided on first render instead of internal state */
   initialExample?: string
+  initialMessage?: string
 }
 
-export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
+export const AutomateModule = ({
+  initialExample,
+  initialMessage,
+}: AutomateModuleProps) => {
   let data = new AutoTxData()
   data.duration = 14 * 86400000
   data.interval = 86400000
@@ -19,11 +23,15 @@ export const AutomateModule = ({ initialExample }: AutomateModuleProps) => {
   //works faster than without array for some reason
   const [autoTxDatas, setAutoTxDatas] = useState([data])
 
+  const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
 
   useEffect(
-    function setInitialExampleIfProvided() {
-      if (initialExampleValue) {
+    function setInitialIfProvided() {
+      if (initialMessageValue) {
+        autoTxDatas[0].msgs[0] = initialMessageValue
+        setAutoTxDatas(autoTxDatas)
+      } else if (initialExampleValue) {
         const exampleIndex = initialExampleValue
         autoTxDatas[0].msgs[0] = JSON.stringify(
           generalExamples[exampleIndex],

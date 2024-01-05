@@ -13,7 +13,7 @@ import React, { useRef, useState } from 'react'
 import { JsonFormEditor } from './JsonForm'
 import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
 import { Chip } from './../AutoTxComponent'
-import * as tmpFiles from '../../../../util/scripts/Schemas/msgs'
+import * as tmpFiles from '../../../../util/scripts/schemas/msgs'
 import { MessageSelector } from './MessageSelector'
 import { CodeMirrorWrapper } from './CodeMirrorWrapper'
 
@@ -42,7 +42,7 @@ export const JsonFormWrapper = ({
   const msgTypeName = (extractedMsg && extractedMsg.split('"')[0]) || 'Unknown'
 
   const [exampleSchema, setExampleSchema] = useState(
-    findFileByName(msgTypeName) || findFileByName('MsgSend')
+    findFileByName(msgTypeName) 
   )
 
   // Helper function to find and return a file by name
@@ -93,12 +93,12 @@ export const JsonFormWrapper = ({
       </Inline>
       <Column>
         <Divider offsetY="$6" />
-        {showJsonForm ? (
+        {showJsonForm && msgTypeName != "Unknown"? (
           <div style={{ margin: '$4', padding: '$4' }}>
             <Inline css={{ display: 'inline' }}>
               <Text css={{ paddingLeft: '$4', paddingBottom: '$4' }} variant="legend">
                 {' '}
-                Examples
+                Examples 
               </Text>
               {generalExamples.map((example, ei) => (
                 <span key={ei}>

@@ -7,7 +7,7 @@ import React, {
   useState,
 } from 'react'
 
-import * as tmpFiles from '../../../../util/scripts/Schemas/msgs'
+import * as tmpFiles from '../../../../util/scripts/schemas/msgs'
 import { MessageSelectorToggle } from './MessageSelectorToggle'
 import { CosmosMessageSelector } from './CosmosMessageSelector'
 
