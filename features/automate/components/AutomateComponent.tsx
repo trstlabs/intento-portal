@@ -52,7 +52,8 @@ export const AutomateComponent = ({
   const [counterpartyConnectionId, setCounterpartyConnectionId] = useState('')
   const [chainSymbol, setChainSymbol] = useState('TRST')
   const [chainId, setChainId] = useState('TRST')
-  const [isICAChain, setIsICAChain] = useState(true)
+  const [chainIsConnected, setChainIsConnected] = useState(false)
+  const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
   const [showWarning, hideWarning] = useState(true)
   const [isJsonValid, setIsJsonValid] = useState(true)
@@ -64,7 +65,7 @@ export const AutomateComponent = ({
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
     chainSymbol,
     icaAddress,
-    isICAChain
+    chainIsConnected
   )
   const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
     icaAddress,
@@ -150,7 +151,7 @@ export const AutomateComponent = ({
         console.log(error)
       },
     },
-    !isICAChain
+    !chainIsConnected
   )
 
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
@@ -235,10 +236,9 @@ export const AutomateComponent = ({
 
   //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
-    if (!isJsonValid) {
-      // alert("Invalid JSON")
-      return
-    }
+    // if (!isJsonValid) {
+    //   return
+    // }
     try {
       let msgs = autoTxData.msgs
       msgs[index] = msg
@@ -246,15 +246,12 @@ export const AutomateComponent = ({
         ...autoTxData,
         msgs,
       }
-      console.log('handleChangeMsg')
-      //newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
       onAutoTxChange(newAutoTxData)
       if (
         JSON.parse(msg)
           ['typeUrl'].split('.')
           .find((data) => data.includes('Msg'))
       ) {
-        // connectExternalWallet(null)
         refetchAuthzGrants()
       }
     } catch (e) {
@@ -293,12 +290,13 @@ export const AutomateComponent = ({
     setChainSymbol(chainSymbol)
     setChainId(chainId)
     setPrefix(newPrefix)
-    let isICAChain = connectionId != undefined && connectionId != ''
-    setIsICAChain(isICAChain)
+    let chainIsConnected = connectionId != undefined && connectionId != ''
+    setChainIsConnected(chainIsConnected)
+    setChainHasIAModule((chainId == 'TRST'))
 
     await sleep(2000)
 
-    if (isICAChain) {
+    if (chainIsConnected) {
       refetchICA()
       refetchAuthzGrants()
     }
@@ -332,7 +330,7 @@ export const AutomateComponent = ({
     const newMsgs = newAutoTxData.msgs.filter(
       (msg) => msg !== newAutoTxData.msgs[index]
     )
-  
+
     if (index == 0 && newMsgs.length == 0) {
       newMsgs[index] = ''
     }
@@ -352,7 +350,9 @@ export const AutomateComponent = ({
       JSON.parse(autoTxData.msgs[0])['typeUrl'].length < 5)
 
   const shouldDisableAutomateButton =
-    shouldDisableSubmitButton || isExecutingRegisterICA || !icaAddress
+    shouldDisableSubmitButton ||
+    isExecutingRegisterICA ||
+    (!icaAddress && !chainHasIAModule)
 
   return (
     <StyledDivForContainer>
@@ -378,7 +378,7 @@ export const AutomateComponent = ({
               />{' '}
               {
                 /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
-                  isICAChain &&
+                  chainIsConnected &&
                   !isIcaLoading &&
                   autoTxData.connectionId != '' && (
                     <>
@@ -404,7 +404,7 @@ export const AutomateComponent = ({
               }
             </Row>
             {chainName &&
-              isICAChain &&
+              chainIsConnected &&
               (isIcaLoading ? (
                 <Spinner size={18} style={{ margin: 0 }} />
               ) : (

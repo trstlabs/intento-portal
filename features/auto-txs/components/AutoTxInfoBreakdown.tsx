@@ -271,7 +271,7 @@ AutoTxInfoBreakdownProps) => {
               {autoTxInfo.label != '' ? (
                 <> Trigger: {autoTxInfo.label}</>
               ) : (
-                <>Trigger ID: {autoTxInfo.txId.toString()}</>
+                <>Trigger {autoTxInfo.txId.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">
@@ -300,21 +300,31 @@ AutoTxInfoBreakdownProps) => {
               wordBreak: 'break-word',
             }}
           >
-            <Column css={{padding: "$3"}} gap={8}  align="flex-start" justifyContent="flex-start">
+            <Column
+              css={{ padding: '$3' }}
+              gap={8}
+              align="flex-start"
+              justifyContent="flex-start"
+            >
               <Text variant="legend" color="secondary" align="left">
                 Owner
               </Text>
 
-              <Text  variant="body">{autoTxInfo.owner} </Text>
+              <Text variant="body">{autoTxInfo.owner} </Text>
             </Column>
             {autoTxInfo.portId && (
               /* (icaActive && !isIcaActiveLoading ?  */
-              <Column  css={{padding: "$3"}} gap={8} align="flex-start" justifyContent="flex-start">
+              <Column
+                css={{ padding: '$3' }}
+                gap={8}
+                align="flex-start"
+                justifyContent="flex-start"
+              >
                 <Text variant="legend" color="secondary" align="left">
                   IBC Port
                 </Text>
 
-                <Text  variant="body">{autoTxInfo.portId} </Text>
+                <Text variant="body">{autoTxInfo.portId} </Text>
               </Column>
             )}
           </Inline>
@@ -493,9 +503,7 @@ AutoTxInfoBreakdownProps) => {
                   <>
                     <JsonCodeMirrorEditor
                       jsonValue={editMsg}
-                      onChange={
-                        setEditMsg /* (val) => {handleChangeMsg(index, val, msg.typeUrl == "/cosmos.authz.v1beta1.MsgExec")} */
-                      }
+                      onChange={setEditMsg}
                       onValidate={setIsJsonValid}
                     />
                     <Button
@@ -747,7 +755,7 @@ const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {latestExecWasError ? <>🔴</> : active && <>🟢</>}Trigger ID: {txId}
+      {latestExecWasError ? <>🔴</> : active && <>🟢</>} Trigger {txId}
     </Text>
   </Inline>
 )
@@ -755,7 +763,6 @@ const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
 const StyledInput = styled('input', {
   width: '100%',
   color: 'inherit',
-  // fontSize: `20px`,
   padding: '$2',
   margin: '$2',
 })

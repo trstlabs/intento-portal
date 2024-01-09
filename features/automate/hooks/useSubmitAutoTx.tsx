@@ -61,7 +61,7 @@ export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}
             title="Your trigger is submitted!"
-            body={`An on-chain trigger was created succesfully! Trigger ID is ${autoTxID}`}
+            body={`An on-chain trigger was created succesfully! Your unique trigger ID is ${autoTxID}`}
             buttons={
               <Button
                 as="a"

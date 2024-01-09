@@ -59,7 +59,7 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                Trigger ID: {autoTxInfo.txId.toString()}{' '}
+                Trigger {autoTxInfo.txId.toString()}{' '}
               </StyledText>
             )}
             {autoTxInfo.msgs && (
