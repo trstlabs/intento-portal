@@ -1,2 +1,1 @@
-export { AutomateModule } from './components'
-
+export { AutomateWrapper } from './components'

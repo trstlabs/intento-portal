@@ -20,7 +20,7 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { convertDenomToMicroDenom } from 'util/conversion'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
+import { IBCAssetInfo } from '../../../hooks/useChainList'
 
 type UseTokenSendArgs = {
     ibcAsset: IBCAssetInfo

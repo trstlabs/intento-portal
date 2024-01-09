@@ -13,7 +13,7 @@ import React from 'react'
 import { TokenSendModule } from 'features/send'
 // import Link from 'next/link'
 
-import { useIBCAssetList } from '../../hooks/useIBCAssetList'
+import { useIBCAssetList } from '../../hooks/useChainList'
 
 function getInitialTokenFromSearchParams() {
   const params = new URLSearchParams(location.search)
@@ -34,8 +34,8 @@ export default function Send() {
     <AppLayout>
       <StyledContainer>
         <PageHeader
-          title="Send"
-          subtitle={`Schedule automatic asset transfers to family and friends`}
+          title="Token Sender"
+          subtitle={`Configure asset transfers, schedule ahead and make recurring payments. Supports chains connected to the testnet.`}
         />
         <TokenSendModule
           initialToken={getInitialTokenFromSearchParams()}
@@ -51,7 +51,7 @@ export default function Send() {
                 css={{ padding: '$8' }}
               >Advanced </StyledText>
               <Column align="center">
-                <Inline css={{ justifyContent: 'center' }}>  {!isLoading && ibcInfos?.tokens.map((ibcInfo, index) => (
+                <Inline css={{ justifyContent: 'center' }}>  {!isLoading && ibcInfos.map((ibcInfo, index) => (
                   <div key={"x" + index}>
                     <StyledDivForTokenLogos>
                       <ImageForTokenLogo

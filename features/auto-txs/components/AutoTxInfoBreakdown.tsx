@@ -33,7 +33,7 @@ import {
 } from '../../../hooks/useICA'
 
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
-import { IBCAssetInfo } from '../../../hooks/useIBCAssetList'
+import { IBCAssetInfo } from '../../../hooks/useChainList'
 import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
 
 import { JsonCodeMirrorEditor } from '../../automate/components/Editor/CodeMirror'
@@ -71,7 +71,8 @@ AutoTxInfoBreakdownProps) => {
   const [showICAHostButtons, setShowICAHostButtons] = useState(false)
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
     symbol,
-    icaAddress
+    icaAddress,
+    true
   )
 
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(

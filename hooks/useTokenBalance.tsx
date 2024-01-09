@@ -7,7 +7,7 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
-import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
+import { IBCAssetInfo, useIBCAssetList } from './useChainList'
 
 import { getBalanceForAcc } from '../services/chain-info'
 import { useCosmosRpcClient } from './useRPCClient'
@@ -105,7 +105,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
             address,
             token:
               mapIbcTokenToNative(
-                getIBCAssetInfoFromList(tokenSymbol, ibcAssetsList?.tokens)
+                getIBCAssetInfoFromList(tokenSymbol, ibcAssetsList)
               ) ||
               {},
           })
@@ -121,7 +121,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
       enabled: Boolean(
         status === WalletStatusType.connected &&
           tokenSymbols?.length &&
-          ibcAssetsList?.tokens
+          ibcAssetsList
       ),
 
       refetchOnMount: 'always',

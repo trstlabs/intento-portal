@@ -13,7 +13,7 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef, useMemo } from 'react'
 
-import { TokenInfo } from '../types/trstTypes'
+import { SelectChainInfo } from '../types/trstTypes'
 import { getPropsForInteractiveElement } from '../util/getPropsForInteractiveElement'
 
 const StyledDivForScrollContainer = styled('div', {
@@ -22,7 +22,7 @@ const StyledDivForScrollContainer = styled('div', {
 
 export type TokenSelectListProps = {
   activeTokenSymbol?: string
-  tokenList: Array<Pick<TokenInfo, 'symbol' | 'logo_uri' | 'name'>>
+  tokenList: Array<Pick<SelectChainInfo, 'symbol' | 'logo_uri' | 'name'>>
   onSelect: (tokenSymbol: string) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number

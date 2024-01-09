@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeUpdateAutoTx } from '../../../services/ica'
+import { executeUpdateAutoTx } from '../../../services/automate'
 import {
     TransactionStatus,
     transactionStatusState,

@@ -1,7 +1,7 @@
 import { media, styled, useControlTheme, useMedia } from 'junoblocks'
 import { APP_MAX_WIDTH, MAIN_PANE_MAX_WIDTH } from 'util/constants'
 
-/* import { ExtensionSidebar } from './ExtensionSidebar' */
+import { ExtensionSidebar } from './ExtensionSidebar'
 import { FooterBar } from './FooterBar'
 import { NavigationSidebar } from './NavigationSidebar'
 
@@ -14,12 +14,12 @@ import { particleState } from '../../state/atoms/particlesAtoms'
 
 export const AppLayout = ({
   navigationSidebar = <NavigationSidebar />,
-  /*   extensionSidebar = <ExtensionSidebar />, */
+  extensionSidebar = <ExtensionSidebar />,
   footerBar = <FooterBar />,
   children,
 }) => {
   const isSmallScreen = useMedia('sm')
-  /*   const isMediumScreen = useMedia('md') */
+  const isMediumScreen = useMedia('md')
   const themeController = useControlTheme()
 
   ///let isConfetti = useRecoilValue(particleState)
@@ -70,8 +70,8 @@ export const AppLayout = ({
             <StyledChildrenLight>{children}</StyledChildrenLight>
           )}
         </StyledContainer>
-
-        {/* {!isMediumScreen && extensionSidebar} */}
+      
+        {!isMediumScreen && extensionSidebar}
       </StyledWrapper>
       {isConfetti ? (
         <Particles
@@ -82,12 +82,12 @@ export const AppLayout = ({
         />
       ) : (
         isDarkMode && (
-          <Particles
-            id="tsparticles"
-            init={particlesInit}
-            loaded={particlesLoaded}
-            url={'/stars_bg.json'}
-          />
+            <Particles
+              id="tsparticles"
+              init={particlesInit}
+              loaded={particlesLoaded}
+              url={'/stars_bg.json'}
+            />
         )
       )}
     </>
@@ -97,7 +97,7 @@ export const AppLayout = ({
 const StyledWrapper = styled('div', {
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'flex-start',
+  justifyContent: 'space-between',
   minHeight: '100vh',
   backgroundColor: '$backgroundColors$base',
   width: APP_MAX_WIDTH,
@@ -116,7 +116,7 @@ const StyledChildrenLight = styled('div', {
 })
 
 const StyledChildrenDark = styled('div', {
-  background: `linear-gradient(90deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.9) 7%, rgba(0, 0, 0, 0.9) 96%, rgba(0, 0, 0, 0.1) 100%) !important`,
+  background: `linear-gradient(90deg, rgba(7,9,11, 0.1), rgba(7,9,11, 0.9) 7%, rgba(7,9,11, 0.9) 96%, rgba(7,9,11, 0.1) 100%) !important`,
   position: 'relative',
   zIndex: 1,
   padding: '$12',

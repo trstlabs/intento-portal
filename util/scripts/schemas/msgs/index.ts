@@ -42,6 +42,13 @@ export { default as cosmos_mint_v1beta1_MsgUpdateParams } from './cosmos_mint_v1
 export { default as cosmos_nft_v1beta1_MsgSend } from './cosmos_nft_v1beta1_MsgSend.json';
 export { default as cosmos_slashing_v1beta1_MsgUnjail } from './cosmos_slashing_v1beta1_MsgUnjail.json';
 export { default as cosmos_slashing_v1beta1_MsgUpdateParams } from './cosmos_slashing_v1beta1_MsgUpdateParams.json';
+export { default as cosmos_staking_v1beta1_MsgBeginRedelegate } from './cosmos_staking_v1beta1_MsgBeginRedelegate.json';
+export { default as cosmos_staking_v1beta1_MsgCancelUnbondingDelegation } from './cosmos_staking_v1beta1_MsgCancelUnbondingDelegation.json';
+export { default as cosmos_staking_v1beta1_MsgCreateValidator } from './cosmos_staking_v1beta1_MsgCreateValidator.json';
+export { default as cosmos_staking_v1beta1_MsgDelegate } from './cosmos_staking_v1beta1_MsgDelegate.json';
+export { default as cosmos_staking_v1beta1_MsgEditValidator } from './cosmos_staking_v1beta1_MsgEditValidator.json';
+export { default as cosmos_staking_v1beta1_MsgUndelegate } from './cosmos_staking_v1beta1_MsgUndelegate.json';
+export { default as cosmos_staking_v1beta1_MsgUpdateParams } from './cosmos_staking_v1beta1_MsgUpdateParams.json';
 export { default as cosmos_upgrade_v1beta1_MsgCancelUpgrade } from './cosmos_upgrade_v1beta1_MsgCancelUpgrade.json';
 export { default as cosmos_upgrade_v1beta1_MsgSoftwareUpgrade } from './cosmos_upgrade_v1beta1_MsgSoftwareUpgrade.json';
 export { default as cosmos_vesting_v1beta1_MsgCreatePeriodicVestingAccount } from './cosmos_vesting_v1beta1_MsgCreatePeriodicVestingAccount.json';

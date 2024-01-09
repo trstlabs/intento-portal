@@ -9,52 +9,44 @@ import {
 import React from 'react'
 import { getPropsForInteractiveElement } from 'util/getPropsForInteractiveElement'
 
-type IbcSelectorToggleProps = {
+type ChainSelectorToggleProps = {
   isSelecting: boolean
   onToggle: () => void
-  connectionId: string
   chainLogoURI: string
   chainName: string
-  /*   availableAmount: number */
 }
 
-export const IbcSelectorToggle = ({
+export const ChainSelectorToggle = ({
   isSelecting,
   onToggle,
   chainLogoURI,
   chainName,
-  /*   availableAmount, */
-  connectionId,
-}: IbcSelectorToggleProps) => {
-  const connectionSelected = Boolean(connectionId)
+}: ChainSelectorToggleProps) => {
+  const chainSelected = Boolean(chainName)
+  const iconRotation = chainName ? '90deg' : '-90deg'
 
-  return (
-    <StyledDivForSelector
-      state={isSelecting || !connectionId ? 'selecting' : 'selected'}
-      {...getPropsForInteractiveElement({ onClick: onToggle })}
-      variant="ghost"
-    >
-      {(isSelecting || !connectionSelected) && (
+  const renderContent = () => {
+    if (isSelecting || !chainSelected) {
+      return (
         <>
           <Text variant="body">Select a Chain</Text>
           <IconWrapper
             size="large"
-            rotation={connectionId ? '90deg' : '-90deg'}
+            rotation={iconRotation}
             color="tertiary"
             icon={<Chevron />}
           />
         </>
-      )}
-      {!isSelecting && connectionSelected && (
+      )
+    } else {
+      return (
         <>
           <ImageForTokenLogo
             logoURI={chainLogoURI}
             size="big"
-            alt={connectionId}
+            alt={chainName}
           />
-
           <Text variant="body">{chainName}</Text>
-
           <IconWrapper
             size="medium"
             rotation="-90deg"
@@ -62,7 +54,17 @@ export const IbcSelectorToggle = ({
             icon={<Chevron />}
           />
         </>
-      )}
+      )
+    }
+  }
+
+  return (
+    <StyledDivForSelector
+      state={isSelecting || !chainName ? 'selecting' : 'selected'}
+      {...getPropsForInteractiveElement({ onClick: onToggle })}
+      variant="ghost"
+    >
+      {renderContent()}
     </StyledDivForSelector>
   )
 }
@@ -87,7 +89,6 @@ const StyledDivForSelector = styled(ButtonForWrapper, {
         minWidth: 231,
       },
       selecting: {
-        //margin: '$space$1 0',
         padding: '$space$6 $8',
         columnGap: '$space$4',
         gridTemplateColumns: '1fr $space$8',

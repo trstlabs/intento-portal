@@ -1,5 +1,3 @@
-//import { AminoConverters } from 'trustlessjs'
-
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
@@ -8,26 +6,34 @@ import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
 import { useChain } from '@cosmos-kit/react'
+import { useChainInfoByChainID } from './useChainList'
 
 /* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
   tokenSymbol: string,
-  _chainId: string,
-  mutationOptions?: Parameters<typeof useMutation>[2]
+  chainId: string,
+  mutationOptions?: Parameters<typeof useMutation>[2],
+  fromRegistry?: boolean
 ) => {
-
-  const [{ status, tokenSymbol: storedTokenSymbol }, setWalletState] =
+  const [{ status, /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
     useRecoilState(ibcWalletState)
 
-  const assetInfo = useIBCAssetInfo(tokenSymbol || storedTokenSymbol)
+  let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
+  if (fromRegistry) {
+    assetInfo = useChainInfoByChainID(chainId)
+  }
 
-
-  const chainName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
-  const { isWalletConnected, getSigningStargateClient, connect, address, getRpcEndpoint } = useChain(chainName)
+  const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
+  const {
+    isWalletConnected,
+    getSigningStargateClient,
+    connect,
+    address,
+    getRpcEndpoint,
+  } = useChain(chainRegistryName)
 
   const mutation = useMutation(async () => {
-
-    if (!tokenSymbol && !storedTokenSymbol) {
+    if (!tokenSymbol /* && !storedTokenSymbol */) {
       throw new Error(
         'You must provide `tokenSymbol` before connecting to the wallet.'
       )
@@ -47,12 +53,10 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-
-      if (!isWalletConnected){
-      await connect()
-      await sleep(500)
-    }
-    
+      if (!isWalletConnected) {
+        await connect()
+        await sleep(500)
+      }
 
       const ibcChainClient = await getSigningStargateClient()
 
@@ -67,15 +71,15 @@ export const useConnectIBCWallet = (
         status: WalletStatusType.connected,
         rpc,
       })
-     
     } catch (e) {
+      // toast.error("Error connecting wallet: ",e)
       /* set the error state */
       setWalletState({
         tokenSymbol: null,
         address: '',
         client: null,
         status: WalletStatusType.error,
-        rpc: ''
+        rpc: '',
       })
 
       throw e

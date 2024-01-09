@@ -34,7 +34,7 @@ export const useCosmosRpcClient = () => {
 
 
 
-export const useTMRpcClient = () => {
+export const useTendermintRpcClient = () => {
   const { data } = useQuery(
     '@client-querier',
     () => {

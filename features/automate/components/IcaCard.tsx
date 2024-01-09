@@ -11,8 +11,8 @@ import {
   useMedia,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { Row, StyledInput } from './AutoTxComponent'
-import { GrantResponse } from '../../../services/ica'
+import { Row, StyledInput } from './AutomateComponent'
+import { GrantResponse } from '../../../services/automate'
 
 interface IcaCardProps {
   icaAddress: string

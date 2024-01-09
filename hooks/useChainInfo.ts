@@ -7,7 +7,7 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 import { cosmos } from 'trustlessjs'
 import { DEFAULT_REFETCH_INTERVAL, DEFAULT_LONG_REFETCH_INTERVAL } from '../util/constants'
 
-import { useTrstRpcClient, useCosmosRpcClient, useTMRpcClient } from './useRPCClient'
+import { useTrstRpcClient, useCosmosRpcClient, useTendermintRpcClient } from './useRPCClient'
 import {
   getStakeBalanceForAcc,
   getAPR,
@@ -19,12 +19,13 @@ import {
 } from '../services/chain-info'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { AutoTxData } from '../services/ica'
+
 import {
   paramsStateAtom,
   triggerModuleParamsAtom,
 } from '../state/atoms/moduleParamsAtoms'
 import { useEffect } from 'react'
+import { AutoTxData } from '../types/trstTypes'
 
 const chainInfoQueryKey = '@chain-info'
 
@@ -148,7 +149,7 @@ export const useGetStakeBalanceForAcc = () => {
 
 export const useGetAPR = () => {
   const cosmosClient = useCosmosRpcClient()
-  const client = useTMRpcClient()
+  const client = useTendermintRpcClient()
   const paramsState = useRecoilValue(paramsStateAtom)
 
   const { data, isLoading } = useQuery(

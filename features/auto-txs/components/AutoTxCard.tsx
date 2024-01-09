@@ -25,6 +25,7 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
     autoTxInfo.endTime &&
     autoTxInfo.execTime &&
     autoTxInfo.endTime.getSeconds() >= autoTxInfo.execTime.getSeconds()
+    && autoTxInfo.endTime.getTime() > Date.now()
 
 
   

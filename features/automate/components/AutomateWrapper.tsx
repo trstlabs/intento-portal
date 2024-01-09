@@ -1,27 +1,28 @@
 import { styled } from 'junoblocks'
 import { useState, useRef, useEffect } from 'react'
-import { AutoTxData } from './SubmitAutoTxDialog'
-import { AutoTxComponent } from './AutoTxComponent'
+import { AutomateComponent } from './AutomateComponent'
 import { generalExamples } from './ExampleMsgs'
+import { AutoTxData } from '../../../types/trstTypes'
 
-type AutomateModuleProps = {
+type AutomateWrapperProps = {
   /* will be used if provided on first render instead of internal state */
   initialExample?: string
   initialMessage?: string
+  mode?: string
 }
 
-export const AutomateModule = ({
+export const AutomateWrapper = ({
   initialExample,
   initialMessage,
-}: AutomateModuleProps) => {
-  let data = new AutoTxData()
-  data.duration = 14 * 86400000
-  data.interval = 86400000
-  data.msgs = [JSON.stringify(generalExamples[0], null, 2)]
+}: AutomateWrapperProps) => {
+  let initialAutoTxData = new AutoTxData()
+  initialAutoTxData.duration = 14 * 86400000
+  initialAutoTxData.interval = 86400000
+  initialAutoTxData.msgs = [JSON.stringify(generalExamples[0], null, 2)]
 
   //data.typeUrls = [""]
   //works faster than without array for some reason
-  const [autoTxDatas, setAutoTxDatas] = useState([data])
+  const [autoTxDatas, setAutoTxDatas] = useState([initialAutoTxData])
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
@@ -46,7 +47,7 @@ export const AutomateModule = ({
 
   return (
     <StyledDivForWrapper>
-      <AutoTxComponent
+      <AutomateComponent
         autoTxData={autoTxDatas[0]}
         onAutoTxChange={(autoTx) => setAutoTxDatas([autoTx])}
       />

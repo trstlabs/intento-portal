@@ -13,10 +13,7 @@ import {
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 
-import {
-  SubmitAutoTxDialog,
-  AutoTxData,
-} from '../../automate/components/SubmitAutoTxDialog'
+import { SubmitAutoTxDialog } from '../../automate/components/SubmitAutoTxDialog'
 import { useSubmitAutoTx } from '../../automate/hooks'
 import {
   useGetAPR,
@@ -30,6 +27,7 @@ import { useRecoilValue } from 'recoil'
 import { triggerModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
 import IssuanceChart from './Chart'
 import { getDuration } from '../../../util/time'
+import { AutoTxData } from '../../../types/trstTypes'
 
 type InfoCardProps = {
   shouldShowAutoCompound: Boolean
@@ -71,7 +69,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
     }
   }, [isExecutingSchedule, requestedSubmitAutoTx, handleSubmitAutoTx])
 
-  const handleSubmitAutoTxButtonClick = (newAutoTxData: AutoTxData) => {
+  const handleSubmitAutoTxClick = (newAutoTxData: AutoTxData) => {
     const msgs = []
     for (const validator of stakeBalance.validators) {
       let claimMsg = claimRewardSDKMessage
@@ -270,9 +268,9 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     ) : (
                       <>
                         You hold {formatTokenBalance(balance)} TRST and have not
-                        staked tokens yet, stake to secure the network
-                        and earn staking rewards. Staking rewards can be
-                        compounded to earn additional yield.
+                        staked tokens yet, stake to secure the network and earn
+                        staking rewards. Staking rewards can be compounded to
+                        earn additional yield.
                       </>
                     )}
                   </Text>
@@ -342,7 +340,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             })
           }
           handleSubmitAutoTx={(autoTxData) =>
-            handleSubmitAutoTxButtonClick(autoTxData)
+            handleSubmitAutoTxClick(autoTxData)
           }
         />
       </StyledDivForInfoGrid>

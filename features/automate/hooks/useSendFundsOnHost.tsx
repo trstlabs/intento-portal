@@ -4,7 +4,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeSendFunds } from '../../../services/ica'
+import { executeSendFunds } from '../../../services/automate'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -65,7 +65,7 @@ export const useSendFundsOnHost = ({
             onError(e) {
                 const errorMessage = formatSdkErrorMessage(e)
 
-                toast.error("Oops sending funds to Interchain Account! " + errorMessage)
+                toast.error("Oops, error sending funds to Interchain Account! " + errorMessage)
             },
             onSettled() {
                 setTransactionState(TransactionStatus.IDLE)

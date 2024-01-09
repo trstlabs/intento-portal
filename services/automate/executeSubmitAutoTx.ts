@@ -5,6 +5,7 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
 import { trst } from 'trustlessjs'
 import { validateTransactionSuccess } from '../../util/messages'
+import { AutoTxData } from '../../types/trstTypes'
 
 type ExecuteSubmitAutoTxArgs = {
   owner: string
@@ -98,16 +99,4 @@ export const executeSubmitAutoTx = async ({
       gas: '300000',
     })
   )
-}
-
-export class AutoTxData {
-  duration: number
-  startTime?: number
-  interval?: number
-  connectionId?: string
-  dependsOnTxIds?: number[]
-  msgs: string[]
-  icaAddressForAuthZGrant?: string
-  label?: string
-  feeFunds?: number
 }

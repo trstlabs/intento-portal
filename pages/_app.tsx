@@ -71,125 +71,47 @@ function TrstApp({ Component, pageProps }: AppProps) {
         ],
       })
 
-      chains.push({
-        chain_name: 'trustlesshub',
-        status: 'live',
-        network_type: 'testnet',
-        pretty_name: 'Trustless Hub Testnet',
-        chain_id: 'TRST',
-        bech32_prefix: 'trust',
-        daemon_name: 'trstd',
-        node_home: '$HOME/.trstd',
-        key_algos: ['secp256k1'],
-        slip44: 118,
-        fees: {
-          fee_tokens: [
-            {
-              denom: 'utrst',
-              low_gas_price: 0.025,
-              average_gas_price: 0.05,
-              high_gas_price: 0.1,
-            },
-          ],
-        },
-        codebase: {
-          git_repo: 'https://github.com/trstlabs/trustless-hub',
-          cosmos_sdk_version: '0.47.3',
-          cosmwasm_enabled: false,
-          consensus: {
-            type: 'tendermint',
-            version: '0.35',
-          },
-          ibc_go_version: '7.2.0',
-          genesis: {
-            genesis_url:
-              'https://raw.githubusercontent.com/trustlesshub/mainnet-assets/main/trustlesshub-genesis.json',
-          },
-          versions: [
-            {
-              name: 'v0.8.0',
-              recommended_version: 'v0.8.0',
-              compatible_versions: [],
-              cosmos_sdk_version: '0.47.3',
-              cosmwasm_enabled: false,
-              consensus: {
-                type: 'tendermint',
-                version: '0.37',
+      for (let asset of ibcAssetList) {
+        const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
+        chains.push({
+          chain_name: asset.registry_name,
+          status: 'live',
+          network_type: 'testnet',
+          pretty_name: asset.name,
+          chain_id: asset.chain_id,
+          bech32_prefix: asset.prefix,
+          logo_URIs: { svg: asset.logo_uri },
+          // daemon_name: 'trstd',
+          // node_home: '$HOME/.trstd',
+          // key_algos: ['secp256k1'],
+          slip44: 118,
+          fees: {
+            fee_tokens: [
+              {
+                denom: asset.denom,
+                low_gas_price: 0.025,
+                average_gas_price: 0.05,
+                high_gas_price: 0.1,
               },
-              ibc_go_version: '7.2.0',
-            },
-          ],
-        },
-        logo_URIs: {
-          png: 'https://www.trustlesshub.com/img/brand/icon.png',
-          svg: 'https://info.trstlabs.xyz/trst.svg',
-        },
-        apis: {
-          rpc: [
-            {
-              address: process.env.NEXT_PUBLIC_TRST_RPC,
-              provider: 'trsttest',
-            },
-          ],
-          rest: [
-            {
-              address: process.env.NEXT_PUBLIC_TRST_API,
-              provider: 'trsttest',
-            },
-          ],
-        },
-      })
-
-      chains.push({
-        chain_name: 'host',
-        status: 'live',
-        network_type: 'testnet',
-        pretty_name: 'Host TRST chain for Testnet',
-        chain_id: 'HOST',
-        bech32_prefix: 'trust',
-        daemon_name: 'trstd',
-        node_home: '$HOME/.trstd',
-        key_algos: ['secp256k1'],
-        slip44: 118,
-        fees: {
-          fee_tokens: [
-            {
-              denom: 'ucosm',
-              low_gas_price: 0.025,
-              average_gas_price: 0.05,
-              high_gas_price: 0.1,
-            },
-          ],
-        },
-        apis: {},
-      })
-
-      for (let asset of ibcAssetList.tokens) {
-        //console.log(asset.registry_name)
-        let chain = chainList.find((i) => i.chain_name == asset.registry_name)
-
-        // console.log(chain)
-        chain.apis.rpc = [
-          {
-            address: process.env[`NEXT_PUBLIC_${asset.symbol}_RPC`],
-            provider: 'trsttest',
+            ],
           },
-        ]
-        chain.fees = {
-          fee_tokens: [
-            {
-              denom: asset.denom,
-              low_gas_price: 0.025,
-              average_gas_price: 0.05,
-              high_gas_price: 0.1,
-            },
-          ],
-        }
-        chain.chain_id = asset.chain_id
-        chainList[
-          chainList.findIndex((i) => i.chain_name == asset.registry_name)
-        ] = chain
-        //console.log(chainList.find((i) => i.chain_name == 'cosmoshub').apis)
+          apis: {
+            rpc: [
+              {
+                address: rpcEndpoint,
+                provider: 'TRST Labs',
+              },
+            ],
+            rest: [
+              {
+                address: apiEndpoint,
+                provider: 'TRST Labs',
+              },
+            ],
+          },
+        })
+
+        // console.log(chains[chains.length - 1])
       }
       // console.log(chains.find((i) => i.chain_name == 'cosmoshub'))
       // Mark the data as pushed
@@ -225,38 +147,28 @@ function TrstApp({ Component, pageProps }: AppProps) {
                 assetLists={[...assets]}
                 wallets={wallets}
                 signerOptions={signerOptions}
-                endpointOptions={{
-                  endpoints: {
-                    trustlesshub: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_TRST_RPC],
-                      rest: [process.env.NEXT_PUBLIC_TRST_API],
-                    },
-                    cosmoshub: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
-                      rest: [process.env.NEXT_PUBLIC_ATOM_API],
-                    },
-                    osmosis: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
-                      rest: [process.env.NEXT_PUBLIC_OSMO_API],
-                    },
-                    host: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
-                      rest: [process.env.NEXT_PUBLIC_COSM_API],
-                    },
-                  },
-                }}
                 walletConnectOptions={{
                   signClient: {
                     projectId: 'fa03e8566efb5455b17a0e1f888f0e14',
                   },
                 }}
-                //walletModal={undefined} // `modalViews` only counts when `walletModal` is `undefined`
-
-                // walletModal={ConnectModal}
+                //isLazy = true, no validation because these are not part of the chain registry
+                endpointOptions={{
+                  endpoints: {
+                    trustlesshub: {
+                      isLazy: true,
+                    },
+                    cosmostest: {
+                      isLazy: true,
+                    },
+                    osmosistest: {
+                      isLazy: true,
+                    },
+                    host: {
+                      isLazy: true,
+                    },
+                  },
+                }}
               >
                 <Component {...pageProps} />
               </ChainProvider>
@@ -279,3 +191,35 @@ function TrstApp({ Component, pageProps }: AppProps) {
 }
 
 export default TrstApp
+
+//workaround for typescript to know symbol at compile time
+function getEnvVarForSymbol(symbol: string): {
+  rpcEndpoint: string | undefined
+  apiEndpoint: string | undefined
+} {
+  switch (symbol) {
+    case 'TRST':
+      return {
+        rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
+        apiEndpoint: process.env.NEXT_PUBLIC_TRST_API,
+      }
+    case 'ATOM':
+      return {
+        rpcEndpoint: process.env.NEXT_PUBLIC_ATOM_RPC,
+        apiEndpoint: process.env.NEXT_PUBLIC_ATOM_API,
+      }
+    case 'OSMO':
+      return {
+        rpcEndpoint: process.env.NEXT_PUBLIC_OSMO_RPC,
+        apiEndpoint: process.env.NEXT_PUBLIC_OSMO_API,
+      }
+    case 'COSM':
+      return {
+        rpcEndpoint: process.env.NEXT_PUBLIC_COSM_RPC,
+        apiEndpoint: process.env.NEXT_PUBLIC_COSM_API,
+      }
+    // Add more cases as needed for other symbols
+    default:
+      return { rpcEndpoint: undefined, apiEndpoint: undefined }
+  }
+}

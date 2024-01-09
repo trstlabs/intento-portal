@@ -7,8 +7,9 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef } from 'react'
 
-import { TokenInfo } from '../../../types/trstTypes'
+
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
+import { SelectChainInfo } from '../../../types/trstTypes';
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
@@ -28,7 +29,7 @@ export class ChannelInfo {
 
 export type ChannelSelectListProps = {
   activeChannel?: string
-  channelList: Array<Pick<TokenInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'denom_on_trst' | 'logo_uri' | 'name' | 'symbol'| 'connection_id'>>
+  channelList: Array<Pick<SelectChainInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'denom_on_trst' | 'logo_uri' | 'name' | 'symbol'| 'connection_id'>>
   onSelect: (channelInfo: ChannelInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number

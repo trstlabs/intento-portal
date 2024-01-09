@@ -1,16 +1,16 @@
-import { useIBCAssetList } from 'hooks/useIBCAssetList'
+import { useIBCAssetList } from '../../../hooks/useChainList'
 import { useMultipleTokenBalance } from 'hooks/useTokenBalance'
 import { useMemo } from 'react'
 
 export const useGetIBCAssetsBalances = () => {
   let [ibcAssetList] = useIBCAssetList()
 
-  const tokensList = useMemo(
-    () => ibcAssetList?.tokens.filter(token => token.connection_id).map(({ symbol }) => symbol),
-    [ibcAssetList?.tokens.filter(token => token.connection_id)]
+  const assetList = useMemo(
+    () => ibcAssetList.filter(token => token.connection_id).map(({ symbol }) => symbol),
+    [ibcAssetList.filter(token => token.connection_id)]
   )
 
-  const [tokenBalances, loadingBalances] = useMultipleTokenBalance(tokensList)
+  const [tokenBalances, loadingBalances] = useMultipleTokenBalance(assetList)
 
   const categorizedBalances = useMemo((): [
     typeof tokenBalances,
@@ -18,7 +18,7 @@ export const useGetIBCAssetsBalances = () => {
   ] => {
     if (!tokenBalances?.length) {
       const fallbackTokensList =
-        tokensList?.map((tokenSymbol) => ({
+        assetList?.map((tokenSymbol) => ({
           balance: 0,
           tokenSymbol,
         })) ?? []
@@ -37,7 +37,7 @@ export const useGetIBCAssetsBalances = () => {
     }
 
     return [userTokens, otherTokens]
-  }, [tokenBalances, tokensList])
+  }, [tokenBalances, assetList])
 
   return [loadingBalances, categorizedBalances] as const
 }
@@ -46,12 +46,12 @@ export const useGetIBCAssetsBalances = () => {
 export const useGetAllSupportedAssetsBalances = () => {
   const [ibcAssetList] = useIBCAssetList()
  
-  const tokensList = useMemo(
-    () => ibcAssetList?.tokens.map(({ symbol }) => symbol),
+  const assetList = useMemo(
+    () => ibcAssetList.map(({ symbol }) => symbol),
     [ibcAssetList]
   )
 
-  const [tokenBalances, loadingBalances] = useMultipleTokenBalance(tokensList)
+  const [tokenBalances, loadingBalances] = useMultipleTokenBalance(assetList)
 
   const categorizedBalances = useMemo((): [
     typeof tokenBalances,
@@ -59,7 +59,7 @@ export const useGetAllSupportedAssetsBalances = () => {
   ] => {
     if (!tokenBalances?.length) {
       const fallbackTokensList =
-        tokensList?.map((tokenSymbol) => ({
+        assetList?.map((tokenSymbol) => ({
           balance: 0,
           tokenSymbol,
         })) ?? []
@@ -78,7 +78,7 @@ export const useGetAllSupportedAssetsBalances = () => {
     }
 
     return [userTokens, otherTokens]
-  }, [tokenBalances, tokensList])
+  }, [tokenBalances, assetList])
 
   return [loadingBalances, categorizedBalances] as const
 }

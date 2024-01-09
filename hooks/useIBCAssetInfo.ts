@@ -1,24 +1,26 @@
 import { useCallback, useMemo } from 'react'
 
-import { IBCAssetInfo, useIBCAssetList } from './useIBCAssetList'
+import { IBCAssetInfo, useIBCAssetList } from './useChainList'
 
 const getIBCAssetInfo = (idKey: string, id: string, assetList: IBCAssetInfo[]) =>
   assetList?.find((asset) => asset[idKey] === id)
 
+  //useIBCAssetInfoBySymbol
 export const useIBCAssetInfo = (assetSymbol: string) => {
   const [assetList] = useIBCAssetList()
   return useMemo(
-    () => getIBCAssetInfo('symbol', assetSymbol, assetList?.tokens),
+    () => getIBCAssetInfo('symbol', assetSymbol, assetList),
     [assetList, assetSymbol]
   )
 }
 
+
 export const useIBCAssetInfoFromConnection = (ibcConnectionID: string) => {
   const [assetList] = useIBCAssetList()
 
-  const defaultAsset = assetList?.tokens.find((asset) => asset.id == "Trustless Hub")
+  const defaultAsset = assetList?.find((asset) => asset.id == "Trustless Hub")
   const memoizedAsset = useMemo(
-    () => getIBCAssetInfo('connection_id', ibcConnectionID, assetList?.tokens),
+    () => getIBCAssetInfo('connection_id', ibcConnectionID, assetList),
     [assetList, ibcConnectionID]
   )
 
@@ -35,7 +37,7 @@ export const useGetMultipleIBCAssetInfo = () => {
   return useCallback(
     function getMultipleIBCAssetInfo(assetSymbols: Array<string>) {
       return assetSymbols?.map((assetSymbol) =>
-        getIBCAssetInfoFromList(assetSymbol, assetList?.tokens)
+        getIBCAssetInfoFromList(assetSymbol, assetList)
       )
     },
     [assetList]

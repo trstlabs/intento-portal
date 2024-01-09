@@ -1,5 +1,5 @@
 import { TokenSelectList } from 'components'
-import { useIBCAssetList } from 'hooks/useIBCAssetList'
+import { useIBCAssetList } from '../../../../hooks/useChainList'
 
 export const TokenOptionsList = ({
   activeTokenSymbol,
@@ -11,7 +11,7 @@ export const TokenOptionsList = ({
   return (
     <TokenSelectList
       {...props}
-      tokenList={tokenList.tokens}
+      tokenList={tokenList}
       activeTokenSymbol={activeTokenSymbol}
       onSelect={onSelect}
       visibleNumberOfTokensInViewport={2.5}

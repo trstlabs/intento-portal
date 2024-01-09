@@ -12,7 +12,7 @@ import {
 import { RecipientInfo, RecipientList } from './RecipientList'
 
 import { TokenSelector } from './TokenSelector'
-import { useIBCAssetList } from '../../../hooks/useIBCAssetList'
+import { useIBCAssetList } from '../../../hooks/useChainList'
 
 
 type TokenSendModuleProps = {

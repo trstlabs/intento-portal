@@ -1,17 +1,17 @@
 import { ChannelSelectList, ChannelSelectListProps } from './ChannelSelectList'
-import { useIBCAssetList } from 'hooks/useIBCAssetList'
+import { useIBCAssetList } from '../../../hooks/useChainList'
 
 export const ChannelOptionsList = ({
   activeChannel,
   onSelect,
   ...props
 }: Omit<ChannelSelectListProps, 'channelList' | 'fetchingBalanceMode'>) => {
-  const [channelList] = useIBCAssetList()
+  const [assetList] = useIBCAssetList()
 
   return (
     <ChannelSelectList
       {...props}
-      channelList={channelList.tokens.filter(token => token.connection_id)}
+      channelList={assetList.filter(asset =>  asset.connection_id != '')}
       activeChannel={activeChannel}
       onSelect={onSelect}
       fetchingBalanceMode="native"

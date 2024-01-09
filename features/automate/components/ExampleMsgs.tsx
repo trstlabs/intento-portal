@@ -79,7 +79,7 @@ export const generalExamples = [
     },
   },
   {
-    typeUrl: '/cosmos.staking.v1beta1.MsgUndelegate',
+    typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
     value: {
       amount: [
         {
@@ -120,7 +120,7 @@ export const generalExamples = [
       grantee: 'trust1....',
       msgs: [
         {
-          typeUrl: '/cosmos.staking.v1beta1.MsgUndelegate',
+          typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
           value: {
             amount: {
               amount: '1000000',

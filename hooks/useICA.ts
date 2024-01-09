@@ -14,15 +14,15 @@ import {
   getICA,
   getAuthZGrantsForGrantee,
   getFeeGrantAllowance,
-  AutoTxData,
   GrantResponse,
-} from '../services/ica'
+} from '../services/automate'
 
 import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
 import { useTrstRpcClient } from './useRPCClient'
+import { AutoTxData } from '../types/trstTypes'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
   if (accAddr === '') {
@@ -59,7 +59,8 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 
 export const useICATokenBalance = (
   tokenSymbol: string,
-  nativeWalletAddress: string
+  nativeWalletAddress: string,
+  isICAChain: boolean
 ) => {
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   const ibcState = useRecoilValue(ibcWalletState)
@@ -78,7 +79,13 @@ export const useICATokenBalance = (
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(tokenSymbol && nativeWalletAddress != '' && ibcAsset),
+      enabled: Boolean(
+        tokenSymbol &&
+          nativeWalletAddress != '' &&
+          ibcAsset &&
+          ibcState.tokenSymbol == tokenSymbol &&
+          isICAChain
+      ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -131,7 +138,8 @@ export const useAuthZGrantsForUser = (
           autoTxData.msgs[0].includes('typeUrl') &&
           ibcState.status === WalletStatusType.connected &&
           ibcState.client &&
-          ibcState.address
+          ibcState.address &&
+          autoTxData.connectionId
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,

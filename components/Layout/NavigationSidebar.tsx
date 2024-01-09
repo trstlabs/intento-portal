@@ -30,7 +30,7 @@ import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
 
 import { SwapIcon } from '../../icons/Swap'
-import { TransferIcon } from '../../icons/Transfer'
+// import { TransferIcon } from '../../icons/Transfer'
 import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
@@ -77,7 +77,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     let attempts = 0
     while (status !== WalletStatusType.connected && attempts < 30) {
       if (client != undefined || client != null) {
-        attempts = attempts + 10
+        attempts = attempts + 30
       }
       afterConnectWallet(null)
       await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -129,10 +129,10 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           iconLeft={<DoubleArrowIcon rotation="-90deg" />}
           selected={getIsLinkActive('/send')}
         >
-          <Inline css={{ paddingLeft: '$4' }}>Send</Inline>
+          <Inline css={{ paddingLeft: '$4' }}>Token Sender</Inline>
         </Button>
       </Link>
-      <Link href="/transfer" passHref>
+     {/*  <Link href="/transfer" passHref>
         <Button
           as="a"
           variant="menu"
@@ -142,7 +142,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
         </Button>
-      </Link>
+      </Link> */}
       {process.env.NEXT_PUBLIC_AUTO_TX_ENABLED == 'true' && (
         <Link href="/automate" passHref>
           <Button
@@ -152,7 +152,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             iconLeft={<GearIcon />}
             selected={getIsLinkActive('/automate')}
           >
-            <Inline css={{ paddingLeft: '$4' }}>Automate</Inline>
+            <Inline css={{ paddingLeft: '$4' }}>Actions Automator </Inline>
           </Button>
         </Link>
       )}
@@ -195,6 +195,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Link>
         </>
       )}
+
       {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"
@@ -315,6 +316,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
         {menuLinks}
       </StyledMenuContainer>
+      
       <Column>
         <Text variant="legend" css={{ padding: '$4 $3' }}>
           {APP_NAME} v{process.env.NEXT_PUBLIC_APP_VERSION}
@@ -394,6 +396,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           />
         </Inline>
       </Column>
+     
     </StyledWrapper>
   )
 }

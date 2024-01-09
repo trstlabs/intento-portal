@@ -1,9 +1,9 @@
-import { TokenInfo } from 'types/trstTypes'
+import { SelectChainInfo } from 'types/trstTypes'
 
 import { fetchDollarPriceByTokenIds } from './fetchDollarPriceByTokenIds'
 import { pricingServiceIsDownAlert } from './pricingServiceIsDownAlert'
 
-export async function tokenDollarValueQuery(tokenIds: Array<TokenInfo['id']>) {
+export async function tokenDollarValueQuery(tokenIds: Array<SelectChainInfo['id']>) {
   if (!tokenIds?.length) {
     throw new Error('Provide token ids in order to query their price')
   }

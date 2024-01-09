@@ -12,7 +12,7 @@ import {
 import React, { useRef, useState } from 'react'
 import { JsonFormEditor } from './JsonForm'
 import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
-import { Chip } from './../AutoTxComponent'
+import { Chip } from '../AutomateComponent'
 import * as tmpFiles from '../../../../util/scripts/schemas/msgs'
 import { MessageSelector } from './MessageSelector'
 import { CodeMirrorWrapper } from './CodeMirrorWrapper'

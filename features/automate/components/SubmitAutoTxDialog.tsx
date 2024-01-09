@@ -21,21 +21,7 @@ import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useGetExpectedAutoTxFee } from '../../../hooks/useChainInfo'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-
-export class AutoTxData {
-  duration: number
-  startTime?: number
-  interval?: number
-  connectionId?: string
-  dependsOnTxIds?: number[]
-  msgs: string[]
-  icaAddressForAuthZGrant?: string
-  // typeUrls?: string[]
-  recurrences: number
-  useSubmitAutoTx?: boolean
-  feeFunds?: number
-  label?: string
-}
+import { AutoTxData } from '../../../types/trstTypes'
 
 type SubmitAutoTxDialogProps = {
   isDialogShowing: boolean
@@ -43,7 +29,6 @@ type SubmitAutoTxDialogProps = {
   chainSymbol?: string
   icaAddress?: string
   icaBalance?: number
-  hasAllIcaAuthzGrants?: boolean
   customLabel?: string
   feeFundsHostChain?: string
   isLoading: boolean
@@ -62,7 +47,6 @@ export const SubmitAutoTxDialog = ({
   isDialogShowing,
   icaAddress,
   icaBalance,
-  hasAllIcaAuthzGrants,
   customLabel,
   chainSymbol,
   autoTxData,
@@ -132,7 +116,7 @@ export const SubmitAutoTxDialog = ({
         <Toast
           icon={<IconWrapper icon={<Error />} color="error" />}
           title={
-            "Can't make interval higher than duration " +
+            "Can't set interval higher than duration " +
             displayInterval +
             ',your specified interval is: ' +
             label
@@ -554,11 +538,11 @@ export const SubmitAutoTxDialog = ({
                             {'Send ' + feeFundsHostChain + ' ' + chainSymbol}
                           </Button>
                         )}
-                      {!hasAllIcaAuthzGrants && (
+                      {!shouldDisableAuthzGrantButton && (
                         <Button
                           css={{ marginTop: '$8', margin: '$2' }}
                           variant="secondary"
-                          disabled={shouldDisableAuthzGrantButton}
+  
                           onClick={() => handleCreateAuthzGrantClick(Number(feeFundsHostChain) != 0)}
                         >
                           {isExecutingAuthzGrant && <Spinner instant />}{' '}
@@ -689,7 +673,7 @@ export const SubmitAutoTxDialog = ({
       >
         {autoTxData.connectionId && (
           <Button
-            disabled={!hasAllIcaAuthzGrants}
+            disabled={shouldDisableAuthzGrantButton}
             variant="secondary"
             onClick={() => (isLoading ? undefined : handleData(icaAddress))}
           >

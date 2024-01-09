@@ -2,7 +2,7 @@
 import { Coin } from '@cosmjs/stargate'
 import { Height } from 'trustlessjs/dist/codegen/ibc/core/client/v1/client'
 import { ibc } from 'trustlessjs'
-import { IBCAssetInfo } from 'hooks/useIBCAssetList'
+import { IBCAssetInfo } from '../../../../hooks/useChainList'
 import { SigningStargateClient, DeliverTxResponse } from '@cosmjs/stargate'
 import { useMutation } from 'react-query'
 import { useRecoilValue } from 'recoil'

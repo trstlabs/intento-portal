@@ -7,10 +7,11 @@ import { useTokenSend } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
 import { useRecoilValue } from 'recoil'
-import { SubmitAutoTxDialog, AutoTxData } from '../../automate/components/SubmitAutoTxDialog';
+import { SubmitAutoTxDialog } from '../../automate/components/SubmitAutoTxDialog';
 import { ChannelInfo } from './ChannelSelectList';
 import { useSubmitAutoTx } from '../../automate/hooks';
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo';
+import { AutoTxData } from '../../../types/trstTypes';
 
 export class RecipientInfo {
   recipient: string;
@@ -78,14 +79,14 @@ export const RecipientList = ({
     }
   }, [isExecutingSchedule, requestedSchedule, handleSchedule])
 
-  const handleSendButtonClick = () => {
+  const handleSendClick = () => {
     if (status === WalletStatusType.connected) {
       return setRequestedSend(true)
     }
 
   }
 
-  const handleScheduleButtonClick = (txData: AutoTxData) => {
+  const handleScheduleClick = (txData: AutoTxData) => {
 
     if (status === WalletStatusType.connected) {
       let msgs = []
@@ -315,7 +316,7 @@ export const RecipientList = ({
           disabled={shouldDisableSubmissionButton}
           onClick={
             !isExecutingTransaction
-              ? handleSendButtonClick
+              ? handleSendClick
               : undefined
           }
         >
@@ -348,7 +349,7 @@ export const RecipientList = ({
 
           })
         }
-        handleSubmitAutoTx={(txData) => handleScheduleButtonClick(txData)}
+        handleSubmitAutoTx={(txData) => handleScheduleClick(txData)}
       />
     </div >)
 }

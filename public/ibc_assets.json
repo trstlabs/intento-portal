@@ -1,65 +1,62 @@
-{
-  "tokens": [
-    {
-      "id": "Trustless Hub",
-      "name": "Trustless Hub",
-      "registry_name": "trustlesshub",
-      "symbol": "TRST",
-      "chain_id": "TRST",
-      "denom": "utrst",
-      "decimals": 6,
-      "denom_on_trst": "utrst",
-      "logo_uri": "https://www.trustlesshub.com/img/brand/icon.png",
-      "prefix": "trust"
-    }, 
-    {
-      "id": "Cosmos Hub",
-      "name": "Cosmos Hub",
-      "registry_name": "cosmoshub",
-      "symbol": "ATOM",
-      "chain_id": "GAIA",
-      "denom": "uatom",
-      "decimals": 6,
-      "channel": "channel-0",
-      "channel_to_trst": "channel-0",
-      "denom_on_trst": "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
-      "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
-      "connection_id": "connection-0",
-      "counterparty_connection_id": "connection-0",
-      "prefix": "cosmos"
-    }, 
-    {
-      "id": "Osmosis",
-      "name": "Osmosis",
-      "symbol": "OSMO",
-      "chain_id": "OSMO",
-      "registry_name": "osmosis",
-      "denom": "uosmo",
-      "decimals": 6,
-      "channel": "channel-1",
-      "channel_to_trst": "channel-0",
-      "denom_on_trst": "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
-      "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
-      "connection_id": "connection-1", 
-      "counterparty_connection_id": "connection-0",
-      "prefix": "osmo"
-    },
-    {
-      "id": "Trustless Hub Host",
-      "name": "Trustless Hub Host(2)",
-      "registry_name": "host",
-      "symbol": "COSM",
-      "chain_id": "HOST",
-      "denom": "ucosm",
-      "decimals": 6,
-      "channel": "channel-2",
-      "channel_to_trst": "channel-0",
-      "denom_on_trst": "ibc/F2116BE5B0D320180094EEBE3E8D34826EB44CAD8409166CADD1DD9134FD682C",
-      "logo_uri": "https://www.trustlesshub.com/img/brand/icon.png",
-      "prefix": "trust",
-      "connection_id": "connection-2",
-      "counterparty_connection_id": "connection-0"
-      
-    } 
-  ]
-}
+[
+  {
+    "id": "Trustless Hub",
+    "name": "Test Chain 1",
+    "registry_name": "trustlesshub",
+    "symbol": "TRST",
+    "chain_id": "TRST",
+    "denom": "utrst",
+    "decimals": 6,
+    "denom_on_trst": "utrst",
+    "logo_uri": "https://trstlabs.xyz/trst.svg",
+    "prefix": "trust"
+  },
+  {
+    "id": "Cosmos Hub",
+    "name": "Cosmos Hub Test",
+    "registry_name": "cosmostest",
+    "symbol": "ATOM",
+    "chain_id": "GAIA",
+    "denom": "uatom",
+    "decimals": 6,
+    "channel": "channel-0",
+    "channel_to_trst": "channel-0",
+    "denom_on_trst": "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+    "connection_id": "connection-0",
+    "counterparty_connection_id": "connection-0",
+    "prefix": "cosmos"
+  },
+  {
+    "id": "Osmosis",
+    "name": "Osmosis Test",
+    "symbol": "OSMO",
+    "chain_id": "OSMO",
+    "registry_name": "osmosistest",
+    "denom": "uosmo",
+    "decimals": 6,
+    "channel": "channel-1",
+    "channel_to_trst": "channel-0",
+    "denom_on_trst": "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
+    "connection_id": "connection-1",
+    "counterparty_connection_id": "connection-0",
+    "prefix": "osmo"
+  },
+  {
+    "id": "Trustless Hub Host",
+    "name": "Test Chain 2 (ICA Host)",
+    "registry_name": "host",
+    "symbol": "COSM",
+    "chain_id": "HOST",
+    "denom": "ucosm",
+    "decimals": 6,
+    "channel": "channel-2",
+    "channel_to_trst": "channel-0",
+    "denom_on_trst": "ibc/F2116BE5B0D320180094EEBE3E8D34826EB44CAD8409166CADD1DD9134FD682C",
+    "logo_uri": "https://trstlabs.xyz/trst.svg",
+    "prefix": "trust",
+    "connection_id": "connection-2",
+    "counterparty_connection_id": "connection-0"
+  }
+]

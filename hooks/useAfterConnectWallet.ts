@@ -8,7 +8,6 @@ export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
   let {
-
     connect,
     getSigningStargateClient,
     address,

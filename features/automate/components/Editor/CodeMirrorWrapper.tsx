@@ -2,7 +2,7 @@ import { Inline, Button, Text, Column, IconWrapper, Union } from 'junoblocks'
 import React from 'react'
 import { JsonCodeMirrorEditor } from './CodeMirror'
 import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
-import { Chip } from './../AutoTxComponent'
+import { Chip } from '../AutomateComponent'
 
 export const CodeMirrorWrapper = ({
   index,

@@ -1,1 +1,1 @@
-export { AutomateModule } from './AutomateModule'
+export { AutomateWrapper } from './AutomateWrapper'

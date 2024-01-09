@@ -23,13 +23,13 @@ export const ExtensionSidebar = () => {
       >
         Report an issue
       </Button>
-     {/*  <StyledPNGBottom src="/multiportal2.png" /> */}
+     <StyledPNGBottom src="/img/cosmonaut.png" />  
     </StyledDivForWrapper>
   )
 }
 
 const StyledDivForWrapper = styled('div', {
-  flexBasis: '16.5rem',
+  flexBasis: '28rem',
   flexGrow: 0,
   flexShrink: 0,
   zIndex: 1,
@@ -49,15 +49,14 @@ const StyledDivForTitleWrapper = styled('div', {
   alignItems: 'center',
   columnGap: '$4',
 })
-/* 
+
 const StyledPNGBottom = styled('img', {
   position: 'absolute',
-  right: 20,
-  bottom: 40,
-  width: '60%',
-  maxWidth: '300px',
+  right: 0,
+  bottom: 0,
+  width: '300%',
+  maxWidth: '500px',
   zIndex: '$1',
   userSelect: 'none',
   userDrag: 'none',
 })
- */

@@ -21,18 +21,30 @@ for json_file in "${SCRIPT_PATH}/schemas/msgs"/*.json; do
         # Extract the first characters of the file name
         prefix="${file_name%%_*}"
         
-        #type="${file_name#*_}"
-        
         # Create a new aggregated JSON file with the same prefix
         aggregated_file="${AGGREGATED_DIR}/${prefix}_json_msgs.json"
         
-        # If the aggregated file already exists, append the contents of the current JSON file to it
+        # If the aggregated file already exists, add a comma before appending the contents
         if [ -f "$aggregated_file" ]; then
+            # Add a comma to the end of the existing aggregated file
+            echo -n "," >> "$aggregated_file"
+            # Append the contents of the current JSON file
             cat "$json_file" >> "$aggregated_file"
         else
-            # Otherwise, create the aggregated file and copy the current JSON file contents
-            cp "$json_file" "$aggregated_file"
+            # Otherwise, create the aggregated file and wrap the contents in an array of objects
+            echo "[" > "$aggregated_file"
+            # Append the contents of the current JSON file
+            cat "$json_file" >> "$aggregated_file"
         fi
+    fi
+done
+
+# Close the JSON array in the aggregated files
+for aggregated_file in "${AGGREGATED_DIR}"/*.json; do
+    # Check if the file exists
+    if [ -f "$aggregated_file" ]; then
+        # Close the JSON array
+        echo "]" >> "$aggregated_file"
     fi
 done
 

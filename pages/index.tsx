@@ -14,13 +14,13 @@ import {
   Spinner,
   styled,
   Text,
-  Tooltip,
+/*   Tooltip, */
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
-import { InfoCard } from '../features/dashboard/components/InfoCard'
+// import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
@@ -40,16 +40,16 @@ export default function Home() {
     ),
   })
 
-  const shouldShowAutoCompound =
+/*   const shouldShowAutoCompound =
     !myAutoTxs?.length ||
-    myAutoTxs.find((tx) => tx.label === 'Autocompound') == undefined
+    myAutoTxs.find((tx) => tx.label === 'Autocompound') == undefined */
   const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
 
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="View and manage your Intent-Centric Triggers"
+      subtitle="View and manage configurations of automated actions 🌟"
     />
   )
 
@@ -68,7 +68,7 @@ export default function Home() {
         </>
       )}
       <Column css={{ paddingTop: '12' }}>
-        <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
+{/*         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} /> */}
       </Column>
       {!isLoading && isSorting && address && (
         <Column
@@ -82,11 +82,11 @@ export default function Home() {
           </Inline>
         </Column>
       )}
-      <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
-        <Tooltip label="Intent-Centric Triggers can automate workflows and move assets on your behalf, only available on Trustless Hub ">
-          <span>Intent-Centric Triggers</span>
+{/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
+        <Tooltip label="Automate messages and workflows, move assets on your behalf">
+          <span>Automations</span>
         </Tooltip>
-      </Text>
+      </Text> */}
       {shouldRenderAutoTxs && (
         <>
           {Boolean(myAutoTxs?.length) && (
