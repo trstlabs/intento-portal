@@ -66,5 +66,3 @@ node_modules
 
 localtrst
 util/scripts/Trustless-Hub
-util/scripts/cosmos-sdk
-util/scripts/cosmos-proto
