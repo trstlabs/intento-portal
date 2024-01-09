@@ -31,5 +31,5 @@
     
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/s"],
-  "exclude": ["node_modules", "util/scripts"] // *** The files to not type check ***
+  "exclude": ["node_modules", "util/scripts/*"] // *** The files to not type check ***
 }
