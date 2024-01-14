@@ -250,7 +250,7 @@ export const SubmitAutoTxDialog = ({
       interval,
       recurrences,
       connectionId: autoTxData.connectionId,
-      dependsOnTxIds: autoTxData.dependsOnTxIds,
+      configuration: autoTxData.configuration,
       // retries: autoTxData.retries,
       msgs: autoTxData.msgs,
       icaAddressForAuthZGrant,

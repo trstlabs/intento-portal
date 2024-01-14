@@ -34,6 +34,9 @@ import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
 import MessagePreview from './MessagePreview'
 import { AutoTxData } from '../../../types/trstTypes'
+import { AutomateConfiguration } from './AutomateConfiguration'
+import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { GearIcon, TransferIcon } from '../../../icons'
 
 type AutoTxsInputProps = {
   autoTxData: AutoTxData
@@ -242,11 +245,11 @@ export const AutomateComponent = ({
     try {
       let msgs = autoTxData.msgs
       msgs[index] = msg
-      let newAutoTxData = {
+      let updatedAutoTxData = {
         ...autoTxData,
         msgs,
       }
-      onAutoTxChange(newAutoTxData)
+      onAutoTxChange(updatedAutoTxData)
       if (
         JSON.parse(msg)
           ['typeUrl'].split('.')
@@ -268,22 +271,21 @@ export const AutomateComponent = ({
     name: string,
     chainSymbol: string
   ) {
-    let newAutoTx = autoTxData
-    newAutoTx.connectionId = connectionId
+    let updatedAutoTxData = autoTxData
+    updatedAutoTxData.connectionId = connectionId
     autoTxData.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
-        newAutoTx.msgs[editIndex] = editMsg.replaceAll(
+        updatedAutoTxData.msgs[editIndex] = editMsg.replaceAll(
           prefix + '1...',
           newPrefix + '1...'
         )
-        newAutoTx.msgs[editIndex] = newAutoTx.msgs[editIndex].replaceAll(
-          denom,
-          newDenom
-        )
+        updatedAutoTxData.msgs[editIndex] = updatedAutoTxData.msgs[
+          editIndex
+        ].replaceAll(denom, newDenom)
       }
     })
 
-    onAutoTxChange(newAutoTx)
+    onAutoTxChange(updatedAutoTxData)
     setDenom(newDenom)
     setChainName(name)
     setCounterpartyConnectionId(counterpartyConnectionId)
@@ -292,7 +294,7 @@ export const AutomateComponent = ({
     setPrefix(newPrefix)
     let chainIsConnected = connectionId != undefined && connectionId != ''
     setChainIsConnected(chainIsConnected)
-    setChainHasIAModule((chainId == 'TRST'))
+    setChainHasIAModule(chainId == 'TRST')
 
     await sleep(2000)
 
@@ -305,37 +307,46 @@ export const AutomateComponent = ({
   }
 
   function setExample(index: number, msgObject: any) {
-    const msg = JSON.stringify(msgObject, null, '\t')
-    let newMsg = msg.replaceAll('trust', prefix)
-    newMsg = newMsg.replaceAll('utrst', denom)
-    let newAutoTxData = autoTxData
-    newAutoTxData.msgs[index] = newMsg
-    //newAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+    try {
+      const msg = JSON.stringify(msgObject, null, '\t')
+      let newMsg = msg.replaceAll('trust', prefix)
+      newMsg = newMsg.replaceAll('utrst', denom)
+      let updatedAutoTxData = autoTxData
+      updatedAutoTxData.msgs[index] = newMsg
+      //updatedAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
 
-    onAutoTxChange(newAutoTxData)
+      onAutoTxChange(updatedAutoTxData)
+    } catch (e) {
+      alert(e)
+    }
+  }
+
+  function setConfig(updatedConfig: ExecutionConfiguration) {
+    let updatedAutoTxData = autoTxData
+    updatedAutoTxData.configuration = updatedConfig
+    onAutoTxChange(updatedAutoTxData)
   }
 
   function handleAddMsg() {
-    // Create a new RecipientInfo object
     let newMsgs = [...autoTxData.msgs]
     let emptyMsg = ''
     newMsgs.push(emptyMsg)
-    let newAutoTxData = autoTxData
-    newAutoTxData.msgs = newMsgs
-    onAutoTxChange(newAutoTxData)
+    let updatedAutoTxData = autoTxData
+    updatedAutoTxData.msgs = newMsgs
+    onAutoTxChange(updatedAutoTxData)
   }
   function handleRemoveMsg(index: number) {
-    let newAutoTxData = autoTxData
+    let updatedAutoTxData = autoTxData
 
-    const newMsgs = newAutoTxData.msgs.filter(
-      (msg) => msg !== newAutoTxData.msgs[index]
+    const newMsgs = updatedAutoTxData.msgs.filter(
+      (msg) => msg !== updatedAutoTxData.msgs[index]
     )
 
     if (index == 0 && newMsgs.length == 0) {
       newMsgs[index] = ''
     }
-    newAutoTxData.msgs = newMsgs
-    onAutoTxChange(newAutoTxData)
+    updatedAutoTxData.msgs = newMsgs
+    onAutoTxChange(updatedAutoTxData)
   }
 
   const [
@@ -356,8 +367,12 @@ export const AutomateComponent = ({
 
   return (
     <StyledDivForContainer>
-      <Card variant="secondary" disabled css={{ padding: '$2' }}>
-        <CardContent size="medium">
+      <Card
+        css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
+        variant="secondary"
+        disabled
+      >
+        <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
           <Column>
             <Row>
               <Text align="center" variant="caption">
@@ -439,21 +454,21 @@ export const AutomateComponent = ({
                 </>
               ))}
           </Column>
-          {autoTxData.msgs.map((msg, index) => (
-            <div key={index}>
-              <JsonFormWrapper
-                index={index}
-                chainSymbol={chainSymbol}
-                msg={msg}
-                setExample={setExample}
-                handleRemoveMsg={handleRemoveMsg}
-                handleChangeMsg={handleChangeMsg}
-                setIsJsonValid={setIsJsonValid}
-              />
-            </div>
-          ))}{' '}
         </CardContent>
       </Card>
+      {autoTxData.msgs.map((msg, index) => (
+        <div key={index}>
+          <JsonFormWrapper
+            index={index}
+            chainSymbol={chainSymbol}
+            msg={msg}
+            setExample={setExample}
+            handleRemoveMsg={handleRemoveMsg}
+            handleChangeMsg={handleChangeMsg}
+            setIsJsonValid={setIsJsonValid}
+          />
+        </div>
+      ))}{' '}
       <Card variant="secondary" disabled css={{ margin: '$6' }}>
         {
           <Column>
@@ -483,12 +498,15 @@ export const AutomateComponent = ({
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
         showWarning={showWarning}
         hideWarning={hideWarning}
-        handleAddMsg={handleAddMsg}
         handleSubmitAutoTxClick={handleSubmitAutoTxClick}
         handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
-
+       <AutomateConfiguration
+          config={autoTxData.configuration}
+          disabled={!icaAddress && !chainHasIAModule}
+          onChange={setConfig}
+        />
       <Inline
         css={{
           margin: '$4 $6 $8',
@@ -497,16 +515,17 @@ export const AutomateComponent = ({
         }}
       >
         <Button
-          css={{ marginRight: '$4' }}
+         css={{ margin: '$4' ,columnGap: '$4',}}
           variant="primary"
           size="large"
           disabled={shouldDisableSubmitButton}
           onClick={() => handleSubmitTxClick()}
+          iconLeft={<TransferIcon />}
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Submit Directly'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Send directly'}
         </Button>
         <Button
-          css={{ marginRight: '$4' }}
+          css={{ margin: '$4' ,columnGap: '$4',}}
           variant="primary"
           size="large"
           disabled={shouldDisableAutomateButton}
@@ -515,8 +534,9 @@ export const AutomateComponent = ({
               isShowing: true,
             })
           }
+          iconLeft={<GearIcon />}
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Automate'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Automate Action'}
         </Button>
       </Inline>
     </StyledDivForContainer>
