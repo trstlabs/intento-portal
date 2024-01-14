@@ -7,7 +7,6 @@ import {
   IconWrapper,
   Info,
   Column,
-  PlusIcon,
   Inline,
   Union,
 } from 'junoblocks'
@@ -29,30 +28,18 @@ const MessagePreview = ({
   showWarning,
   hideWarning,
   setFeeFundsHostChain,
-  handleAddMsg,
   handleSubmitAutoTxClick,
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
 }) => {
   return (
     <div>
-      <Card variant="secondary" disabled css={{ margin: '$6' }}>
-        <Column>
-          <Button
-            css={{ margin: '$2' }}
-            icon={<IconWrapper icon={<PlusIcon />} />}
-            variant="ghost"
-            iconColor="tertiary"
-            onClick={handleAddMsg}
-          />
-        </Column>
-      </Card>
       {autoTxData.msgs &&
         autoTxData.msgs[0] &&
         autoTxData.msgs[0].length > 3 && (
           <Column>
             <Card
-              css={{ margin: '$4', paddingLeft: '$12', paddingTop: '$2' }}
+              css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
               variant="secondary"
               disabled
             >

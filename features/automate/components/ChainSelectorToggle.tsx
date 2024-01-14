@@ -29,7 +29,7 @@ export const ChainSelectorToggle = ({
     if (isSelecting || !chainSelected) {
       return (
         <>
-          <Text variant="body">Select a Chain</Text>
+          <Text variant="body">Select a chain</Text>
           <IconWrapper
             size="large"
             rotation={iconRotation}

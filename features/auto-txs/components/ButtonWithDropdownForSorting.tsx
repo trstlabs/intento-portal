@@ -27,10 +27,16 @@ import {
         return 'Sort by ID'
       }
       if (sortParameter === 'label') {
-        return 'Sort by label'
+        return 'Sort by Label'
+      }
+      if (sortParameter === 'start_time') {
+        return 'Sort by Start Time'
+      }
+      if (sortParameter === 'end_time') {
+        return 'Sort by End Time'
       }
       if (sortParameter === 'exec_time') {
-        return 'Sort by execute time'
+        return 'Sort by Execution Time'
       }
       return `Sort by ${sortParameter}`
     }
@@ -67,6 +73,22 @@ import {
                 iconLeft={<ValidIcon visible={sortParameter === 'exec_time'} />}
               >
                 Execution Time
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => onSortParameterChange('start_time')}
+                selected={sortParameter === 'start_time'}
+                iconLeft={<ValidIcon visible={sortParameter === 'start_time'} />}
+              >
+                Start Time
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => onSortParameterChange('end_time')}
+                selected={sortParameter === 'end_time'}
+                iconLeft={<ValidIcon visible={sortParameter === 'end_time'} />}
+              >
+                End Time
               </Button>
             </Column>
             <Divider />

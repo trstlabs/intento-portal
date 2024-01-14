@@ -2,7 +2,7 @@
 import { useMemo } from 'react'
 import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 
-export type SortParameters = 'exec_time' | 'id' |  'label'
+export type SortParameters = 'end_time' | 'exec_time' |'start_time'| 'id' |  'label'
 export type SortDirections = 'asc' | 'desc'
 
 export type InfoArgs = {
@@ -55,13 +55,12 @@ function sortAutoTxs(
   autoTxs: Array<AutoTxInfo>,
   sortBy?: UseSortAutoTxsArgs['sortBy']
 ) {
-  // const { address } = useRecoilValue(walletState)
   if (!sortBy) return autoTxs
   const result = autoTxs.sort((autoTxA, autoTxB) => {
 
-    if (sortBy.parameter === 'exec_time') {
-      const timeA = autoTxA.execTime;
-      const timeB = autoTxB.execTime;
+    if (sortBy.parameter === 'end_time') {
+      const timeA = autoTxA.endTime;
+      const timeB = autoTxB.endTime;
 
 
       if (timeA > timeB) {
@@ -71,7 +70,29 @@ function sortAutoTxs(
       }
     }
 
-    /* sort by autoTxId */
+    if (sortBy.parameter === 'exec_time') {
+      const timeA = autoTxA.execTime.getSeconds();
+      const timeB = autoTxB.execTime.getSeconds();
+      
+      if (timeA > timeB) {
+        return 1
+      } else if (timeA < timeB) {
+        return -1
+      }
+    }
+    
+    if (sortBy.parameter === 'start_time') {
+      const timeA = autoTxA.startTime;
+      const timeB = autoTxB.startTime;
+
+
+      if (timeA > timeB) {
+        return 1
+      } else if (timeA < timeB) {
+        return -1
+      }
+    }
+
     if (sortBy.parameter === 'id') {
       const autoTxIdA = autoTxA.txId
       const autoTxIdB = autoTxB.txId

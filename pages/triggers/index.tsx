@@ -14,7 +14,6 @@ import {
   Spinner,
   styled,
   Text,
-
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
@@ -23,9 +22,7 @@ import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
 import { AutoTxCard } from '../../features/auto-txs/components/AutoTxCard'
 import { InfoArgs } from '../../features/auto-txs/hooks/useSortAutoTxs'
 
-
 export default function AutoTxs() {
-
   const { address } = useRecoilValue(walletState)
   const [autoTxs, isLoading] = useAutoTxInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
@@ -42,7 +39,7 @@ export default function AutoTxs() {
     ),
   })
 
-  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length;
+  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length
   const shouldRenderAutoTxs = Boolean(autoTxs?.length)
 
   const pageHeaderContents = (
@@ -67,19 +64,18 @@ export default function AutoTxs() {
           </Column>
         </>
       )}
-      {!isLoading && isSorting && (<Column
-        justifyContent="center"
-        align="center"
-        css={{ paddingTop: '$24' }}>
-        <Inline gap={2}>
-          <ConnectIcon color="secondary" />
-          <Text variant="primary">
-            {
-              "Finding your autoTxs..."
-            }
-          </Text>
-        </Inline>
-      </Column>)}
+      {!isLoading && isSorting && (
+        <Column
+          justifyContent="center"
+          align="center"
+          css={{ paddingTop: '$24' }}
+        >
+          <Inline gap={2}>
+            <ConnectIcon color="secondary" />
+            <Text variant="primary">{'Finding your autoTxs...'}</Text>
+          </Inline>
+        </Column>
+      )}
       {shouldRenderAutoTxs && (
         <>
           {Boolean(myAutoTxs?.length) && (
@@ -88,15 +84,11 @@ export default function AutoTxs() {
                 Your Personal Triggers
               </Text>
               <StyledDivForAutoTxsGrid>
-                {myAutoTxs.map(
-                  (autoTxInfo, index) => (
-                    <div key={index}>
-                    <AutoTxCard
-                      autoTxInfo={autoTxInfo}
-                    />
-                    </div>
-                  )
-                )}
+                {myAutoTxs.map((autoTxInfo, index) => (
+                  <div key={index}>
+                    <AutoTxCard autoTxInfo={autoTxInfo} />
+                  </div>
+                ))}
               </StyledDivForAutoTxsGrid>
             </>
           )}
@@ -112,32 +104,29 @@ export default function AutoTxs() {
                 paddingBottom: '$11',
               }}
             >
-              <Text variant="primary">{allAutoTxs.length} Other AutoTxs</Text>
+              <Text variant="primary">
+                {allAutoTxs.length} {myAutoTxs[0] && <>Other</>} Available
+                automations
+              </Text>
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}
                 onSortParameterChange={setSortParameter}
                 onSortDirectionChange={setSortDirection}
               />
-
             </Inline>
-          )}</>
+          )}
+        </>
       </StyledDivForAutoTxsGrid>
 
       <StyledDivForAutoTxsGrid>
-        {allAutoTxs.map(
-          (autoTxInfo, index) => (
-            <div key={index}>
-            <AutoTxCard
-              autoTxInfo={autoTxInfo}
-            />
-            </div>
-          )
-        )}
+        {allAutoTxs.map((autoTxInfo, index) => (
+          <div key={index}>
+            <AutoTxCard autoTxInfo={autoTxInfo} />
+          </div>
+        ))}
       </StyledDivForAutoTxsGrid>
-
-
-    </AppLayout >
+    </AppLayout>
   )
 }
 
@@ -176,7 +165,6 @@ const StyledDivForAutoTxsGrid = styled('div', {
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',
   rowGap: '$8',
-
 
   '@media (max-width: 1360px)': {
     gridTemplateColumns: '1fr',

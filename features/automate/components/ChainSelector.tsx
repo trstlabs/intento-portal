@@ -1,24 +1,30 @@
-import { Button, IconWrapper, styled, Union } from 'junoblocks'
+import {
+  Button,
+  IconWrapper,
+  styled,
+  Union,
+} from 'junoblocks'
 import React, { useRef, useState } from 'react'
 
 import { ChainSelectorToggle } from './ChainSelectorToggle'
 import { ChainSelectorDialog } from './ChainSelectorDialog'
 import { ChainInfo } from './ChainSelectorSelectList'
 
+
 type ChainSelectorProps = {
-  readOnly?: boolean
   disabled?: boolean
   onChange: (ChainInfo: ChainInfo) => void
 }
 
 export const ChainSelector = ({
-  readOnly,
   disabled,
   onChange,
 }: ChainSelectorProps) => {
-  const wrapperRef = useRef<HTMLDivElement>()
+  const wrapperRef = useRef()
   const [isChainListShowing, setChainListShowing] = useState(false)
   const [selectedChain, setSelectedChain] = useState({ logoURI: '', name: '' })
+
+
 
   const handleSelectChain = (chainInfo: ChainInfo) => {
     setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })
@@ -30,14 +36,8 @@ export const ChainSelector = ({
     if (!disabled) setChainListShowing(!isChainListShowing)
   }
 
-  const handleOverlayClick = () => {
-    if (!readOnly && isChainListShowing) {
-      setChainListShowing(false)
-    }
-  }
-
   return (
-    <StyledDivForContainer ref={wrapperRef} css={{ position: 'relative', zIndex: 1 }}>
+    <StyledDivForContainer ref={wrapperRef}>
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {!isChainListShowing && (
@@ -48,9 +48,9 @@ export const ChainSelector = ({
               onToggle={toggleChainList}
             />
           )}
-        </StyledDivForSelector>
-        {isChainListShowing && (
-          <StyledDivForAmountWrapper>
+        </StyledDivForSelector>{' '}
+        <StyledDivForButton>
+          {isChainListShowing && (
             <Button
               css={{ padding: '$0 $0 $0' }}
               icon={<IconWrapper icon={<Union />} />}
@@ -59,9 +59,8 @@ export const ChainSelector = ({
               onClick={() => handleSelectChain(new ChainInfo())}
               iconColor="tertiary"
             />
-          </StyledDivForAmountWrapper>
-        )}
-        <StyledDivForOverlay onClick={handleOverlayClick} />
+          )}
+        </StyledDivForButton>
       </StyledDivForWrapper>
       {isChainListShowing && (
         <ChainSelectorDialog
@@ -88,20 +87,9 @@ const StyledDivForWrapper = styled('div', {
 
 const StyledDivForSelector = styled('div', sharedStyles)
 
-const StyledDivForAmountWrapper = styled('div', {
+const StyledDivForButton = styled('div', {
   justifyContent: 'flex-end',
   ...sharedStyles,
-})
-
-const StyledDivForOverlay = styled('div', {
-  position: 'absolute',
-  left: 0,
-  top: 0,
-  width: '100%',
-  height: '100%',
-  zIndex: 0,
-  backgroundColor: '$colors$dark0',
-  transition: 'background-color .1s ease-out',
 })
 
 const StyledDivForContainer = styled('div', {

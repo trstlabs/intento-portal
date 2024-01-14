@@ -1,7 +1,6 @@
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { Coin } from '@cosmjs/stargate'
-import { Timestamp } from 'trustlessjs/dist/codegen/google/protobuf/timestamp'
-import { Duration } from 'trustlessjs/dist/codegen/google/protobuf/duration'
+import { ExecutionConfiguration, /* AutoTxHistoryEntry */ } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 
 export interface MsgUpdateAutoTxParams {
   owner: string
@@ -13,27 +12,8 @@ export interface MsgUpdateAutoTxParams {
   interval?: string
   startAt?: number
   feeFunds?: Coin[]
-  dependsOnTxIds?: number[]
   version?: string
-}
-
-/** AutoTxInfo stores the info for the auto executing interchain accounts transaction */
-export interface AutoTxInfo {
-  txId: string
-  owner: string
-  label: string
-  feeAddress: string
-  msgs: Any[]
-  interval?: Duration
-  startTime?: Timestamp
-  execTime?: Timestamp
-  endTime?: Timestamp
-  autoTxHistory: AutoTxHistoryEntry[]
-  portId: string
-  connectionId: string
-  /** optional array of dependent txs that should be executed before execution is allowed */
-  dependsOnTxIds: string[]
-  updateHistory: Timestamp[]
+  configuration?: ExecutionConfiguration
 }
 
 export class AutoTxData {
@@ -44,22 +24,11 @@ export class AutoTxData {
   startTime?: number
   interval?: number
   connectionId?: string
-  dependsOnTxIds?: number[]
-  //useSubmitAutoTx?: boolean
+  configuration?: ExecutionConfiguration
   feeFunds?: number
   label?: string
 }
 
-/** AutoTxHistoryEntry provides a the history of AutoTx interchain tx call */
-export interface AutoTxHistoryEntry {
-  scheduledExecTime?: Timestamp
-  actualExecTime?: Timestamp
-  execFee?: Coin
-  executed: boolean
-  timedOut: boolean
-  /** uint64 retries = 6; */
-  error: string
-}
 
 export type SelectChainInfo = {
   id: string

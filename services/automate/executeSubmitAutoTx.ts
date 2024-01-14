@@ -4,7 +4,7 @@ import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
 import { trst } from 'trustlessjs'
-import { validateTransactionSuccess } from '../../util/messages'
+import { validateTransactionSuccess } from '../../util/validateTx'
 import { AutoTxData } from '../../types/trstTypes'
 
 type ExecuteSubmitAutoTxArgs = {
@@ -90,7 +90,7 @@ export const executeSubmitAutoTx = async ({
       duration,
       interval,
       startAt,
-      dependsOnTxIds: [],
+      configuration: autoTxData.configuration ? autoTxData.configuration : {saveMsgResponses:false, updatingDisabled:false, stopOnSuccess:false, stopOnFailure: false},
       feeFunds,
     })
   return validateTransactionSuccess(

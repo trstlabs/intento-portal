@@ -19,7 +19,13 @@ export const AutomateWrapper = ({
   initialAutoTxData.duration = 14 * 86400000
   initialAutoTxData.interval = 86400000
   initialAutoTxData.msgs = [JSON.stringify(generalExamples[0], null, 2)]
-
+  const initConfig = {
+    saveMsgResponses: true,
+    updatingDisabled: false,
+    stopOnFailure: false,
+    stopOnSuccess: false,
+  }
+  initialAutoTxData.configuration = initConfig
   //data.typeUrls = [""]
   //works faster than without array for some reason
   const [autoTxDatas, setAutoTxDatas] = useState([initialAutoTxData])

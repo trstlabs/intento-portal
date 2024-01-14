@@ -5,7 +5,7 @@ import { SelectChainInfo } from '../types/trstTypes'
 
 import { useIBCAssetList } from './useChainList'
 
-/* token selector functions */
+/* Coin Selector functions */
 
 export const getTokenInfoFromTokenList = (
   tokenSymbol: string,
@@ -16,7 +16,7 @@ export const getNativeTokenInfoFromTokenList = (
   denom: string,
   tokensList: Array<SelectChainInfo>
 ): SelectChainInfo | undefined => tokensList?.find((x) => x.denom === denom)
-/* /token selector functions */
+/* /Coin Selector functions */
 
 /* returns a selector for getting multiple tokens info at once */
 export const useGetMultipleTokenInfo = () => {

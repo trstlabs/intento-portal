@@ -1,7 +1,7 @@
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
 
-import { validateTransactionSuccess } from '../../util/messages'
+import { validateTransactionSuccess } from '../../util/validateTx'
 import { AutoTxData } from '../../types/trstTypes'
 
 type ExecuteSubmitTxArgs = {

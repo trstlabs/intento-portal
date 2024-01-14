@@ -280,7 +280,7 @@ export const RecipientList = ({
           </div>))
         }
       </Card>
-      {recipients[0].recipient && recipients[0].recipient.length >= 40 && (<Card css={{ margin: '$6', paddingLeft: '$12', paddingTop: '$2' }} variant="secondary" disabled >
+      {recipients[0].recipient && recipients[0].recipient.length >= 40 && (<Card css={{ margin: '$6', paddingLeft: '$8', paddingTop: '$2' }} variant="secondary" disabled >
         <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
           <Text align="left"
             variant="header">

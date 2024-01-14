@@ -8,6 +8,7 @@ import {
 } from '../../../hooks/useChainList'
 
 import { Dialog } from 'junoblocks'
+
 export const ChainSelectorDialog = ({
   activeChain,
   onSelect,
@@ -19,8 +20,10 @@ export const ChainSelectorDialog = ({
   const chainList = useChainRegistryList()
 
   const [icaChainList] = useIBCAssetList()
+  
   return (
     <Dialog isShowing={true} onRequestClose={undefined}>
+                   
       <ChainSelectorList
         {...props}
         icaChainList={

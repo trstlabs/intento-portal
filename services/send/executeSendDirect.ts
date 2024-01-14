@@ -1,7 +1,7 @@
 import { ibc } from 'trustlessjs'
 import { cosmos } from 'trustlessjs'
 import { SigningStargateClient, StdFee } from '@cosmjs/stargate'
-import { validateTransactionSuccess } from '../../util/messages'
+import { validateTransactionSuccess } from '../../util/validateTx'
 
 type ExecuteSendDirectArgs = {
   denom: string

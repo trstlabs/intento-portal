@@ -3,7 +3,7 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 // import { MsgUpdateAutoTx } from "trustlessjs/dist/codegen/trst/autoibctx/v1beta1/tx"
 import {
   validateTransactionSuccess,
-} from '../../util/messages'
+} from '../../util/validateTx'
 import { trst } from 'trustlessjs'
 import { MsgUpdateAutoTxParams } from '../../types/trstTypes'
 
@@ -28,7 +28,7 @@ export const executeUpdateAutoTx = async ({
       label: autoTxParams.label ? autoTxParams.label : "",
       interval: autoTxParams.interval ? autoTxParams.interval : "",
       startAt: autoTxParams.startAt ? BigInt(autoTxParams.startAt) : BigInt(0),
-      dependsOnTxIds: /* autoTxParams.dependsOnTxId ? autoTxParams.dependsOnTxIds || */ [],
+      configuration: autoTxParams.configuration ? autoTxParams.configuration : {saveMsgResponses:false, updatingDisabled:false, stopOnSuccess:false, stopOnFailure: false},
       feeFunds: autoTxParams.feeFunds ? autoTxParams.feeFunds : [],
     })
 

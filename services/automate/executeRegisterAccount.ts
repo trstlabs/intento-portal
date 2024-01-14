@@ -1,4 +1,4 @@
-import { validateTransactionSuccess } from '../../util/messages'
+import { validateTransactionSuccess } from '../../util/validateTx'
 
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { trst } from 'trustlessjs'

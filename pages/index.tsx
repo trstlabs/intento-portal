@@ -170,7 +170,7 @@ const useSortControllers = () => {
   const [sortParameter, setSortParameter] = useState<SortParameters>(
     () =>
       (localStorage.getItem(storeKeyForParameter) as SortParameters) ||
-      'exec_time'
+      'end_time'
   )
   const [sortDirection, setSortDirection] = useState<SortDirections>(
     () =>

@@ -7286,10 +7286,10 @@ tr46@^3.0.0:
   dependencies:
     punycode "^2.1.1"
 
-trustlessjs@0.7.2-alpha.6:
-  version "0.7.2-alpha.6"
-  resolved "https://registry.yarnpkg.com/trustlessjs/-/trustlessjs-0.7.2-alpha.6.tgz#5d2e58fe20e33ea1c56bd1a91b9de8a38484b7eb"
-  integrity sha512-9nO+1C5C3rwlQUoEXN90jRKihdW9ZlLHTaSbQ1PzT5gpFXj9UCfN9EveknzRbwSfWJWuf8GaE8yOhXpeyUbuDA==
+trustlessjs@0.7.2-alpha.8:
+  version "0.7.2-alpha.8"
+  resolved "https://registry.yarnpkg.com/trustlessjs/-/trustlessjs-0.7.2-alpha.8.tgz#5d742caa7f7833fb834eec5bf3364d399a7b0ff7"
+  integrity sha512-x77wI2zQ4gq7xFp41obGwLKcLrSZKHEdpEyF2bdP/f7sxp35yeTbF2wHr8MH1JyO9wgSmuAEHzU+BAZ8Yh+d0w==
   dependencies:
     "@cosmjs/amino" "0.31.0"
     "@cosmjs/proto-signing" "0.31.0"

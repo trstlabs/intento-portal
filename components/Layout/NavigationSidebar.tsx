@@ -121,17 +121,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
 
-      <Link href="/send" passHref>
-        <Button
-          as="a"
-          variant="menu"
-          size="large"
-          iconLeft={<DoubleArrowIcon rotation="-90deg" />}
-          selected={getIsLinkActive('/send')}
-        >
-          <Inline css={{ paddingLeft: '$4' }}>Token Sender</Inline>
-        </Button>
-      </Link>
+     
      {/*  <Link href="/transfer" passHref>
         <Button
           as="a"
@@ -156,6 +146,17 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Button>
         </Link>
       )}
+       <Link href="/send" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<DoubleArrowIcon rotation="-90deg" />}
+          selected={getIsLinkActive('/send')}
+        >
+          <Inline css={{ paddingLeft: '$4' }}>Coin Sender</Inline>
+        </Button>
+      </Link>
       <Inline css={{ paddingBottom: '$6' }} />
       {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == 'true' && (
         <>

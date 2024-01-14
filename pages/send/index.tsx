@@ -27,55 +27,60 @@ const StyledContainer = styled('div', {
 })
 
 export default function Send() {
-
   const [ibcInfos, isLoading] = useIBCAssetList()
   //console.log("ibcInfos", ibcInfos.tokens[0].logoURI)
   return (
     <AppLayout>
       <StyledContainer>
         <PageHeader
-          title="Token Sender"
-          subtitle={`Configure asset transfers, schedule ahead and make recurring payments. Supports chains connected to the testnet.`}
+          title="Coin Sender"
+          subtitle={`Configure (IBC) token and coin transfers, schedule ahead and make recurring payments. Supports chains connected to the testnet.`}
         />
-        <TokenSendModule
-          initialToken={getInitialTokenFromSearchParams()}
-        />
-       
-        <a href={`/automate?example=0`} target={"_blank"} rel="noreferrer">
-          <Card variant="secondary" css={{ padding: '$8' }} > <CardContent size="medium">
+        <TokenSendModule initialToken={getInitialTokenFromSearchParams()} />
 
-            <Column align="center">
-              <StyledText
-                variant="title"
-                align="center"
-                css={{ padding: '$8' }}
-              >Advanced </StyledText>
+        <a href={`/automate?example=0`} target={'_blank'} rel="noreferrer">
+          <Card variant="secondary" css={{ padding: '$8' }}>
+            {' '}
+            <CardContent size="medium">
               <Column align="center">
-                <Inline css={{ justifyContent: 'center' }}>  {!isLoading && ibcInfos.map((ibcInfo, index) => (
-                  <div key={"x" + index}>
-                    <StyledDivForTokenLogos>
-                      <ImageForTokenLogo
-                        size="big"
-                        logoURI={ibcInfo.logo_uri}
-                        alt={ibcInfo.symbol}
-                      />
-                    </StyledDivForTokenLogos>
-                  </div>
-                ))}</Inline><StyledText css={{ padding: '$8' }} variant="caption">
-                  Schedule a payment directly from your account on another chain.<br /> You control the trigger on Trustless Hub using an Interchain Account.
-                </StyledText></Column>
-
-            </Column>
-          </CardContent>
+                <StyledText
+                  variant="title"
+                  align="center"
+                  css={{ padding: '$8' }}
+                >
+                  Advanced{' '}
+                </StyledText>
+                <Column align="center">
+                  <Inline css={{ justifyContent: 'center' }}>
+                    {' '}
+                    {!isLoading &&
+                      ibcInfos.map((ibcInfo, index) => (
+                        <div key={'x' + index}>
+                          <StyledDivForTokenLogos>
+                            <ImageForTokenLogo
+                              size="big"
+                              logoURI={ibcInfo.logo_uri}
+                              alt={ibcInfo.symbol}
+                            />
+                          </StyledDivForTokenLogos>
+                        </div>
+                      ))}
+                  </Inline>
+                  <StyledText css={{ padding: '$8' }} variant="caption">
+                    Automate payment actions from your wallet on another
+                    chain.
+                    <br /> You control the action on Trustless Hub using an
+                    Interchain Account.
+                  </StyledText>
+                </Column>
+              </Column>
+            </CardContent>
           </Card>
-          </a>
-          
+        </a>
       </StyledContainer>
-
     </AppLayout>
   )
 }
-
 
 export const StyledDivForTokenLogos = styled('div', {
   display: 'flex',
@@ -85,10 +90,7 @@ export const StyledDivForTokenLogos = styled('div', {
     backgroundColor: '$transparent',
 
     marginLeft: '1.25rem',
-
-
   },
-
 })
 
 const StyledText: typeof Text = styled(Text, {
@@ -104,4 +106,3 @@ const StyledText: typeof Text = styled(Text, {
     backgroundColor: '$textColors$primary',
   },
 })
-

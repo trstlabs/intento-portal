@@ -92,7 +92,7 @@ function transformChain(chain) {
     channel_to_trst: '', // TODO: Find in ibc assets
     channel: '', // TODO: Find in ibc assets
     logo_uri: chain.logo_URIs
-      ? chain.logo_URIs.svg || chain.logo_URIs.png || chain.logo_URIs.jpeg
+      ?  chain.logo_URIs.png || chain.logo_URIs.svg || chain.logo_URIs.jpeg
       : '',
     connection_id: '',
     prefix: chain.bech32_prefix,

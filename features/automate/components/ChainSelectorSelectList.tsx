@@ -1,8 +1,16 @@
-import { ButtonForWrapper, ImageForTokenLogo, styled, Text } from 'junoblocks'
-import { ComponentPropsWithoutRef } from 'react'
+import {
+  ButtonForWrapper,
+  ImageForTokenLogo,
+  Inline,
+  RejectIcon,
+  styled,
+  Text,
+} from 'junoblocks'
+import { ComponentPropsWithoutRef, useMemo, useState } from 'react'
 
 import { SelectChainInfo } from '../../../types/trstTypes'
 import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
+import { QueryInput } from './ChainSelectorQueryInput'
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
@@ -37,7 +45,6 @@ export type ChainSelectorListProps = {
       | 'id'
     >
   >
-  //todo refactor
   chainList: Array<
     Pick<
       SelectChainInfo,
@@ -55,7 +62,7 @@ export type ChainSelectorListProps = {
   >
   onSelect: (connectionInfo: ChainInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
-  visibleNumberOfTokensInViewport?: number
+  visibleNumberOfChainsInViewport?: number
 } & ComponentPropsWithoutRef<typeof StyledDivForScrollContainer>
 
 export const ChainSelectorList = ({
@@ -64,9 +71,12 @@ export const ChainSelectorList = ({
   icaChainList,
   onSelect,
   fetchingBalanceMode = 'native',
-  visibleNumberOfTokensInViewport = 8.5,
+  visibleNumberOfChainsInViewport = 8.5,
   ...props
 }: ChainSelectorListProps) => {
+  const [queryFilter, setChainSearchQuery] = useState('')
+  const [_isInputForSearchFocused, setInputForSearchFocused] = useState(false)
+
   function passChainInfo(selectedInfo) {
     let selectedChain = new ChainInfo()
     selectedChain.connectionId = selectedInfo.connection_id
@@ -82,24 +92,92 @@ export const ChainSelectorList = ({
     return selectedChain
   }
 
+  const filteredChainList = useMemo(() => {
+    if (!chainList || isQueryEmpty(queryFilter)) {
+      return chainList
+    }
+    const lowerCasedQueryFilter = queryFilter.toLowerCase()
+    return chainList
+      .filter(({ denom, name }) => {
+        return (
+          denom.toLowerCase().search(lowerCasedQueryFilter) >= 0 ||
+          name.toLowerCase().search(lowerCasedQueryFilter) >= 0
+        )
+      })
+      .sort((chainA, chainB) => {
+        if (
+          chainA.denom.toLowerCase().startsWith(lowerCasedQueryFilter) ||
+          chainA.name.toLowerCase().startsWith(lowerCasedQueryFilter)
+        ) {
+          return -1
+        }
+        if (
+          chainB.denom.toLowerCase().startsWith(lowerCasedQueryFilter) ||
+          chainB.name.toLowerCase().startsWith(lowerCasedQueryFilter)
+        ) {
+          return 1
+        }
+        return 0
+      })
+  }, [chainList, queryFilter])
+
+  const filteredIcaChainList = useMemo(() => {
+    if (!icaChainList || isQueryEmpty(queryFilter)) {
+      return icaChainList
+    }
+    const lowerCasedQueryFilter = queryFilter.toLowerCase()
+    return icaChainList
+      .filter(({ denom, name }) => {
+        return (
+          denom.toLowerCase().search(lowerCasedQueryFilter) >= 0 ||
+          name.toLowerCase().search(lowerCasedQueryFilter) >= 0
+        )
+      })
+      .sort((chainA, chainB) => {
+        if (
+          chainA.denom.toLowerCase().startsWith(lowerCasedQueryFilter) ||
+          chainA.name.toLowerCase().startsWith(lowerCasedQueryFilter)
+        ) {
+          return -1
+        }
+        if (
+          chainB.denom.toLowerCase().startsWith(lowerCasedQueryFilter) ||
+          chainB.name.toLowerCase().startsWith(lowerCasedQueryFilter)
+        ) {
+          return 1
+        }
+        return 0
+      })
+  }, [icaChainList, queryFilter])
+
   return (
     <>
+      <QueryInput
+        searchQuery={queryFilter}
+        onQueryChange={setChainSearchQuery}
+        onFocus={() => {
+          setInputForSearchFocused(true)
+        }}
+        onBlur={() => {
+          setInputForSearchFocused(false)
+        }}
+      />
       <StyledDivForScrollContainer
         {...props}
         css={{
-          height: `${visibleNumberOfTokensInViewport * 2.5}rem`,
+          height: `${visibleNumberOfChainsInViewport * 2.5}rem`,
           ...(props.css ? props.css : {}),
         }}
       >
         <Text variant="legend">
           Automate Actions (Now using local Testnets)
         </Text>{' '}
-        {icaChainList.map((chainInfo) => {
+        {filteredIcaChainList.map((chainInfo) => {
           return (
             <StyledButtonForRow
               role="listitem"
               variant="ghost"
-              key={"icaChainList"+chainInfo.connection_id}
+              key={'icaChainList' + chainInfo.connection_id}
               selected={chainInfo.name === activeChain}
               {...getPropsForInteractiveElement({
                 onClick() {
@@ -112,10 +190,10 @@ export const ChainSelectorList = ({
                 <ImageForTokenLogo
                   logoURI={chainInfo.logo_uri}
                   size="large"
-                  alt={chainInfo.symbol}
+                  alt={chainInfo.denom}
                   loading="lazy"
                 />
-                <div data-token-info="">
+                <div data-chain-info="">
                   <Text variant="body">{chainInfo.name}</Text>
                 </div>
               </StyledDivForColumn>
@@ -125,12 +203,12 @@ export const ChainSelectorList = ({
         <Text variant="legend">
           Other chains (direct transaction submission only)
         </Text>{' '}
-        {chainList.map((chainInfo) => {
+        {filteredChainList.map((chainInfo) => {
           return (
             <StyledButtonForRow
               role="listitem"
               variant="ghost"
-              key={"chainList"+chainInfo.chain_id}
+              key={'chainList' + chainInfo.chain_id}
               selected={chainInfo.name === activeChain}
               {...getPropsForInteractiveElement({
                 onClick() {
@@ -143,19 +221,31 @@ export const ChainSelectorList = ({
                 <ImageForTokenLogo
                   logoURI={chainInfo.logo_uri}
                   size="large"
-                  alt={chainInfo.symbol}
+                  alt={chainInfo.denom}
                   loading="lazy"
                 />
-                <div data-token-info="">
+                <div data-chain-info="">
                   <Text variant="body">{chainInfo.name}</Text>
                 </div>
               </StyledDivForColumn>
             </StyledButtonForRow>
           )
         })}
+        {(filteredChainList?.length || filteredChainList?.length) === 0 && (
+          <Inline gap={6} css={{ padding: '$5 $6' }}>
+            <ImageForTokenLogo size="big">
+              <RejectIcon color="tertiary" />
+            </ImageForTokenLogo>
+            <Text variant="secondary">not found</Text>
+          </Inline>
+        )}
       </StyledDivForScrollContainer>
     </>
   )
+}
+
+function isQueryEmpty(query: string) {
+  return !query || !query.replace(new RegExp(' ', 'g'), '')
 }
 
 const StyledButtonForRow = styled(ButtonForWrapper, {

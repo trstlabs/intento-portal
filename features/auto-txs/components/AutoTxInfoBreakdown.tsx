@@ -84,7 +84,8 @@ AutoTxInfoBreakdownProps) => {
     autoTxInfo.endTime.getTime() >= autoTxInfo.execTime.getTime()
   const latestExecWasError =
     autoTxInfo.autoTxHistory.length > 0 &&
-    autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].error != ''
+    autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].errors[0] !=
+      undefined
   //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
 
   //send funds on host
@@ -233,6 +234,7 @@ AutoTxInfoBreakdownProps) => {
              </>
          )
      } */
+
   return (
     <>
       <InfoHeader
@@ -269,17 +271,16 @@ AutoTxInfoBreakdownProps) => {
             </Text>
             <Text variant="legend">
               {autoTxInfo.label != '' ? (
-                <> Trigger: {autoTxInfo.label}</>
+                <> {autoTxInfo.label}</>
               ) : (
                 <>Trigger {autoTxInfo.txId.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">
               {' '}
-              <Text variant="legend">
+              <Text variant="secondary">
                 <>
                   {' '}
-                  Message Type:{' '}
                   {
                     autoTxInfo.msgs[0].typeUrl
                       .split('.')
@@ -649,9 +650,9 @@ AutoTxInfoBreakdownProps) => {
                       {
                         execFee,
                         actualExecTime,
-                        scheduledExecTime,
+                       
                         executed,
-                        error,
+                        errors,
                         timedOut,
                       },
                       index
@@ -664,33 +665,53 @@ AutoTxInfoBreakdownProps) => {
                         >
                           <Column>
                             <Text variant="body">
-                              At {getRelativeTime(scheduledExecTime.getTime())}{' '}
+                              At {getRelativeTime(actualExecTime.getTime())}{' '}
                             </Text>
                           </Column>
+                         {/*  {actualExecTime.getSeconds() -
+                            scheduledExecTime.getSeconds() >=
+                            5 && (
+                            <Column>
+                              <Text variant="caption">
+                                Actual send time was{' '}
+                                {actualExecTime.getSeconds() -
+                                  scheduledExecTime.getSeconds()}{' '}
+                                seconds later than scheduled
+                              </Text>
+                            </Column>
+                          )} */}
                           <Column>
-                            <Text variant="caption">
-                              Actual Time was{' '}
-                              {getRelativeTime(actualExecTime.getTime())}
-                            </Text>{' '}
-                          </Column>
-                          <Column>
-                            <Text variant="caption">
-                              Execution Fee was{' '}
+                            <Text variant="legend">
+                              Gas cost:{' '}
                               {convertMicroDenomToDenom(execFee.amount, 6)} TRST
                             </Text>
+                          </Column>
 
-                            {/* {result && <Text variant="caption">Result: {result}</Text>} */}
-                            {error ? (
-                              <Text variant="caption">
-                                🔴 Execution Error: {error}
+                          {errors.map((err, _) => (
+                            <Column>
+                              {/*    <span key={'b' + ei}> */}
+                              <Text variant="legend">
+                                🔴 Execution error: {err}
                               </Text>
-                            ) : (
-                              <Text variant="caption">
-                                Executed: {executed ? <>🟢</> : <>🔴</>}
-                              </Text>
-                            )}
+
+                              {/*    </span> */}
+                            </Column>
+                          ))}
+
+                          <Column>
+                            <Text variant="legend">
+                              Executed: {executed && <>🟢</>}{' '}
+                              {!executed &&
+                                (Date.now() - actualExecTime.valueOf() >
+                                3000000 ? (
+                                  <>🔴</>
+                                ) : (
+                                  <>⌛</>
+                                ))}
+                            </Text>
+
                             {timedOut && (
-                              <Text variant="caption">
+                              <Text variant="legend">
                                 Execution on the destination chain did not
                                 happen because it timed out
                               </Text>
@@ -755,7 +776,7 @@ const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {latestExecWasError ? <>🔴</> : active && <>🟢</>} Trigger {txId}
+      {latestExecWasError ? <>🔴</> : active ? <>🟢</> : <>✅</>} Trigger {txId}
     </Text>
   </Inline>
 )

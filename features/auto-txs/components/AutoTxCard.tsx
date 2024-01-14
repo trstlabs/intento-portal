@@ -90,7 +90,7 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
               {isActive ? (
                 <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</>
               ) : (
-                <>Execution ended</>
+                <>Execution ended {autoTxInfo.endTime.toLocaleTimeString()}</>
               )}
               {/* {isActive ? (
                                 <>

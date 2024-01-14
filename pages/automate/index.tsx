@@ -1,6 +1,6 @@
 import { AppLayout, PageHeader } from 'components'
 
-import { styled, Text } from 'junoblocks'
+import { styled } from 'junoblocks'
 import React from 'react'
 import { AutomateWrapper } from 'features/automate'
 
@@ -27,18 +27,8 @@ export default function Automate() {
       <StyledContainer>
         <PageHeader
           title="Automate"
-          subtitle={`Create actions on any connected chain. Submit or automate messages with a trigger account. `}
+          subtitle={`Create actions on any connected chain 🌌. Submit messages for direct execution or automate them with a trigger account. 💫`}
         />
-        <Text variant="legend" color="disabled">
-          <a
-            target={'_blank'}
-            href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
-            rel="noopener noreferrer"
-          >
-            Ask Cosmonaut GPT to generate a message!
-          </a>
-        </Text>
-
         <AutomateWrapper
           initialExample={getInitialExampleFromSearchParams()}
           initialMessage={getInitialMessageFromSearchParams()}

@@ -1,8 +1,5 @@
 import { AppLayout, NavigationSidebar } from 'components'
-import {
-  AutoTxInfoBreakdown
-
-} from 'features/auto-txs'
+import { AutoTxInfoBreakdown } from 'features/auto-txs'
 import {
   Button,
   ChevronIcon,
@@ -10,15 +7,13 @@ import {
   Spinner,
   styled,
   useMedia,
+  Text,
 } from 'junoblocks'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
-import {
-
-  APP_NAME,
-} from 'util/constants'
+import { APP_NAME } from 'util/constants'
 import { useAutoTxInfo } from '../../hooks/useAutoTxInfo'
 import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
 
@@ -30,18 +25,18 @@ export default function AutoTx() {
   const isMobile = useMedia('sm')
 
   const [autoTxInfo, isLoading] = useAutoTxInfo(id)
-  const connectionId = autoTxInfo ? autoTxInfo.connectionId : ""
+  const connectionId = autoTxInfo ? autoTxInfo.connectionId : ''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {
     return (
-
       <Inline
         align="center"
         justifyContent="center"
-        css={{ padding: '$10', height: '100vh' }}> <title>
-          Trigger
-        </title>
+        css={{ padding: '$10', height: '100vh' }}
+      >
+        {' '}
+        <title>Trigger</title>
         {/*  {isLoading && (
           <Text variant="header">
             {"Oops, we've messed up. Please try again later."}
@@ -53,10 +48,8 @@ export default function AutoTx() {
     )
   }
 
-
   return (
     <>
-
       <AppLayout
         navigationSidebar={
           <NavigationSidebar
@@ -67,8 +60,8 @@ export default function AutoTx() {
               </Link>
             }
           />
-        }>
-
+        }
+      >
         {APP_NAME && autoTxInfo != undefined && (
           <Head>
             <title>
@@ -78,27 +71,29 @@ export default function AutoTx() {
         )}
 
         {(isLoading || !autoTxInfo) && (
-          <StyledDivForSpinner>
+          <StyledDiv>
             <Spinner color="primary" size={32} />
-          </StyledDivForSpinner>
+          </StyledDiv>
         )}
 
-
-
-        {!isLoading && autoTxInfo && (
-          <>
-            <AutoTxInfoBreakdown
-              autoTxInfo={autoTxInfo}
-              ibcInfo={ibcInfo}
-            />
-          </>
-        )}
+        {!isLoading &&
+          (autoTxInfo && autoTxInfo.msgs[0] ? (
+            <>
+              <AutoTxInfoBreakdown autoTxInfo={autoTxInfo} ibcInfo={ibcInfo} />
+            </>
+          ) : (
+            <StyledDiv>
+              <Text variant="legend">
+                <>Trigger not found in this space continuum 🌌</>
+              </Text>{' '}
+            </StyledDiv>
+          ))}
       </AppLayout>
     </>
   )
 }
 
-const StyledDivForSpinner = styled('div', {
+const StyledDiv = styled('div', {
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
