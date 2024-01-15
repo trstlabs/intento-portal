@@ -23,7 +23,7 @@ interface IcaCardProps {
   isAuthzGrantsLoading: boolean
   icaAuthzGrants: GrantResponse[]
   shouldDisableAuthzGrantButton: boolean
-  shouldDisableSendFundsButton: boolean
+  shouldDisableSendHostChainFundsButton: boolean
   isExecutingSendFundsOnHost: boolean
   isExecutingAuthzGrant: boolean
   requestedSendAndAuthzGrant: boolean
@@ -41,7 +41,7 @@ export const IcaCard = ({
   isAuthzGrantsLoading,
   icaAuthzGrants,
   shouldDisableAuthzGrantButton,
-  shouldDisableSendFundsButton,
+  shouldDisableSendHostChainFundsButton,
   isExecutingSendFundsOnHost,
   isExecutingAuthzGrant,
   requestedSendAndAuthzGrant,
@@ -166,7 +166,7 @@ export const IcaCard = ({
                       css={{ margin: '$2' }}
                       variant="secondary"
                       size="small"
-                      disabled={shouldDisableSendFundsButton}
+                      disabled={shouldDisableSendHostChainFundsButton}
                       onClick={() => handleSendFundsOnHostClick()}
                     >
                       {isExecutingSendFundsOnHost ? (
@@ -205,7 +205,7 @@ export const IcaCard = ({
                       variant="secondary"
                       size="small"
                       disabled={
-                        shouldDisableSendFundsButton ||
+                        shouldDisableSendHostChainFundsButton ||
                         (shouldDisableAuthzGrantButton &&
                           Number(feeFundsHostChain) != 0)
                       }

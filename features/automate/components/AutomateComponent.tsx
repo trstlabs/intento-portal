@@ -184,7 +184,7 @@ export const AutomateComponent = ({
     [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost]
   )
 
-  const shouldDisableSendFundsButton = useMemo(
+  const shouldDisableSendHostChainFundsButton = useMemo(
     () =>
       !icaAddress ||
       (autoTxData.msgs && autoTxData.msgs.length === 0) ||
@@ -441,8 +441,8 @@ export const AutomateComponent = ({
                       isAuthzGrantsLoading={isAuthzGrantsLoading}
                       icaAuthzGrants={icaAuthzGrants}
                       shouldDisableAuthzGrantButton={shouldDisableAuthzGrants}
-                      shouldDisableSendFundsButton={
-                        shouldDisableSendFundsButton
+                      shouldDisableSendHostChainFundsButton={
+                        shouldDisableSendHostChainFundsButton
                       }
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
                       isExecutingAuthzGrant={isExecutingAuthzGrant}
@@ -496,7 +496,7 @@ export const AutomateComponent = ({
         feeFundsHostChain={feeFundsHostChain}
         setFeeFundsHostChain={setFeeFundsHostChain}
         shouldDisableAuthzGrants={shouldDisableAuthzGrants}
-        shouldDisableSendFundsButton={shouldDisableSendFundsButton}
+        shouldDisableSendHostChainFundsButton={shouldDisableSendHostChainFundsButton}
         isExecutingAuthzGrant={isExecutingAuthzGrant}
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
         showWarning={showWarning}

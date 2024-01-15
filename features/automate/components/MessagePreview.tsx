@@ -22,7 +22,7 @@ const MessagePreview = ({
   setSubmitAutoTxDialogState,
   isExecutingSchedule,
   feeFundsHostChain,
-  shouldDisableSendFundsButton,
+  shouldDisableSendHostChainFundsButton,
   isExecutingAuthzGrant,
   isExecutingSendFundsOnHost,
   showWarning,
@@ -100,8 +100,8 @@ const MessagePreview = ({
                         }
                         isLoading={isExecutingSchedule}
                         feeFundsHostChain={feeFundsHostChain}
-                        shouldDisableSendFundsButton={
-                          shouldDisableSendFundsButton
+                        shouldDisableSendHostChainFundsButton={
+                          shouldDisableSendHostChainFundsButton
                         }
                         isExecutingAuthzGrant={isExecutingAuthzGrant}
                         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}

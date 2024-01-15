@@ -35,7 +35,7 @@ type SubmitAutoTxDialogProps = {
   isExecutingAuthzGrant?: boolean
   isExecutingSendFundsOnHost?: boolean
   shouldDisableAuthzGrantButton?: boolean
-  shouldDisableSendFundsButton?: boolean
+  shouldDisableSendHostChainFundsButton?: boolean
   onRequestClose: () => void
   handleSubmitAutoTx: (data: AutoTxData) => void
   handleCreateAuthzGrantClick?: (withFunds: boolean) => void
@@ -55,7 +55,7 @@ export const SubmitAutoTxDialog = ({
   isExecutingSendFundsOnHost,
   isLoading,
   shouldDisableAuthzGrantButton,
-  shouldDisableSendFundsButton,
+  shouldDisableSendHostChainFundsButton,
   onRequestClose,
   setFeeFundsHostChain,
   handleSubmitAutoTx,
@@ -219,10 +219,10 @@ export const SubmitAutoTxDialog = ({
   }
 
   const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedAutoTxFee(
-    duration/1000,
+    duration / 1000,
     autoTxData,
     isDialogShowing,
-    interval/1000
+    interval / 1000
   )
   const refetchExpectedAutoTxFee = useRefetchQueries('expectedAutoTxFee')
   const canSchedule = duration > 0 && interval > 0
@@ -510,10 +510,10 @@ export const SubmitAutoTxDialog = ({
             <Column css={{ padding: '$6 0' }}>
               <DialogDivider offsetBottom="$4" />
 
-              {chainSymbol && (
+              {chainSymbol != 'TRST' && (
                 <>
                   <Text align="center" variant="caption">
-                    Fee Funds - {chainSymbol}
+                    Host Chain Fee Funds - {chainSymbol}
                   </Text>
                   <Inline justifyContent={'space-between'} align="center">
                     <Text variant="legend">
@@ -530,7 +530,7 @@ export const SubmitAutoTxDialog = ({
                     </Text>
                     <Tooltip
                       label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
-                      aria-label="Execution Funds  "
+                      aria-label="host chain execution fee funds"
                     >
                       <Text variant="legend" color="disabled">
                         {' '}
@@ -549,7 +549,7 @@ export const SubmitAutoTxDialog = ({
                           <Button
                             css={{ margin: '$2' }}
                             variant="secondary"
-                            disabled={shouldDisableSendFundsButton}
+                            disabled={shouldDisableSendHostChainFundsButton}
                             onClick={() => handleSendFundsOnHostClick()}
                           >
                             {isExecutingSendFundsOnHost && <Spinner instant />}{' '}
@@ -577,7 +577,7 @@ export const SubmitAutoTxDialog = ({
                 </>
               )}
               <Tooltip
-                label="Funds to set aside for automatic execution. Remaining funds are refunded after execution. If set to 0, your local balance will be used"
+                label="Funds to set aside for execution fee of the action. Remaining funds are refunded after execution. If deduct fees from wallet balance is checked, your local balance will be used"
                 aria-label="Fund Trigger - TRST (Optional)"
               >
                 <Text align="center" css={{ margin: '$4' }} variant="caption">
@@ -596,7 +596,7 @@ export const SubmitAutoTxDialog = ({
               )}
               <Inline justifyContent={'space-between'}>
                 <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                  Deduct fees from balance
+                  Deduct fees from wallet balance
                 </Text>{' '}
                 <StyledInput
                   type="checkbox"
@@ -608,7 +608,7 @@ export const SubmitAutoTxDialog = ({
               {!checkedFeeAcc && (
                 <Inline justifyContent={'space-between'}>
                   <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                    Send TRST to Trigger Account
+                    Attatch TRST fee to action
                   </Text>{' '}
                   <Text variant="legend">
                     <StyledInput
