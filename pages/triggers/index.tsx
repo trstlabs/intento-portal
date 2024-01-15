@@ -106,7 +106,7 @@ export default function AutoTxs() {
             >
               <Text variant="primary">
                 {allAutoTxs.length} {myAutoTxs[0] && <>Other</>} Available
-                automations
+                Automations
               </Text>
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}

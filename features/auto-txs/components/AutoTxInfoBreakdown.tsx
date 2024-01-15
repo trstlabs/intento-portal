@@ -682,7 +682,7 @@ AutoTxInfoBreakdownProps) => {
                           )} */}
                           <Column>
                             <Text variant="legend">
-                              Gas cost:{' '}
+                              Exec Fee:{' '}
                               {convertMicroDenomToDenom(execFee.amount, 6)} TRST
                             </Text>
                           </Column>

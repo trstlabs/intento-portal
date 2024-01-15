@@ -23,7 +23,7 @@ export const executeSubmitAutoTx = async ({
     startAtInt = Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000
   }
   console.log(startAtInt)
-  let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt("0") //BigInt(startAtInt)
+  let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
   console.log(startAt.toString())
   let duration = autoTxData.duration + 'ms'
   let interval = autoTxData.interval + 'ms'
@@ -31,8 +31,6 @@ export const executeSubmitAutoTx = async ({
   const masterRegistry = client.registry
 
   for (let msgJSON of autoTxData.msgs) {
-    console.log(msgJSON)
-
     let value = JSON.parse(msgJSON)['value']
 
     let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
@@ -52,7 +50,6 @@ export const executeSubmitAutoTx = async ({
     console.log(encodeObject)
 
     let msgAny = masterRegistry.encodeAsAny(encodeObject)
-    console.log(msgAny)
     msgs.push(msgAny)
   }
 
@@ -68,7 +65,6 @@ export const executeSubmitAutoTx = async ({
       },
     }
     msgs = [masterRegistry.encodeAsAny(encodeObject2)]
-    console.log(msgs)
   }
 
   let feeFunds: Coin[] = []
@@ -80,7 +76,6 @@ export const executeSubmitAutoTx = async ({
       },
     ]
   }
-  console.log('label', autoTxData.label)
   const msgSubmitAutoTx =
     trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.submitAutoTx({
       connectionId: autoTxData.connectionId ? autoTxData.connectionId : '',
@@ -90,9 +85,17 @@ export const executeSubmitAutoTx = async ({
       duration,
       interval,
       startAt,
-      configuration: autoTxData.configuration ? autoTxData.configuration : {saveMsgResponses:false, updatingDisabled:false, stopOnSuccess:false, stopOnFailure: false},
+      configuration: autoTxData.configuration
+        ? autoTxData.configuration
+        : {
+            saveMsgResponses: false,
+            updatingDisabled: false,
+            stopOnSuccess: false,
+            stopOnFailure: false,
+          },
       feeFunds,
     })
+  console.log(msgSubmitAutoTx)
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitAutoTx], {
       amount: [],

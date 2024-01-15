@@ -123,13 +123,9 @@ export default function Home() {
                 paddingBottom: '$11',
               }}
             >
-              <Text variant="caption" css={{ padding: '$4' }}>
-                {' '}
-                {allAutoTxs.length > 1 ? (
-                  <span> All Triggers({allAutoTxs.length})</span>
-                ) : (
-                  <span> Other trigger (1)</span>
-                )}
+              <Text variant="primary">
+                {allAutoTxs.length} {myAutoTxs[0] && <>Other</>} Available
+                Automations
               </Text>
 
               <ButtonWithDropdownForSorting

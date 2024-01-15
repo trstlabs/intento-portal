@@ -83,14 +83,11 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
         <Divider offsetTop="$10" offsetBottom="$5" />
         <CardContent size="medium">
           <Column gap={5} css={{ paddingBottom: '$8' }}>
-            {/*    <Text variant="legend" color="secondary">
-                            Information
-                        </Text> */}
             <Text variant="legend">
               {isActive ? (
                 <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</>
               ) : (
-                <>Execution ended {autoTxInfo.endTime.toLocaleTimeString()}</>
+                <>Execution ended {autoTxInfo.endTime.toLocaleString()}</>
               )}
               {/* {isActive ? (
                                 <>

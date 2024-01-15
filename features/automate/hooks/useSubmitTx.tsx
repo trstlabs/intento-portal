@@ -81,7 +81,6 @@ export const useSubmitTx = ({ autoTxData }: UseSubmitTxArgs) => {
       },
       onError(e) {
         const errorMessage = formatSdkErrorMessage(e)
-
         toast.custom((t) => (
           <Toast
             icon={<ErrorIcon color="error" />}

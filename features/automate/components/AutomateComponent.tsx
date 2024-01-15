@@ -37,6 +37,7 @@ import { AutoTxData } from '../../../types/trstTypes'
 import { AutomateConfiguration } from './AutomateConfiguration'
 import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 import { GearIcon, TransferIcon } from '../../../icons'
+// import { useAfterConnectWallet } from '../../../hooks/useAfterConnectWallet'
 
 type AutoTxsInputProps = {
   autoTxData: AutoTxData
@@ -157,6 +158,8 @@ export const AutomateComponent = ({
     !chainIsConnected
   )
 
+  // const { mutate: connectWallet } = useAfterConnectWallet()
+
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
 
@@ -233,6 +236,7 @@ export const AutomateComponent = ({
   }
 
   const handleSubmitAutoTxClick = (autoTxData: AutoTxData) => {
+    // connectWallet(null)
     onAutoTxChange(autoTxData)
     return setRequestedSubmitAutoTx(true)
   }
@@ -301,9 +305,8 @@ export const AutomateComponent = ({
     if (chainIsConnected) {
       refetchICA()
       refetchAuthzGrants()
+      connectExternalWallet(null)
     }
-
-    connectExternalWallet(null)
   }
 
   function setExample(index: number, msgObject: any) {
@@ -502,11 +505,11 @@ export const AutomateComponent = ({
         handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
-       <AutomateConfiguration
-          config={autoTxData.configuration}
-          disabled={!icaAddress && !chainHasIAModule}
-          onChange={setConfig}
-        />
+      <AutomateConfiguration
+        config={autoTxData.configuration}
+        disabled={!icaAddress && !chainHasIAModule}
+        onChange={setConfig}
+      />
       <Inline
         css={{
           margin: '$4 $6 $8',
@@ -515,7 +518,7 @@ export const AutomateComponent = ({
         }}
       >
         <Button
-         css={{ margin: '$4' ,columnGap: '$4',}}
+          css={{ margin: '$4', columnGap: '$4' }}
           variant="primary"
           size="large"
           disabled={shouldDisableSubmitButton}
@@ -525,7 +528,7 @@ export const AutomateComponent = ({
           {isExecutingSchedule ? <Spinner instant /> : 'Send directly'}
         </Button>
         <Button
-          css={{ margin: '$4' ,columnGap: '$4',}}
+          css={{ margin: '$4', columnGap: '$4' }}
           variant="primary"
           size="large"
           disabled={shouldDisableAutomateButton}
