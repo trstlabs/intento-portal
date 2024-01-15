@@ -226,7 +226,7 @@ export const getExpectedAutoTxFee = (
     recurrences * Number(triggerParams.AutoTxConstantFee) * lenMsgs
   const autoTxFeeDenom = convertMicroDenomToDenom(autoTxFee, 6)
 
-  return autoTxFeeDenom
+  return Number(autoTxFeeDenom.toFixed(4))
 }
 
 function blockInfoAndCalculateApr(
