@@ -599,8 +599,70 @@ AutoTxInfoBreakdownProps) => {
             </Column>
           </Row>
         )}
+        {autoTxInfo.configuration && (
+          <Row>
+            {' '}
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              <>
+                <Tooltip
+                  label={
+                    'If set to true, message responses i.e. outputs may be used as inputs for new actions'
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Save Message Responses
+                  </Text>
+                </Tooltip>
 
-        {autoTxInfo.updateHistory.length != 0 && (
+                <Text variant="body">
+                  {autoTxInfo.configuration.saveMsgResponses ? 'True' : 'False'}
+                </Text>
+              </>
+              <>
+                <Tooltip
+                  label={
+                    'If set to true, the action settings can not be updated'
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Updating Disabled
+                  </Text>
+                </Tooltip>
+                <Text variant="body">
+                  {autoTxInfo.configuration.updatingDisabled ? 'True' : 'False'}
+                </Text>
+              </>
+              <>
+                <Tooltip
+                  label={'If set to true, stops on any errors that occur'}
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Stop On Failure
+                  </Text>
+                </Tooltip>
+                <Text variant="body">
+                  {autoTxInfo.configuration.stopOnFailure ? 'True' : 'False'}
+                </Text>
+              </>
+              <>
+                <Tooltip
+                  label={
+                    'If set to true, stops when execution of the messages was succesful'
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Stop On Success
+                  </Text>
+                </Tooltip>
+                <Text variant="body">
+                  {autoTxInfo.configuration.stopOnSuccess ? 'True' : 'False'}
+                </Text>
+              </>
+            </Column>
+          </Row>
+        )}
+
+        {/* {autoTxInfo.updateHistory.length != 0 && (
           <>
             {' '}
             <Row>
@@ -612,8 +674,8 @@ AutoTxInfoBreakdownProps) => {
                     Update History
                   </Text>
                 </Inline>
-                {autoTxInfo.updateHistory?.map((entry, index) => (
-                  <div key={index}>
+                {autoTxInfo.updateHistory?.map((entry, ei) => (
+                  <div key={ei}>
                     <Column
                       gap={2}
                       align="flex-start"
@@ -628,7 +690,7 @@ AutoTxInfoBreakdownProps) => {
               </Column>
             </Row>
           </>
-        )}
+        )} */}
 
         {autoTxInfo.autoTxHistory.length > 0 && (
           <>
@@ -650,7 +712,7 @@ AutoTxInfoBreakdownProps) => {
                       {
                         execFee,
                         actualExecTime,
-                       
+
                         executed,
                         errors,
                         timedOut,
@@ -668,7 +730,7 @@ AutoTxInfoBreakdownProps) => {
                               At {getRelativeTime(actualExecTime.getTime())}{' '}
                             </Text>
                           </Column>
-                         {/*  {actualExecTime.getSeconds() -
+                          {/*  {actualExecTime.getSeconds() -
                             scheduledExecTime.getSeconds() >=
                             5 && (
                             <Column>
