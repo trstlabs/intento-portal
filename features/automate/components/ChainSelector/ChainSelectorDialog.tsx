@@ -5,7 +5,7 @@ import {
 import {
   useIBCAssetList,
   useChainRegistryList,
-} from '../../../hooks/useChainList'
+} from '../../../../hooks/useChainList'
 
 import { Dialog } from 'junoblocks'
 

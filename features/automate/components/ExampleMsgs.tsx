@@ -66,19 +66,6 @@ export const generalExamples = [
     },
   },
   {
-    typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
-    value: {
-      sourcePort: 'transfer',
-      sourceChannel: 'channel_source_chain__destination_chain',
-      token: { denom: 'IBC/....', amount: '10' },
-      sender: 'dao_address',
-      receiver: 'user_address',
-      timeoutHeight: '0',
-      timeoutTimestamp: '0',
-      connectionId: 'connection-123',
-    },
-  },
-  {
     typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
     value: {
       amount: [

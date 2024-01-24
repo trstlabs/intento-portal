@@ -8,8 +8,8 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef, useMemo, useState } from 'react'
 
-import { SelectChainInfo } from '../../../types/trstTypes'
-import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
+import { SelectChainInfo } from '../../../../types/trstTypes'
+import { getPropsForInteractiveElement } from '../../../../util/getPropsForInteractiveElement'
 import { QueryInput } from './ChainSelectorQueryInput'
 
 const StyledDivForScrollContainer = styled('div', {

@@ -19,7 +19,7 @@ import {
   useSendFundsOnHost,
   useSubmitTx,
 } from '../hooks'
-import { ChainSelector } from './ChainSelector'
+import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
   useGetICA,
@@ -416,7 +416,6 @@ export const AutomateComponent = ({
                           'Register Interchain Account '
                         )}
                       </Button>
-                      {/*  {isExecutingRegisterICA && isIcaLoading && <Text variant="legend">Retrieving Interchain Account on {chainName}. This takes approx. 30 seconds. It can take up to a minute.</Text>} */}
                     </>
                   )
               }
@@ -466,6 +465,7 @@ export const AutomateComponent = ({
             chainSymbol={chainSymbol}
             msg={msg}
             setExample={setExample}
+            isJsonValid={isJsonValid}
             handleRemoveMsg={handleRemoveMsg}
             handleChangeMsg={handleChangeMsg}
             setIsJsonValid={setIsJsonValid}
