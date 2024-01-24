@@ -1,4 +1,4 @@
-import { Logo, LogoText, PoolsIcon, GearIcon } from 'icons'
+import {  PoolsIcon, GearIcon } from 'icons'
 import {
   Button,
   ChevronIcon,
@@ -121,8 +121,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
 
-     
-     {/*  <Link href="/transfer" passHref>
+      {/*  <Link href="/transfer" passHref>
         <Button
           as="a"
           variant="menu"
@@ -142,11 +141,11 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             iconLeft={<GearIcon />}
             selected={getIsLinkActive('/automate')}
           >
-            <Inline css={{ paddingLeft: '$4' }}>Actions Automator </Inline>
+            <Inline css={{ paddingLeft: '$4' }}>Action Builder </Inline>
           </Button>
         </Link>
       )}
-       <Link href="/send" passHref>
+      <Link href="/send" passHref>
         <Button
           as="a"
           variant="menu"
@@ -267,19 +266,16 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           >
             <Link href="/" passHref>
               <StyledDivForLogo as="a">
-                <Logo data-logo="" width="37px" height="47px" />
-                <div data-logo-label="">
-                  <Text
-                    variant="caption"
-                    color="primary"
-                    css={{ padding: '0 0 $1 0' }}
-                  >
-                    {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
-                  </Text>
-                  <LogoText />
-                </div>
+                {/*  <Logo data-logo="" width="37px" height="47px" /> */}
+                <StyledPNG
+                  css={{ maxWidth: '100px' }}
+                  src="/img/triggerportal-text-logo-blue.png"
+                />
               </StyledDivForLogo>
-            </Link>
+            </Link>{' '}
+            <Text variant="caption" color="primary" css={{ textAlign: 'end' }}>
+              {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
+            </Text>
             {triggerMenuButton}
           </Inline>
           {isOpen && (
@@ -296,28 +292,29 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   return (
     <StyledWrapper>
-      <StyledMenuContainer>
+      <StyledMenuContainer dark={themeController.theme.name === 'dark'}>
         <Link href="/" passHref>
-          <StyledDivForLogo as="a">
-            <Logo data-logo="" width="60px" height="80px" />
-            <div data-logo-label="">
-              <LogoText />
-              <Text
-                variant="caption"
-                color="primary"
-                css={{ padding: '0 0 $5 $15' }}
-              >
-                {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
-              </Text>
-            </div>
-          </StyledDivForLogo>
+          <>
+            <StyledDivForLogo as="a">
+              <div data-logo-label="">
+                <StyledPNG src="/img/triggerportal-text-logo-blue.png" />
+              </div>
+            </StyledDivForLogo>
+            <Text
+              variant="caption"
+              color="primary"
+              css={{ textAlign: 'center', paddingBottom: '$5' }}
+            >
+              {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
+            </Text>
+          </>
         </Link>
 
         {walletButton}
 
         {menuLinks}
       </StyledMenuContainer>
-      
+
       <Column>
         <Text variant="legend" css={{ padding: '$4 $3' }}>
           {APP_NAME} v{process.env.NEXT_PUBLIC_APP_VERSION}
@@ -397,7 +394,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           />
         </Inline>
       </Column>
-     
     </StyledWrapper>
   )
 }
@@ -434,6 +430,13 @@ const StyledWrapperForMobile = styled('div', {
 
 const StyledMenuContainer = styled('div', {
   display: 'flex',
+  variants: {
+    dark: {
+      true: {
+        background: `linear-gradient(90deg, rgba(7,9,11, 0.1), rgba(7,9,11, 0.9) 7%, rgba(7,9,11, 0.9) 96%, rgba(7,9,11, 0.1) 100%) !important`,
+      },
+    },
+  },
   backgroundColor: '$backgroundColors$base',
   flexDirection: 'column',
   position: 'relative',
@@ -484,3 +487,11 @@ const buttonIconCss = {
     color: '$iconColors$tertiary',
   },
 }
+
+const StyledPNG = styled('img', {
+  width: '400%',
+  maxWidth: '1000px',
+  zIndex: '$1',
+  userSelect: 'none',
+  userDrag: 'none',
+})
