@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 // import validateFormData from '@rjsf/core'
 // import camelCase from 'camelcase'
 
@@ -12,7 +12,7 @@ import {
   DescriptionFieldProps,
   UiSchema,
 } from '@rjsf/utils'
-import { Validator } from 'jsonschema'
+import { Validator, ValidatorResult } from 'jsonschema'
 import {
   ArrowUpIcon,
   Button,
@@ -59,16 +59,17 @@ export const JsonFormEditor = ({
     }
     try {
       const parsedJSON = JSON.parse(val)
-      if (!validateJSON(parsedJSON, {})) {
+      const validated = validateJSON(parsedJSON, {})
+      if (!validated.valid) {
         // TODO: Show correct error message when validate message functionality changes.
-        setValidationError('Invalid JSON')
+        setValidationError(validated.toString())
         onValidate?.(false)
       } else {
         onValidate?.(true)
         setValidationError('')
       }
-    } catch {
-      setValidationError('Invalid JSON')
+    } catch (e) {
+      setValidationError(e.message)
       onValidate?.(false)
     }
   }
@@ -156,8 +157,8 @@ export const JsonFormEditor = ({
   function TitleFieldTemplate(props: TitleFieldProps) {
     const { id, required, title } = props
     return (
-      <Text variant="title" id={id}>
-        {title.replace(/([A-Z])/g, ' $1')}
+      <Text variant="body" id={id}>
+        {formatMainTitle(title)}
         {required && <span>*</span>}
       </Text>
     )
@@ -178,6 +179,14 @@ export const JsonFormEditor = ({
     )
   }
 
+  useEffect(() => {
+    // Select and format labels after component mounts
+    const labels = document.querySelectorAll('.control-label')
+    labels.forEach((label) => {
+      label.textContent = formatTitle(label.textContent)
+    })
+  }, [])
+
   return (
     <StyledDivForContainer>
       <StyledFormWrapper>
@@ -194,6 +203,7 @@ export const JsonFormEditor = ({
           }}
           validator={validator}
           templates={{
+            // FieldTemplate: CustomFieldTemplate,
             TitleFieldTemplate,
             DescriptionFieldTemplate,
             ButtonTemplates: {
@@ -223,32 +233,17 @@ const StyledGrid = styled('div', {
 })
 
 const StyledDivForContainer = styled('div', {
-  // borderRadius: '$4',
-  // justifyContent: "center",
-  // width: '100%',
   margin: '$2',
-  // transition: 'box-shadow .1s ease-out',
-  // height: '100%',
-  // display: 'block',
   color: '$textColors$secondary',
 })
 
 const StyledFormWrapper = styled('div', {
-  // justifyContent: "center",
-  // zIndex: 1,
-  // borderRadius: '$4 !important',
-  // margin: '$4',
-  // padding: '$4',
-  // width: '70%',
-  //display: 'block',
   textColor: '$textColors$secondary',
   fontSize: '12px',
   fontFamily: 'Inter',
-  // borderSize: '6px !important',
-  // borderColor: '$backgroundColors$base !important',
 })
 
-export const validateJSON = (json: any, jsonSchema: any): boolean => {
+export const validateJSON = (json: any, jsonSchema: any): ValidatorResult => {
   const v = new Validator()
   const result = v.validate(json, jsonSchema)
 
@@ -257,5 +252,32 @@ export const validateJSON = (json: any, jsonSchema: any): boolean => {
     console.error(`JSON validation failed:\n${result.toString()}`)
   }
 
-  return result.valid
+  return result
+}
+
+function formatMainTitle(title) {
+  // Insert a space before each uppercase letter and trim any leading space
+  let formattedTitle = title.replace(/([A-Z])/g, ' $1').trim()
+
+  // Capitalize the first letter of the entire string
+  formattedTitle = formattedTitle =
+    formattedTitle.charAt(0).toUpperCase() +
+    formattedTitle.slice(1).toLowerCase()
+
+  // Capitalize the first letter following each space
+  formattedTitle = formattedTitle.replace(/\s[a-z]/g, function (match) {
+    return match.toUpperCase()
+  })
+
+  return formattedTitle
+}
+
+function formatTitle(title) {
+  // Insert a space before each uppercase letter and trim any leading space
+  let formattedTitle = title.replace(/([A-Z])/g, ' $1').trim();
+
+  // Capitalize only the first letter of the entire string
+  formattedTitle = formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1).toLowerCase();
+
+  return formattedTitle;
 }

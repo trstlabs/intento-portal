@@ -70,7 +70,7 @@ export default function AutoTx() {
           </Head>
         )}
 
-        {(isLoading || !autoTxInfo) && (
+        {(isLoading) && (
           <StyledDiv>
             <Spinner color="primary" size={32} />
           </StyledDiv>

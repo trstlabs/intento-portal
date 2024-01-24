@@ -22,6 +22,7 @@ export const JsonFormWrapper = ({
   index,
   chainSymbol,
   msg,
+  isJsonValid,
   setExample,
   handleRemoveMsg,
   handleChangeMsg,
@@ -30,6 +31,7 @@ export const JsonFormWrapper = ({
   index: number
   chainSymbol: string
   msg: string
+  isJsonValid: boolean
   setExample: (index: number, msg: any) => void
   handleRemoveMsg: (index: number) => void
   handleChangeMsg: (index: number) => (msg: string) => void
@@ -64,12 +66,22 @@ export const JsonFormWrapper = ({
           disabled
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+          <Text variant="legend" color="disabled" align={'center'}>
+                <a
+                  target={'_blank'}
+                  href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
+                  rel="noopener noreferrer"
+                >
+                  Ask <b>Cosmonaut GPT</b>  to generate a message!
+                </a>
+              </Text>
             <Inline css={{ justifyContent: 'space-between' }}>
               <Button
                 variant="ghost"
                 size="large"
                 css={{ columnGap: '$12' }}
                 onClick={() => setShowJsonForm((show) => !show)}
+                disabled={!isJsonValid}
                 iconRight={
                   <ToggleSwitch
                     id="advanced-toggle"
@@ -210,15 +222,6 @@ export const JsonFormWrapper = ({
                 />
               )}
             </Column>{' '}
-            <Text variant="legend" color="disabled" align={'right'}>
-              <a
-                target={'_blank'}
-                href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
-                rel="noopener noreferrer"
-              >
-                Ask Cosmonaut GPT to generate a message!
-              </a>
-            </Text>
           </CardContent>
         </Card>
       </Column>
