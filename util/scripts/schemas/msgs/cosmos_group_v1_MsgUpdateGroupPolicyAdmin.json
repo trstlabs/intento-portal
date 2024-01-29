@@ -16,7 +16,7 @@
           "description": "new_admin is the new group policy admin."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Group Policy Admin",
       "description": "MsgUpdateGroupPolicyAdmin is the Msg/UpdateGroupPolicyAdmin request type."

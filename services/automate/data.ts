@@ -61,7 +61,7 @@ export const getAuthZGrantsForGrantee = async ({
     if (grant.granter == granter) {
 
       const res: GrantResponse = {
-        msgTypeUrl: grant.authorization.msg,
+        msgTypeUrl: grant.authorization.$typeUrl,
         expiration: grant.expiration,
         hasGrant: true,
       }

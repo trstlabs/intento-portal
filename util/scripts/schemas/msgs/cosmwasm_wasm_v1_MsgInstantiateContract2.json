@@ -29,6 +29,7 @@
           "items": {
             "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
           },
+          "additionalProperties": false,
           "type": "array",
           "description": "Funds coins that are transferred to the contract on instantiation"
         },
@@ -43,7 +44,7 @@
           "description": "FixMsg include the msg value into the hash for the predictable address. Default is false"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Instantiate Contract 2",
       "description": "MsgInstantiateContract2 create a new smart contract instance for the given code id with a predicable address."
@@ -57,7 +58,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."

@@ -10,6 +10,7 @@
           "items": {
             "$ref": "#/definitions/osmosis.poolmanager.v1beta1.SwapAmountOutRoute"
           },
+          "additionalProperties": false,
           "type": "array"
         },
         "tokenInMaxAmount": {
@@ -17,10 +18,10 @@
         },
         "tokenOut": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
-          "additionalProperties": true
+          "additionalProperties": false
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Swap Exact Amount Out"
     },
@@ -33,7 +34,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
@@ -47,7 +48,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Swap Amount Out Route"
     }

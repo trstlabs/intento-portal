@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react'
-// import validateFormData from '@rjsf/core'
-// import camelCase from 'camelcase'
-
+import React from 'react'
 import Form from '@rjsf/core'
 import validator from '@rjsf/validator-ajv8'
 import { JSONSchema7 } from 'json-schema'
+
 
 import {
   IconButtonProps,
@@ -12,31 +10,36 @@ import {
   DescriptionFieldProps,
   UiSchema,
 } from '@rjsf/utils'
-import { Validator, ValidatorResult } from 'jsonschema'
+
 import {
   ArrowUpIcon,
   Button,
   Inline,
   PlusIcon,
   styled,
-  /* useControlTheme, useMedia, */ Text,
+  Text,
   UnionIcon,
 } from 'junoblocks'
+import { customValidate, ErrorStack, extractRJSFErrorMessages, validateJSON } from './Validation'
+// import { customFields } from './ValueField'
 
 interface JsonFormEditorProps {
   jsonValue: any
   exampleSchema: any
+  validationErrors: string[]
   onChange?(val: string): void
   onValidate?(valid: boolean): void
+  setValidationErrors(errors: string[]): void
 }
 
 export const JsonFormEditor = ({
   jsonValue,
   exampleSchema,
+  validationErrors,
   onChange,
   onValidate,
+  setValidationErrors
 }: JsonFormEditorProps) => {
-  const [validationError, setValidationError] = useState('')
 
   const handleChange = (form, e) => {
     if (e && e.message != null) {
@@ -58,18 +61,18 @@ export const JsonFormEditor = ({
       return
     }
     try {
-      const parsedJSON = JSON.parse(val)
-      const validated = validateJSON(parsedJSON, {})
-      if (!validated.valid) {
+      let parsedJSON = JSON.parse(val)
+      let errors = validateJSON(parsedJSON, exampleSchema)
+      if (errors) {
         // TODO: Show correct error message when validate message functionality changes.
-        setValidationError(validated.toString())
+        setValidationErrors(errors)
         onValidate?.(false)
       } else {
         onValidate?.(true)
-        setValidationError('')
+        setValidationErrors([""])
       }
     } catch (e) {
-      setValidationError(e.message)
+      setValidationErrors([e.message])
       onValidate?.(false)
     }
   }
@@ -80,23 +83,16 @@ export const JsonFormEditor = ({
 
   const formDataItem = JSON.parse(jsonValue)['value']
 
-  const uischema: UiSchema = {
-    'ui:options': {
-      addable: false,
-    },
-    'ui:submitButtonOptions': {
-      norender: true,
-    },
-  }
-
   function AddButton(props: IconButtonProps) {
-    const { icon, iconType, ...btnProps } = props
+    const { icon, ...btnProps } = props
+
     return (
       <Button
         variant="secondary"
         size="small"
         css={{ margin: '$2' }}
         {...btnProps}
+
       >
         <Inline>
           {icon} <PlusIcon />
@@ -107,7 +103,7 @@ export const JsonFormEditor = ({
   }
 
   function RemoveButton(props: IconButtonProps) {
-    const { icon, iconType, ...btnProps } = props
+    const { icon, ...btnProps } = props
     return (
       <Button
         variant="secondary"
@@ -124,7 +120,7 @@ export const JsonFormEditor = ({
   }
 
   function MoveDownButton(props: IconButtonProps) {
-    const { icon, iconType, ...btnProps } = props
+    const { icon, ...btnProps } = props
     return (
       <Button
         variant="secondary"
@@ -140,7 +136,7 @@ export const JsonFormEditor = ({
   }
 
   function MoveUpButton(props: IconButtonProps) {
-    const { icon, iconType, ...btnProps } = props
+    const { icon, ...btnProps } = props
     return (
       <Button
         variant="secondary"
@@ -168,7 +164,7 @@ export const JsonFormEditor = ({
     return (
       <>
         {' '}
-        {description.toString().length > 2 && (
+        {description.toString().length > 2 && description.toString().length < 100 && (
           <details id={id}>
             <Text variant="caption" id={id}>
               {description.toString()}
@@ -179,28 +175,24 @@ export const JsonFormEditor = ({
     )
   }
 
-  useEffect(() => {
-    // Select and format labels after component mounts
-    const labels = document.querySelectorAll('.control-label')
-    labels.forEach((label) => {
-      label.textContent = formatTitle(label.textContent)
-    })
-  }, [])
 
   return (
-    <StyledDivForContainer>
+    <StyledDivForContainer>   <ErrorStack validationErrors={validationErrors} />
       <StyledFormWrapper>
-        <Form
+        <Form tagName="div"
+          showErrorList='top'
           className="rjsf-form"
           uiSchema={uischema}
+          // fields={customFields}
           schema={exampleSchema as JSONSchema7}
           formData={formDataItem}
           onChange={handleChange}
           onError={(errors) => {
             console.log('errors')
             console.log(errors)
-            setValidationError(errors[0].message)
+            setValidationErrors(extractRJSFErrorMessages(errors))
           }}
+          customValidate={customValidate}
           validator={validator}
           templates={{
             // FieldTemplate: CustomFieldTemplate,
@@ -218,19 +210,10 @@ export const JsonFormEditor = ({
         {/* Render your rjsf/core form components here */}
       </StyledFormWrapper>
 
-      {validationError && (
-        <StyledGrid>
-          <Text>Validation Error: {validationError}</Text>
-        </StyledGrid>
-      )}
+
     </StyledDivForContainer>
   )
 }
-
-const StyledGrid = styled('div', {
-  display: 'grid',
-  rowGap: '$space$8',
-})
 
 const StyledDivForContainer = styled('div', {
   margin: '$2',
@@ -242,18 +225,6 @@ const StyledFormWrapper = styled('div', {
   fontSize: '12px',
   fontFamily: 'Inter',
 })
-
-export const validateJSON = (json: any, jsonSchema: any): ValidatorResult => {
-  const v = new Validator()
-  const result = v.validate(json, jsonSchema)
-
-  // TODO: Return error message
-  if (!result.valid) {
-    console.error(`JSON validation failed:\n${result.toString()}`)
-  }
-
-  return result
-}
 
 function formatMainTitle(title) {
   // Insert a space before each uppercase letter and trim any leading space
@@ -272,12 +243,24 @@ function formatMainTitle(title) {
   return formattedTitle
 }
 
-function formatTitle(title) {
-  // Insert a space before each uppercase letter and trim any leading space
-  let formattedTitle = title.replace(/([A-Z])/g, ' $1').trim();
 
-  // Capitalize only the first letter of the entire string
-  formattedTitle = formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1).toLowerCase();
+const uischema: UiSchema = {
+  "ui:options": {
+    "addable": false,
+  },
+  "ui:submitButtonOptions": {
+    "norender": true,
+  },
+  "value": {
+    "ui:title": "Surname",
+    "ui:emptyValue": "",
+    "ui:autocomplete": "given-name",
+    "ui:widget": "textarea",
+    "ui:options": {
+      "rows": 5
+    }
+  }
 
-  return formattedTitle;
 }
+
+

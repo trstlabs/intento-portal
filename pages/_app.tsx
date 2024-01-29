@@ -23,10 +23,10 @@ import { wallets as leapWallets } from '@cosmos-kit/leap'
 
 import { assets, chains } from 'chain-registry'
 import {
-  getSigningCosmosClientOptions,
-  getTrstSigningClientOptions,
+  getTrstSigningClientOptions, getSigningCosmosClientOptions
 } from 'trustlessjs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
+
 // import { GasPrice } from '@cosmjs/stargate';
 import { css, media, useMedia } from 'junoblocks'
 import { SignerOptions } from '@cosmos-kit/core'

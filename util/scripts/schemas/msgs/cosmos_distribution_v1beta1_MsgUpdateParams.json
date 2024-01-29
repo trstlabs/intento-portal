@@ -9,11 +9,11 @@
         },
         "params": {
           "$ref": "#/definitions/cosmos.distribution.v1beta1.Params",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "params defines the x/distribution parameters to update. NOTE: All parameters must be supplied."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
@@ -35,7 +35,7 @@
           "type": "boolean"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Params",
       "description": "Params defines the set of params for the distribution module."

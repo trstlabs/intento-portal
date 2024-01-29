@@ -12,7 +12,7 @@
           "description": "executor is the account address used to execute the proposal."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Exec",
       "description": "MsgExec is the Msg/Exec request type."

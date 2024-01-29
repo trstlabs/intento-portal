@@ -42,9 +42,7 @@ export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
         throw new Error('Please connect your wallet.')
       }
       if (client == null) {
-        
         connectWallet(null)
-        alert('connect')
       }
       if (client == null) {
         throw new Error('Please try reconnecting your wallet.')

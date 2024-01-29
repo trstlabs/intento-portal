@@ -25,6 +25,9 @@ import { useTrstRpcClient } from './useRPCClient'
 import { AutoTxData } from '../types/trstTypes'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
+  if (!connectionId ){
+    return []
+  }
   if (accAddr === '') {
     const { address } = useRecoilValue(walletState)
     accAddr = address
@@ -45,12 +48,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
       enabled: Boolean(
         connectionId != '' &&
           connectionId != undefined &&
-          rpcClient &&
           accAddr != ''
       ),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
     }
   )
 

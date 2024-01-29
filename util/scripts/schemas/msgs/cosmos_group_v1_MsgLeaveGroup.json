@@ -12,7 +12,7 @@
           "description": "group_id is the unique ID of the group."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Leave Group",
       "description": "MsgLeaveGroup is the Msg/LeaveGroup request type."

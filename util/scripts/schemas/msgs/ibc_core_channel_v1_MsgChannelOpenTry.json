@@ -12,7 +12,7 @@
         },
         "channel": {
           "$ref": "#/definitions/ibc.core.channel.v1.Channel",
-          "additionalProperties": true
+          "additionalProperties": false
         },
         "counterpartyVersion": {
           "type": "string"
@@ -24,13 +24,13 @@
         },
         "proofHeight": {
           "$ref": "#/definitions/ibc.core.client.v1.Height",
-          "additionalProperties": true
+          "additionalProperties": false
         },
         "signer": {
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Channel Open Try",
       "description": "MsgChannelOpenInit defines a msg sent by a Relayer to try to open a channel on Chain B."
@@ -40,50 +40,28 @@
         "state": {
           "enum": [
             "STATE_UNINITIALIZED_UNSPECIFIED",
-            0,
             "STATE_INIT",
-            1,
             "STATE_TRYOPEN",
-            2,
             "STATE_OPEN",
-            3,
-            "STATE_CLOSED",
-            4
+            "STATE_CLOSED"
           ],
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "integer"
-            }
-          ],
+          "type": "string",
           "title": "State",
           "description": "State defines if a channel is in one of the following states: CLOSED, INIT, TRYOPEN, OPEN or UNINITIALIZED."
         },
         "ordering": {
           "enum": [
             "ORDER_NONE_UNSPECIFIED",
-            0,
             "ORDER_UNORDERED",
-            1,
-            "ORDER_ORDERED",
-            2
+            "ORDER_ORDERED"
           ],
-          "oneOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "integer"
-            }
-          ],
+          "type": "string",
           "title": "Order",
           "description": "Order defines if a channel is ORDERED or UNORDERED"
         },
         "counterparty": {
           "$ref": "#/definitions/ibc.core.channel.v1.Counterparty",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "counterparty channel end"
         },
         "connectionHops": {
@@ -98,7 +76,7 @@
           "description": "opaque channel version, which is agreed upon during the handshake"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Channel",
       "description": "Channel defines pipeline for exactly-once packet delivery between specific modules on separate blockchains, which has at least one end capable of sending packets and one end capable of receiving packets."
@@ -114,7 +92,7 @@
           "description": "channel end on the counterparty chain"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Counterparty",
       "description": "Counterparty defines a channel end counterparty"
@@ -130,7 +108,7 @@
           "description": "the height within the given revision"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Height",
       "description": "Height is a monotonically increasing data type that can be compared against another Height for the purposes of updating and freezing clients Normally the RevisionHeight is incremented at each height while keeping RevisionNumber the same. However some consensus algorithms may choose to reset the height in certain conditions e.g. hard forks, state-machine breaking changes In these cases, the RevisionNumber is incremented so that height continues to be monitonically increasing even as the RevisionHeight gets reset"

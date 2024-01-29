@@ -19,7 +19,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Exit Swap Share Amount In",
       "description": "===================== MsgExitSwapShareAmountIn"

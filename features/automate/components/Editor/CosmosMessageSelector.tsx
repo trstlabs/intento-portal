@@ -71,7 +71,7 @@ export const CosmosMessageSelector: React.FC<{
           //   )
           // )
           setExample(index, {
-            typeUrl: msgFile.key.replaceAll('_', '.'),
+            typeUrl: "/"+msgFile.key.replaceAll('_', '.'),
             value: generateDefaultObject(
               msgFile.value,
               msgFile.value.definitions

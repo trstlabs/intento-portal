@@ -16,7 +16,7 @@
           "description": "invariant_route is the msg's invariant route."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Verify Invariant",
       "description": "MsgVerifyInvariant represents a message to verify a particular invariance."

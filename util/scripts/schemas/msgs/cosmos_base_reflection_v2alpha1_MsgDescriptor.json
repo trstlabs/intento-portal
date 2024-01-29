@@ -8,7 +8,7 @@
           "description": "msg_type_url contains the TypeURL of a sdk.Msg."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Descriptor",
       "description": "MsgDescriptor describes a cosmos-sdk message that can be delivered with a transaction"

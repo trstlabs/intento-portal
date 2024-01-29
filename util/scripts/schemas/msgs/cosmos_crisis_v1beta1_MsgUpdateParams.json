@@ -9,11 +9,11 @@
         },
         "constantFee": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "constant_fee defines the x/crisis parameter."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
@@ -27,7 +27,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."

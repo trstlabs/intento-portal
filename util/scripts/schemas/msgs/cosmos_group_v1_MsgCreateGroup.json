@@ -11,6 +11,7 @@
           "items": {
             "$ref": "#/definitions/cosmos.group.v1.MemberRequest"
           },
+          "additionalProperties": false,
           "type": "array",
           "description": "members defines the group members."
         },
@@ -19,7 +20,7 @@
           "description": "metadata is any arbitrary metadata to attached to the group."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Groups",
       "description": "Groups  MsgCreateGroup is the Msg/CreateGroup request type."
@@ -39,7 +40,7 @@
           "description": "metadata is any arbitrary metadata attached to the member."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Member Request",
       "description": "MemberRequest represents a group member to be used in Msg server requests. Contrary to `Member`, it doesn't have any `added_at` field since this field cannot be set as part of requests."

@@ -3,7 +3,7 @@ import { convertDenomToMicroDenom } from 'junoblocks'
 import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { trst } from 'trustlessjs'
+import { trst, GlobalDecoderRegistry } from 'trustlessjs'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { AutoTxData } from '../../types/trstTypes'
 
@@ -28,30 +28,9 @@ export const executeSubmitAutoTx = async ({
   let duration = autoTxData.duration + 'ms'
   let interval = autoTxData.interval + 'ms'
   let msgs = []
-  const masterRegistry = client.registry
 
-  for (let msgJSON of autoTxData.msgs) {
-    let value = JSON.parse(msgJSON)['value']
-
-    let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
-
-    if (typeUrl.startsWith('/cosmwasm')) {
-      let msgString: string = JSON.stringify(value['msg'])
-      console.log(msgString)
-      let msg2: Uint8Array = toUtf8(msgString)
-      console.log(msg2)
-      value['msg'] = msg2
-    }
-
-    const encodeObject = {
-      typeUrl,
-      value,
-    }
-    console.log(encodeObject)
-
-    let msgAny = masterRegistry.encodeAsAny(encodeObject)
-    msgs.push(msgAny)
-  }
+  transformAndEncodeMsgs(autoTxData, client, msgs)
+  console.log(msgs)
 
   if (
     autoTxData.icaAddressForAuthZGrant &&
@@ -64,7 +43,7 @@ export const executeSubmitAutoTx = async ({
         grantee: autoTxData.icaAddressForAuthZGrant,
       },
     }
-    msgs = [masterRegistry.encodeAsAny(encodeObject2)]
+    msgs = [client.registry.encodeAsAny(encodeObject2)]
   }
 
   let feeFunds: Coin[] = []
@@ -92,6 +71,7 @@ export const executeSubmitAutoTx = async ({
             updatingDisabled: false,
             stopOnSuccess: false,
             stopOnFailure: false,
+            fallbackToOwnerBalance: false,
           },
       feeFunds,
     })
@@ -103,3 +83,71 @@ export const executeSubmitAutoTx = async ({
     })
   )
 }
+function transformAndEncodeMsgs(
+  autoTxData: AutoTxData,
+  client: SigningStargateClient,
+  msgs: any[]
+) {
+  for (let msgJSON of autoTxData.msgs) {
+    let value = JSON.parse(msgJSON)['value']
+    let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
+
+    if (typeUrl.startsWith('/cosmwasm')) {
+      let msgString: string = JSON.stringify(value['msg'])
+      console.log(msgString)
+      let msg2: Uint8Array = toUtf8(msgString)
+      console.log(msg2)
+      value['msg'] = msg2
+    }
+    console.log(value)
+    // const encodedValue = deepEnccodeProtoTypes(value, 'typeUrl', client)
+    // if (encodedValue) {
+    //   value = encodedValue
+    // }
+    //console.log(value)
+    const encodeObject = {
+      typeUrl,
+      value,
+    }
+    console.log(encodeObject)
+
+    let msgAny = client.registry.encodeAsAny(encodeObject)
+     msgAny = GlobalDecoderRegistry.wrapAny(value)
+    let decoded = client.registry.decode(msgAny)
+    console.log(decoded)
+    msgs.push(msgAny)
+  }
+}
+
+// function deepEnccodeProtoTypes(
+//   obj: any,
+//   targetProperty: string,
+//   client: SigningStargateClient
+// ): any | undefined {
+//   console.log(client.registry)
+//   if (typeof obj === 'object' && obj !== null) {
+//     if (obj.hasOwnProperty(targetProperty)) {
+//       let decoder = GlobalDecoderRegistry.getDecoderByInstance(
+//         obj[targetProperty]
+//       )
+//       console.log(decoder)
+//       if (targetProperty === 'typeUrl' && obj.hasOwnProperty('value')) {
+//         const encodeObject = {
+//           typeUrl: obj[targetProperty],
+//           value: obj['value'],
+//         }
+//         obj['value'] = GlobalDecoderRegistry.wrapAny(obj['value'])
+//       }
+
+//       return obj
+//     } else {
+//       for (const key in obj) {
+//         const result = deepEnccodeProtoTypes(obj[key], targetProperty, client)
+//         if (result !== undefined) {
+//           return obj
+//         }
+//       }
+//     }
+//   }
+//   return undefined
+// }

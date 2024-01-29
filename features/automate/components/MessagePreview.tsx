@@ -57,9 +57,12 @@ const MessagePreview = ({
                       <IconWrapper icon={<Info />} color="primary" />
                       <Text variant="caption" align="left">
                         {' '}
-                        You may lose funds if message values are incorrect. Do
-                        not interact if you do not know what you are doing.
-                        Always review messages before submitting.
+                        Please exercise caution when handling message values, as
+                        incorrect inputs could potentially result in the loss of
+                        funds. It is advisable not to engage in any interactions
+                        if you are uncertain about the actions you are taking.
+                        Always thoroughly review the contents of your messages
+                        before submitting them to mitigate any potential risks.
                       </Text>
                       <Button
                         variant="ghost"
@@ -85,7 +88,8 @@ const MessagePreview = ({
                         align="left"
                         css={{ paddingBottom: '$10' }}
                       >
-                        Message {i + 1}: <pre>{msgToDisplay}</pre>
+                        Message {i + 1}: <pre>{msgToDisplay}
+                        </pre>
                       </Text>{' '}
                       <SubmitAutoTxDialog
                         chainSymbol={chainSymbol}
@@ -105,7 +109,9 @@ const MessagePreview = ({
                         }
                         isExecutingAuthzGrant={isExecutingAuthzGrant}
                         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                        shouldDisableAuthzGrantButton={!shouldDisableAuthzGrants}
+                        shouldDisableAuthzGrantButton={
+                          !shouldDisableAuthzGrants
+                        }
                         setFeeFundsHostChain={setFeeFundsHostChain}
                         handleSubmitAutoTx={(autoTxData) =>
                           handleSubmitAutoTxClick(autoTxData)

@@ -9,11 +9,11 @@
         },
         "params": {
           "$ref": "#/definitions/cosmos.slashing.v1beta1.Params",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "params defines the x/slashing parameters to update. NOTE: All parameters must be supplied."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
@@ -44,7 +44,7 @@
           "binaryEncoding": "base64"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Params",
       "description": "Params represents the parameters used for by the slashing module."

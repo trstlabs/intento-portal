@@ -9,11 +9,11 @@
         },
         "params": {
           "$ref": "#/definitions/cosmos.staking.v1beta1.Params",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "params defines the x/staking parameters to update. NOTE: All parameters must be supplied."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
@@ -47,7 +47,7 @@
           "description": "min_commission_rate is the chain-wide minimum commission rate that a validator can charge their delegators"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Params",
       "description": "Params defines the parameters for the x/staking module."

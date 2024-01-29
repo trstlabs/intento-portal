@@ -16,7 +16,7 @@
           "description": "metadata is the group policy metadata to be updated."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Group Policy Metadata",
       "description": "MsgUpdateGroupPolicyMetadata is the Msg/UpdateGroupPolicyMetadata request type."

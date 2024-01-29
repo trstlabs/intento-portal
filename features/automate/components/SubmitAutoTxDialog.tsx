@@ -62,23 +62,21 @@ export const SubmitAutoTxDialog = ({
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
-  if (!isDialogShowing) {
-    return
-  }
+ 
   const [startTime, setStartTime] = useState(0)
   const [duration, setDuration] = useState(14 * 86400000)
 
-  const [interval, setInterval] = useState(86400000)
+  const [interval, setInterval] = useState(0)
   const [feeFunds, setFeeAmount] = useState(0)
   const [txLabel, setLabel] = useState(customLabel)
   const [recurrences, setRecurrence] = useState(2)
 
-  const [displayInterval, setDisplayInterval] = useState('1 day')
+  const [displayInterval, setDisplayInterval] = useState('None')
   const [editInterval, setEditInterval] = useState(false)
-  const [editIntervalValue, setEditIntervalValue] = useState('0')
-  const [displayDuration, setDisplayDuration] = useState('2 weeks')
+  const [editIntervalValue, setEditIntervalValue] = useState('1 hour')
+  const [displayDuration, setDisplayDuration] = useState('1 hour')
   const [editDuration, setEditDuration] = useState(false)
-  const [editDurationValue, setEditDurationValue] = useState('0')
+  const [editDurationValue, setEditDurationValue] = useState('2 hours')
   const [displayStartTime, setDisplayStartTime] = useState('1 day')
   const [editStartTime, setEditStartTime] = useState(false)
   const [editStartTimeValue, setEditStartTimeValue] = useState('0')
@@ -111,17 +109,15 @@ export const SubmitAutoTxDialog = ({
     3600000 * 24 * 90,
   ]
 
-  function handleInterval(label, value) {
-    console.log(value)
+  function handleInterval(label, value: number) {
+    console.log("value", value, "duration", duration)
     if (value >= duration) {
       toast.custom((t) => (
         <Toast
           icon={<IconWrapper icon={<Error />} color="error" />}
           title={
-            "Can't set interval higher than duration " +
-            displayInterval +
-            ',your specified interval is: ' +
-            label
+            "Can't set interval longer than the duration of " +
+            displayDuration
           }
           onClose={() => toast.dismiss(t.id)}
         />
@@ -140,7 +136,7 @@ export const SubmitAutoTxDialog = ({
     setDisplayInterval('None Selected')
   }
   function handleDuration(label: string, value) {
-    if (value >= interval) {
+    if (value >= interval || interval == 0) {
       setDuration(value)
       setDisplayDuration(label)
       const recurrence = Math.floor(value / interval)
@@ -154,10 +150,8 @@ export const SubmitAutoTxDialog = ({
       <Toast
         icon={<IconWrapper icon={<Error />} color="error" />}
         title={
-          "Can't select a lower duration than interval " +
-          displayInterval +
-          ',your specified duration is: ' +
-          label
+          "Can't select a lower duration than the interval of " +
+          displayInterval
         }
         onClose={() => toast.dismiss(t.id)}
       />
@@ -324,7 +318,7 @@ export const SubmitAutoTxDialog = ({
                         Duration
                         <StyledInput
                           placeholder={displayDuration}
-                          value={displayDuration}
+                          value={editDurationValue}
                           onChange={({ target: { value } }) =>
                             setEditDurationValue(value)
                           }

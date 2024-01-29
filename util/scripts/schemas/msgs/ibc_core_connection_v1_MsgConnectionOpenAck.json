@@ -11,19 +11,13 @@
         },
         "version": {
           "$ref": "#/definitions/ibc.core.connection.v1.Version",
-          "additionalProperties": true
+          "additionalProperties": false
         },
         "clientState": {
           "properties": {
             "typeUrl": {
               "type": "string",
               "description": "A URL/resource name that uniquely identifies the type of the serialized protocol buffer message. This string must contain at least one \"/\" character. The last segment of the URL's path must represent the fully qualified name of the type (as in `path/google.protobuf.Duration`). The name should be in a canonical form (e.g., leading \".\" is not accepted). In practice, teams usually precompile into the binary all types that they expect it to use in the context of Any. However, for URLs which use the scheme `http`, `https`, or no scheme, one can optionally set up a type server that maps type URLs to message definitions as follows: * If no scheme is provided, `https` is assumed. * An HTTP GET on the URL must yield a [google.protobuf.Type][]   value in binary format, or produce an error. * Applications are allowed to cache lookup results based on the   URL, or have them precompiled into a binary to avoid any   lookup. Therefore, binary compatibility needs to be preserved   on changes to types. (Use versioned type names to manage   breaking changes.) Note: this functionality is not currently available in the official protobuf release, and it is not used for type URLs beginning with type.googleapis.com. Schemes other than `http`, `https` (or the empty scheme) might be used with implementation specific semantics."
-            },
-            "value": {
-              "type": "string",
-              "description": "Must be a valid serialized protocol buffer of the above specified type.",
-              "format": "binary",
-              "binaryEncoding": "base64"
             }
           },
           "additionalProperties": true,
@@ -31,7 +25,7 @@
         },
         "proofHeight": {
           "$ref": "#/definitions/ibc.core.client.v1.Height",
-          "additionalProperties": true
+          "additionalProperties": false
         },
         "proofTry": {
           "type": "string",
@@ -53,13 +47,13 @@
         },
         "consensusHeight": {
           "$ref": "#/definitions/ibc.core.client.v1.Height",
-          "additionalProperties": true
+          "additionalProperties": false
         },
         "signer": {
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Connection Open Ack",
       "description": "MsgConnectionOpenAck defines a msg sent by a Relayer to Chain A to acknowledge the change of connection state to TRYOPEN on Chain B."
@@ -75,7 +69,7 @@
           "description": "the height within the given revision"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Height",
       "description": "Height is a monotonically increasing data type that can be compared against another Height for the purposes of updating and freezing clients Normally the RevisionHeight is incremented at each height while keeping RevisionNumber the same. However some consensus algorithms may choose to reset the height in certain conditions e.g. hard forks, state-machine breaking changes In these cases, the RevisionNumber is incremented so that height continues to be monitonically increasing even as the RevisionHeight gets reset"
@@ -94,7 +88,7 @@
           "description": "list of features compatible with the specified identifier"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Version",
       "description": "Version defines the versioning scheme used to negotiate the IBC verison in the connection handshake."

@@ -6,6 +6,7 @@ import {
 } from '../util/constants'
 import { useTrstRpcClient } from './useRPCClient'
 import { QueryAutoTxsResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query'
+import { GlobalDecoderRegistry } from 'trustlessjs'
 
 export const useAutoTxInfos = () => {
   const client = useTrstRpcClient()
@@ -17,7 +18,28 @@ export const useAutoTxInfos = () => {
         await client.trst.autoibctx.v1beta1.autoTxs({
           pagination: undefined,
         })
-            return resp.autoTxInfos
+
+      // Transform each msg in autoTxInfos
+      const transformedAutoTxInfos = resp.autoTxInfos.map((autoTxInfo) => {
+        return {
+          ...autoTxInfo,
+          msgs: autoTxInfo.msgs.map((msg) => {
+            const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
+            wrappedMsg.typeUrl =
+              wrappedMsg.typeUrl ==
+              '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+                ? '/cosmos.authz.v1beta1.MsgExec'
+                : wrappedMsg.typeUrl
+            return {
+              value: wrappedMsg.value,
+              valueDecoded: msg.value,
+              typeUrl: wrappedMsg.typeUrl,
+            }
+          }),
+        }
+      })
+
+      return transformedAutoTxInfos
     },
     {
       enabled: Boolean(client && client.trst),
@@ -35,17 +57,35 @@ export const useAutoTxInfo = (id) => {
   const { data, isLoading } = useQuery(
     ['autoTxId', id],
     async () => {
-      const info = await client.trst.autoibctx.v1beta1.autoTx({ id })
-      //console.log(info)
-      return info.autoTxInfo
+      if (!id || !client || !client.trst) {
+        throw new Error('Invalid ID or client not available')
+      }
+      const autoTxInfo = (await client.trst.autoibctx.v1beta1.autoTx({ id }))
+        .autoTxInfo
+      return {
+        ...autoTxInfo,
+        msgs: autoTxInfo.msgs.map((msg) => {
+          const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
+          wrappedMsg.typeUrl =
+            wrappedMsg.typeUrl ==
+            '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+              ? '/cosmos.authz.v1beta1.MsgExec'
+              : wrappedMsg.typeUrl
+          return {
+            value: wrappedMsg.value,
+            valueDecoded: msg.value,
+            typeUrl: wrappedMsg.typeUrl,
+          }
+        }),
+      }
     },
     {
-      enabled: Boolean(id != '' || (client && client.trst)),
+      enabled: !!id && !!client?.trst,
       refetchOnMount: 'always',
       refetchInterval: AUTOTX_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
-
+  console.log(data)
   return [data, isLoading] as const
 }

@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@codemirror/lang-json": "^6.0.1",
-    "@cosmjs/cosmwasm-stargate": "^0.31.0",
+    "@cosmjs/cosmwasm-stargate": "^0.32.0",
     "@cosmos-kit/core": "^2.4.1",
     "@cosmos-kit/cosmostation": "^2.2.1",
     "@cosmos-kit/keplr": "^2.2.1",

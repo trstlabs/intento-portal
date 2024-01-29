@@ -14,10 +14,10 @@
         },
         "amount": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
-          "additionalProperties": true
+          "additionalProperties": false
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Begin Redelegate",
       "description": "MsgBeginRedelegate defines a SDK message for performing a redelegation of coins from a delegator and source validator to a destination validator."
@@ -31,7 +31,7 @@
           "type": "string"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."

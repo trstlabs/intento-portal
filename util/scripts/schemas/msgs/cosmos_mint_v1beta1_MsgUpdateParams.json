@@ -9,11 +9,11 @@
         },
         "params": {
           "$ref": "#/definitions/cosmos.mint.v1beta1.Params",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "params defines the x/mint parameters to update. NOTE: All parameters must be supplied."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
@@ -45,7 +45,7 @@
           "description": "expected blocks per year"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Params",
       "description": "Params defines the parameters for the x/mint module."

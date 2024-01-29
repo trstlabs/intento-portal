@@ -9,11 +9,11 @@
         },
         "params": {
           "$ref": "#/definitions/cosmos.bank.v1beta1.Params",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "description": "params defines the x/bank parameters to update. NOTE: All parameters must be supplied."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
@@ -24,6 +24,7 @@
           "items": {
             "$ref": "#/definitions/cosmos.bank.v1beta1.SendEnabled"
           },
+          "additionalProperties": false,
           "type": "array",
           "description": "Deprecated: Use of SendEnabled in params is deprecated. For genesis, use the newly added send_enabled field in the genesis object. Storage, lookup, and manipulation of this information is now in the keeper. As of cosmos-sdk 0.47, this only exists for backwards compatibility of genesis files."
         },
@@ -31,7 +32,7 @@
           "type": "boolean"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Params",
       "description": "Params defines the parameters for the bank module."
@@ -45,7 +46,7 @@
           "type": "boolean"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Send Enabled",
       "description": "SendEnabled maps coin denom to a send_enabled status (whether a denom is sendable)."

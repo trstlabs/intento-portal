@@ -12,7 +12,7 @@
           "binaryEncoding": "base64"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Data",
       "description": "MsgData defines the data returned in a Result object during message execution."

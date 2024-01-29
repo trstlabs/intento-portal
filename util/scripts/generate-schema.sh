@@ -18,8 +18,6 @@ MSGS_DIR="${SCRIPT_PATH}/schemas/msgs"
 
 INDEX_FILE="${MSGS_DIR}/index.ts"
 
-
-echo "ddd"
 echo "${SCRIPT_PATH}"
 echo "${TRST_DIR}"
 echo "${TRST_THIRD_PARTY_DIR}"
@@ -45,6 +43,9 @@ find "${TRST_DIR}" "${TRST_THIRD_PARTY_DIR}" -path -prune -o -name '*.proto' -pr
         --plugin=$GOPATH/bin/protoc-gen-jsonschema \
         --jsonschema_out=${MSGS_DIR} \
         --jsonschema_opt=prefix_schema_files_with_package \
+        --jsonschema_opt=disallow_additional_properties \
+        --jsonschema_opt=enums_as_constants \
+        --jsonschema_opt=enums_as_strings_only \
         --proto_path="${TRST_DIR}" \
         --proto_path="${TRST_THIRD_PARTY_DIR}" \
         "${file}"
@@ -79,8 +80,6 @@ for dir in "$MSGS_DIR"/*; do
     fi
 done
 
-
-# cat "${MSGS_DIR}"/*.json > "${OUTPUT_FILE}"
 # Iterate over all JSON files in the msgs directory
 for json_file in "${MSGS_DIR}"/*.json; do
     # Check if the file exists
@@ -91,18 +90,33 @@ for json_file in "${MSGS_DIR}"/*.json; do
         # Check if the file name starts with "Msg" and does not end with "Response"
         if [[ "$file_name" == *Msg* && "$file_name" != *Response ]]; then
             
-            # # Convert the keys in the "properties" section of all definitions to camelCase
+            # Convert the keys in the "properties" section of all definitions to camelCase
+            # Set additionalProperties to true at the correct level
+            # Remove specific 'value' object
             updated_json=$(cat "$json_file" | jq '
             def snake_to_camel:
             gsub( "_(?<a>[a-z])"; .a|ascii_upcase);
 
-            walk(if type == "object" then with_entries(.key |= snake_to_camel) else . end)
+            def add_additional_properties:
+                if type == "object" then
+                    if any(values[]; type == "object" and has("typeUrl")) then
+                        . + {"additionalProperties": true}
+                    else
+                        with_entries(if .value | type == "object" then .value |= add_additional_properties else . end)
+                    end
+                else
+                    .
+                end;
 
+            walk(if type == "object" then with_entries(.key |= snake_to_camel) else . end) |
+            walk(add_additional_properties) |
+            walk(if type == "object" and .value? and .value.type == "string" and .value.description == "Must be a valid serialized protocol buffer of the above specified type." and .value.format == "binary" and .value.binaryEncoding == "base64" then del(.value) else . end)
             ')
             
             # Overwrite the file with the modified JSON
             echo "$updated_json" > "${MSGS_DIR}"/"$file_name"+"_tmp".json
             
+            # Remove the "$schema" key
             jq 'del(."$schema")' "${MSGS_DIR}"/"$file_name"+"_tmp".json > "$json_file"
             
             # Add an export statement to the index.ts file
@@ -115,8 +129,6 @@ for json_file in "${MSGS_DIR}"/*.json; do
 done
 
 
-
-# rm updated_json.json
 
 
 echo "Generated msg schemas and index.ts file in $MSGS_DIR"

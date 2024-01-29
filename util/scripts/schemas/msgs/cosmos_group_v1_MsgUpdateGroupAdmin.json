@@ -16,7 +16,7 @@
           "description": "new_admin is the group new admin account address."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Group Admin",
       "description": "MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type."

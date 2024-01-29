@@ -25,7 +25,7 @@ export default function AutoTx() {
   const isMobile = useMedia('sm')
 
   const [autoTxInfo, isLoading] = useAutoTxInfo(id)
-  const connectionId = autoTxInfo ? autoTxInfo.connectionId : ''
+  const connectionId = autoTxInfo && autoTxInfo.connectionId ? autoTxInfo.connectionId : ''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {
@@ -84,7 +84,7 @@ export default function AutoTx() {
           ) : (
             <StyledDiv>
               <Text variant="legend">
-                <>Trigger not found in this space continuum 🌌</>
+                <>Trigger not found in this space continuum 🌌 </>
               </Text>{' '}
             </StyledDiv>
           ))}

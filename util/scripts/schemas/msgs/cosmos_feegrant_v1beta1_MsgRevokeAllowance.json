@@ -12,7 +12,7 @@
           "description": "grantee is the address of the user being granted an allowance of another user's funds."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Revoke Allowance",
       "description": "MsgRevokeAllowance removes any existing Allowance from Granter to Grantee."

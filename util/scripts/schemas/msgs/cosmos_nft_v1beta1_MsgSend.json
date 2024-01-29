@@ -20,7 +20,7 @@
           "description": "receiver is the receiver address of nft"
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Send",
       "description": "MsgSend represents a message to send a nft from one account to another account."

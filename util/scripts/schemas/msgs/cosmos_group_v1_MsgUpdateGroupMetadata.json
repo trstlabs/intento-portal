@@ -16,7 +16,7 @@
           "description": "metadata is the updated group's metadata."
         }
       },
-      "additionalProperties": true,
+      "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Group Metadata",
       "description": "MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type."
