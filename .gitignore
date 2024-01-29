@@ -68,3 +68,4 @@ localtrst
 util/scripts/Trustless-Hub
 util/scripts/cosmos-sdk
 util/scripts/cosmos-proto
+.env
