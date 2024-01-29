@@ -27,8 +27,6 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
     autoTxInfo.endTime.getSeconds() >= autoTxInfo.execTime.getSeconds()
     && autoTxInfo.endTime.getTime() > Date.now()
 
-
-  
   return (
     <Link href={`/triggers/${autoTxInfo.txId.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>

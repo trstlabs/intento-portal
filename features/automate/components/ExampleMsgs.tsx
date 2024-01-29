@@ -68,14 +68,52 @@ export const generalExamples = [
   {
     typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
     value: {
-      amount: [
-        {
-          amount: '1000000',
-          denom: 'utrst',
-        },
-      ],
+      amount: {
+        amount: '1000000',
+        denom: 'utrst'
+      },
       delegatorAddress: 'trust1....',
       validatorAddress: 'trustvaloper1...',
+    },
+  },
+  {
+    typeUrl: '/cosmos.gov.v1beta1.MsgVote',
+    value: {
+      "proposalId": "1",
+      "voter": "trust1....",
+      "option": "VOTE_OPTION_UNSPECIFIED"
+
+    },
+  },
+
+  {
+    typeUrl: "/cosmos.gov.v1beta1.MsgVoteWeighted",
+    value: {
+      "proposalId": "1",
+      "voter": "trust1....",
+      "options": [
+        {
+          "option": "VOTE_OPTION_NO",
+          "weight": "50"
+        },
+        {
+          "option": "VOTE_OPTION_ABSTAIN",
+          "weight": "50"
+        }
+      ]
+    }
+  },
+  {
+    typeUrl: '/cosmos.gov.v1beta1.MsgSubmitProposal',
+    value: {
+      content:
+      {
+        typeUrl: '/cosmos.gov.v1beta1.TextProposal',
+        title: "Important Gov Proposal",
+        description: "tokens for all!"
+      },
+      initialDeposit: [{ denom: "utrst", amount: "100000" }],
+      proposer: 'trust1....',
     },
   },
   {
@@ -91,37 +129,6 @@ export const generalExamples = [
     },
   },
   {
-    typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
-    value: {
-      granter: 'trust1....',
-      grantee: 'trust1....',
-      authorization: {
-        msg: 'cosmos.bank.v1beta1.MsgSend',
-      },
-      expiration: '1678206285',
-    },
-  },
-  {
-    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
-    value: {
-      grantee: 'trust1....',
-      msgs: [
-        {
-          typeUrl: '/cosmos.staking.v1beta1.MsgDelegate',
-          value: {
-            amount: {
-              amount: '1000000',
-              denom: 'utrst',
-            },
-            delegatorAddress: 'trust1....',
-            validatorAddress: 'trustvaloper1...',
-          },
-        },
-      ],
-      expiration: '1678206285',
-    },
-  },
-  {
     typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
     value: {
       granter: 'trust1....',
@@ -129,6 +136,23 @@ export const generalExamples = [
       msgTypeUrl: 'cosmos.bank.v1beta1.MsgSend',
     },
   },
+  {
+    typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
+    value: {
+      granter: 'trust1....',
+      grantee: 'trust1....',
+      grant: {
+        authorization: {
+          typeUrl: '/cosmos.authz.v1beta1.GenericAuthorization',
+          value: {
+            msg: "/cosmos.bank.v1beta1.MsgSend",
+          }
+        },
+        expiration: "1678206285",
+      },
+    },
+  }
+
 ]
 
 export const osmoExamples = [

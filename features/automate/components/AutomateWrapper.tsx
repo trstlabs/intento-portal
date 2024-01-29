@@ -24,6 +24,7 @@ export const AutomateWrapper = ({
     updatingDisabled: false,
     stopOnFailure: false,
     stopOnSuccess: false,
+    fallbackToOwnerBalance: true,
   }
   initialAutoTxData.configuration = initConfig
   //data.typeUrls = [""]

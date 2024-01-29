@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   Button,
   ChevronIcon,
@@ -20,10 +21,9 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateAutoTxParams } from '../../../types/trstTypes'
-
 import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 
-import { useEffect, useState } from 'react'
+
 import { convertMicroDenomToDenom } from 'util/conversion'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
@@ -31,19 +31,15 @@ import {
   /* useAuthZGrantsForUser,  */ useGetICA,
   /* useIsActiveICAForUser,  */ useICATokenBalance,
 } from '../../../hooks/useICA'
-
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
 import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
-
 import { JsonCodeMirrorEditor } from '../../automate/components/Editor/CodeMirror'
-
 import { getDuration, getRelativeTime } from '../../../util/time'
 import { getTrstSigningClientOptions } from 'trustlessjs'
-
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
-// import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx";
 import { Any } from 'cosmjs-types/google/protobuf/any'
+
 
 type AutoTxInfoBreakdownProps = {
   autoTxInfo: AutoTxInfo
@@ -61,7 +57,7 @@ export const AutoTxInfoBreakdown = ({
   autoTxInfo,
   ibcInfo,
 }: //size = 'large',
-AutoTxInfoBreakdownProps) => {
+  AutoTxInfoBreakdownProps) => {
   const [icaAddress, _] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
 
   //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
@@ -85,8 +81,7 @@ AutoTxInfoBreakdownProps) => {
   const latestExecWasError =
     autoTxInfo.autoTxHistory.length > 0 &&
     autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].errors[0] !=
-      undefined
-  //const msgData = new TextDecoder().decode(autoTxInfo.data).split(",")
+    undefined
 
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
@@ -284,8 +279,8 @@ AutoTxInfoBreakdownProps) => {
                   {
                     autoTxInfo.msgs[0].typeUrl
                       .split('.')
-                      .find((data) => data.includes('Msg'))
-                      .split(',')[0]
+                      .find((data) => data.includes('Msg')).split(',')[0]
+
                   }
                 </>
               </Text>
@@ -493,9 +488,11 @@ AutoTxInfoBreakdownProps) => {
                             fontSize: '0.8rem',
                           }}
                         >
+
                           {msg.typeUrl == '/cosmos.authz.v1beta1.MsgExec'
                             ? getMsgValueForMsgExec(msg)
                             : JSON.stringify(registry.decode(msg), null, 2)}
+
                         </pre>
                       </Text>
                     </Inline>
@@ -658,6 +655,20 @@ AutoTxInfoBreakdownProps) => {
                   {autoTxInfo.configuration.stopOnSuccess ? 'True' : 'False'}
                 </Text>
               </>
+              <>
+                <Tooltip
+                  label={
+                    'If set to true, as a fallback, the owner balance is used to pay for local fees'
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Wallet Fallback
+                  </Text>
+                </Tooltip>
+                <Text variant="body">
+                  {autoTxInfo.configuration.fallbackToOwnerBalance ? 'True' : 'False'}
+                </Text>
+              </>
             </Column>
           </Row>
         )}
@@ -765,9 +776,9 @@ AutoTxInfoBreakdownProps) => {
                               Executed: {executed && <>🟢</>}{' '}
                               {!executed &&
                                 (Date.now() - actualExecTime.valueOf() >
-                                3000000 ? (
-                                  <>🔴</>
-                                ) : (
+                                  3000000 ? (
+                                    <>🔴</>
+                                  ) || errors[0] : (
                                   <>⌛</>
                                 ))}
                             </Text>

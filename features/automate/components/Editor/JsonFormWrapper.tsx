@@ -14,15 +14,15 @@ import React, { useState } from 'react'
 import { JsonFormEditor } from './JsonForm'
 import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
 import { Chip } from '../AutomateComponent'
-import * as tmpFiles from '../../../../util/scripts/schemas/msgs'
+
 import { MessageSelector } from './MessageSelector'
-import { CodeMirrorWrapper } from './CodeMirrorWrapper'
+import { JsonCodeMirrorEditor } from './CodeMirror'
+import { findFileBySuffix, validateJSON } from './Validation'
 
 export const JsonFormWrapper = ({
   index,
   chainSymbol,
   msg,
-  isJsonValid,
   setExample,
   handleRemoveMsg,
   handleChangeMsg,
@@ -31,7 +31,6 @@ export const JsonFormWrapper = ({
   index: number
   chainSymbol: string
   msg: string
-  isJsonValid: boolean
   setExample: (index: number, msg: any) => void
   handleRemoveMsg: (index: number) => void
   handleChangeMsg: (index: number) => (msg: string) => void
@@ -41,20 +40,34 @@ export const JsonFormWrapper = ({
   const extractedMsg =
     msg.length > 32 && msg.split('.').find((name) => name.includes('Msg'))
   const msgTypeName = (extractedMsg && extractedMsg.split('"')[0]) || 'Unknown'
-
+  const [validationErrors, setValidationErrors] = useState([""])
   const [exampleSchema, setExampleSchema] = useState(
     findFileBySuffix(msgTypeName) || findFileBySuffix('MsgSend')
   )
 
-  // Helper function to find and return a file by name
-  function findFileBySuffix(typeUrlSuffix: string): any | undefined {
-    for (const key in tmpFiles) {
-      ///TODO there may be identical messages so at some point it may suffice to add more controls for msg
-      if (tmpFiles.hasOwnProperty(key) && key.includes(typeUrlSuffix)) {
-        return tmpFiles[key]
-      }
+  const wasmEnabledList = JSON.parse(
+    process.env.NEXT_PUBLIC_WASM_ENABLED_LIST || '[]'
+  )
+
+  function setMsg(example) {
+    const schema = findFileBySuffix(
+      example.typeUrl
+        .split('.')
+        .find((data) => data.includes('Msg'))
+    )
+    let errors = validateJSON(example, schema)
+    setExampleSchema(
+      schema
+    )
+    setValidationErrors([""])
+    setIsJsonValid(errors && errors.length >= 0)
+    if (errors) {
+      setValidationErrors(errors)
+
     }
-    return undefined
+
+    return setExample(index, example)
+
   }
 
   return (
@@ -66,57 +79,74 @@ export const JsonFormWrapper = ({
           disabled
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-          <Text variant="legend" color="disabled" align={'center'}>
-                <a
-                  target={'_blank'}
-                  href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
-                  rel="noopener noreferrer"
-                >
-                  Ask <b>Cosmonaut GPT</b>  to generate a message!
-                </a>
-              </Text>
-            <Inline css={{ justifyContent: 'space-between' }}>
-              <Button
-                variant="ghost"
-                size="large"
-                css={{ columnGap: '$12' }}
-                onClick={() => setShowJsonForm((show) => !show)}
-                disabled={!isJsonValid}
-                iconRight={
-                  <ToggleSwitch
-                    id="advanced-toggle"
-                    name="advanced-mode"
-                    onChange={() => setShowJsonForm((show) => !show)}
-                    checked={!showJsonForm}
-                    optionLabels={['Advanced', 'Editor View']}
-                  />
-                }
-              >
-                Advanced mode
-              </Button>
+            <Inline css={{ justifyContent: 'space-between' }} >
               <MessageSelector
                 msgTypeName={msgTypeName}
                 setExampleSchema={setExampleSchema}
                 setExample={setExample}
                 index={index}
-              />
-            </Inline>
+              /><Text variant="legend" color="disabled" align={'center'}>
+                <a
+                  target={'_blank'}
+                  href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
+                  rel="noopener noreferrer"
+                >
+                  Ask <b>Cosmonaut GPT</b> to generate a message!
+                </a>
+              </Text></Inline>
+
+            <Button
+              variant="ghost"
+              size="large"
+              onClick={() => setShowJsonForm((show) => !show)}
+              css={{ columnGap: '$12' }}
+              iconRight={
+                <ToggleSwitch
+                  id="advanced-toggle"
+                  name="advanced-mode"
+                  onChange={() => setShowJsonForm((show) => !show)}
+                  checked={!showJsonForm}
+                  optionLabels={['Advanced', 'Editor View']}
+                />
+              }
+            >
+              Advanced mode
+            </Button>
+
             <Column>
               <Divider offsetY="$6" />
-              {showJsonForm && msgTypeName != 'Unknown' ? (
-                <div style={{ margin: '$4', padding: '$4' }}>
-                  <Inline css={{ display: 'inline' }}>
-                    <Text
-                      css={{ paddingLeft: '$4', paddingBottom: '$4' }}
-                      variant="legend"
-                    >
-                      {' '}
-                      Examples
-                    </Text>
-                    {generalExamples.map((example, ei) => (
+              <Inline css={{ display: 'inline' }}>
+                <Text
+                  css={{ paddingLeft: '$4', paddingBottom: '$4' }}
+                  variant="legend"
+                >
+                  {' '}
+                  Examples
+                </Text>
+                {generalExamples.map((example, ei) => (
+                  <span key={ei}>
+                    {' '}
+                    <Chip
+                      href="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                      label={example.typeUrl
+                        .split('.')
+                        .find((data) => data.includes('Msg'))
+                        .slice(3)
+                        .replace(/([A-Z])/g, ' $1')
+                        .trim()}
+                      onClick={() => {
+                        setMsg(example)
+                      }}
+                    />
+                  </span>
+                ))}
+                {wasmEnabledList.find((symbol) => symbol == chainSymbol) && (
+                  <>
+                    {wasmExamples.map((example, ei) => (
                       <span key={ei}>
                         {' '}
                         <Chip
+                          href="https://cosmwasm.com/_next/image/?url=%2Fcosmwasm-logo.png&w=3840&q=75"
                           label={example.typeUrl
                             .split('.')
                             .find((data) => data.includes('Msg'))
@@ -124,73 +154,37 @@ export const JsonFormWrapper = ({
                             .replace(/([A-Z])/g, ' $1')
                             .trim()}
                           onClick={() => {
-                            setExampleSchema(
-                              findFileBySuffix(
-                                example.typeUrl
-                                  .split('.')
-                                  .find((data) => data.includes('Msg'))
-                              )
-                            )
-                            setExample(index, example)
+                            setMsg
                           }}
                         />
                       </span>
                     ))}
-                    {chainSymbol == 'JUNO' && (
-                      <>
-                        {wasmExamples.map((example, ei) => (
-                          <span key={ei}>
-                            {' '}
-                            <Chip
-                              label={example.typeUrl
-                                .split('.')
-                                .find((data) => data.includes('Msg'))
-                                .slice(3)
-                                .replace(/([A-Z])/g, ' $1')
-                                .trim()}
-                              onClick={() => {
-                                setExampleSchema(
-                                  findFileBySuffix(
-                                    example.typeUrl
-                                      .split('.')
-                                      .find((data) => data.includes('Msg'))
-                                  )
-                                )
-                                setExample(index, example)
-                              }}
-                            />
-                          </span>
-                        ))}
-                      </>
-                    )}
-                    {chainSymbol == 'OSMO' && (
-                      <>
-                        {osmoExamples.map((example, ei) => (
-                          <span key={ei}>
-                            {' '}
-                            <Chip
-                              label={example.typeUrl
-                                .split('.')
-                                .find((data) => data.includes('Msg'))
-                                .slice(3)
-                                .replace(/([A-Z])/g, ' $1')
-                                .trim()}
-                              onClick={() => {
-                                setExampleSchema(
-                                  findFileBySuffix(
-                                    example.typeUrl
-                                      .split('.')
-                                      .find((data) => data.includes('Msg'))
-                                  )
-                                )
-                                setExample(index, example)
-                              }}
-                            />
-                          </span>
-                        ))}
-                      </>
-                    )}
-                  </Inline>
+                  </>
+                )}
+                {chainSymbol == 'OSMO' && (
+                  <>
+                    {osmoExamples.map((example, ei) => (
+                      <span key={ei}>
+                        {' '}
+                        <Chip
+                          href="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg"
+                          label={example.typeUrl
+                            .split('.')
+                            .find((data) => data.includes('Msg'))
+                            .slice(3)
+                            .replace(/([A-Z])/g, ' $1')
+                            .trim()}
+                          onClick={() => {
+                            setMsg
+                          }}
+                        />
+                      </span>
+                    ))}
+                  </>
+                )}
+              </Inline>
+              {showJsonForm && msgTypeName != 'Unknown' ? (
+                <div style={{ margin: '$4', padding: '$4' }}>
                   <Divider offsetY="$6" />
                   {msg && msg.length > 32 && (
                     <div style={{ display: 'flex', justifyContent: 'end' }}>
@@ -208,17 +202,18 @@ export const JsonFormWrapper = ({
                     exampleSchema={exampleSchema}
                     onChange={handleChangeMsg(index)}
                     onValidate={setIsJsonValid}
+                    validationErrors={validationErrors}
+                    setValidationErrors={setValidationErrors}
                   />
                 </div>
               ) : (
-                <CodeMirrorWrapper
-                  index={index}
-                  chainSymbol={chainSymbol}
-                  msg={msg}
-                  setExample={setExample}
-                  handleRemoveMsg={handleRemoveMsg}
-                  handleChangeMsg={handleChangeMsg}
-                  setIsJsonValid={setIsJsonValid}
+                <JsonCodeMirrorEditor
+                  jsonSchema={exampleSchema}
+                  jsonValue={msg}
+                  onChange={handleChangeMsg(index)}
+                  onValidate={setIsJsonValid}
+                  validationErrors={validationErrors}
+                  setValidationErrors={setValidationErrors}
                 />
               )}
             </Column>{' '}

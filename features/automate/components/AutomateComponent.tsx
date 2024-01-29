@@ -32,12 +32,12 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
-import MessagePreview from './MessagePreview'
 import { AutoTxData } from '../../../types/trstTypes'
-import { AutomateConfiguration } from './AutomateConfiguration'
 import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
 import { GearIcon, TransferIcon } from '../../../icons'
-// import { useAfterConnectWallet } from '../../../hooks/useAfterConnectWallet'
+import { SubmitAutoTxDialog } from './SubmitAutoTxDialog'
+import { AutomateConfiguration } from './AutomateConfiguration'
+
 
 type AutoTxsInputProps = {
   autoTxData: AutoTxData
@@ -59,8 +59,7 @@ export const AutomateComponent = ({
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
-  const [showWarning, hideWarning] = useState(true)
-  const [isJsonValid, setIsJsonValid] = useState(true)
+  const [_isJsonValid, setIsJsonValid] = useState(true)
   const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
@@ -204,9 +203,9 @@ export const AutomateComponent = ({
         : [],
       coin: requestedSendAndAuthzGrant
         ? {
-            denom,
-            amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
-          }
+          denom,
+          amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
+        }
         : undefined,
     })
 
@@ -256,7 +255,7 @@ export const AutomateComponent = ({
       onAutoTxChange(updatedAutoTxData)
       if (
         JSON.parse(msg)
-          ['typeUrl'].split('.')
+        ['typeUrl'].split('.')
           .find((data) => data.includes('Msg'))
       ) {
         refetchAuthzGrants()
@@ -358,7 +357,7 @@ export const AutomateComponent = ({
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmitButton =
-    !isJsonValid ||
+    
     (autoTxData.msgs[0] &&
       autoTxData.msgs[0].length == 0 &&
       JSON.parse(autoTxData.msgs[0])['typeUrl'].length < 5)
@@ -396,28 +395,28 @@ export const AutomateComponent = ({
               />{' '}
               {
                 /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
-                  chainIsConnected &&
-                  !isIcaLoading &&
-                  autoTxData.connectionId != '' && (
-                    <>
-                      <Button
-                        css={{
-                          margin: '$2',
-                          overflow: 'hidden',
-                          float: 'left',
-                        }}
-                        variant="secondary"
-                        onClick={() => handleRegisterAccountClick()}
-                      >
-                        {' '}
-                        {isExecutingRegisterICA ? (
-                          <Spinner instant />
-                        ) : (
-                          'Register Interchain Account '
-                        )}
-                      </Button>
-                    </>
-                  )
+                chainIsConnected &&
+                !isIcaLoading &&
+                autoTxData.connectionId != '' && (
+                  <>
+                    <Button
+                      css={{
+                        margin: '$2',
+                        overflow: 'hidden',
+                        float: 'left',
+                      }}
+                      variant="secondary"
+                      onClick={() => handleRegisterAccountClick()}
+                    >
+                      {' '}
+                      {isExecutingRegisterICA ? (
+                        <Spinner instant />
+                      ) : (
+                        'Register Interchain Account '
+                      )}
+                    </Button>
+                  </>
+                )
               }
             </Row>
             {chainName &&
@@ -465,7 +464,6 @@ export const AutomateComponent = ({
             chainSymbol={chainSymbol}
             msg={msg}
             setExample={setExample}
-            isJsonValid={isJsonValid}
             handleRemoveMsg={handleRemoveMsg}
             handleChangeMsg={handleChangeMsg}
             setIsJsonValid={setIsJsonValid}
@@ -485,24 +483,34 @@ export const AutomateComponent = ({
           </Column>
         }
       </Card>
-      <MessagePreview
-        autoTxData={autoTxData}
+      <SubmitAutoTxDialog
         chainSymbol={chainSymbol}
         icaBalance={icaBalance}
         icaAddress={icaAddress}
-        isSubmitAutoTxDialogShowing={isSubmitAutoTxDialogShowing}
-        setSubmitAutoTxDialogState={setSubmitAutoTxDialogState}
-        isExecutingSchedule={isExecutingSchedule}
+        autoTxData={autoTxData}
+        isDialogShowing={isSubmitAutoTxDialogShowing}
+        onRequestClose={() =>
+          setSubmitAutoTxDialogState({
+            isShowing: false,
+          })
+        }
+        isLoading={isExecutingSchedule}
         feeFundsHostChain={feeFundsHostChain}
-        setFeeFundsHostChain={setFeeFundsHostChain}
-        shouldDisableAuthzGrants={shouldDisableAuthzGrants}
-        shouldDisableSendHostChainFundsButton={shouldDisableSendHostChainFundsButton}
+        shouldDisableSendHostChainFundsButton={
+          shouldDisableSendHostChainFundsButton
+        }
         isExecutingAuthzGrant={isExecutingAuthzGrant}
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-        showWarning={showWarning}
-        hideWarning={hideWarning}
-        handleSubmitAutoTxClick={handleSubmitAutoTxClick}
-        handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
+        shouldDisableAuthzGrantButton={
+          !shouldDisableAuthzGrants
+        }
+        setFeeFundsHostChain={setFeeFundsHostChain}
+        handleSubmitAutoTx={(autoTxData) =>
+          handleSubmitAutoTxClick(autoTxData)
+        }
+        handleCreateAuthzGrantClick={
+          handleCreateAuthzGrantClick
+        }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
       <AutomateConfiguration
@@ -567,8 +575,15 @@ export function Row({ children }) {
   )
 }
 
-export function Chip({ label, onClick }) {
-  return <ChipContainer onClick={onClick}>{label}</ChipContainer>
+export function Chip({ label, onClick, href = '' }) {
+  return (
+    <ChipContainer onClick={onClick}>
+      <Inline>
+        {href && <img src={href} alt="Icon" className="chip-icon" />}
+        {label}
+      </Inline>
+    </ChipContainer>
+  )
 }
 
 const ChipContainer = styled('div', {
@@ -584,6 +599,11 @@ const ChipContainer = styled('div', {
   '&:hover': {
     backgroundColor: '$colors$light60',
     border: '1px solid $borderColors$selected',
+  },
+  '.chip-icon': {
+    marginRight: '0.9em', // Adjust the margin as needed
+    height: '2em', // Set the height of the icon as needed
+    // width: '1em',  // Set the width of the icon as needed
   },
 })
 

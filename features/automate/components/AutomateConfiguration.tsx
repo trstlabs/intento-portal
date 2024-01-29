@@ -3,9 +3,9 @@ import {
   Card,
   CardContent,
   Column,
-  Inline,
   ToggleSwitch,
   Text,
+  Tooltip,
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
@@ -46,6 +46,11 @@ export const AutomateConfiguration = ({
     newConfig.stopOnSuccess = !config.stopOnSuccess
     onChange(newConfig)
   }
+  function fallback() {
+    let newConfig = config
+    newConfig.fallbackToOwnerBalance = !config.fallbackToOwnerBalance
+    onChange(newConfig)
+  }
 
   return (
     <Column>
@@ -59,44 +64,53 @@ export const AutomateConfiguration = ({
             <Text css={{ paddingBottom: '$4' }} align="center">
               Action Configuration
             </Text>
-            <Inline>
-              <Button
-                variant="ghost"
-                size="large"
-                css={{ columnGap: '$4', margin: '$2' }}
-                onClick={() => saveMsgResponses()}
-                iconLeft={
-                  <ToggleSwitch
-                    id="saveresp"
-                    name="msgsresp"
-                    onChange={() => saveMsgResponses()}
-                    checked={config.saveMsgResponses}
-                    optionLabels={['Save money', 'Save Responses']}
-                  />
-                }
-              >
+
+            <Tooltip
+              label={
+                'If set to true, message responses i.e. outputs may be used as inputs for new actions'
+              }
+            ><Button
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => saveMsgResponses()}
+              iconLeft={
+                <ToggleSwitch
+                  id="saveresp"
+                  name="msgsresp"
+                  onChange={() => saveMsgResponses()}
+                  checked={config.saveMsgResponses}
+                  optionLabels={['Save money', 'Save Responses']}
+                />
+              }
+            >
                 Save Message Responses
-              </Button>
+              </Button></Tooltip>
 
-              <Button
-                variant="ghost"
-                size="large"
-                css={{ columnGap: '$4', margin: '$2' }}
-                onClick={() => updatingDisabled()}
-                iconLeft={
-                  <ToggleSwitch
-                    id="saveresp"
-                    name="msgsresp"
-                    onChange={() => updatingDisabled()}
-                    checked={config.updatingDisabled}
-                    optionLabels={['Save money', 'Save Responses']}
-                  />
-                }
-              >
+            <Tooltip
+              label={
+                'If set to true, the action settings can not be updated'
+              }
+            ><Button
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => updatingDisabled()}
+              iconLeft={
+                <ToggleSwitch
+                  id="saveresp"
+                  name="msgsresp"
+                  onChange={() => updatingDisabled()}
+                  checked={config.updatingDisabled}
+                  optionLabels={['Save money', 'Save Responses']}
+                />
+              }
+            >
                 Updating Disabled
-              </Button>
-
-              <Button
+              </Button></Tooltip>
+            <Tooltip
+              label={'If set to true, stops on any errors that occur'}
+            ><Button
                 variant="ghost"
                 size="large"
                 css={{ columnGap: '$4', margin: '$2' }}
@@ -112,9 +126,12 @@ export const AutomateConfiguration = ({
                 }
               >
                 Stop on Fail
-              </Button>
-
-              <Button
+              </Button></Tooltip>
+            <Tooltip
+              label={
+                'If set to true, stops when execution of the messages was succesful'
+              }
+            ><Button
                 variant="ghost"
                 size="large"
                 css={{ columnGap: '$4', margin: '$2' }}
@@ -130,8 +147,29 @@ export const AutomateConfiguration = ({
                 }
               >
                 Stop on Success
-              </Button>
-            </Inline>
+              </Button></Tooltip>
+            <Tooltip
+              label={
+                'If set to true, as a fallback, the owner balance is used to pay for local fees'
+              }
+            ><Button
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => fallback()}
+              iconLeft={
+                <ToggleSwitch
+                  id="fallback"
+                  name="fallback"
+                  onChange={() => fallback()}
+                  checked={config.fallbackToOwnerBalance}
+                  optionLabels={['no fallback', 'fallback']}
+                />
+              }
+            >
+                Wallet Fallback
+              </Button></Tooltip>
+
             {/*       {isConfigItemsShowing && (
         <AutomateConfigurationDialog
           activeConfig={selectedConfig.name}
