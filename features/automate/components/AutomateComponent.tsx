@@ -297,15 +297,18 @@ export const AutomateComponent = ({
     setPrefix(newPrefix)
     let chainIsConnected = connectionId != undefined && connectionId != ''
     setChainIsConnected(chainIsConnected)
-    setChainHasIAModule(chainId == 'TRST')
+    setChainHasIAModule(chainId === 'TRST')
 
-    await sleep(2000)
 
-    if (chainIsConnected) {
-      refetchICA()
-      refetchAuthzGrants()
-      connectExternalWallet(null)
+    if (!chainIsConnected) {
+      return
     }
+
+    connectExternalWallet(null)
+    await sleep(2000)
+    refetchICA()
+    refetchAuthzGrants()
+
   }
 
   function setExample(index: number, msgObject: any) {
@@ -357,7 +360,7 @@ export const AutomateComponent = ({
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmitButton =
-    
+
     (autoTxData.msgs[0] &&
       autoTxData.msgs[0].length == 0 &&
       JSON.parse(autoTxData.msgs[0])['typeUrl'].length < 5)

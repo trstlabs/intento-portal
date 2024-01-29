@@ -32,7 +32,7 @@ export const useAutoTxInfos = () => {
                 : wrappedMsg.typeUrl
             return {
               value: wrappedMsg.value,
-              valueDecoded: msg.value,
+              valueDecoded: msg,
               typeUrl: wrappedMsg.typeUrl,
             }
           }),
@@ -73,7 +73,7 @@ export const useAutoTxInfo = (id) => {
               : wrappedMsg.typeUrl
           return {
             value: wrappedMsg.value,
-            valueDecoded: msg.value,
+            valueDecoded: msg,
             typeUrl: wrappedMsg.typeUrl,
           }
         }),

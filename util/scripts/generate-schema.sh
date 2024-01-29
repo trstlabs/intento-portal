@@ -109,6 +109,11 @@ for json_file in "${MSGS_DIR}"/*.json; do
                 end;
 
             walk(if type == "object" then with_entries(.key |= snake_to_camel) else . end) |
+            walk(if type == "object" and .msg? and .msg.type == "string" and .msg.format == "binary" then .msg = {
+                "type": "object",
+                "description": "is an object and will be encoded to a string before submission .",
+                "additionalProperties": true
+            } else . end) |
             walk(add_additional_properties) |
             walk(if type == "object" and .value? and .value.type == "string" and .value.description == "Must be a valid serialized protocol buffer of the above specified type." and .value.format == "binary" and .value.binaryEncoding == "base64" then del(.value) else . end)
             ')

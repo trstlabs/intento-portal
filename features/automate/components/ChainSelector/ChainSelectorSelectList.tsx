@@ -181,7 +181,6 @@ export const ChainSelectorList = ({
               selected={chainInfo.name === activeChain}
               {...getPropsForInteractiveElement({
                 onClick() {
-                  console.log('click')
                   onSelect(passChainInfo(chainInfo))
                 },
               })}
@@ -212,7 +211,6 @@ export const ChainSelectorList = ({
               selected={chainInfo.name === activeChain}
               {...getPropsForInteractiveElement({
                 onClick() {
-                  console.log('click')
                   onSelect(passChainInfo(chainInfo))
                 },
               })}

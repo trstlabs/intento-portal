@@ -7,8 +7,7 @@ import {
   WalletStatusType,
 } from '../state/atoms/walletAtoms'
 import {
-  DEFAULT_REFETCH_INTERVAL,
-  DEFAULT_LONG_REFETCH_INTERVAL,
+  DEFAULT_LONG_REFETCH_INTERVAL,DEFAULT_REFETCH_INTERVAL
 } from '../util/constants'
 import {
   getICA,
@@ -25,11 +24,9 @@ import { useTrstRpcClient } from './useRPCClient'
 import { AutoTxData } from '../types/trstTypes'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
-  if (!connectionId ){
-    return []
-  }
+  const { address } = useRecoilValue(walletState)
+
   if (accAddr === '') {
-    const { address } = useRecoilValue(walletState)
     accAddr = address
   }
 
@@ -48,9 +45,12 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
       enabled: Boolean(
         connectionId != '' &&
           connectionId != undefined &&
+          rpcClient &&
           accAddr != ''
       ),
       refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
     }
   )
 
@@ -113,7 +113,7 @@ export const useAuthZGrantsForUser = (
 
       for (const msg of autoTxData.msgs) {
         let msgTypeUrl = JSON.parse(msg)['typeUrl']
-        console.log(msgTypeUrl)
+        // console.log(msgTypeUrl)
         const grantMatch = ganteeGrants.find(
           (grant) => grant.msgTypeUrl == msgTypeUrl
         )
@@ -128,7 +128,7 @@ export const useAuthZGrantsForUser = (
         }
         // typeUrls.push(grant.msgTypeUrl)
       }
-      console.log('grants', grants)
+      // console.log('grants', grants)
       return grants
     },
     {
@@ -142,8 +142,8 @@ export const useAuthZGrantsForUser = (
           autoTxData.connectionId
       ),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
     }
   )
 

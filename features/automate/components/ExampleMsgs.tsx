@@ -20,13 +20,6 @@ export const wasmExamples = [
     },
   },
   {
-    typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
-    value: {
-      delegatorAddress: 'trust1....',
-      validatorAddress: 'trustvaloper1...',
-    },
-  },
-  {
     typeUrl: '/cosmwasm.wasm.v1.MsgInstantiateContract',
     value: {
       sender: 'trust1....',
@@ -85,7 +78,6 @@ export const generalExamples = [
 
     },
   },
-
   {
     typeUrl: "/cosmos.gov.v1beta1.MsgVoteWeighted",
     value: {
@@ -151,7 +143,14 @@ export const generalExamples = [
         expiration: "1678206285",
       },
     },
-  }
+  },
+  {
+    typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
+    value: {
+      delegatorAddress: 'trust1....',
+      validatorAddress: 'trustvaloper1...',
+    },
+  },
 
 ]
 
@@ -160,8 +159,10 @@ export const osmoExamples = [
     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
     value: {
       sender: 'trust1....',
-      routes: '',
-      tokenIn: '1000000',
+      routes: [{
+        poolId: "1", tokenOutDenom: "ucosm"
+      }],
+      tokenIn: { denom: "uosmo", amount: "1000000" },
       tokenOutMinAmount: '2000000',
     },
   },
@@ -170,7 +171,7 @@ export const osmoExamples = [
     value: {
       sender: 'trust1....',
       tokenInMaxAmount: '1000000',
-      tokenOut: '1000000',
+      tokenOut: { denom: "uosmo", amount: "1000000" },
     },
   },
   {
@@ -187,7 +188,7 @@ export const osmoExamples = [
       sender: 'trust1....',
       poolId: 'trust1...',
       shareInAmount: '1000000',
-      tokenOutMins: '1000000',
+      tokenOutMins: [{ denom: "uosmo", amount: "1000000" }],
     },
   },
 ]

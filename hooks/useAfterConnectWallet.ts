@@ -27,7 +27,7 @@ export const useAfterConnectWallet = (
       if (address != undefined && (client == null ||client == undefined)) {
       const trstChainClient = await getSigningStargateClient()
 
-      // console.log('trstChainClient', trstChainClient)
+
       
         /* successfully update the wallet state */
         setWalletState({

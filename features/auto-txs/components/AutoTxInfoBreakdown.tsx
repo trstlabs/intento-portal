@@ -121,7 +121,7 @@ export const AutoTxInfoBreakdown = ({
     const msgExecDecoded = registry.decode(exMsg)
     console.log
     for (let message of msgExecDecoded.msgs) {
-      let messageValue = registry.decode(message)
+      let messageValue = registry.decode({ typeUrl: message.typeUrl, value: message.value })
       msgs.push({ typeUrl: message.typeUrl, value: messageValue })
     }
     return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
@@ -436,7 +436,7 @@ export const AutoTxInfoBreakdown = ({
             )}
           </Column>
         </Row>
-        {autoTxInfo.msgs.map((msg, index) => (
+        {autoTxInfo.msgs.map((msg: any, index) => (
           <div key={index}>
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -489,9 +489,7 @@ export const AutoTxInfoBreakdown = ({
                           }}
                         >
 
-                          {msg.typeUrl == '/cosmos.authz.v1beta1.MsgExec'
-                            ? getMsgValueForMsgExec(msg)
-                            : JSON.stringify(registry.decode(msg), null, 2)}
+                          {JSON.stringify(msg.valueDecoded, null, 2)}
 
                         </pre>
                       </Text>

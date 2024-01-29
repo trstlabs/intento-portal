@@ -154,7 +154,7 @@ export const JsonFormWrapper = ({
                             .replace(/([A-Z])/g, ' $1')
                             .trim()}
                           onClick={() => {
-                            setMsg
+                            setMsg(example)
                           }}
                         />
                       </span>
@@ -175,7 +175,7 @@ export const JsonFormWrapper = ({
                             .replace(/([A-Z])/g, ' $1')
                             .trim()}
                           onClick={() => {
-                            setMsg
+                            setMsg(example)
                           }}
                         />
                       </span>

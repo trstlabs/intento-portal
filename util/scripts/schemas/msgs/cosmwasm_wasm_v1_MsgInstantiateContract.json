@@ -20,10 +20,9 @@
           "description": "Label is optional metadata to be stored with a contract instance."
         },
         "msg": {
-          "type": "string",
-          "description": "Msg json encoded message to be passed to the contract on instantiation",
-          "format": "binary",
-          "binaryEncoding": "base64"
+          "type": "object",
+          "description": "is an object and will be encoded to a string before submission .",
+          "additionalProperties": true
         },
         "funds": {
           "items": {

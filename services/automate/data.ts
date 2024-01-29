@@ -55,13 +55,15 @@ export const getAuthZGrantsForGrantee = async ({
     pagination: undefined,
   })
   const resp = await cosmosClient.cosmos.authz.v1beta1.granteeGrants(req)
-
   let granterGrants: GrantResponse[] = []
   for (const grant of resp.grants) {
     if (grant.granter == granter) {
-
+      const msgTypeUrl =
+        'msg' in grant.authorization
+          ? grant.authorization.msg
+          : grant.authorization.$typeUrl
       const res: GrantResponse = {
-        msgTypeUrl: grant.authorization.$typeUrl,
+        msgTypeUrl: msgTypeUrl,
         expiration: grant.expiration,
         hasGrant: true,
       }
