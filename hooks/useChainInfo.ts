@@ -1,13 +1,19 @@
 import { ChainInfo } from '@keplr-wallet/types'
 import { useQuery } from 'react-query'
-
 import { queryClient } from '../services/queryClient'
-// import { Long } from 'trustlessjs/dist/codegen/helpers'
+
 import { convertMicroDenomToDenom } from 'util/conversion'
 import { cosmos } from 'trustlessjs'
-import { DEFAULT_REFETCH_INTERVAL, DEFAULT_LONG_REFETCH_INTERVAL } from '../util/constants'
+import {
+  DEFAULT_REFETCH_INTERVAL,
+  DEFAULT_LONG_REFETCH_INTERVAL,
+} from '../util/constants'
 
-import { useTrstRpcClient, useCosmosRpcClient, useTendermintRpcClient } from './useRPCClient'
+import {
+  useTrstRpcClient,
+  useCosmosRpcClient,
+  useTendermintRpcClient,
+} from './useRPCClient'
 import {
   getStakeBalanceForAcc,
   getAPR,
@@ -60,9 +66,8 @@ export const useGetExpectedAutoTxFee = (
     triggerModuleParamsAtom
   )
   const client = useTrstRpcClient()
-
   const { data, isLoading } = useQuery(
-    'expectedAutoTxFee',
+    `expectedAutoTxFee/${durationSeconds}/${intervalSeconds}`,
     async () => {
       const triggerModuleParams = await getAutoTxParams(client)
       setTriggerModuleData(triggerModuleParams)
@@ -76,13 +81,7 @@ export const useGetExpectedAutoTxFee = (
       return fee
     },
     {
-      enabled: Boolean(
-        client &&
-          client.trst &&
-          durationSeconds &&
-          autoTxData.msgs &&
-          isDialogShowing
-      ),
+      enabled: Boolean(durationSeconds && autoTxData.msgs && isDialogShowing),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -226,7 +225,9 @@ export const useGetAPYForWithFees = (
       )
     },
     {
-      enabled: Boolean(client && cosmosClient && trstClient && paramsState),
+      enabled: Boolean(
+        !!client && !!cosmosClient && !!trstClient && !!paramsState
+      ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,

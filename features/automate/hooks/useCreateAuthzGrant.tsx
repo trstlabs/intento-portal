@@ -36,10 +36,10 @@ export const useCreateAuthzGrant = ({
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
 
-  const refetchQueries = useRefetchQueries(['tokenBalance', 'userAuthZGrants'])
+  const refetchQueries = useRefetchQueries(['tokenBalance', `userAuthZGrants/${grantee}`])
 
   let typeUrls = []
-  for (const grant of grantInfos){
+  for (const grant of grantInfos) {
     typeUrls.push(grant.msgTypeUrl)
   }
 
@@ -49,7 +49,7 @@ export const useCreateAuthzGrant = ({
       if (status !== WalletStatusType.connected) {
         throw new Error('Please connect your wallet.')
       }
-     
+
       console.log(client)
       return await executeCreateAuthzGrant({
         client,

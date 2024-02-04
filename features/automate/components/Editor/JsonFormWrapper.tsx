@@ -8,12 +8,11 @@ import {
   Divider,
   ToggleSwitch,
   Card,
-  CardContent,
+  CardContent, styled
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { JsonFormEditor } from './JsonForm'
 import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
-import { Chip } from '../AutomateComponent'
 
 import { MessageSelector } from './MessageSelector'
 import { JsonCodeMirrorEditor } from './CodeMirror'
@@ -95,34 +94,18 @@ export const JsonFormWrapper = ({
                 </a>
               </Text></Inline>
 
-            <Button
-              variant="ghost"
-              size="large"
-              onClick={() => setShowJsonForm((show) => !show)}
-              css={{ columnGap: '$12' }}
-              iconRight={
-                <ToggleSwitch
-                  id="advanced-toggle"
-                  name="advanced-mode"
-                  onChange={() => setShowJsonForm((show) => !show)}
-                  checked={!showJsonForm}
-                  optionLabels={['Advanced', 'Editor View']}
-                />
-              }
-            >
-              Advanced mode
-            </Button>
+
 
             <Column>
-              <Divider offsetY="$6" />
-              <Inline css={{ display: 'inline' }}>
-                <Text
+              {/*   <Divider offsetY="$6" /> */}
+              <Inline css={{ display: 'inline', paddingTop: '$4' }} >
+                {/*   <Text
                   css={{ paddingLeft: '$4', paddingBottom: '$4' }}
                   variant="legend"
                 >
                   {' '}
                   Examples
-                </Text>
+                </Text> */}
                 {generalExamples.map((example, ei) => (
                   <span key={ei}>
                     {' '}
@@ -183,9 +166,26 @@ export const JsonFormWrapper = ({
                   </>
                 )}
               </Inline>
-              {showJsonForm && msgTypeName != 'Unknown' ? (
-                <div style={{ margin: '$4', padding: '$4' }}>
-                  <Divider offsetY="$6" />
+
+              <div style={{ margin: '$4', padding: '$4' }}>
+                <Divider offsetY="$6" />
+                <Inline css={{ justifyContent: 'space-between' }}><Button
+                  variant="ghost"
+                  size="large"
+                  onClick={() => setShowJsonForm((show) => !show)}
+                  css={{ columnGap: '$12' }}
+                  iconRight={
+                    <ToggleSwitch
+                      id="advanced-toggle"
+                      name="advanced-mode"
+                      onChange={() => setShowJsonForm((show) => !show)}
+                      checked={!showJsonForm}
+                      optionLabels={['Advanced', 'Editor View']}
+                    />
+                  }
+                >
+                  Advanced mode
+                </Button>
                   {msg && msg.length > 32 && (
                     <div style={{ display: 'flex', justifyContent: 'end' }}>
                       <Button
@@ -196,16 +196,18 @@ export const JsonFormWrapper = ({
                         Discard
                       </Button>
                     </div>
-                  )}
-                  <JsonFormEditor
-                    jsonValue={msg}
-                    exampleSchema={exampleSchema}
-                    onChange={handleChangeMsg(index)}
-                    onValidate={setIsJsonValid}
-                    validationErrors={validationErrors}
-                    setValidationErrors={setValidationErrors}
-                  />
-                </div>
+                  )}</Inline>
+              </div>
+              {showJsonForm && msgTypeName != 'Unknown' ? (
+                <JsonFormEditor
+                  jsonValue={msg}
+                  exampleSchema={exampleSchema}
+                  onChange={handleChangeMsg(index)}
+                  onValidate={setIsJsonValid}
+                  validationErrors={validationErrors}
+                  setValidationErrors={setValidationErrors}
+                />
+
               ) : (
                 <JsonCodeMirrorEditor
                   jsonSchema={exampleSchema}
@@ -219,9 +221,42 @@ export const JsonFormWrapper = ({
             </Column>{' '}
           </CardContent>
         </Card>
-      </Column>
+      </Column >
     </>
   )
 }
 
 export type ListType = { key: string; name: string; value: any }
+
+
+export function Chip({ label, onClick, href = '' }) {
+  return (
+    <ChipContainer onClick={onClick}>
+      <Inline>
+        {href && <img src={href} alt="Icon" className="chip-icon" />}
+        {label}
+      </Inline>
+    </ChipContainer>
+  )
+}
+
+const ChipContainer = styled('div', {
+  display: 'inline-block',
+  fontSize: '10px',
+  color: '$colors$black',
+  borderRadius: '$2',
+  backgroundColor: '$colors$light95',
+  padding: '0.5em 0.75em',
+  margin: '0.3em 0.4em',
+  cursor: 'pointer',
+  border: '1px solid $colors$light95',
+  '&:hover': {
+    backgroundColor: '$colors$light60',
+    border: '1px solid $borderColors$selected',
+  },
+  '.chip-icon': {
+    marginRight: '0.9em', // Adjust the margin as needed
+    height: '2em', // Set the height of the icon as needed
+    // width: '1em',  // Set the width of the icon as needed
+  },
+})

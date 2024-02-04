@@ -66,7 +66,7 @@ export const AutoTxInfoBreakdown = ({
   const denom = ibcInfo ? ibcInfo.denom : ''
   const [showICAHostButtons, setShowICAHostButtons] = useState(false)
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
-    symbol,
+    chainId,
     icaAddress,
     true
   )

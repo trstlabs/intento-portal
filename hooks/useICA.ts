@@ -7,7 +7,8 @@ import {
   WalletStatusType,
 } from '../state/atoms/walletAtoms'
 import {
-  DEFAULT_LONG_REFETCH_INTERVAL,DEFAULT_REFETCH_INTERVAL
+  DEFAULT_LONG_REFETCH_INTERVAL,
+  DEFAULT_REFETCH_INTERVAL,
 } from '../util/constants'
 import {
   getICA,
@@ -18,10 +19,10 @@ import {
 
 import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
-import { useIBCAssetInfo } from './useIBCAssetInfo'
 
 import { useTrstRpcClient } from './useRPCClient'
 import { AutoTxData } from '../types/trstTypes'
+import { useChainInfoByChainID } from './useChainList'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
   const { address } = useRecoilValue(walletState)
@@ -32,7 +33,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 
   const rpcClient = useTrstRpcClient()
   const { data: ica, isLoading } = useQuery(
-    [`interchainAccount/${connectionId}`, connectionId],
+    [`interchainAccount/${connectionId}`],
     async () => {
       const resp: string = await getICA({
         owner: accAddr,
@@ -45,8 +46,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
       enabled: Boolean(
         connectionId != '' &&
           connectionId != undefined &&
-          rpcClient &&
-          accAddr != ''
+          rpcClient.trst != undefined &&
+          !!accAddr &&
+          accAddr.length > 40
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
@@ -58,34 +60,26 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 }
 
 export const useICATokenBalance = (
-  tokenSymbol: string,
-  nativeWalletAddress: string,
+  chainId: string,
+  ibcWalletAddress: string,
   isICAChain: boolean
 ) => {
-  const ibcAsset = useIBCAssetInfo(tokenSymbol)
-  const ibcState = useRecoilValue(ibcWalletState)
+  const chain = useChainInfoByChainID(chainId)
 
   const { data, isLoading } = useQuery(
-    [`icaTokenBalance/${tokenSymbol}`, nativeWalletAddress],
+    [`icaTokenBalance/${chainId}/${ibcWalletAddress}`],
     async () => {
-      const { denom, decimals } = ibcAsset
+      const { denom, decimals } = chain
+      const chainClient = await StargateClient.connect(chain.rpc)
 
-      const chainClient = await StargateClient.connect(ibcState.rpc)
-
-      const coin = await chainClient.getBalance(nativeWalletAddress, denom)
+      const coin = await chainClient.getBalance(ibcWalletAddress, denom)
 
       const amount = coin ? Number(coin.amount) : 0
 
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(
-        tokenSymbol &&
-          nativeWalletAddress != '' &&
-          ibcAsset &&
-          ibcState.tokenSymbol == tokenSymbol &&
-          isICAChain
-      ),
+      enabled: Boolean(ibcWalletAddress != '' && isICAChain),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -96,49 +90,62 @@ export const useICATokenBalance = (
 }
 
 export const useAuthZGrantsForUser = (
+  chainId: string,
   grantee: string,
   autoTxData?: AutoTxData
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
+  const chain = useChainInfoByChainID(chainId)
+
   // console.log('granter ', ibcState.address, 'grantee ', grantee)
   const { data, isLoading } = useQuery(
-    ['userAuthZGrants', grantee],
+    [`userAuthZGrants/${grantee}/${chainId}`],
     async () => {
+      // console.log(ibcState.status)
+
       let grants: GrantResponse[] = []
-      const ganteeGrants = await getAuthZGrantsForGrantee({
+      // console.log('granter ', ibcState.address, 'grantee ', grantee)
+      const granteeGrants = await getAuthZGrantsForGrantee({
         grantee,
         granter: ibcState.address,
-        rpc: ibcState.rpc,
+        rpc: chain.rpc,
       })
+      if (granteeGrants != false) {
+        console.log(grants, grantee, ibcState)
 
-      for (const msg of autoTxData.msgs) {
-        let msgTypeUrl = JSON.parse(msg)['typeUrl']
-        // console.log(msgTypeUrl)
-        const grantMatch = ganteeGrants.find(
-          (grant) => grant.msgTypeUrl == msgTypeUrl
-        )
-        if (grantMatch == undefined) {
-          grants.push({
-            msgTypeUrl,
-            expiration: undefined,
-            hasGrant: false,
-          })
-        } else {
-          grants.push(grantMatch)
+        for (const msg of autoTxData.msgs) {
+          let msgTypeUrl = JSON.parse(msg)['typeUrl']
+          // console.log(msgTypeUrl)
+          const grantMatch = granteeGrants?.find(
+            (grant) => grant.msgTypeUrl == msgTypeUrl
+          )
+          if (grantMatch == undefined) {
+            grants.push({
+              msgTypeUrl,
+              expiration: undefined,
+              hasGrant: false,
+            })
+          } else {
+            grants.push(grantMatch)
+          }
+          // typeUrls.push(grant.msgTypeUrl)
         }
-        // typeUrls.push(grant.msgTypeUrl)
+        // console.log('grants', grants)
+        return grants
       }
-      // console.log('grants', grants)
-      return grants
+      return undefined
     },
     {
       enabled: Boolean(
         grantee &&
+          chain &&
+          chain.rpc &&
+          grantee != '' &&
+          chainId &&
+          ibcState.status === WalletStatusType.connected &&
+          grantee.includes(ibcState.address.slice(0, 5)) &&
           autoTxData.msgs[0] &&
           autoTxData.msgs[0].includes('typeUrl') &&
-          ibcState.status === WalletStatusType.connected &&
-          ibcState.client &&
-          ibcState.address &&
           autoTxData.connectionId
       ),
       refetchOnMount: 'always',

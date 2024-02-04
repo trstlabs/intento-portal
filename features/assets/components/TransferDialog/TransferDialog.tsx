@@ -46,7 +46,7 @@ export const TransferDialog = ({
     ? ibcAssetInfo.deposit_gas_fee
     : 0.01
 
-  const { balance: externalIbcAssetBalance } = useIBCTokenBalance(tokenSymbol)
+  const { balance: externalIbcAssetBalance } = useIBCTokenBalance()
   const { balance: nativeAssetBalance } = useTokenBalance(tokenSymbol)
 
   const [tokenAmount, setTokenAmount] = useState(0)

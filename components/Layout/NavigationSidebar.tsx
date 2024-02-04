@@ -1,4 +1,4 @@
-import {  PoolsIcon, GearIcon } from 'icons'
+import { PoolsIcon, GearIcon } from 'icons'
 import {
   Button,
   ChevronIcon,
@@ -56,9 +56,15 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     disconnect,
     username,
     address,
-    openView,
+    openView, assets,
   } = useChain('trustlesshub')
+
   const { mutate: afterConnectWallet } = useAfterConnectWallet()
+
+  // const { address: ibcAddress, client: ibcClient } =
+  //   useRecoilValue(ibcWalletState)
+
+  // const { mutate: connectIBCWallet } = useConnectIBCWallet()
 
   function resetWalletConnection() {
     disconnect()
@@ -67,7 +73,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       address: '',
       key: null,
       client: null,
-      rpc: '',
+      assets: assets,
     })
     // window.location.reload()
   }
@@ -103,6 +109,18 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       css={{ marginBottom: '$8' }}
     />
   )
+
+  // const ibcWalletButton = (
+  //   <WalletButton
+  //     onClick={openView}
+  //     connected={isWalletConnected && status === WalletStatusType.connected}
+  //     walletName={username}
+  //     address={address}
+  //     onConnect={connectWallet}
+  //     onDisconnect={resetWalletConnection}
+  //     css={{ marginBottom: '$8' }}
+  //   />
+  // )
 
   const { pathname } = useRouter()
   const getIsLinkActive = (path) => pathname === path

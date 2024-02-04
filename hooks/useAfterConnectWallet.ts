@@ -7,14 +7,10 @@ import { useChain } from '@cosmos-kit/react'
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
-  let {
-    connect,
-    getSigningStargateClient,
-    address,
-    username,
-  } = useChain('trustlesshub')
+  let { connect, getSigningStargateClient, address, username } =
+    useChain('trustlesshub')
 
-  const [{ status, client}, setWalletState] = useRecoilState(walletState)
+  const [{ status, client }, setWalletState] = useRecoilState(walletState)
 
   const mutation = useMutation(async () => {
     setWalletState((value) => ({
@@ -24,18 +20,16 @@ export const useAfterConnectWallet = (
     }))
 
     try {
-      if (address != undefined && (client == null ||client == undefined)) {
-      const trstChainClient = await getSigningStargateClient()
+      if (address != undefined && (client == null || client == undefined)) {
+        const trstChainClient = await getSigningStargateClient()
 
-
-      
         /* successfully update the wallet state */
         setWalletState({
           key: username,
           address,
           client: trstChainClient,
           status: WalletStatusType.connected,
-          rpc: '',
+          assets: undefined,
         })
       }
     } catch (error) {
@@ -44,7 +38,7 @@ export const useAfterConnectWallet = (
         address: '',
         client: null,
         status: WalletStatusType.error,
-        rpc: '',
+        assets: undefined,
       })
 
       /* throw the error for the UI */

@@ -6,9 +6,11 @@ import {
   ToggleSwitch,
   Text,
   Tooltip,
+  Inline,
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { StepIcon } from '../../../icons/StepIcon'
 
 type AutomateConfigurationProps = {
   config: ExecutionConfiguration
@@ -54,6 +56,17 @@ export const AutomateConfiguration = ({
 
   return (
     <Column>
+      <Inline css={{ margin: '$6', marginTop: '$16' }}>
+        <StepIcon step={3} />
+        <Text
+          align="center"
+          variant="body"
+          color="tertiary"
+          css={{ padding: '0 $15 0 $6' }}
+        >
+          Configure when to execute
+        </Text>{' '}
+      </Inline>
       {isConfigItemsShowing && (
         <Card
           css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -111,20 +124,20 @@ export const AutomateConfiguration = ({
             <Tooltip
               label={'If set to true, stops on any errors that occur'}
             ><Button
-                variant="ghost"
-                size="large"
-                css={{ columnGap: '$4', margin: '$2' }}
-                onClick={() => stopOnFail()}
-                iconLeft={
-                  <ToggleSwitch
-                    id="needsuccess"
-                    name="needsuccess"
-                    onChange={() => stopOnFail()}
-                    checked={config.stopOnFailure}
-                    optionLabels={['needsuccess', 'dontstoponfail']}
-                  />
-                }
-              >
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => stopOnFail()}
+              iconLeft={
+                <ToggleSwitch
+                  id="needsuccess"
+                  name="needsuccess"
+                  onChange={() => stopOnFail()}
+                  checked={config.stopOnFailure}
+                  optionLabels={['needsuccess', 'dontstoponfail']}
+                />
+              }
+            >
                 Stop on Fail
               </Button></Tooltip>
             <Tooltip
@@ -132,20 +145,20 @@ export const AutomateConfiguration = ({
                 'If set to true, stops when execution of the messages was succesful'
               }
             ><Button
-                variant="ghost"
-                size="large"
-                css={{ columnGap: '$4', margin: '$2' }}
-                onClick={() => stopOnSuccess()}
-                iconLeft={
-                  <ToggleSwitch
-                    id="needfail"
-                    name="needfail"
-                    onChange={() => stopOnSuccess()}
-                    checked={config.stopOnSuccess}
-                    optionLabels={['needfail', 'dont stop']}
-                  />
-                }
-              >
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => stopOnSuccess()}
+              iconLeft={
+                <ToggleSwitch
+                  id="needfail"
+                  name="needfail"
+                  onChange={() => stopOnSuccess()}
+                  checked={config.stopOnSuccess}
+                  optionLabels={['needfail', 'dont stop']}
+                />
+              }
+            >
                 Stop on Success
               </Button></Tooltip>
             <Tooltip

@@ -1,6 +1,5 @@
-
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { ExtendedHttpEndpoint } from '@cosmos-kit/core'
+import { AssetList } from '@chain-registry/types'
 import { atom } from 'recoil'
 
 export enum WalletStatusType {
@@ -23,7 +22,7 @@ type GeneratedWalletState<
   client: TClient | null
   status: WalletStatusType
   address: string
-  rpc: string | ExtendedHttpEndpoint
+  assets: AssetList | undefined
 }
 
 type CreateWalletStateArgs<TState = {}> = {
@@ -41,7 +40,7 @@ function createWalletState<TClient = any, TState = {}>({
       status: WalletStatusType.idle,
       client: null,
       address: '',
-      rpc: '',
+      assets: undefined,
       ...defaultState,
     },
     dangerouslyAllowMutability: true,
@@ -83,7 +82,7 @@ function createWalletState<TClient = any, TState = {}>({
 }
 
 export const walletState = createWalletState<
-SigningStargateClient,
+  SigningStargateClient,
   { key?: string }
 >({
   key: 'internal-wallet',

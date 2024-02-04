@@ -21,7 +21,7 @@ export type IBCAssetInfo = {
   external_deposit_uri?: string
   prefix: string
 }
-//todo rename to IBCChainList
+
 export const useIBCAssetList = () => {
   const { data, isLoading } = useQuery<IBCAssetInfo[]>(
     '@ibc-asset-list',
@@ -74,6 +74,7 @@ function transformChain(chain: Chain) {
     chain.fees && chain.fees.fee_tokens[0]
       ? chain.fees.fee_tokens[0].denom.slice(1).toUpperCase()
       : ''
+   
   return {
     id: chain.chain_id,
     name: chain.pretty_name,

@@ -35,7 +35,10 @@ export interface BaseQueryInput {
 
 export const getBalanceForAcc = async ({ address, client }: BaseQueryInput) => {
   try {
-    const response = await  client.cosmos.bank.v1beta1.allBalances({address, pagination: undefined})
+    const response = await client.cosmos.bank.v1beta1.allBalances({
+      address,
+      pagination: undefined,
+    })
 
     return response
   } catch (e) {
@@ -89,7 +92,7 @@ export const getAPR = async (
 
     const yearlyStakingProvision =
       moduleState.stakingProvision * annualProvisionNumber
-    console.log("yearlyStakingProvision", yearlyStakingProvision)
+    console.log('yearlyStakingProvision', yearlyStakingProvision)
     return blockInfoAndCalculateApr(
       yearlyStakingProvision,
       bondedTokens,
@@ -271,12 +274,12 @@ async function getBlockParams(client: StargateClient) {
     // console.log(prevBlock)
     const prevBlockTime = Date.parse(prevBlock.header.time) //* 1000 + prevBlock.header.time.nanos / 1e6
     const prevBlockHeight = Number(prevBlock.header.height)
-    console.log("currentBlockTime", currentBlockTime)
+    console.log('currentBlockTime', currentBlockTime)
 
     const actualBlockTime =
       (currentBlockTime - prevBlockTime) /
       (currentBlockHeight - prevBlockHeight)
-    console.log('actualBlockTime', actualBlockTime/100)
+    console.log('actualBlockTime', actualBlockTime / 100)
     ///console.log(actualBlockTime)
     const actualBlocksPerYear = Math.ceil(
       (365 * 24 * 60 * 60 * 1000) / actualBlockTime
@@ -362,13 +365,9 @@ async function getAnnualProvisions(client: any) {
 }
 
 export async function getAutoTxParams(client: any) {
-  try {
-    const resp: QueryAutoTxParamsResponse =
-      await client.trst.autoibctx.v1beta1.params({})
-    return resp.params
-  } catch (e) {
-    console.error('err(getAutoTxParams):', e)
-  }
+  const resp: QueryAutoTxParamsResponse =
+    await client.trst.autoibctx.v1beta1.params({})
+  return resp.params
 }
 
 async function getStakeProvisionPercent(client: any) {

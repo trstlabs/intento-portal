@@ -15,7 +15,7 @@ export const useConnectIBCWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2],
   fromRegistry?: boolean
 ) => {
-  const [{ status, /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
+  const [{ status /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
     useRecoilState(ibcWalletState)
 
   let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
@@ -29,7 +29,7 @@ export const useConnectIBCWallet = (
     getSigningStargateClient,
     connect,
     address,
-    getRpcEndpoint,
+    assets,
   } = useChain(chainRegistryName)
 
   const mutation = useMutation(async () => {
@@ -62,14 +62,13 @@ export const useConnectIBCWallet = (
 
       console.log('ibcChainClient', ibcChainClient)
 
-      const rpc = await getRpcEndpoint(true)
       /* successfully update the wallet state */
       setWalletState({
         tokenSymbol,
         address,
         client: ibcChainClient,
         status: WalletStatusType.connected,
-        rpc,
+        assets,
       })
     } catch (e) {
       // toast.error("Error connecting wallet: ",e)
@@ -79,7 +78,7 @@ export const useConnectIBCWallet = (
         address: '',
         client: null,
         status: WalletStatusType.error,
-        rpc: '',
+        assets: undefined,
       })
 
       throw e

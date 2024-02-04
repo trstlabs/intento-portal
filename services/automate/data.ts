@@ -3,6 +3,7 @@ import { QueryInterchainAccountFromAddressResponse } from 'trustlessjs/dist/code
 import { cosmos } from 'trustlessjs'
 import { QueryGranteeGrantsRequest } from 'trustlessjs/dist/codegen/cosmos/authz/v1beta1/query'
 
+
 export interface ICAQueryInput {
   owner: string
   connectionId: string
@@ -24,16 +25,16 @@ export const getICA = async ({
   } catch (e) {
     if (e.message.includes('account found')) {
       return ''
-    } else {
+    } /* else {
       console.error('err(getICA):', e)
-    }
+    } */
   }
 }
 
 export interface GrantQueryInput {
   grantee: string
   granter: string
-  rpc: any
+  rpc: string
   msgTypeUrl?: string
 }
 
@@ -47,31 +48,39 @@ export const getAuthZGrantsForGrantee = async ({
   granter,
   rpc,
 }: GrantQueryInput) => {
-  const cosmosClient = await cosmos.ClientFactory.createRPCQueryClient({
-    rpcEndpoint: rpc,
-  })
-  const req = QueryGranteeGrantsRequest.fromPartial({
-    grantee,
-    pagination: undefined,
-  })
-  const resp = await cosmosClient.cosmos.authz.v1beta1.granteeGrants(req)
-  let granterGrants: GrantResponse[] = []
-  for (const grant of resp.grants) {
-    if (grant.granter == granter) {
-      const msgTypeUrl =
-        'msg' in grant.authorization
-          ? grant.authorization.msg
-          : grant.authorization.$typeUrl
-      const res: GrantResponse = {
-        msgTypeUrl: msgTypeUrl,
-        expiration: grant.expiration,
-        hasGrant: true,
-      }
-
-      granterGrants.push(res)
+  try {
+    if (grantee == '') {
+      return false
     }
+    const cosmosClient = await cosmos.ClientFactory.createRPCQueryClient({
+      rpcEndpoint: rpc,
+    })
+    const req = QueryGranteeGrantsRequest.fromPartial({
+      grantee,
+      pagination: undefined,
+    })
+    const resp = await cosmosClient.cosmos.authz.v1beta1.granteeGrants(req)
+    let granterGrants: GrantResponse[] = []
+    for (const grant of resp.grants) {
+      if (grant.granter == granter) {
+        const msgTypeUrl =
+          'msg' in grant.authorization
+            ? grant.authorization.msg
+            : grant.authorization.$typeUrl
+        const res: GrantResponse = {
+          msgTypeUrl: msgTypeUrl,
+          expiration: grant.expiration,
+          hasGrant: true,
+        }
+
+        granterGrants.push(res)
+      }
+    }
+    return granterGrants
+  } catch (e) {
+    console.error('err(getAuthZGrantsForGrantee):', e)
+    return false
   }
-  return granterGrants
 }
 
 export interface GrantResponse {

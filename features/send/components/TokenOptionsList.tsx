@@ -1,4 +1,4 @@
-import { TokenSelectList, TokenSelectListProps } from 'components'
+import { TokenSelectList, TokenSelectListProps } from './TokenSelectList'
 import { useIBCAssetList } from '../../../hooks/useChainList'
 
 export const TokenOptionsList = ({

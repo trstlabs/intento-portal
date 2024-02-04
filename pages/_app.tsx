@@ -142,7 +142,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
           <ErrorBoundary>
             {dataPushed && (
               <ChainProvider
-                // logLevel="DEBUG"
+               // logLevel="DEBUG"
                 chains={[...chainList]}
                 assetLists={[...assets]}
                 wallets={wallets}

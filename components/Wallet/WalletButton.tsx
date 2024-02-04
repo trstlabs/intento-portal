@@ -16,7 +16,9 @@ import {
   Valid, Connect,
 } from 'junoblocks'
 import React from 'react'
-
+import { useRecoilValue } from 'recoil'
+import { useIBCTokenBalance } from '../../hooks/useIBCTokenBalance'
+import { ibcWalletState } from '../../state/atoms/walletAtoms'
 
 type WalletButtonProps = { css?: CSS } & {
   walletName?: string
@@ -39,6 +41,8 @@ export const WalletButton = ({
   const baseToken = useBaseTokenInfo()
 
   const { balance } = useTokenBalance(baseToken?.symbol)
+  const { tokenSymbol } = useRecoilValue(ibcWalletState)
+  const { balance: ibcBalance, isLoading: isIBCBalanceLoading } = useIBCTokenBalance()
 
   if (!connected) {
     return (
@@ -53,7 +57,7 @@ export const WalletButton = ({
   return (
     <StyledWalletButton {...props} role="button">
       <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Connect />} />
-      <div data-content="" onClick={onClick} style={{cursor: "pointer"}} >
+      <div data-content="" onClick={onClick} style={{ cursor: "pointer" }} >
         <Text variant="link" color="body">
           {walletName}
         </Text>
@@ -69,6 +73,18 @@ export const WalletButton = ({
           {formatTokenBalance(balance, { includeCommaSeparation: true })}{' '}
           {baseToken?.symbol}
         </Text>
+        {!isIBCBalanceLoading && ibcBalance != 0 && <Text
+          variant="legend"
+          css={{
+            '-webkit-background-clip': 'text',
+            '-webkit-text-fill-color': 'transparent',
+            backgroundImage:
+              'linear-gradient(90.55deg, #103b64 1.35%, #144a7d 19.1%, #185996 37.37%, #1c68af 58.83%, #1c68af 75.84%, #1c68af 99.52%)',
+          }}
+        >
+          {formatTokenBalance(ibcBalance, { includeCommaSeparation: true })}{' '}
+          {tokenSymbol}
+        </Text>}
       </div>
       <StyledDivForActions>
         <StyledDivForInlineActions>
@@ -100,7 +116,7 @@ export const WalletButton = ({
           </Tooltip>
         </StyledDivForInlineActions>
       </StyledDivForActions>
-    </StyledWalletButton>
+    </StyledWalletButton >
   )
 }
 

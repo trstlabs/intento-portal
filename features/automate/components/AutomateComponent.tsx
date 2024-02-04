@@ -15,7 +15,6 @@ import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
 import {
   useSubmitAutoTx,
   useRegisterAccount,
-  useCreateAuthzGrant,
   useSendFundsOnHost,
   useSubmitTx,
 } from '../hooks'
@@ -23,7 +22,6 @@ import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
   useGetICA,
-  useAuthZGrantsForUser,
   useICATokenBalance,
 } from '../../../hooks/useICA'
 
@@ -37,6 +35,8 @@ import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/
 import { GearIcon, TransferIcon } from '../../../icons'
 import { SubmitAutoTxDialog } from './SubmitAutoTxDialog'
 import { AutomateConfiguration } from './AutomateConfiguration'
+import { useAfterConnectWallet } from '../../../hooks/useAfterConnectWallet'
+import { StepIcon } from '../../../icons/StepIcon'
 
 
 type AutoTxsInputProps = {
@@ -65,25 +65,21 @@ export const AutomateComponent = ({
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
 
   const [icaAddress, isIcaLoading] = useGetICA(autoTxData.connectionId, '')
+
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
-    chainSymbol,
+    chainId,
     icaAddress,
     chainIsConnected
   )
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
-    icaAddress,
-    autoTxData
-  )
 
-  const shouldDisableAuthzGrants = useMemo(
-    () => icaAuthzGrants?.every((grant) => grant.hasGrant),
-    [icaAuthzGrants]
-  )
 
-  const refetchAuthzGrants = useRefetchQueries(['userAuthZGrants'])
+
+  const refetchICAData = useRefetchQueries([
+    //`userAuthZGrants/${icaAddress}/${autoTxData}`,
+    `icaTokenBalance/${chainId}/${icaAddress}`,
+  ])
   const refetchICA = useRefetchQueries([
     `interchainAccount/${autoTxData.connectionId}`,
-    `icaTokenBalance/${chainSymbol}`,
   ])
 
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
@@ -157,7 +153,7 @@ export const AutomateComponent = ({
     !chainIsConnected
   )
 
-  // const { mutate: connectWallet } = useAfterConnectWallet()
+  const { mutate: connectWallet } = useAfterConnectWallet()
 
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -191,51 +187,14 @@ export const AutomateComponent = ({
     [icaAddress, autoTxData.msgs, feeFundsHostChain]
   )
 
-  const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
-  const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
-    useState(false)
 
-  const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
-    useCreateAuthzGrant({
-      grantee: icaAddress,
-      grantInfos: icaAuthzGrants
-        ? icaAuthzGrants.filter((grant) => grant.hasGrant == false)
-        : [],
-      coin: requestedSendAndAuthzGrant
-        ? {
-          denom,
-          amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
-        }
-        : undefined,
-    })
-
-  useEffect(
-    () =>
-      handleTriggerEffect(
-        !isExecutingAuthzGrant && requestedAuthzGrant,
-        handleCreateAuthzGrant,
-        () => {
-          setRequestedSendAndAuthzGrant(false)
-          setRequestedCreateAuthzGrant(false)
-        }
-      ),
-    [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant]
-  )
-
-  const handleCreateAuthzGrantClick = (withFunds) => {
-    connectExternalWallet(null)
-    setRequestedCreateAuthzGrant(true)
-    if (withFunds) {
-      setRequestedSendAndAuthzGrant(true)
-    }
-  }
 
   const handleRegisterAccountClick = () => {
     return setRequestedRegisterICA(true)
   }
 
   const handleSubmitAutoTxClick = (autoTxData: AutoTxData) => {
-    // connectWallet(null)
+    connectWallet(null)
     onAutoTxChange(autoTxData)
     return setRequestedSubmitAutoTx(true)
   }
@@ -258,7 +217,7 @@ export const AutomateComponent = ({
         ['typeUrl'].split('.')
           .find((data) => data.includes('Msg'))
       ) {
-        refetchAuthzGrants()
+        refetchICAData()
       }
     } catch (e) {
       console.log(e)
@@ -303,11 +262,13 @@ export const AutomateComponent = ({
     if (!chainIsConnected) {
       return
     }
-
+    await sleep(200)
     connectExternalWallet(null)
-    await sleep(2000)
     refetchICA()
-    refetchAuthzGrants()
+    // console.log("Connection: ", connectionId, autoTxData.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    await sleep(5000)
+    //console.log("Connection: ", connectionId, autoTxData.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    refetchICAData()
 
   }
 
@@ -372,13 +333,25 @@ export const AutomateComponent = ({
 
   return (
     <StyledDivForContainer>
+      <Inline css={{ margin: '$6', marginTop: '$12', }}>
+        <StepIcon step={1} />
+        <Text
+          align="center"
+          variant="body"
+          color="tertiary"
+          css={{ padding: '0 $15 0 $6' }}
+        >
+          Choose where to automate
+        </Text>{' '}
+      </Inline>
       <Card
-        css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
+        css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$1' }}
         variant="secondary"
         disabled
       >
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
           <Column>
+
             <Row>
               <Text align="center" variant="caption">
                 Chain
@@ -439,20 +412,17 @@ export const AutomateComponent = ({
                       feeFundsHostChain={feeFundsHostChain}
                       icaBalance={icaBalance}
                       isIcaBalanceLoading={isIcaBalanceLoading}
-                      isAuthzGrantsLoading={isAuthzGrantsLoading}
-                      icaAuthzGrants={icaAuthzGrants}
-                      shouldDisableAuthzGrantButton={shouldDisableAuthzGrants}
                       shouldDisableSendHostChainFundsButton={
                         shouldDisableSendHostChainFundsButton
                       }
+                      hostDenom={denom}
+                      chainId={chainId}
+                      autoTxData={autoTxData}
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                      isExecutingAuthzGrant={isExecutingAuthzGrant}
-                      requestedSendAndAuthzGrant={requestedSendAndAuthzGrant}
                       setFeeFundsHostChain={(fees) =>
                         setFeeFundsHostChain(fees)
                       }
                       handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                      handleCreateAuthzGrantClick={handleCreateAuthzGrantClick}
                     />
                   )}
                 </>
@@ -462,6 +432,17 @@ export const AutomateComponent = ({
       </Card>
       {autoTxData.msgs.map((msg, index) => (
         <div key={index}>
+          <Inline css={{ margin: '$6', marginTop: '$16' }}>
+            <StepIcon step={2} />
+            <Text
+              align="center"
+              variant="body"
+              color="tertiary"
+              css={{ padding: '0 $15 0 $6' }}
+            >
+              Define what to automate
+            </Text>{' '}
+          </Inline>
           <JsonFormWrapper
             index={index}
             chainSymbol={chainSymbol}
@@ -502,17 +483,10 @@ export const AutomateComponent = ({
         shouldDisableSendHostChainFundsButton={
           shouldDisableSendHostChainFundsButton
         }
-        isExecutingAuthzGrant={isExecutingAuthzGrant}
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-        shouldDisableAuthzGrantButton={
-          !shouldDisableAuthzGrants
-        }
         setFeeFundsHostChain={setFeeFundsHostChain}
         handleSubmitAutoTx={(autoTxData) =>
           handleSubmitAutoTxClick(autoTxData)
-        }
-        handleCreateAuthzGrantClick={
-          handleCreateAuthzGrantClick
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
@@ -536,7 +510,7 @@ export const AutomateComponent = ({
           onClick={() => handleSubmitTxClick()}
           iconLeft={<TransferIcon />}
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Send directly'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Send messages now'}
         </Button>
         <Button
           css={{ margin: '$4', columnGap: '$4' }}
@@ -569,7 +543,7 @@ export function Row({ children }) {
         ...baseCss,
         display: 'flex',
         justifyContent: 'start',
-        marginBottom: '$3',
+        marginBottom: '$4',
         columnGap: '$space$1',
       }}
     >
@@ -578,37 +552,6 @@ export function Row({ children }) {
   )
 }
 
-export function Chip({ label, onClick, href = '' }) {
-  return (
-    <ChipContainer onClick={onClick}>
-      <Inline>
-        {href && <img src={href} alt="Icon" className="chip-icon" />}
-        {label}
-      </Inline>
-    </ChipContainer>
-  )
-}
-
-const ChipContainer = styled('div', {
-  display: 'inline-block',
-  fontSize: '12px',
-  color: '$colors$black',
-  borderRadius: '$2',
-  backgroundColor: '$colors$light95',
-  padding: '0.5em 0.75em',
-  margin: '0.3em 0.4em',
-  cursor: 'pointer',
-  border: '1px solid $colors$light95',
-  '&:hover': {
-    backgroundColor: '$colors$light60',
-    border: '1px solid $borderColors$selected',
-  },
-  '.chip-icon': {
-    marginRight: '0.9em', // Adjust the margin as needed
-    height: '2em', // Set the height of the icon as needed
-    // width: '1em',  // Set the width of the icon as needed
-  },
-})
 
 export const StyledInput = styled('input', {
   color: 'inherit',

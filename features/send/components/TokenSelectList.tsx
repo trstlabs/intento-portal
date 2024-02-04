@@ -1,4 +1,3 @@
-import { useIBCTokenBalance } from 'hooks/useIBCTokenBalance'
 import { useTokenBalance } from 'hooks/useTokenBalance'
 import {
   ButtonForWrapper,
@@ -13,8 +12,8 @@ import {
 } from 'junoblocks'
 import { ComponentPropsWithoutRef, useMemo } from 'react'
 
-import { SelectChainInfo } from '../types/trstTypes'
-import { getPropsForInteractiveElement } from '../util/getPropsForInteractiveElement'
+import { SelectChainInfo } from '../../../types/trstTypes'
+import { getPropsForInteractiveElement } from '../../../util/getPropsForInteractiveElement'
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',
@@ -169,7 +168,7 @@ const FetchBalanceTextForNativeTokenSymbol = ({ tokenSymbol }) => {
 }
 
 const FetchBalanceTextForIbcTokenSymbol = ({ tokenSymbol }) => {
-  const { balance, isLoading } = useIBCTokenBalance(tokenSymbol)
+  const { balance, isLoading } = useTokenBalance(tokenSymbol)
   return (
     <>
       {isLoading ? (

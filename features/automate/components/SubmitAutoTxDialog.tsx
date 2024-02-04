@@ -42,7 +42,7 @@ type SubmitAutoTxDialogProps = {
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
 }
-
+//todo clean up all authz and host fund logic
 export const SubmitAutoTxDialog = ({
   isDialogShowing,
   icaAddress,
@@ -62,7 +62,7 @@ export const SubmitAutoTxDialog = ({
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
- 
+
   const [startTime, setStartTime] = useState(0)
   const [duration, setDuration] = useState(14 * 86400000)
 
@@ -218,7 +218,7 @@ export const SubmitAutoTxDialog = ({
     isDialogShowing,
     interval / 1000
   )
-  const refetchExpectedAutoTxFee = useRefetchQueries('expectedAutoTxFee')
+  const refetchExpectedAutoTxFee = useRefetchQueries([`expectedAutoTxFee/${duration}/${autoTxData}/${isDialogShowing}/${interval}`])
   const canSchedule = duration > 0 && interval > 0
 
   const handleData = (icaAddressForAuthZGrant: string) => {

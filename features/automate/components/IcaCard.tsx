@@ -9,10 +9,15 @@ import {
   IconWrapper,
   Divider,
   useMedia,
+  convertDenomToMicroDenom,
 } from 'junoblocks'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { Row, StyledInput } from './AutomateComponent'
-import { GrantResponse } from '../../../services/automate'
+
+import { useAuthZGrantsForUser } from '../../../hooks/useICA'
+import { useCreateAuthzGrant } from '../hooks'
+import { AutoTxData } from '../../../types/trstTypes'
+import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 interface IcaCardProps {
   icaAddress: string
@@ -20,16 +25,13 @@ interface IcaCardProps {
   feeFundsHostChain: string
   icaBalance: number
   isIcaBalanceLoading: boolean
-  isAuthzGrantsLoading: boolean
-  icaAuthzGrants: GrantResponse[]
-  shouldDisableAuthzGrantButton: boolean
   shouldDisableSendHostChainFundsButton: boolean
   isExecutingSendFundsOnHost: boolean
-  isExecutingAuthzGrant: boolean
-  requestedSendAndAuthzGrant: boolean
+  chainId: string
+  hostDenom: string
+  autoTxData: AutoTxData
   setFeeFundsHostChain: (fees: string) => void
   handleSendFundsOnHostClick: () => void
-  handleCreateAuthzGrantClick: (withFunds: boolean) => void
 }
 
 export const IcaCard = ({
@@ -38,19 +40,83 @@ export const IcaCard = ({
   feeFundsHostChain,
   icaBalance,
   isIcaBalanceLoading,
-  isAuthzGrantsLoading,
-  icaAuthzGrants,
-  shouldDisableAuthzGrantButton,
   shouldDisableSendHostChainFundsButton,
   isExecutingSendFundsOnHost,
-  isExecutingAuthzGrant,
-  requestedSendAndAuthzGrant,
+  chainId,
+  hostDenom,
+  autoTxData,
   setFeeFundsHostChain,
   handleSendFundsOnHostClick,
-  handleCreateAuthzGrantClick,
 }: IcaCardProps) => {
   const [showICAInfo, setShowICAInfo] = useState(false)
   const isMobile = useMedia('sm')
+
+  // ICA funds
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(
+    chainSymbol,
+    chainId,
+    {
+      onError(error) {
+        console.log(error)
+      },
+    },
+    false
+  )
+
+  const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
+  const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
+    useState(false)
+  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
+    chainId,
+    icaAddress,
+    autoTxData
+  )
+  const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
+    useCreateAuthzGrant({
+      grantee: icaAddress,
+      grantInfos: icaAuthzGrants
+        ? icaAuthzGrants.filter((grant) => grant.hasGrant == false)
+        : [],
+      coin: requestedSendAndAuthzGrant
+        ? {
+          denom: hostDenom,
+          amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
+        }
+        : undefined,
+    })
+  const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
+    if (shouldTrigger) {
+      handler(undefined, { onSettled: () => resetStateSetter(false) })
+    }
+  }
+
+  useEffect(
+    () =>
+      handleTriggerEffect(
+        !isExecutingAuthzGrant && requestedAuthzGrant,
+        handleCreateAuthzGrant,
+        () => {
+          setRequestedSendAndAuthzGrant(false)
+          setRequestedCreateAuthzGrant(false)
+        }
+      ),
+    [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant]
+  )
+
+  const handleCreateAuthzGrantClick = (withFunds) => {
+    connectExternalWallet(null)
+    setRequestedCreateAuthzGrant(true)
+    if (withFunds) {
+      setRequestedSendAndAuthzGrant(true)
+    }
+  }
+
+
+  const shouldDisableAuthzGrantButton = useMemo(
+    () => icaAuthzGrants?.every((grant) => grant.hasGrant),
+    [icaAuthzGrants]
+  )
+
   return (
     <>
       <Button
@@ -109,32 +175,33 @@ export const IcaCard = ({
             ) : (
               <Spinner instant />
             ))}
-          <Text variant="legend"> Grants</Text>
-          {isAuthzGrantsLoading && !icaAuthzGrants ? (
-            <Spinner />
-          ) : (
-            <>
-              {icaAuthzGrants && icaAuthzGrants[0] && icaAuthzGrants.map((grant, index) =>
-                grant.hasGrant ? (
-                  <Text key={index} css={{ padding: '$4' }} variant="caption">
-                    {' '}
-                    ✓ Trigger Account is granted for type: {
-                      grant.msgTypeUrl
-                    }{' '}
-                    {grant.expiration && (
-                      <span> and expires on {grant.expiration.toLocaleString()}</span>
-                    )}
-                  </Text>
-                ) : (
-                  <Text css={{ padding: '$4' }} variant="caption">
-                    {' '}
-                    ✘ Trigger Account is not granted for type:{' '}
-                    {grant.msgTypeUrl}{' '}
-                  </Text>
-                )
-              )}
-            </>
-          )}
+          {icaAuthzGrants != undefined  && <><Text variant="legend"> Grants</Text>
+            {isAuthzGrantsLoading && !icaAuthzGrants ? (
+              <Spinner />
+            ) : (
+              <>
+                {icaAuthzGrants && icaAuthzGrants[0] && icaAuthzGrants.map((grant, index) =>
+                  grant.hasGrant ? (
+                    <Text key={index} css={{ padding: '$4' }} variant="caption">
+                      {' '}
+                      ✓ Action Account is granted for type: {
+                        grant.msgTypeUrl
+                      }{' '}
+                      {grant.expiration && (
+                        <span> and expires on {grant.expiration.toLocaleString()}</span>
+                      )}
+                    </Text>
+                  ) : (
+                    <Text css={{ padding: '$4' }} variant="caption">
+                      {' '}
+                      ✘ Action Account is not granted for type:{' '}
+                      {grant.msgTypeUrl}{' '}
+                    </Text>
+                  )
+                )}
+              </>
+            )}
+          </>}
           {!shouldDisableAuthzGrantButton && (
             <>
               <Card
@@ -193,7 +260,7 @@ export const IcaCard = ({
                         onClick={() => handleCreateAuthzGrantClick(false)}
                       >
                         {isExecutingAuthzGrant &&
-                        !requestedSendAndAuthzGrant ? (
+                          !requestedSendAndAuthzGrant ? (
                           <Spinner instant />
                         ) : (
                           'Create AuthZ Grant'

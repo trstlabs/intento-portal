@@ -170,7 +170,7 @@ export const ChainSelectorList = ({
         }}
       >
         <Text variant="legend">
-          Automate Actions (Now using local Testnets)
+          Connected testnet chains
         </Text>{' '}
         {filteredIcaChainList.map((chainInfo) => {
           return (
@@ -200,7 +200,7 @@ export const ChainSelectorList = ({
           )
         })}
         <Text variant="legend">
-          Other chains (direct transaction submission only)
+          Other chains - send messages directly only
         </Text>{' '}
         {filteredChainList.map((chainInfo) => {
           return (
