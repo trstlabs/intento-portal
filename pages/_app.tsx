@@ -18,6 +18,7 @@ import { __TEST_MODE__ } from '../util/constants'
 import { ChainProvider } from '@cosmos-kit/react'
 
 import { wallets as keplrWallets } from '@cosmos-kit/keplr'
+import { wallets as metamaskWallets } from "@cosmos-kit/cosmos-extension-metamask";
 import { wallets as cosmostationWallets } from '@cosmos-kit/cosmostation'
 import { wallets as leapWallets } from '@cosmos-kit/leap'
 
@@ -41,7 +42,7 @@ const toasterClassName = css({
   },
 }).toString()
 
-const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets]
+const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets, ...metamaskWallets]
 
 var chainList = chains
 function TrstApp({ Component, pageProps }: AppProps) {
@@ -142,7 +143,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
           <ErrorBoundary>
             {dataPushed && (
               <ChainProvider
-               // logLevel="DEBUG"
+                // logLevel="DEBUG"
                 chains={[...chainList]}
                 assetLists={[...assets]}
                 wallets={wallets}

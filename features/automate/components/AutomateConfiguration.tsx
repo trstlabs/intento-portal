@@ -182,6 +182,27 @@ export const AutomateConfiguration = ({
             >
                 Wallet Fallback
               </Button></Tooltip>
+            <Tooltip
+              label={
+                'If set to true, as a fallback, the interchain account associated with the action will be reregistered when a channel times out'
+              }
+            ><Button
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => fallback()}
+              iconLeft={
+                <ToggleSwitch
+                  id="reregisterIcaAfterTimeout"
+                  name="reregisterIcaAfterTimeout"
+                  onChange={() => fallback()}
+                  checked={config.reregisterIcaAfterTimeout}
+                  optionLabels={['no fallback', 'fallback']}
+                />
+              }
+            >
+                Allow Recovery
+              </Button></Tooltip>
 
             {/*       {isConfigItemsShowing && (
         <AutomateConfigurationDialog

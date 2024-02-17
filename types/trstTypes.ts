@@ -23,10 +23,11 @@ export class AutoTxData {
   recurrences: number
   startTime?: number
   interval?: number
-  connectionId?: string
   configuration?: ExecutionConfiguration
   feeFunds?: number
   label?: string
+  connectionId?: string
+  hostConnectionId?:string
 }
 
 

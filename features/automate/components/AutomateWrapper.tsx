@@ -25,6 +25,7 @@ export const AutomateWrapper = ({
     stopOnFailure: false,
     stopOnSuccess: false,
     fallbackToOwnerBalance: true,
+    reregisterIcaAfterTimeout: true,
   }
   initialAutoTxData.configuration = initConfig
   //data.typeUrls = [""]

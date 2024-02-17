@@ -21,7 +21,7 @@ export class ChainInfo {
   name: string
   logoURI: string
   connectionId: string
-  counterpartyConnectionId: string
+  hostConnectionId: string
   prefix: string
   denom: string
   trstDenom: string
@@ -81,7 +81,7 @@ export const ChainSelectorList = ({
     let selectedChain = new ChainInfo()
     selectedChain.connectionId = selectedInfo.connection_id
     selectedChain.chainId = selectedInfo.chain_id
-    selectedChain.counterpartyConnectionId =
+    selectedChain.hostConnectionId =
       selectedInfo.counterparty_connection_id
     selectedChain.name = selectedInfo.name
     selectedChain.logoURI = selectedInfo.logo_uri

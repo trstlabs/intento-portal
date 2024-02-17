@@ -20,7 +20,7 @@ export declare type autoTxInfoWithDetails = {
 
 export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
   //const autoTxInfoAmino = AutoTxInfo.toAmino(autoTxInfo)
-  const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.connectionId)
+  const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.icaConfig.connectionId || '')
   const isActive =
     autoTxInfo.endTime &&
     autoTxInfo.execTime &&

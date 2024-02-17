@@ -2,6 +2,7 @@ import { chains } from 'chain-registry'
 import { Chain } from '@chain-registry/types'
 import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
+import { useChains } from '@cosmos-kit/react'
 
 export type IBCAssetInfo = {
   id: string
@@ -43,6 +44,14 @@ export const useIBCAssetList = () => {
   return [data, isLoading] as const
 }
 
+//connect to all chains at once, requires chains to come from registry (can only be used in production/public testnet)
+export const useConnectChains = (chains: IBCAssetInfo[]) => {
+  const chainList = chains[0]
+    ? chains.map((chain) => chain.registry_name)
+    : ['trustlesshub']
+  useChains(chainList)
+}
+
 //useIBCAssetInfoBySymbol
 export const useChainInfoByChainID = (chainId: string) => {
   //idea: use useChainRegistryList here
@@ -74,7 +83,7 @@ function transformChain(chain: Chain) {
     chain.fees && chain.fees.fee_tokens[0]
       ? chain.fees.fee_tokens[0].denom.slice(1).toUpperCase()
       : ''
-   
+
   return {
     id: chain.chain_id,
     name: chain.pretty_name,

@@ -25,7 +25,7 @@ export default function AutoTx() {
   const isMobile = useMedia('sm')
 
   const [autoTxInfo, isLoading] = useAutoTxInfo(id)
-  const connectionId = autoTxInfo && autoTxInfo.connectionId ? autoTxInfo.connectionId : ''
+  const connectionId = autoTxInfo && autoTxInfo.icaConfig ? autoTxInfo.icaConfig.connectionId : ''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {
@@ -77,7 +77,7 @@ export default function AutoTx() {
         )}
 
         {!isLoading &&
-          (autoTxInfo && autoTxInfo.msgs[0] ? (
+          (autoTxInfo && autoTxInfo.feeAddress ? (
             <>
               <AutoTxInfoBreakdown autoTxInfo={autoTxInfo} ibcInfo={ibcInfo} />
             </>

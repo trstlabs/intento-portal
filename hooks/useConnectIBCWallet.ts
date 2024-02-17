@@ -30,7 +30,7 @@ export const useConnectIBCWallet = (
     connect,
     address,
     assets,
-  } = useChain(chainRegistryName)
+  } = useChain(chainRegistryName, true)
 
   const mutation = useMutation(async () => {
     if (!tokenSymbol /* && !storedTokenSymbol */) {

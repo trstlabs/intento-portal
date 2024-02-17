@@ -35,6 +35,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
   const { data: ica, isLoading } = useQuery(
     [`interchainAccount/${connectionId}`],
     async () => {
+      if (connectionId == '') {
+        return ''
+      }
       const resp: string = await getICA({
         owner: accAddr,
         connectionId,
@@ -44,8 +47,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     },
     {
       enabled: Boolean(
-        connectionId != '' &&
-          connectionId != undefined &&
+        connectionId != undefined &&
           rpcClient.trst != undefined &&
           !!accAddr &&
           accAddr.length > 40

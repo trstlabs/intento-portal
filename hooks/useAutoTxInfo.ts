@@ -3,10 +3,12 @@ import { useQuery } from 'react-query'
 import {
   DEFAULT_REFETCH_INTERVAL,
   AUTOTX_REFETCH_INTERVAL,
+  DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
 import { useTrstRpcClient } from './useRPCClient'
 import { QueryAutoTxsResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query'
 import { GlobalDecoderRegistry } from 'trustlessjs'
+import { PageRequest } from 'trustlessjs/dist/codegen/cosmos/base/query/v1beta1/pagination'
 
 export const useAutoTxInfos = () => {
   const client = useTrstRpcClient()
@@ -82,10 +84,41 @@ export const useAutoTxInfo = (id) => {
     {
       enabled: !!id && !!client?.trst,
       refetchOnMount: 'always',
-      refetchInterval: AUTOTX_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
   console.log(data)
+  return [data, isLoading] as const
+}
+
+export const useAutoTxHistory = (id, limit: number) => {
+  const client = useTrstRpcClient()
+  const { data, isLoading } = useQuery(
+    ['autoTxHistory', id],
+    async () => {
+      if (!id || !client || !client.trst) {
+        throw new Error('Invalid ID or client not available')
+      }
+
+      const pageRequest = PageRequest.fromPartial({
+        limit: BigInt(limit),
+        reverse: true,
+      })
+      const autoTxHistory = await client.trst.autoibctx.v1beta1.autoTxHistory({
+        id: id,
+        pagination: pageRequest,
+      })
+
+      return autoTxHistory.history
+    },
+    {
+      enabled: !!id && !!client?.trst,
+      refetchOnMount: 'always',
+      refetchInterval: AUTOTX_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
   return [data, isLoading] as const
 }

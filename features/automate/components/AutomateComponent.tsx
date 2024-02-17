@@ -53,7 +53,7 @@ export const AutomateComponent = ({
   const [prefix, setPrefix] = useState('trust')
   const [denom, setDenom] = useState('utrst')
   const [chainName, setChainName] = useState('')
-  const [counterpartyConnectionId, setCounterpartyConnectionId] = useState('')
+
   const [chainSymbol, setChainSymbol] = useState('TRST')
   const [chainId, setChainId] = useState('TRST')
   const [chainIsConnected, setChainIsConnected] = useState(false)
@@ -87,7 +87,7 @@ export const AutomateComponent = ({
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
     useRegisterAccount({
       connectionId: autoTxData.connectionId,
-      counterpartyConnectionId,
+      hostConnectionId: autoTxData.hostConnectionId,
     })
 
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
@@ -227,7 +227,7 @@ export const AutomateComponent = ({
   async function handleChainChange(
     chainId: string,
     connectionId: string,
-    counterpartyConnectionId: string,
+    hostConnectionId: string,
     newPrefix: string,
     newDenom: string,
     name: string,
@@ -235,6 +235,7 @@ export const AutomateComponent = ({
   ) {
     let updatedAutoTxData = autoTxData
     updatedAutoTxData.connectionId = connectionId
+    updatedAutoTxData.hostConnectionId = hostConnectionId
     autoTxData.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
         updatedAutoTxData.msgs[editIndex] = editMsg.replaceAll(
@@ -250,7 +251,6 @@ export const AutomateComponent = ({
     onAutoTxChange(updatedAutoTxData)
     setDenom(newDenom)
     setChainName(name)
-    setCounterpartyConnectionId(counterpartyConnectionId)
     setChainSymbol(chainSymbol)
     setChainId(chainId)
     setPrefix(newPrefix)
@@ -361,7 +361,7 @@ export const AutomateComponent = ({
                   handleChainChange(
                     update.chainId,
                     update.connectionId,
-                    update.counterpartyConnectionId,
+                    update.hostConnectionId,
                     update.prefix,
                     update.denom,
                     update.name,

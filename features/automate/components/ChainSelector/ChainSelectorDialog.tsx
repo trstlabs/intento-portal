@@ -20,6 +20,7 @@ export const ChainSelectorDialog = ({
   const chainList = useChainRegistryList()
 
   const [icaChainList] = useIBCAssetList()
+  //useConnectChains(chainList)
   
   return (
     <Dialog isShowing={true} onRequestClose={undefined}>

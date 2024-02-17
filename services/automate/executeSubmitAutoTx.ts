@@ -57,13 +57,16 @@ export const executeSubmitAutoTx = async ({
   }
   const msgSubmitAutoTx =
     trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.submitAutoTx({
-      connectionId: autoTxData.connectionId ? autoTxData.connectionId : '',
       owner,
       msgs,
       label: autoTxData.label ? autoTxData.label : '',
       duration,
       interval,
       startAt,
+      connectionId: autoTxData.connectionId ? autoTxData.connectionId : '',
+      hostConnectionId: autoTxData.hostConnectionId
+        ? autoTxData.hostConnectionId
+        : '',
       configuration: autoTxData.configuration
         ? autoTxData.configuration
         : {
@@ -72,6 +75,7 @@ export const executeSubmitAutoTx = async ({
             stopOnSuccess: false,
             stopOnFailure: false,
             fallbackToOwnerBalance: false,
+            reregisterIcaAfterTimeout: false,
           },
       feeFunds,
     })
@@ -112,7 +116,7 @@ function transformAndEncodeMsgs(
     console.log(encodeObject)
 
     let msgAny = client.registry.encodeAsAny(encodeObject)
-     msgAny = GlobalDecoderRegistry.wrapAny(value)
+    msgAny = GlobalDecoderRegistry.wrapAny(value)
     let decoded = client.registry.decode(msgAny)
     console.log(decoded)
     msgs.push(msgAny)

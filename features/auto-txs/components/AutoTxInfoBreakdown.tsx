@@ -39,6 +39,7 @@ import { getDuration, getRelativeTime } from '../../../util/time'
 import { getTrstSigningClientOptions } from 'trustlessjs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
+import { useAutoTxHistory } from '../../../hooks/useAutoTxInfo'
 
 
 type AutoTxInfoBreakdownProps = {
@@ -58,8 +59,9 @@ export const AutoTxInfoBreakdown = ({
   ibcInfo,
 }: //size = 'large',
   AutoTxInfoBreakdownProps) => {
-  const [icaAddress, _] = useGetICA(autoTxInfo.connectionId, autoTxInfo.owner)
+  const [icaAddress, _] = useGetICA(autoTxInfo.icaConfig?.connectionId, autoTxInfo.owner)
 
+  const [autoTxHistory, _isHistoryLoading] = useAutoTxHistory(autoTxInfo.txId.toString(), 20)
   //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
   const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
@@ -79,8 +81,8 @@ export const AutoTxInfoBreakdown = ({
     autoTxInfo.execTime &&
     autoTxInfo.endTime.getTime() >= autoTxInfo.execTime.getTime()
   const latestExecWasError =
-    autoTxInfo.autoTxHistory.length > 0 &&
-    autoTxInfo.autoTxHistory[autoTxInfo.autoTxHistory.length - 1].errors[0] !=
+    autoTxHistory && autoTxHistory.length > 0 &&
+    autoTxHistory[autoTxHistory.length - 1].errors[0] !=
     undefined
 
   //send funds on host
@@ -308,7 +310,7 @@ export const AutoTxInfoBreakdown = ({
 
               <Text variant="body">{autoTxInfo.owner} </Text>
             </Column>
-            {autoTxInfo.portId && (
+            {autoTxInfo.icaConfig && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <Column
                 css={{ padding: '$3' }}
@@ -320,13 +322,13 @@ export const AutoTxInfoBreakdown = ({
                   IBC Port
                 </Text>
 
-                <Text variant="body">{autoTxInfo.portId} </Text>
+                <Text variant="body">{autoTxInfo.icaConfig.portId} </Text>
               </Column>
             )}
           </Inline>
         </Row>
 
-        {icaAddress && icaBalance && autoTxInfo.connectionId && (
+        {icaAddress && icaBalance && autoTxInfo.icaConfig && (
           <Row>
             <Column
               style={{
@@ -701,7 +703,7 @@ export const AutoTxInfoBreakdown = ({
           </>
         )} */}
 
-        {autoTxInfo.autoTxHistory.length > 0 && (
+        {autoTxHistory && autoTxHistory.length > 0 && (
           <>
             {' '}
             <Row>
@@ -713,7 +715,7 @@ export const AutoTxInfoBreakdown = ({
                     Execution History
                   </Text>
                 </Inline>
-                {autoTxInfo.autoTxHistory
+                {autoTxHistory
                   ?.slice(0)
                   .reverse()
                   .map(
@@ -797,7 +799,7 @@ export const AutoTxInfoBreakdown = ({
           </>
         )}
         {autoTxInfo.startTime < autoTxInfo.endTime &&
-          autoTxInfo.autoTxHistory.length == 0 && (
+          !autoTxHistory && (
             <Row>
               {' '}
               <Column gap={8} align="flex-start" justifyContent="flex-start">

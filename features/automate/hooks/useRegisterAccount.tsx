@@ -23,12 +23,12 @@ import { useTrstRpcClient } from '../../../hooks/useRPCClient'
 
 type UseRegisterAccountParams = {
   connectionId: string
-  counterpartyConnectionId: string
+  hostConnectionId: string
 }
 
 export const useRegisterAccount = ({
   connectionId,
-  counterpartyConnectionId,
+  hostConnectionId,
 }: UseRegisterAccountParams) => {
   const rpcClient = useTrstRpcClient()
   const { client, address, status } = useRecoilValue(walletState)
@@ -54,7 +54,7 @@ export const useRegisterAccount = ({
       await executeRegisterAccount({
         owner: address,
         connectionId,
-        counterpartyConnectionId,
+        hostConnectionId,
         client,
       })
       toast.custom((t) => (

@@ -32,6 +32,7 @@ export const executeUpdateAutoTx = async ({
             stopOnSuccess: false,
             stopOnFailure: false,
             fallbackToOwnerBalance: false,
+            reregisterIcaAfterTimeout: false,
           },
       feeFunds: autoTxParams.feeFunds ? autoTxParams.feeFunds : [],
     })
