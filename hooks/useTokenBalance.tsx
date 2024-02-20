@@ -34,9 +34,9 @@ async function fetchTokenBalance({
    * if this is a native asset or an ibc asset that has denom_on_trst
    *  */
 
-    const resp = await client.getBalance(address, denom_on_trst)
-    const amount = resp ? Number(resp.amount) : 0
-    return convertMicroDenomToDenom(amount, decimals)
+  const resp = await client.getBalance(address, denom_on_trst)
+  const amount = resp ? Number(resp.amount) : 0
+  return convertMicroDenomToDenom(amount, decimals)
 
   //  (denom_on_trst) {
   //   const resp = await client.getBalance(address, denom_on_trst)
@@ -63,13 +63,14 @@ export const useTokenBalance = (tokenSymbol: string) => {
   const ibcAssetInfo = useIBCAssetInfo(tokenSymbol)
 
   const { data: balance = 0, isLoading } = useQuery(
-    ['tokenBalance', tokenSymbol, address],
-    async ({ queryKey: [, symbol] }) => {
+    `tokenBalance/${tokenSymbol}/${address}`,
+    // ['tokenBalance'],
+    async ({ queryKey: [symbol] }) => {
       if (symbol && client && ibcAssetInfo) {
         return await fetchTokenBalance({
           client,
           address,
-          token:ibcAssetInfo,
+          token: ibcAssetInfo,
         })
       }
     },
@@ -91,7 +92,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   const [ibcAssetsList] = useIBCAssetList()
 
   const queryKey = useMemo(
-    () => `multipleTokenBalances/${tokenSymbols?.join('+')}`,
+    () => `multipleTokenBalances / ${tokenSymbols?.join('+')}`,
     [tokenSymbols]
   )
 
@@ -120,8 +121,8 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
     {
       enabled: Boolean(
         status === WalletStatusType.connected &&
-          tokenSymbols?.length &&
-          ibcAssetsList
+        tokenSymbols?.length &&
+        ibcAssetsList
       ),
 
       refetchOnMount: 'always',
@@ -139,7 +140,7 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
 
 export const useGetBalanceForAcc = (address: string) => {
   const client = useCosmosRpcClient()
- 
+
   const { data, isLoading } = useQuery(
     ['address', address],
     async () => {

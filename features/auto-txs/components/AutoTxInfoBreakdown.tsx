@@ -41,6 +41,8 @@ import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { useAutoTxHistory } from '../../../hooks/useAutoTxInfo'
 
+import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
+
 
 type AutoTxInfoBreakdownProps = {
   autoTxInfo: AutoTxInfo
@@ -61,7 +63,23 @@ export const AutoTxInfoBreakdown = ({
   AutoTxInfoBreakdownProps) => {
   const [icaAddress, _] = useGetICA(autoTxInfo.icaConfig?.connectionId, autoTxInfo.owner)
 
-  const [autoTxHistory, _isHistoryLoading] = useAutoTxHistory(autoTxInfo.txId.toString(), 20)
+  //AutoTx history entries
+
+  const [autoTxHistory, setAutoTxHistory] = useState([]);
+  const [limit] = useState(5); // Define your limit or make it dynamic as needed
+  const [fetchNext, setFetchNext] = useState(false);
+  const [paginationKey, setPaginationKey] = useState(undefined);
+  const [fetchedHistory, isHistoryLoading] = useAutoTxHistory(autoTxInfo.txId.toString(), limit, paginationKey);
+  const refetchQueries = useRefetchQueries([`autoTxHistory/${autoTxInfo.txId.toString()}/${paginationKey}`], 15);
+
+  useEffect(() => {
+
+    if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0 && !autoTxHistory.find(entry => entry == fetchedHistory.history[0])) {
+      // Append new entries to the existing history
+      setAutoTxHistory(prevHistory => [...prevHistory, ...fetchedHistory.history]);
+    }
+  }, [fetchedHistory]);
+
   //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
   const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
@@ -81,8 +99,7 @@ export const AutoTxInfoBreakdown = ({
     autoTxInfo.execTime &&
     autoTxInfo.endTime.getTime() >= autoTxInfo.execTime.getTime()
   const latestExecWasError =
-    autoTxHistory && autoTxHistory.length > 0 &&
-    autoTxHistory[autoTxHistory.length - 1].errors[0] !=
+    autoTxHistory && autoTxHistory && autoTxHistory.length > 0 && autoTxHistory[autoTxHistory.length - 1].errors[0] !=
     undefined
 
   //send funds on host
@@ -98,6 +115,7 @@ export const AutoTxInfoBreakdown = ({
       amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
     },
   })
+
   useEffect(() => {
     const shouldTriggerSendFunds =
       !isExecutingSendFundsOnHost && requestedSendFunds
@@ -107,6 +125,19 @@ export const AutoTxInfoBreakdown = ({
       })
     }
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
+
+
+  //  fetching next page
+  const fetchNextPage = () => {
+    setFetchNext(prev => !prev)
+    const nextKey = fetchedHistory.pagination?.nextKey;
+    setPaginationKey(nextKey);
+    refetchQueries()
+    setFetchNext(prev => !prev)
+
+  };
+
+
   const { mutate: connectExternalWallet } = useConnectIBCWallet(chainId, symbol)
   const handleSendFundsOnHostClick = () => {
     connectExternalWallet(null)
@@ -281,7 +312,7 @@ export const AutoTxInfoBreakdown = ({
                   {
                     autoTxInfo.msgs[0].typeUrl
                       .split('.')
-                      .find((data) => data.includes('Msg')).split(',')[0]
+                      .find((fetchedHistory) => fetchedHistory.includes('Msg')).split(',')[0]
 
                   }
                 </>
@@ -717,7 +748,6 @@ export const AutoTxInfoBreakdown = ({
                 </Inline>
                 {autoTxHistory
                   ?.slice(0)
-                  .reverse()
                   .map(
                     (
                       {
@@ -794,6 +824,7 @@ export const AutoTxInfoBreakdown = ({
                       </div>
                     )
                   )}
+                {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
               </Column>
             </Row>
           </>

@@ -33,7 +33,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 
   const rpcClient = useTrstRpcClient()
   const { data: ica, isLoading } = useQuery(
-    [`interchainAccount/${connectionId}`],
+    `interchainAccount/${connectionId}/${address}`,
     async () => {
       if (connectionId == '') {
         return ''
@@ -69,7 +69,7 @@ export const useICATokenBalance = (
   const chain = useChainInfoByChainID(chainId)
 
   const { data, isLoading } = useQuery(
-    [`icaTokenBalance/${chainId}/${ibcWalletAddress}`],
+    `icaTokenBalance/${chainId}/${ibcWalletAddress}`,
     async () => {
       const { denom, decimals } = chain
       const chainClient = await StargateClient.connect(chain.rpc)

@@ -53,7 +53,10 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-      if (!isWalletConnected) {
+      if (
+        !isWalletConnected ||
+        !assets?.assets.find((asset) => asset.symbol == tokenSymbol)
+      ) {
         await connect()
         await sleep(500)
       }

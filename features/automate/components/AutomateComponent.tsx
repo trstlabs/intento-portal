@@ -79,7 +79,8 @@ export const AutomateComponent = ({
     `icaTokenBalance/${chainId}/${icaAddress}`,
   ])
   const refetchICA = useRefetchQueries([
-    `interchainAccount/${autoTxData.connectionId}`,
+    `ibcTokenBalance/${denom}/${icaAddress}`,
+    `interchainAccount/${autoTxData.connectionId}/${icaAddress}`,
   ])
 
   const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =

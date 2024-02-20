@@ -1,8 +1,7 @@
 import { useQuery } from 'react-query'
 
 import {
-  DEFAULT_REFETCH_INTERVAL,
-  AUTOTX_REFETCH_INTERVAL,
+/*   DEFAULT_REFETCH_INTERVAL, */
   DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
 import { useTrstRpcClient } from './useRPCClient'
@@ -46,7 +45,7 @@ export const useAutoTxInfos = () => {
     {
       enabled: Boolean(client && client.trst),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
@@ -85,17 +84,17 @@ export const useAutoTxInfo = (id) => {
       enabled: !!id && !!client?.trst,
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchIntervalInBackground: false,
     }
   )
-  console.log(data)
+
   return [data, isLoading] as const
 }
 
-export const useAutoTxHistory = (id, limit: number) => {
+export const useAutoTxHistory = (id, limit: number, key: Uint8Array) => {
   const client = useTrstRpcClient()
   const { data, isLoading } = useQuery(
-    ['autoTxHistory', id],
+    `autoTxHistory/${id}/${key}`,
     async () => {
       if (!id || !client || !client.trst) {
         throw new Error('Invalid ID or client not available')
@@ -103,19 +102,20 @@ export const useAutoTxHistory = (id, limit: number) => {
 
       const pageRequest = PageRequest.fromPartial({
         limit: BigInt(limit),
+        key,
         reverse: true,
+        countTotal: true,
       })
-      const autoTxHistory = await client.trst.autoibctx.v1beta1.autoTxHistory({
+    
+      const autoTxHistoryResponse = await client.trst.autoibctx.v1beta1.autoTxHistory({
         id: id,
         pagination: pageRequest,
       })
-
-      return autoTxHistory.history
+      return autoTxHistoryResponse
     },
     {
       enabled: !!id && !!client?.trst,
-      refetchOnMount: 'always',
-      refetchInterval: AUTOTX_REFETCH_INTERVAL,
+      refetchOnMount: true,
       refetchIntervalInBackground: true,
     }
   )
