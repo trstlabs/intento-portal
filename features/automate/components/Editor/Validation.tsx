@@ -18,7 +18,7 @@ export const ErrorStack = ({ validationErrors }: ErrorStackProps) => {
                 ❌ {error}
             </Text> :
                 <Text css={{ margin: "$4" }} variant="caption" key={error} >
-                   {/*  ✅ Valid Cosmos message structure */}
+                    {/*  ✅ Valid Cosmos message structure */}
                 </Text >
         ))}
     </ul >
@@ -89,13 +89,12 @@ export function extractErrorMessages(errors: Array<ErrorObject>): Array<string> 
     return errors.map(error => {
         console.log(error)
 
-        if (error.instancePath.length != -1) {
-            if (error.keyword == "additionalProperties") {
-                if ((error.instancePath == '/amount' || error.instancePath.includes("grant"))) {
-                    return
-                }
-                return `Error at ${error.instancePath}, you have defined fields that are not valid for this Cosmos messsage`
-
+        if (error.instancePath.length != 0) {
+            if (error.keyword == "additionalProperties" || error.params.additionalProperty != "amount" || error.params.additionalProperty != "denom ") {
+                // if ((error.instancePath == '/amount' || error.instancePath.includes("grant"))) {
+                return
+                // }
+                // return `Error at ${error.instancePath}, you have defined fields that are not valid for this Cosmos messsage`
             }
             return error.message ? `Error at ${error.instancePath}: Validation failed for ${error.keyword}: ${error.message}` : error.keyword
         }
