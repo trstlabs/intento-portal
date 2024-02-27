@@ -50,7 +50,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   const {
     isWalletConnected,
-    isWalletConnecting,
     status: walletStatus,
     connect,
     disconnect,
@@ -61,6 +60,8 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   const { mutate: afterConnectWallet } = useAfterConnectWallet()
 
+  const walletStatusesConnected = isWalletConnected && (status === WalletStatusType.connected || status === WalletStatusType.restored)
+  const isClientConnected = client != null && client != undefined
   // const { address: ibcAddress, client: ibcClient } =
   //   useRecoilValue(ibcWalletState)
 
@@ -81,27 +82,30 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   async function connectWallet() {
     await connect()
     let attempts = 0
-    while (status !== WalletStatusType.connected && attempts < 30) {
-      if (client != undefined || client != null) {
+    while ( status !== WalletStatusType.connecting && attempts < 5) {
+      console.log(
+        walletStatusesConnected,
+        isClientConnected,
+        status,
+        walletStatus,
+        address
+      )
+
+      if (isClientConnected) {
         attempts = attempts + 30
       }
+  
       afterConnectWallet(null)
       await new Promise((resolve) => setTimeout(resolve, 1000))
       attempts++
     }
-    console.log(
-      isWalletConnected,
-      isWalletConnecting,
-      status,
-      walletStatus,
-      address
-    )
+
   }
 
   const walletButton = (
     <WalletButton
       onClick={openView}
-      connected={isWalletConnected && status === WalletStatusType.connected}
+      connected={walletStatusesConnected && isClientConnected}
       walletName={username}
       address={address}
       onConnect={connectWallet}

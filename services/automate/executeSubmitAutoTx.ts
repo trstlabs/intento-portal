@@ -104,11 +104,7 @@ function transformAndEncodeMsgs(
       value['msg'] = msg2
     }
     console.log(value)
-    // const encodedValue = deepEnccodeProtoTypes(value, 'typeUrl', client)
-    // if (encodedValue) {
-    //   value = encodedValue
-    // }
-    //console.log(value)
+
     const encodeObject = {
       typeUrl,
       value,
@@ -117,8 +113,7 @@ function transformAndEncodeMsgs(
 
     let msgAny = client.registry.encodeAsAny(encodeObject)
     msgAny = GlobalDecoderRegistry.wrapAny(value)
-    let decoded = client.registry.decode(msgAny)
-    console.log(decoded)
+
     msgs.push(msgAny)
   }
 }

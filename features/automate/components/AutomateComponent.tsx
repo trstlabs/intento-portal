@@ -35,7 +35,6 @@ import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/
 import { GearIcon, TransferIcon } from '../../../icons'
 import { SubmitAutoTxDialog } from './SubmitAutoTxDialog'
 import { AutomateConfiguration } from './AutomateConfiguration'
-import { useAfterConnectWallet } from '../../../hooks/useAfterConnectWallet'
 import { StepIcon } from '../../../icons/StepIcon'
 
 
@@ -154,7 +153,6 @@ export const AutomateComponent = ({
     !chainIsConnected
   )
 
-  const { mutate: connectWallet } = useAfterConnectWallet()
 
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -195,7 +193,6 @@ export const AutomateComponent = ({
   }
 
   const handleSubmitAutoTxClick = (autoTxData: AutoTxData) => {
-    connectWallet(null)
     onAutoTxChange(autoTxData)
     return setRequestedSubmitAutoTx(true)
   }
@@ -507,7 +504,7 @@ export const AutomateComponent = ({
           css={{ margin: '$4', columnGap: '$4' }}
           variant="primary"
           size="large"
-          disabled={shouldDisableSubmitButton}
+          disabled={shouldDisableSubmitButton && chainHasIAModule}//ia module need  endpoint specified for this
           onClick={() => handleSubmitTxClick()}
           iconLeft={<TransferIcon />}
         >

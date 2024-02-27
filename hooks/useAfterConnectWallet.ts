@@ -3,7 +3,6 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
-
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
@@ -15,33 +14,34 @@ export const useAfterConnectWallet = (
   const mutation = useMutation(async () => {
     setWalletState((value) => ({
       ...value,
-      client: null,
       state: WalletStatusType.connecting,
     }))
 
     try {
-      if (address != undefined && (client == null || client == undefined)) {
+      if (address && !client) {
         const trstChainClient = await getSigningStargateClient()
-
-        /* successfully update the wallet state */
-        setWalletState({
-          key: username,
-          address,
-          client: trstChainClient,
-          status: WalletStatusType.connected,
-          assets: undefined,
-        })
+        if (trstChainClient) {
+          //console.log("CLIENT", trstChainClient)
+          setWalletState({
+            key: username,
+            address,
+            client: trstChainClient,
+            status: WalletStatusType.connected,
+            assets: undefined,
+          })
+        } else {
+          // Handle the case where the client could not be obtained
+          throw new Error('Failed to obtain the client')
+        }
       }
     } catch (error) {
+      console.error('Error connecting the wallet:', error)
       setWalletState({
-        key: null,
+        status: WalletStatusType.error,
         address: '',
         client: null,
-        status: WalletStatusType.error,
         assets: undefined,
       })
-
-      /* throw the error for the UI */
       throw error
     }
   }, mutationOptions)

@@ -20,7 +20,6 @@ export class AutoTxData {
   duration: number
   msgs: string[]
   icaAddressForAuthZGrant?: string
-  recurrences: number
   startTime?: number
   interval?: number
   configuration?: ExecutionConfiguration

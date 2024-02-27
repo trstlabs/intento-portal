@@ -21,7 +21,6 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
 import { AutoTxData } from '../../../types/trstTypes'
-import { useAfterConnectWallet } from '../../../hooks/useAfterConnectWallet'
 
 type UseSubmitAutoTxArgs = {
   autoTxData: AutoTxData
@@ -34,19 +33,16 @@ export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
   const [_, popConfetti] = useRecoilState(particleState)
 
   const refetchQueries = useRefetchQueries(['tokenBalance'])
-  const { mutate: connectWallet } = useAfterConnectWallet()
   return useMutation(
     'submitAutoTx',
     async () => {
-      if (status !== WalletStatusType.connected) {
-        throw new Error('Please connect your wallet.')
+     // console.log(status)
+      if (status !== WalletStatusType.connected || client == null) {
+        throw new Error('Please retry or connect your wallet.')
       }
-      if (client == null) {
-        connectWallet(null)
-      }
-      if (client == null) {
-        throw new Error('Please try reconnecting your wallet.')
-      }
+      // if (client == null) {
+      //   throw new Error('Please try reconnecting your wallet.')
+      // }
       console.log(autoTxData)
       const response: DeliverTxResponse = await executeSubmitAutoTx({
         owner: address,

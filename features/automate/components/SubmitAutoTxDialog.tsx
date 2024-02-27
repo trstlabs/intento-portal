@@ -63,13 +63,13 @@ export const SubmitAutoTxDialog = ({
   handleSendFundsOnHostClick,
 }: SubmitAutoTxDialogProps) => {
 
-  const [startTime, setStartTime] = useState(0)
+  const [startTime, setStartTime] = useState(3600000)
   const [duration, setDuration] = useState(14 * 86400000)
 
   const [interval, setInterval] = useState(3600000)
   const [feeFunds, setFeeAmount] = useState(0)
   const [txLabel, setLabel] = useState(customLabel)
-  const [recurrences, setRecurrence] = useState(2)
+
 
   const [displayInterval, setDisplayInterval] = useState('1 hour')
   const [editInterval, setEditInterval] = useState(false)
@@ -77,7 +77,7 @@ export const SubmitAutoTxDialog = ({
   const [displayDuration, setDisplayDuration] = useState('2 weeks')
   const [editDuration, setEditDuration] = useState(false)
   const [editDurationValue, setEditDurationValue] = useState('2 hours')
-  const [displayStartTime, setDisplayStartTime] = useState('1 day')
+  const [displayStartTime, setDisplayStartTime] = useState('1 hour')
   const [editStartTime, setEditStartTime] = useState(false)
   const [editStartTimeValue, setEditStartTimeValue] = useState('0')
 
@@ -125,10 +125,7 @@ export const SubmitAutoTxDialog = ({
     }
     setInterval(value)
     setDisplayInterval(label)
-    const recurrence = Math.floor(duration / value)
-    setRecurrence(recurrence)
     refetchExpectedAutoTxFee()
-    //handleDisplayRecurrence(recurrence)
   }
   function handleRemoveInterval() {
     setInterval(0)
@@ -138,10 +135,7 @@ export const SubmitAutoTxDialog = ({
     if (value >= interval || interval == 0) {
       setDuration(value)
       setDisplayDuration(label)
-      const recurrence = Math.floor(value / interval)
-      setRecurrence(recurrence)
       refetchExpectedAutoTxFee()
-      // handleDisplayRecurrence(recurrence)
       return
     }
     // if (interval > 0) {
@@ -168,8 +162,6 @@ export const SubmitAutoTxDialog = ({
     }
     setStartTime(value)
     setDisplayStartTime(label)
-    const recurrence = Math.floor(duration / interval)
-    setRecurrence(recurrence)
     refetchExpectedAutoTxFee()
     //handleDisplayRecurrence(recurrence)
   }
@@ -236,12 +228,11 @@ export const SubmitAutoTxDialog = ({
         />
       ))
     }
-    console.log({ startTime, duration, interval, recurrences })
+    console.log({ startTime, duration, interval })
     handleSubmitAutoTx({
       startTime,
       duration,
       interval,
-      recurrences,
       connectionId: autoTxData.connectionId,
       configuration: autoTxData.configuration,
       // retries: autoTxData.retries,
@@ -578,7 +569,7 @@ export const SubmitAutoTxDialog = ({
                   Fee Funds - TRST
                 </Text>
               </Tooltip>
-              {recurrences > 0 && !isSuggestedFundsLoading && (
+              {!isSuggestedFundsLoading && (
                 <Text
                   align="center"
                   color="disabled"
@@ -623,7 +614,7 @@ export const SubmitAutoTxDialog = ({
               {duration && (
                 <>
                   <Text align="center" variant="legend">
-                    Details
+                    Overview
                   </Text>
                   <Inline justifyContent={'flex-start'}>
 
@@ -642,7 +633,7 @@ export const SubmitAutoTxDialog = ({
                           Interval is {displayInterval}
                         </Text>
                         <Text css={{ padding: '$4' }} variant="caption">
-                          {Math.floor((startTime + duration) / interval)}{' '}
+                          {Math.floor(duration / interval)}{' '}
                           recurrences
                         </Text>
                       </>
@@ -650,7 +641,7 @@ export const SubmitAutoTxDialog = ({
                   </Inline>
                   <Inline justifyContent={'space-between'} align="center">
                     <Tooltip
-                      label="name your trigger so you can find it back later (optional)"
+                      label="Name your trigger so you can find it back later by name"
                       aria-label="Fund Trigger - TRST (Optional)"
                     >
                       <Text color="disabled" wrap={false} variant="legend">
