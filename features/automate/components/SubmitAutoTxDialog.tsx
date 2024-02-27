@@ -414,7 +414,7 @@ export const SubmitAutoTxDialog = ({
             <Inline justifyContent={'space-between'} align="center">
               <div className="chips">
                 <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Start At
+                  Start Time
                 </Text>
                 <ChipSelected
                   label={
@@ -626,15 +626,17 @@ export const SubmitAutoTxDialog = ({
                     Details
                   </Text>
                   <Inline justifyContent={'flex-start'}>
-                    {startTime && (
-                      <Text css={{ padding: '$4' }} variant="caption">
-                        Execution Starts in {displayStartTime}
-                      </Text>
-                    )}
+
+                    <Text css={{ padding: '$4' }} variant="caption">
+                      Execution Starts {displayStartTime == 'Right Away'
+                        ? displayStartTime
+                        : 'In ' + displayStartTime}
+                    </Text>
+
                     <Text css={{ padding: '$4' }} variant="caption">
                       Duration is {displayDuration}
                     </Text>
-                    {interval && (
+                    {interval > 0 && (
                       <>
                         <Text css={{ padding: '$4' }} variant="caption">
                           Interval is {displayInterval}
