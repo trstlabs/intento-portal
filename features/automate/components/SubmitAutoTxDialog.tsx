@@ -66,21 +66,20 @@ export const SubmitAutoTxDialog = ({
   const [startTime, setStartTime] = useState(0)
   const [duration, setDuration] = useState(14 * 86400000)
 
-  const [interval, setInterval] = useState(0)
+  const [interval, setInterval] = useState(3600000)
   const [feeFunds, setFeeAmount] = useState(0)
   const [txLabel, setLabel] = useState(customLabel)
   const [recurrences, setRecurrence] = useState(2)
 
-  const [displayInterval, setDisplayInterval] = useState('None')
+  const [displayInterval, setDisplayInterval] = useState('1 hour')
   const [editInterval, setEditInterval] = useState(false)
   const [editIntervalValue, setEditIntervalValue] = useState('1 hour')
-  const [displayDuration, setDisplayDuration] = useState('1 hour')
+  const [displayDuration, setDisplayDuration] = useState('2 weeks')
   const [editDuration, setEditDuration] = useState(false)
   const [editDurationValue, setEditDurationValue] = useState('2 hours')
   const [displayStartTime, setDisplayStartTime] = useState('1 day')
   const [editStartTime, setEditStartTime] = useState(false)
   const [editStartTimeValue, setEditStartTimeValue] = useState('0')
-  //const [displayRecurrences, setDisplayRecurrences] = useState("2 times");
 
   const timeLabels = [
     'None',
@@ -267,6 +266,76 @@ export const SubmitAutoTxDialog = ({
             <Inline justifyContent={'space-between'} align="center">
               <div className="chips">
                 <Text align="center" variant="caption" css={{ margin: '$6' }}>
+                  Interval
+                </Text>
+                <ChipSelected
+                  label={displayInterval}
+                  onClick={() => handleRemoveInterval()}
+                />
+                {timeLabels.map((time, index) => (
+                  <span key={index}>
+                    {displayInterval != time && (
+                      <Chip
+                        label={time}
+                        onClick={() =>
+                          handleInterval(time, timeSecondValues[index])
+                        }
+                      />
+                    )}
+                  </span>
+                ))}
+              </div>
+              <Button
+                css={{ justifyContent: 'flex-end !important' }}
+                variant="ghost"
+                onClick={() => setEditInterval(!editInterval)}
+                icon={
+                  <IconWrapper
+                    size="medium"
+                    rotation="-90deg"
+                    color="tertiary"
+                    icon={editInterval ? <Union /> : <Chevron />}
+                  />
+                }
+              />
+              {editInterval && (
+                <Inline>
+                  <Column
+                    gap={8}
+                    align="flex-start"
+                    justifyContent="flex-start"
+                  >
+                    <Tooltip label={editLabel} aria-label="edit interval time">
+                      <Text variant="legend">
+                        Interval
+                        <StyledInput
+                          placeholder={displayInterval}
+                          value={editIntervalValue}
+                          onChange={({ target: { value } }) =>
+                            setEditIntervalValue(value)
+                          }
+                        />
+                      </Text>
+                    </Tooltip>
+                    <Button
+                      variant="primary"
+                      size="small"
+                      onClick={() =>
+                        handleInterval(
+                          cleanCustomInputForDisplay(editIntervalValue),
+                          convertTime(editIntervalValue)
+                        )
+                      }
+                    >
+                      {'Edit'}
+                    </Button>
+                  </Column>
+                </Inline>
+              )}
+            </Inline>
+            <Inline justifyContent={'space-between'} align="center">
+              <div className="chips">
+                <Text align="center" variant="caption" css={{ margin: '$6' }}>
                   Duration
                 </Text>
                 {startTime != 0 ? (
@@ -341,76 +410,7 @@ export const SubmitAutoTxDialog = ({
                 </Inline>
               )}
             </Inline>
-            <Inline justifyContent={'space-between'} align="center">
-              <div className="chips">
-                <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Interval
-                </Text>
-                <ChipSelected
-                  label={displayInterval}
-                  onClick={() => handleRemoveInterval()}
-                />
-                {timeLabels.map((time, index) => (
-                  <span key={index}>
-                    {displayInterval != time && (
-                      <Chip
-                        label={time}
-                        onClick={() =>
-                          handleInterval(time, timeSecondValues[index])
-                        }
-                      />
-                    )}
-                  </span>
-                ))}
-              </div>
-              <Button
-                css={{ justifyContent: 'flex-end !important' }}
-                variant="ghost"
-                onClick={() => setEditInterval(!editInterval)}
-                icon={
-                  <IconWrapper
-                    size="medium"
-                    rotation="-90deg"
-                    color="tertiary"
-                    icon={editInterval ? <Union /> : <Chevron />}
-                  />
-                }
-              />
-              {editInterval && (
-                <Inline>
-                  <Column
-                    gap={8}
-                    align="flex-start"
-                    justifyContent="flex-start"
-                  >
-                    <Tooltip label={editLabel} aria-label="edit interval time">
-                      <Text variant="legend">
-                        Interval
-                        <StyledInput
-                          placeholder={displayInterval}
-                          value={displayInterval}
-                          onChange={({ target: { value } }) =>
-                            setEditIntervalValue(value)
-                          }
-                        />
-                      </Text>
-                    </Tooltip>
-                    <Button
-                      variant="primary"
-                      size="small"
-                      onClick={() =>
-                        handleInterval(
-                          cleanCustomInputForDisplay(editIntervalValue),
-                          convertTime(editIntervalValue)
-                        )
-                      }
-                    >
-                      {'Edit'}
-                    </Button>
-                  </Column>
-                </Inline>
-              )}
-            </Inline>
+
             <Inline justifyContent={'space-between'} align="center">
               <div className="chips">
                 <Text align="center" variant="caption" css={{ margin: '$6' }}>
@@ -478,7 +478,7 @@ export const SubmitAutoTxDialog = ({
                         Start In
                         <StyledInput
                           placeholder={displayStartTime}
-                          value={displayStartTime}
+                          value={editStartTimeValue}
                           onChange={({ target: { value } }) =>
                             setEditStartTimeValue(value)
                           }
