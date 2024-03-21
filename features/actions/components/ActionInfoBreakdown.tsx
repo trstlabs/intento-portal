@@ -24,7 +24,6 @@ import { MsgUpdateActionParams } from '../../../types/trstTypes'
 import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
 
-import { convertMicroDenomToDenom } from 'util/conversion'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import {
@@ -39,21 +38,12 @@ import { getDuration, getRelativeTime } from '../../../util/time'
 import { getIntentoSigningClientOptions } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
-import { useActionHistory } from '../../../hooks/useActionInfo'
-
-import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
+import { ActionHistory } from './ActionHistory'
 
 
 type ActionInfoBreakdownProps = {
   actionInfo: ActionInfo
   ibcInfo: IBCAssetInfo
-}
-
-type InfoHeaderProps = {
-  id: string
-  owner: string
-  active: boolean
-  latestExecWasError: boolean
 }
 
 export const ActionInfoBreakdown = ({
@@ -63,26 +53,6 @@ export const ActionInfoBreakdown = ({
   ActionInfoBreakdownProps) => {
   const [icaAddress, _] = useGetICA(actionInfo.icaConfig?.connectionId, actionInfo.owner)
 
-  //Action history entries
-
-  const [actionHistory, setActionHistory] = useState([]);
-  const [historyLimit] = useState(5); // Define your historyLimit or make it dynamic as needed
-  const [fetchNext, setFetchNext] = useState(false);
-  const [paginationKey, setPaginationKey] = useState(undefined);
-  const [fetchedHistory, isHistoryLoading] = useActionHistory(actionInfo.id.toString(), historyLimit, paginationKey);
-  const refetchQueries = useRefetchQueries([`actionHistory/${actionInfo.id.toString()}/${paginationKey}`], 15);
-
-  useEffect(() => {
-
-    if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0 && !actionHistory.find(entry => entry == fetchedHistory.history[0])) {
-      if (!actionHistory.includes(fetchedHistory.history[0])) {
-        // Append new entries to the existing history
-        setActionHistory(prevHistory => [...prevHistory, ...fetchedHistory.history]);
-      }
-    }
-  }, [fetchedHistory]);
-
-  //const [icaActive, isIcaActiveLoading] = useIsActiveICAForUser()
   const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
@@ -96,14 +66,10 @@ export const ActionInfoBreakdown = ({
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
     actionInfo.feeAddress
   )
-  const isActive =
+  const isGood =
     actionInfo.endTime &&
     actionInfo.execTime &&
-    actionInfo.endTime.getTime() >= actionInfo.execTime.getTime()
-  const latestExecWasError =
-    actionHistory && actionHistory && actionHistory.length > 0 && actionHistory[actionHistory.length - 1].errors[0] !=
-    undefined
-
+    actionInfo.endTime.getTime() >= actionInfo.execTime.getTime() && (actionInfo.endTime.getTime() > Date.now() || actionInfo.execTime.getTime() < Date.now())
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -127,17 +93,6 @@ export const ActionInfoBreakdown = ({
       })
     }
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
-
-
-  //  fetching next page
-  const fetchNextPage = () => {
-    setFetchNext(prev => !prev)
-    const nextKey = fetchedHistory.pagination?.nextKey;
-    setPaginationKey(nextKey);
-    refetchQueries()
-    setFetchNext(prev => !prev)
-
-  };
 
 
   const { mutate: connectExternalWallet } = useConnectIBCWallet(chainId, symbol)
@@ -245,7 +200,7 @@ export const ActionInfoBreakdown = ({
                  <InfoHeader
                      id={actionInfo.id}
                      owner={actionInfo.owner}
-                     active={isActive}
+                     good={isGood}
                  />
                  <Inline
                      css={{
@@ -270,15 +225,14 @@ export const ActionInfoBreakdown = ({
       <InfoHeader
         id={actionInfo.id.toString()}
         owner={actionInfo.owner}
-        active={isActive}
-        latestExecWasError={latestExecWasError}
+        good={isGood}
       />
       {/* <Row> */}
 
       <Card
         variant="secondary"
         disabled
-        active={isActive}
+        active={isGood}
         css={{
           margin: '$6',
           padding: '$6',
@@ -297,13 +251,13 @@ export const ActionInfoBreakdown = ({
             )}
             <Text variant="title" align="center" css={{ padding: '$8' }}>
               {' '}
-              {latestExecWasError ? <>🔴</> : <>🟢 </>}
+              {isGood ? <>🔴</> : <>🟢 </>}
             </Text>
             <Text variant="legend">
               {actionInfo.label != '' ? (
                 <> {actionInfo.label}</>
               ) : (
-                <>Trigger {actionInfo.id.toString()}</>
+                <>Action {actionInfo.id.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">
@@ -735,116 +689,9 @@ export const ActionInfoBreakdown = ({
             </Row>
           </>
         )} */}
+        <ActionHistory id={actionInfo.id.toString()} />
 
-        {actionHistory && actionHistory.length > 0 && (
-          <>
-            {' '}
-            <Row>
-              {' '}
-              <Column gap={8} align="flex-start" justifyContent="flex-start">
-                {' '}
-                <Inline>
-                  <Text variant="legend" color="secondary" align="left">
-                    Execution History
-                  </Text>
-                </Inline>
-                {actionHistory
-                  ?.slice(0)
-                  .map(
-                    (
-                      {
-                        execFee,
-                        actualExecTime,
 
-                        executed,
-                        errors,
-                        timedOut,
-                      },
-                      index
-                    ) => (
-                      <div key={index}>
-                        <Column
-                          gap={2}
-                          align="flex-start"
-                          justifyContent="flex-start"
-                        >
-                          <Column>
-                            <Text variant="body">
-                              At {getRelativeTime(actualExecTime.getTime())}{' '}
-                            </Text>
-                          </Column>
-                          {/*  {actualExecTime.getSeconds() -
-                            scheduledExecTime.getSeconds() >=
-                            5 && (
-                            <Column>
-                              <Text variant="caption">
-                                Actual send time was{' '}
-                                {actualExecTime.getSeconds() -
-                                  scheduledExecTime.getSeconds()}{' '}
-                                seconds later than scheduled
-                              </Text>
-                            </Column>
-                          )} */}
-                          <Column>
-                            <Text variant="legend">
-                              Exec Fee:{' '}
-                              {convertMicroDenomToDenom(execFee.amount, 6)} INTO
-                            </Text>
-                          </Column>
-
-                          {errors.map((err, _) => (
-                            <Column>
-                              {/*    <span key={'b' + ei}> */}
-                              <Text variant="legend">
-                                🔴 Execution error: {err}
-                              </Text>
-
-                              {/*    </span> */}
-                            </Column>
-                          ))}
-
-                          <Column>
-                            <Text variant="legend">
-                              Executed: {executed && <>🟢</>}{' '}
-                              {!executed &&
-                                (Date.now() - actualExecTime.valueOf() >
-                                  3000000 ? (
-                                    <>🔴</>
-                                  ) || errors[0] : (
-                                  <>⌛</>
-                                ))}
-                            </Text>
-
-                            {timedOut && (
-                              <Text variant="legend">
-                                Execution on the destination chain did not
-                                happen because it timed out
-                              </Text>
-                            )}
-                          </Column>
-                        </Column>
-                      </div>
-                    )
-                  )}
-                {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
-              </Column>
-            </Row>
-          </>
-        )}
-        {actionInfo.startTime < actionInfo.endTime &&
-          !actionHistory && (
-            <Row>
-              {' '}
-              <Column gap={8} align="flex-start" justifyContent="flex-start">
-                {' '}
-                <Inline>
-                  <Text variant="legend" color="secondary" align="left">
-                    Execution History not available (yet)
-                  </Text>
-                </Inline>
-              </Column>
-            </Row>
-          )}
       </>
     </>
   )
@@ -871,18 +718,26 @@ function Row({ children }) {
   )
 }
 
-const InfoHeader = ({ id, active, latestExecWasError }: InfoHeaderProps) => (
+
+type InfoHeaderProps = {
+  id: string
+  owner: string
+  good: boolean
+}
+
+
+const InfoHeader = ({ id, good }: InfoHeaderProps) => (
   <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
     <Inline gap={6}>
       <Link href="/triggers" passHref>
         <Button as="a" variant="ghost" size="large" iconLeft={<WalletIcon />}>
-          <Inline css={{ paddingLeft: '$4' }}>All Triggers</Inline>
+          <Inline css={{ paddingLeft: '$4' }}>All Actions</Inline>
         </Button>
       </Link>
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {latestExecWasError ? <>🔴</> : active ? <>🟢</> : <>✅</>} Trigger {id}
+      {good ? <>🔴</> : good ? <>🟢</> : <>✅</>} Action {id}
     </Text>
   </Inline>
 )

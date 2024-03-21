@@ -81,7 +81,7 @@ export default function Actions() {
           {Boolean(myActions?.length) && (
             <>
               <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
-                Your Personal Triggers
+                Your Personal Actions
               </Text>
               <StyledDivForActionsGrid>
                 {myActions.map((actionInfo, index) => (
@@ -106,7 +106,7 @@ export default function Actions() {
             >
               <Text variant="primary">
                 {allActions.length} {myActions[0] && <>Other</>} Available
-                Automations
+                Actions
               </Text>
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
