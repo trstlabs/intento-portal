@@ -19,13 +19,13 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
-import { useGetExpectedAutoTxFee } from '../../../hooks/useChainInfo'
+import { useGetExpectedActionFee } from '../../../hooks/useChainInfo'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { AutoTxData } from '../../../types/trstTypes'
+import { ActionData } from '../../../types/trstTypes'
 
-type SubmitAutoTxDialogProps = {
+type SubmitActionDialogProps = {
   isDialogShowing: boolean
-  autoTxData: AutoTxData
+  actionData: ActionData
   chainSymbol?: string
   icaAddress?: string
   icaBalance?: number
@@ -37,19 +37,19 @@ type SubmitAutoTxDialogProps = {
   shouldDisableAuthzGrantButton?: boolean
   shouldDisableSendHostChainFundsButton?: boolean
   onRequestClose: () => void
-  handleSubmitAutoTx: (data: AutoTxData) => void
+  handleSubmitAction: (data: ActionData) => void
   handleCreateAuthzGrantClick?: (withFunds: boolean) => void
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
 }
 //todo clean up all authz and host fund logic
-export const SubmitAutoTxDialog = ({
+export const SubmitActionDialog = ({
   isDialogShowing,
   icaAddress,
   icaBalance,
   customLabel,
   chainSymbol,
-  autoTxData,
+  actionData,
   feeFundsHostChain,
   isExecutingAuthzGrant,
   isExecutingSendFundsOnHost,
@@ -58,10 +58,10 @@ export const SubmitAutoTxDialog = ({
   shouldDisableSendHostChainFundsButton,
   onRequestClose,
   setFeeFundsHostChain,
-  handleSubmitAutoTx,
+  handleSubmitAction,
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
-}: SubmitAutoTxDialogProps) => {
+}: SubmitActionDialogProps) => {
 
   const [startTime, setStartTime] = useState(3600000)
   const [duration, setDuration] = useState(14 * 86400000)
@@ -125,7 +125,7 @@ export const SubmitAutoTxDialog = ({
     }
     setInterval(value)
     setDisplayInterval(label)
-    refetchExpectedAutoTxFee()
+    refetchExpectedActionFee()
   }
   function handleRemoveInterval() {
     setInterval(0)
@@ -135,7 +135,7 @@ export const SubmitAutoTxDialog = ({
     if (value >= interval || interval == 0) {
       setDuration(value)
       setDisplayDuration(label)
-      refetchExpectedAutoTxFee()
+      refetchExpectedActionFee()
       return
     }
     // if (interval > 0) {
@@ -154,7 +154,7 @@ export const SubmitAutoTxDialog = ({
   function handleRemoveDuration() {
     setDuration(0)
     setDisplayDuration('None Selected')
-    refetchExpectedAutoTxFee()
+    refetchExpectedActionFee()
   }
   function handleStartTime(label: string, value: number) {
     if (value == undefined) {
@@ -162,13 +162,13 @@ export const SubmitAutoTxDialog = ({
     }
     setStartTime(value)
     setDisplayStartTime(label)
-    refetchExpectedAutoTxFee()
+    refetchExpectedActionFee()
     //handleDisplayRecurrence(recurrence)
   }
   function handleRemoveStartTime() {
     setStartTime(0)
     setDisplayStartTime(displayInterval)
-    refetchExpectedAutoTxFee()
+    refetchExpectedActionFee()
   }
 
   const editLabel = 'days(s), hour(s), minute(s) or weeks(s)'
@@ -203,13 +203,13 @@ export const SubmitAutoTxDialog = ({
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
-  const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedAutoTxFee(
+  const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedActionFee(
     duration / 1000,
-    autoTxData,
+    actionData,
     isDialogShowing,
     interval / 1000
   )
-  const refetchExpectedAutoTxFee = useRefetchQueries([`expectedAutoTxFee/${duration}/${autoTxData}/${isDialogShowing}/${interval}`])
+  const refetchExpectedActionFee = useRefetchQueries([`expectedActionFee/${duration}/${actionData}/${isDialogShowing}/${interval}`])
   const canSchedule = duration > 0 && interval > 0
 
   const handleData = (icaAddressForAuthZGrant: string) => {
@@ -229,14 +229,14 @@ export const SubmitAutoTxDialog = ({
       ))
     }
     console.log({ startTime, duration, interval })
-    handleSubmitAutoTx({
+    handleSubmitAction({
       startTime,
       duration,
       interval,
-      connectionId: autoTxData.connectionId,
-      configuration: autoTxData.configuration,
-      // retries: autoTxData.retries,
-      msgs: autoTxData.msgs,
+      connectionId: actionData.connectionId,
+      configuration: actionData.configuration,
+      // retries: actionData.retries,
+      msgs: actionData.msgs,
       icaAddressForAuthZGrant,
       feeFunds,
       label: txLabel,
@@ -495,7 +495,7 @@ export const SubmitAutoTxDialog = ({
             <Column css={{ padding: '$6 0' }}>
               <DialogDivider offsetBottom="$4" />
 
-              {chainSymbol != 'TRST' && (
+              {chainSymbol != 'INTO' && (
                 <>
                   <Text align="center" variant="caption">
                     Host Chain Fee Funds - {chainSymbol}
@@ -563,10 +563,10 @@ export const SubmitAutoTxDialog = ({
               )}
               <Tooltip
                 label="Funds to set aside for execution fee of the action. Remaining funds are refunded after execution. If deduct fees from wallet balance is checked, your local balance will be used"
-                aria-label="Fund Trigger - TRST (Optional)"
+                aria-label="Fund Trigger - INTO (Optional)"
               >
                 <Text align="center" css={{ margin: '$4' }} variant="caption">
-                  Fee Funds - TRST
+                  Fee Funds - INTO
                 </Text>
               </Tooltip>
               {!isSuggestedFundsLoading && (
@@ -576,7 +576,7 @@ export const SubmitAutoTxDialog = ({
                   wrap={false}
                   variant="caption"
                 >
-                  Estimated at {suggestedFunds} TRST
+                  Estimated at {suggestedFunds} INTO
                 </Text>
               )}
               <Inline justifyContent={'space-between'}>
@@ -593,7 +593,7 @@ export const SubmitAutoTxDialog = ({
               {!checkedFeeAcc && (
                 <Inline justifyContent={'space-between'}>
                   <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                    Attatch TRST fee to action
+                    Attatch INTO fee to action
                   </Text>{' '}
                   <Text variant="legend">
                     <StyledInput
@@ -605,7 +605,7 @@ export const SubmitAutoTxDialog = ({
                         setFeeAmount(Number(value))
                       }
                     />
-                    TRST
+                    INTO
                   </Text>
                 </Inline>
               )}
@@ -642,7 +642,7 @@ export const SubmitAutoTxDialog = ({
                   <Inline justifyContent={'space-between'} align="center">
                     <Tooltip
                       label="Name your trigger so you can find it back later by name"
-                      aria-label="Fund Trigger - TRST (Optional)"
+                      aria-label="Fund Trigger - INTO (Optional)"
                     >
                       <Text color="disabled" wrap={false} variant="legend">
                         Label (optional)
@@ -679,7 +679,7 @@ export const SubmitAutoTxDialog = ({
           </Button>
         }
       >
-        {autoTxData.connectionId && (
+        {actionData.connectionId && (
           <Button
             disabled={shouldDisableAuthzGrantButton}
             variant="secondary"

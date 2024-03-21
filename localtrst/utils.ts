@@ -1,8 +1,8 @@
 import { sha256 } from '@noble/hashes/sha256'
-import { ibc } from 'trustlessjs'
-// import { cosmos } from 'trustlessjs'
-import { State as ChannelState } from 'trustlessjs/dist/codegen/ibc/core/channel/v1/channel'
-import { State as ConnectionState } from 'trustlessjs/dist/codegen/ibc/core/connection/v1/connection'
+import { ibc } from 'intentojs'
+// import { cosmos } from 'intentojs'
+import { State as ChannelState } from 'intentojs/dist/codegen/ibc/core/channel/v1/channel'
+import { State as ConnectionState } from 'intentojs/dist/codegen/ibc/core/connection/v1/connection'
 import { toUtf8, toHex } from '@cosmjs/encoding'
 
 export const ibcDenom = (
@@ -27,7 +27,7 @@ export async function waitForIBCConnection(
   chainId: string,
   grpcWebUrl: string
 ) {
-  const trustlessjs = await ibc.ClientFactory.createRPCQueryClient({
+  const intentojs = await ibc.ClientFactory.createRPCQueryClient({
     rpcEndpoint: grpcWebUrl,
   })
 
@@ -35,7 +35,7 @@ export async function waitForIBCConnection(
   while (true) {
     try {
       const { connections } =
-        await trustlessjs.ibc.core.connection.v1.connections({
+        await intentojs.ibc.core.connection.v1.connections({
           pagination: undefined,
         })
 
@@ -58,14 +58,14 @@ export async function waitForIBCChannel(
   grpcWebUrl: string,
   channelId: string
 ) {
-  const trustlessjs = await ibc.ClientFactory.createRPCQueryClient({
+  const intentojs = await ibc.ClientFactory.createRPCQueryClient({
     rpcEndpoint: grpcWebUrl,
   })
 
   console.log(`Waiting for ${channelId} on ${chainId}...`)
   outter: while (true) {
     try {
-      const response = await trustlessjs.ibc.core.channel.v1.channels({
+      const response = await intentojs.ibc.core.channel.v1.channels({
         pagination: undefined,
       })
 
@@ -87,14 +87,14 @@ export async function sleep(ms: number) {
 }
 
 // export async function waitForBlocks(chainId: string, grpcWebUrl: string) {
-//   const trustlessjs = await cosmos.ClientFactory.createRPCQueryClient({
+//   const intentojs = await cosmos.ClientFactory.createRPCQueryClient({
 //     rpcEndpoint: grpcWebUrl,
 //   })
 
 //   console.log(`Waiting for blocks on ${chainId}...`)
 //   while (true) {
 //     try {
-//       const { block } = await trustlessjs.getLatestBlock({})
+//       const { block } = await intentojs.getLatestBlock({})
 
 //       if (Number(block?.header?.height) >= 1) {
 //         console.log(`Current block on ${chainId}: ${block!.header!.height}`)

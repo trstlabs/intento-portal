@@ -1,10 +1,10 @@
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { Coin } from '@cosmjs/stargate'
-import { ExecutionConfiguration, /* AutoTxHistoryEntry */ } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { ExecutionConfiguration, /* ActionHistoryEntry */ } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
-export interface MsgUpdateAutoTxParams {
+export interface MsgUpdateActionParams {
   owner: string
-  txId: number
+  id: number
   connectionId?: string
   msgs?: Any[]
   endTime?: number
@@ -16,7 +16,7 @@ export interface MsgUpdateAutoTxParams {
   configuration?: ExecutionConfiguration
 }
 
-export class AutoTxData {
+export class ActionData {
   duration: number
   msgs: string[]
   icaAddressForAuthZGrant?: string

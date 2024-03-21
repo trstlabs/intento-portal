@@ -9,20 +9,6 @@ generate-schema:
 # After generating schema, ann agggregate schemas can be used for GPT knowledge base input (cosmos, cosmwasm, ibc, osmosis)
 aggregate-schema:
 	bash ./util/scripts/aggregate-schema.sh
-	
-# When you run localtrst again, remove Trustless Hub from kelr and add it again. Encryptionutils has to be defined again. 
-# Otherwise you'll get an error when sending transactions ( enrypted: ). Also unpin and re-add keyring.
-run-localtrst: # CTRL+C to stop
-	docker compose -f localtrst/docker-compose-local.yml up
-
-kill-localtrst:
-	docker compose -f localtrst/docker-compose-local.yml stop 
-	docker compose -f localtrst/docker-compose-local.yml rm -f 
-
-# After make run-localtrst is streaming blocks, this will setup TIP20 tokens, the AMM and send some TRST and ETH to user "b"
-setup-dex:
-	(cd localtrst && ./setup-dex.sh)
-
 
 ### users to test and play around with:
 #   a_mnemonic="grant rice replace explain federal release fix clever romance raise often wild taxi quarter soccer fiber love must tape steak together observe swap guitar"

@@ -35,7 +35,7 @@ const config = {
 };
 
 module.exports = withBundleAnalyzer(
-  process.env.BUNDLE_TRSTBLOCKS === 'true'
+  process.env.BUNDLE_INTOBLOCKS === 'true'
     ? withBundleJunoblocks(config)
     : config
 );

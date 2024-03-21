@@ -2,19 +2,19 @@ export const wasmExamples = [
   {
     typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
     value: {
-      sender: 'trust1....',
-      contract: 'trust1....',
+      sender: 'into1....',
+      contract: 'into1....',
       msg: {
         swap_and_send_to: {
           input_token: 'TOKEN2',
           min_token: '500',
-          recipient: 'trust1...',
+          recipient: 'into1...',
         },
       },
       funds: [
         {
           amount: '70',
-          denom: 'utrst',
+          denom: 'uinto',
         },
       ],
     },
@@ -22,22 +22,22 @@ export const wasmExamples = [
   {
     typeUrl: '/cosmwasm.wasm.v1.MsgInstantiateContract',
     value: {
-      sender: 'trust1....',
-      admin: 'trust1....',
+      sender: 'into1....',
+      admin: 'into1....',
       codeId: '0',
       label: 'my contract',
       msg: {
         initial_balances: [
           {
             amount: '7',
-            address: 'trust1....',
+            address: 'into1....',
           },
         ],
       },
       funds: [
         {
           amount: '70',
-          denom: 'utrst',
+          denom: 'uinto',
         },
       ],
     },
@@ -51,11 +51,11 @@ export const generalExamples = [
       amount: [
         {
           amount: '1000000',
-          denom: 'utrst',
+          denom: 'uinto',
         },
       ],
-      fromAddress: 'trust1....',
-      toAddress: 'trust1...',
+      fromAddress: 'into1....',
+      toAddress: 'into1...',
     },
   },
   {
@@ -63,9 +63,9 @@ export const generalExamples = [
     value: {
       amount: {
         amount: '1000000',
-        denom: 'utrst'
+        denom: 'uinto'
       },
-      delegatorAddress: 'trust1....',
+      delegatorAddress: 'into1....',
       validatorAddress: 'trustvaloper1...',
     },
   },
@@ -73,7 +73,7 @@ export const generalExamples = [
     typeUrl: '/cosmos.gov.v1beta1.MsgVote',
     value: {
       "proposalId": "1",
-      "voter": "trust1....",
+      "voter": "into1....",
       "option": "VOTE_OPTION_UNSPECIFIED"
 
     },
@@ -82,7 +82,7 @@ export const generalExamples = [
     typeUrl: "/cosmos.gov.v1beta1.MsgVoteWeighted",
     value: {
       "proposalId": "1",
-      "voter": "trust1....",
+      "voter": "into1....",
       "options": [
         {
           "option": "VOTE_OPTION_NO",
@@ -104,8 +104,8 @@ export const generalExamples = [
         title: "Important Gov Proposal",
         description: "tokens for all!"
       },
-      initialDeposit: [{ denom: "utrst", amount: "100000" }],
-      proposer: 'trust1....',
+      initialDeposit: [{ denom: "uinto", amount: "100000" }],
+      proposer: 'into1....',
     },
   },
   {
@@ -114,25 +114,25 @@ export const generalExamples = [
       amount: [
         {
           amount: '1000000',
-          denom: 'utrst',
+          denom: 'uinto',
         },
       ],
-      depositor: 'trust1....',
+      depositor: 'into1....',
     },
   },
   {
     typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
     value: {
-      granter: 'trust1....',
-      grantee: 'trust1....',
+      granter: 'into1....',
+      grantee: 'into1....',
       msgTypeUrl: 'cosmos.bank.v1beta1.MsgSend',
     },
   },
   {
     typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
     value: {
-      granter: 'trust1....',
-      grantee: 'trust1....',
+      granter: 'into1....',
+      grantee: 'into1....',
       grant: {
         authorization: {
           typeUrl: '/cosmos.authz.v1beta1.GenericAuthorization',
@@ -147,7 +147,7 @@ export const generalExamples = [
   {
     typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
     value: {
-      delegatorAddress: 'trust1....',
+      delegatorAddress: 'into1....',
       validatorAddress: 'trustvaloper1...',
     },
   },
@@ -158,7 +158,7 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
     value: {
-      sender: 'trust1....',
+      sender: 'into1....',
       routes: [{
         poolId: "1", tokenOutDenom: "ucosm"
       }],
@@ -169,7 +169,7 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountOut',
     value: {
-      sender: 'trust1....',
+      sender: 'into1....',
       tokenInMaxAmount: '1000000',
       tokenOut: { denom: "uosmo", amount: "1000000" },
     },
@@ -177,16 +177,16 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgJoinPool',
     value: {
-      sender: 'trust1....',
-      poolId: 'trust1...',
+      sender: 'into1....',
+      poolId: 'into1...',
       shareOutAmount: '1000000',
     },
   },
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgExitPool',
     value: {
-      sender: 'trust1....',
-      poolId: 'trust1...',
+      sender: 'into1....',
+      poolId: 'into1...',
       shareInAmount: '1000000',
       tokenOutMins: [{ denom: "uosmo", amount: "1000000" }],
     },

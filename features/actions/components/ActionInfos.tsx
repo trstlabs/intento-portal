@@ -10,7 +10,7 @@ import React, { useRef, useState } from 'react'
 
 import { QueryInput } from 'components//Input/QueryInput'
 
-type AutoTxInfosProps = {
+type ActionInfosProps = {
   readOnly?: boolean
   disabled?: boolean
   // codeId: number
@@ -18,15 +18,15 @@ type AutoTxInfosProps = {
   size?: 'small' | 'large'
 }
 
-export const AutoTxInfos = ({
+export const ActionInfos = ({
   readOnly,
   // codeId,
   size = 'large',
-}: AutoTxInfosProps) => {
+}: ActionInfosProps) => {
   const wrapperRef = useRef<HTMLDivElement>()
   const inputRef = useRef<HTMLInputElement>()
-  // const infos = useAutoTxInfos(codeId)
-  const [isAutoTxListShowing, setAutoTxListShowing] = useState(false)
+  // const infos = useActionInfos(codeId)
+  const [isActionListShowing, setActionListShowing] = useState(false)
 
   // const { balance: availableAmount } = useTokenBalance(tokenSymbol)
   const [tokenSearchQuery, setTokenSearchQuery] = useState('')
@@ -35,7 +35,7 @@ export const AutoTxInfos = ({
 
 
   useOnClickOutside([wrapperRef], () => {
-    setAutoTxListShowing(false)
+    setActionListShowing(false)
   })
 
   if (size === 'small') {
@@ -44,7 +44,7 @@ export const AutoTxInfos = ({
         selected={isInputForSearchFocused}
         ref={wrapperRef}
       >
-        {isAutoTxListShowing && (
+        {isActionListShowing && (
           <Inline justifyContent="space-between" css={{ padding: '$5 $6' }}>
             <QueryInput
               searchQuery={tokenSearchQuery}
@@ -59,7 +59,7 @@ export const AutoTxInfos = ({
             <Button
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
-              onClick={() => setAutoTxListShowing(false)}
+              onClick={() => setActionListShowing(false)}
               iconColor="tertiary"
             />
           </Inline>
@@ -76,7 +76,7 @@ export const AutoTxInfos = ({
     >
       <StyledDivForWrapper>
         <StyledDivForSelector>
-          {isAutoTxListShowing && (
+          {isActionListShowing && (
             <QueryInput
               searchQuery={tokenSearchQuery}
               onQueryChange={setTokenSearchQuery}
@@ -91,11 +91,11 @@ export const AutoTxInfos = ({
          
         </StyledDivForSelector>
         <StyledDivForAmountWrapper>
-          {isAutoTxListShowing && (
+          {isActionListShowing && (
             <Button
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
-              onClick={() => setAutoTxListShowing(false)}
+              onClick={() => setActionListShowing(false)}
               iconColor="tertiary"
             />
           )}
@@ -106,8 +106,8 @@ export const AutoTxInfos = ({
           interactive={readOnly ? false : !isInputForAmountFocused}
           onClick={() => {
             if (!readOnly) {
-              if (isAutoTxListShowing) {
-                setAutoTxListShowing(false)
+              if (isActionListShowing) {
+                setActionListShowing(false)
               } else {
                 inputRef.current?.focus()
               }

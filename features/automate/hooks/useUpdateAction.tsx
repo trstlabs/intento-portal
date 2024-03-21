@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeUpdateAutoTx } from '../../../services/automate'
+import { executeUpdateAction } from '../../../services/automate'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -20,33 +20,33 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 
-import { MsgUpdateAutoTxParams } from '../../../types/trstTypes'
+import { MsgUpdateActionParams } from '../../../types/trstTypes'
 
 
-type UseUpdateAutoTxArgs = {
-    autoTxParams: MsgUpdateAutoTxParams
+type UseUpdateActionArgs = {
+    actionParams: MsgUpdateActionParams
 }
 
-export const useUpdateAutoTx = ({
-    autoTxParams,
-}: UseUpdateAutoTxArgs) => {
+export const useUpdateAction = ({
+    actionParams,
+}: UseUpdateActionArgs) => {
     const { client, status, address } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries(['tokenBalance'])
     return useMutation(
-        'updateAutoTx',
+        'updateAction',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            if (address !== autoTxParams.owner) {
-                throw new Error('This feature will only work for the owner: '+ autoTxParams.owner)
+            if (address !== actionParams.owner) {
+                throw new Error('This feature will only work for the owner: '+ actionParams.owner)
             }
 
-            return await executeUpdateAutoTx({
-                autoTxParams,
+            return await executeUpdateAction({
+                actionParams,
                 client,
             })
 

@@ -2,7 +2,7 @@ import { styled } from 'junoblocks'
 import { useState, useRef, useEffect } from 'react'
 import { AutomateComponent } from './AutomateComponent'
 import { generalExamples } from './ExampleMsgs'
-import { AutoTxData } from '../../../types/trstTypes'
+import { ActionData } from '../../../types/trstTypes'
 
 type AutomateWrapperProps = {
   /* will be used if provided on first render instead of internal state */
@@ -15,10 +15,10 @@ export const AutomateWrapper = ({
   initialExample,
   initialMessage,
 }: AutomateWrapperProps) => {
-  let initialAutoTxData = new AutoTxData()
-  initialAutoTxData.duration = 14 * 86400000
-  initialAutoTxData.interval = 86400000
-  initialAutoTxData.msgs = [JSON.stringify(generalExamples[0], null, 2)]
+  let initialActionData = new ActionData()
+  initialActionData.duration = 14 * 86400000
+  initialActionData.interval = 86400000
+  initialActionData.msgs = [JSON.stringify(generalExamples[0], null, 2)]
   const initConfig = {
     saveMsgResponses: true,
     updatingDisabled: false,
@@ -27,10 +27,10 @@ export const AutomateWrapper = ({
     fallbackToOwnerBalance: true,
     reregisterIcaAfterTimeout: true,
   }
-  initialAutoTxData.configuration = initConfig
+  initialActionData.configuration = initConfig
   //data.typeUrls = [""]
   //works faster than without array for some reason
-  const [autoTxDatas, setAutoTxDatas] = useState([initialAutoTxData])
+  const [actionDatas, setActionDatas] = useState([initialActionData])
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
@@ -38,26 +38,26 @@ export const AutomateWrapper = ({
   useEffect(
     function setInitialIfProvided() {
       if (initialMessageValue) {
-        autoTxDatas[0].msgs[0] = initialMessageValue
-        setAutoTxDatas(autoTxDatas)
+        actionDatas[0].msgs[0] = initialMessageValue
+        setActionDatas(actionDatas)
       } else if (initialExampleValue) {
         const exampleIndex = initialExampleValue
-        autoTxDatas[0].msgs[0] = JSON.stringify(
+        actionDatas[0].msgs[0] = JSON.stringify(
           generalExamples[exampleIndex],
           null,
           '\t'
         )
-        setAutoTxDatas(autoTxDatas)
+        setActionDatas(actionDatas)
       }
     },
-    [initialExampleValue, setAutoTxDatas]
+    [initialExampleValue, setActionDatas]
   )
 
   return (
     <StyledDivForWrapper>
       <AutomateComponent
-        autoTxData={autoTxDatas[0]}
-        onAutoTxChange={(autoTx) => setAutoTxDatas([autoTx])}
+        actionData={actionDatas[0]}
+        onActionChange={(action) => setActionDatas([action])}
       />
     </StyledDivForWrapper>
   )

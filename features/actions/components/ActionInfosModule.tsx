@@ -6,29 +6,29 @@ import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { useAutoTxInfos } from '../../../hooks/useAutoTxInfo'
-import { AutoTxInfos } from './AutoTxInfos'
+import { useActionInfos } from '../../../hooks/useActionInfo'
+import { ActionInfos } from './ActionInfos'
 
-export const AutoTxInfosModule = () => {
+export const ActionInfosModule = () => {
 
     const transactionStatus = useRecoilValue(transactionStatusState)
 
     /* fetch token list and set initial state */
-    const [autoTxList, isAutoTxListLoading] = useAutoTxInfos()
+    const [actionList, isActionListLoading] = useActionInfos()
     useEffect(() => {
 
-    }, [autoTxList])
+    }, [actionList])
 
     
     const isUiDisabled =
-        transactionStatus === TransactionStatus.EXECUTING || isAutoTxListLoading
+        transactionStatus === TransactionStatus.EXECUTING || isActionListLoading
    // const uiSize = useMedia('sm') ? 'small' : 'large'
 
 
     return (
         <>
             <StyledDivForWrapper>
-                <AutoTxInfos
+                <ActionInfos
                     
                    onChange={() => {
                     }}

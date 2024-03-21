@@ -1,15 +1,15 @@
-import { trst, cosmos, tendermint } from 'trustlessjs'
+import { intento, cosmos, tendermint } from 'intentojs'
 
 import { useQuery } from 'react-query'
 
 import { StargateClient } from '@cosmjs/stargate'
 
-export const useTrstRpcClient = () => {
+export const useIntentoRpcClient = () => {
   const { data } = useQuery(
-    '@trst-querier',
+    '@intento-querier',
     async () => {
-      return trst.ClientFactory.createRPCQueryClient({
-        rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
+      return intento.ClientFactory.createRPCQueryClient({
+        rpcEndpoint: process.env.NEXT_PUBLIC_INTO_RPC,
       })
     },
     { enabled: true}
@@ -23,7 +23,7 @@ export const useCosmosRpcClient = () => {
     '@cosmos-querier',
     () => {
       return cosmos.ClientFactory.createRPCQueryClient({
-       rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
+       rpcEndpoint: process.env.NEXT_PUBLIC_INTO_RPC,
       })
     },
     { enabled: cosmos != undefined}
@@ -39,7 +39,7 @@ export const useTendermintRpcClient = () => {
     '@client-querier',
     () => {
       return StargateClient.connect(
-       process.env.NEXT_PUBLIC_TRST_RPC,
+       process.env.NEXT_PUBLIC_INTO_RPC,
       )
     },
     { enabled: tendermint != undefined}

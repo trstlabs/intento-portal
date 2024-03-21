@@ -2,17 +2,17 @@ import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/amino
 import { convertMicroDenomToDenom } from 'junoblocks'
 import { StargateClient } from '@cosmjs/stargate'
 
-import { Params } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
-import { Params as DistrModuleParams } from 'trustlessjs/dist/codegen/cosmos/distribution/v1beta1/distribution'
-import { Params as MintModuleParams } from 'trustlessjs/dist/codegen/trst/mint/v1beta1/mint'
-import { Params as AllocModuleParams } from 'trustlessjs/dist/codegen/trst/alloc/v1beta1/params'
-import { Params as StakingModuleParams } from 'trustlessjs/dist/codegen/cosmos/staking/v1beta1/staking'
+import { Params } from 'intentojs/dist/codegen/intento/intent/v1beta1/params'
+import { Params as DistrModuleParams } from 'intentojs/dist/codegen/cosmos/distribution/v1beta1/distribution'
+import { Params as MintModuleParams } from 'intentojs/dist/codegen/intento/mint/v1beta1/mint'
+import { Params as AllocModuleParams } from 'intentojs/dist/codegen/intento/alloc/v1beta1/params'
+import { Params as StakingModuleParams } from 'intentojs/dist/codegen/cosmos/staking/v1beta1/staking'
 
 import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 
-import { QueryParamsResponse as QueryAllocParamsResponse } from 'trustlessjs/dist/codegen/trst/alloc/v1beta1/query'
-import { QueryParamsResponse as QueryAutoTxParamsResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query'
-import { QueryAnnualProvisionsResponse } from 'trustlessjs/dist/codegen/trst/mint/v1beta1/query'
+import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/codegen/intento/alloc/v1beta1/query'
+import { QueryParamsResponse as QueryActionParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1beta1/query'
 
 export interface BaseQueryInput {
   client: any
@@ -192,7 +192,7 @@ export const getAPYForAutoCompound = async (
 ) => {
   try {
     const apy = await getAPY(cosmosClient, client, paramsState, intervalSeconds)
-    const expectedFees = getExpectedAutoTxFee(
+    const expectedFees = getExpectedActionFee(
       triggerParams,
       durationSeconds,
       nrMessages,
@@ -204,7 +204,7 @@ export const getAPYForAutoCompound = async (
   }
 }
 
-export const getExpectedAutoTxFee = (
+export const getExpectedActionFee = (
   triggerParams: Params,
   durationSeconds: number,
   lenMsgs: number,
@@ -222,14 +222,14 @@ export const getExpectedAutoTxFee = (
   const periodMinutes = Math.trunc(periodSeconds / 60)
 
   const flexFeeForPeriod =
-    (Number(triggerParams.AutoTxFlexFeeMul) / 100) * periodMinutes
+    (Number(triggerParams.ActionFlexFeeMul) / 100) * periodMinutes
 
-  const autoTxFee =
+  const actionFee =
     recurrences * flexFeeForPeriod +
-    recurrences * Number(triggerParams.AutoTxConstantFee) * lenMsgs
-  const autoTxFeeDenom = convertMicroDenomToDenom(autoTxFee, 6)
+    recurrences * Number(triggerParams.ActionConstantFee) * lenMsgs
+  const actionFeeDenom = convertMicroDenomToDenom(actionFee, 6)
 
-  return Number(autoTxFeeDenom.toFixed(4))
+  return Number(actionFeeDenom.toFixed(4))
 }
 
 function blockInfoAndCalculateApr(
@@ -307,7 +307,7 @@ async function getStakingParams(client: any) {
 
 async function getAllocParams(client: any) {
   try {
-    const alloc = await client.trst.alloc.v1beta1.params({})
+    const alloc = await client.intento.alloc.v1beta1.params({})
 
     return alloc.params
   } catch (e) {
@@ -340,7 +340,7 @@ export async function getDistributionParams(client: any) {
 
 async function getMintParams(client: any) {
   try {
-    const mint = await client.trst.mint.v1beta1.params({})
+    const mint = await client.intento.mint.v1beta1.params({})
     //   const communityTax = parseFloat(distribution.params.community_tax)
     return { params: mint.params }
   } catch (e) {
@@ -351,7 +351,7 @@ async function getMintParams(client: any) {
 async function getAnnualProvisions(client: any) {
   try {
     const annualProvisions: QueryAnnualProvisionsResponse =
-      await client.trst.mint.v1beta1.annualProvisions({})
+      await client.intento.mint.v1beta1.annualProvisions({})
     console.log('annualProvisions', annualProvisions)
     // decode the protobuf-encoded bytes into a string
     const decString = new TextDecoder().decode(
@@ -364,16 +364,16 @@ async function getAnnualProvisions(client: any) {
   }
 }
 
-export async function getAutoTxParams(client: any) {
-  const resp: QueryAutoTxParamsResponse =
-    await client.trst.autoibctx.v1beta1.params({})
+export async function getActionParams(client: any) {
+  const resp: QueryActionParamsResponse =
+    await client.intento.intent.v1beta1.params({})
   return resp.params
 }
 
 async function getStakeProvisionPercent(client: any) {
   try {
     const resp: QueryAllocParamsResponse =
-      await client.trst.alloc.v1beta1.params({})
+      await client.intento.alloc.v1beta1.params({})
 
     const stakeProvision = resp.params.distributionProportions.staking
     console.log('stakeProvision', Number(stakeProvision))

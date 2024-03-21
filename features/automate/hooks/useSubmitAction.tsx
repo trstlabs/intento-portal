@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeSubmitAutoTx } from '../../../services/automate'
+import { executeSubmitAction } from '../../../services/automate'
 import {
   TransactionStatus,
   transactionStatusState,
@@ -20,13 +20,13 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
-import { AutoTxData } from '../../../types/trstTypes'
+import { ActionData } from '../../../types/trstTypes'
 
-type UseSubmitAutoTxArgs = {
-  autoTxData: AutoTxData
+type UseSubmitActionArgs = {
+  actionData: ActionData
 }
 
-export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
+export const useSubmitAction = ({ actionData }: UseSubmitActionArgs) => {
   const { client, address, status } = useRecoilValue(walletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -34,7 +34,7 @@ export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
 
   const refetchQueries = useRefetchQueries(['tokenBalance'])
   return useMutation(
-    'submitAutoTx',
+    'submitAction',
     async () => {
      // console.log(status)
       if (status !== WalletStatusType.connected || client == null) {
@@ -43,10 +43,10 @@ export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
       // if (client == null) {
       //   throw new Error('Please try reconnecting your wallet.')
       // }
-      console.log(autoTxData)
-      const response: DeliverTxResponse = await executeSubmitAutoTx({
+      console.log(actionData)
+      const response: DeliverTxResponse = await executeSubmitAction({
         owner: address,
-        autoTxData,
+        actionData,
         client,
       })
       return response
@@ -54,21 +54,21 @@ export const useSubmitAutoTx = ({ autoTxData }: UseSubmitAutoTxArgs) => {
     {
       onSuccess(data) {
         console.log(data)
-        let autoTxID = data.events
-          .find((event) => event.type == 'auto-tx')
-          .attributes.find((attr) => attr.key == 'tx-id').value
+        let actionID = data.events
+          .find((event) => event.type == 'action')
+          .attributes.find((attr) => attr.key == 'id').value
 
-        console.log(autoTxID)
+        console.log(actionID)
         toast.custom((t) => (
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}
             title="Your trigger is submitted!"
-            body={`An on-chain trigger was created succesfully! Your unique trigger ID is ${autoTxID}`}
+            body={`An on-chain trigger was created succesfully! Your unique ID is ${actionID}`}
             buttons={
               <Button
                 as="a"
                 variant="ghost"
-                href={`/triggers/${autoTxID}`}
+                href={`/triggers/${actionID}`}
                 target="__blank"
                 rel="noopener noreferrer"
                 iconRight={<UpRightArrow />}

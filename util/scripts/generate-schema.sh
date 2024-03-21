@@ -9,8 +9,8 @@ rm -rf "${SCRIPT_PATH}/schemas"
 
 
 
-TRST_DIR="${SCRIPT_PATH}/Trustless-Hub/proto"
-TRST_THIRD_PARTY_DIR="${SCRIPT_PATH}/Trustless-Hub/third_party/proto"
+INTO_DIR="${SCRIPT_PATH}/Trustless-Hub/proto"
+INTO_THIRD_PARTY_DIR="${SCRIPT_PATH}/Trustless-Hub/third_party/proto"
 
 
 # directory for individual schema files
@@ -19,9 +19,9 @@ MSGS_DIR="${SCRIPT_PATH}/schemas/msgs"
 INDEX_FILE="${MSGS_DIR}/index.ts"
 
 echo "${SCRIPT_PATH}"
-echo "${TRST_DIR}"
-echo "${TRST_THIRD_PARTY_DIR}"
-echo " $(find ${TRST_DIR} ${TRST_THIRD_PARTY_DIR} -path -prune -o -name '*.proto' -print0 | xargs -0)"
+echo "${INTO_DIR}"
+echo "${INTO_THIRD_PARTY_DIR}"
+echo " $(find ${INTO_DIR} ${INTO_THIRD_PARTY_DIR} -path -prune -o -name '*.proto' -print0 | xargs -0)"
 
 
 # Remove the msgs directory if it exists
@@ -30,7 +30,7 @@ rm -rf "${MSGS_DIR}"
 mkdir -p "${MSGS_DIR}"
 
 # Generate individual JSON schema files for messages containing "Msg"
-find "${TRST_DIR}" "${TRST_THIRD_PARTY_DIR}" -path -prune -o -name '*.proto' -print0 | while IFS= read -r -d '' file; do
+find "${INTO_DIR}" "${INTO_THIRD_PARTY_DIR}" -path -prune -o -name '*.proto' -print0 | while IFS= read -r -d '' file; do
     input_dir=$(dirname "${file}")
     
     # Create the output directory if it doesn't exist
@@ -46,8 +46,8 @@ find "${TRST_DIR}" "${TRST_THIRD_PARTY_DIR}" -path -prune -o -name '*.proto' -pr
         --jsonschema_opt=disallow_additional_properties \
         --jsonschema_opt=enums_as_constants \
         --jsonschema_opt=enums_as_strings_only \
-        --proto_path="${TRST_DIR}" \
-        --proto_path="${TRST_THIRD_PARTY_DIR}" \
+        --proto_path="${INTO_DIR}" \
+        --proto_path="${INTO_THIRD_PARTY_DIR}" \
         "${file}"
         
     fi

@@ -13,7 +13,7 @@ import {
 } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
 import {
-  useSubmitAutoTx,
+  useSubmitAction,
   useRegisterAccount,
   useSendFundsOnHost,
   useSubmitTx,
@@ -30,40 +30,40 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
-import { AutoTxData } from '../../../types/trstTypes'
-import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { ActionData } from '../../../types/trstTypes'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { GearIcon, TransferIcon } from '../../../icons'
-import { SubmitAutoTxDialog } from './SubmitAutoTxDialog'
+import { SubmitActionDialog } from './SubmitActionDialog'
 import { AutomateConfiguration } from './AutomateConfiguration'
 import { StepIcon } from '../../../icons/StepIcon'
 
 
-type AutoTxsInputProps = {
-  autoTxData: AutoTxData
-  onAutoTxChange: (autoTxData: AutoTxData) => void
+type ActionsInputProps = {
+  actionData: ActionData
+  onActionChange: (actionData: ActionData) => void
 } & HTMLProps<HTMLInputElement>
 
 export const AutomateComponent = ({
-  autoTxData,
-  onAutoTxChange,
-}: AutoTxsInputProps) => {
+  actionData,
+  onActionChange,
+}: ActionsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
-  const [prefix, setPrefix] = useState('trust')
-  const [denom, setDenom] = useState('utrst')
+  const [prefix, setPrefix] = useState('into')
+  const [denom, setDenom] = useState('uinto')
   const [chainName, setChainName] = useState('')
 
-  const [chainSymbol, setChainSymbol] = useState('TRST')
-  const [chainId, setChainId] = useState('TRST')
+  const [chainSymbol, setChainSymbol] = useState('INTO')
+  const [chainId, setChainId] = useState('INTO')
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
   const [_isJsonValid, setIsJsonValid] = useState(true)
-  const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
+  const [requestedSubmitAction, setRequestedSubmitAction] = useState(false)
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
 
-  const [icaAddress, isIcaLoading] = useGetICA(autoTxData.connectionId, '')
+  const [icaAddress, isIcaLoading] = useGetICA(actionData.connectionId, '')
 
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
     chainId,
@@ -74,20 +74,20 @@ export const AutomateComponent = ({
 
 
   const refetchICAData = useRefetchQueries([
-    //`userAuthZGrants/${icaAddress}/${autoTxData}`,
+    //`userAuthZGrants/${icaAddress}/${actionData}`,
     `icaTokenBalance/${chainId}/${icaAddress}`,
   ])
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance/${denom}/${icaAddress}`,
-    `interchainAccount/${autoTxData.connectionId}/${icaAddress}`,
+    `interchainAccount/${actionData.connectionId}/${icaAddress}`,
   ])
 
-  const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
-    useSubmitAutoTx({ autoTxData })
+  const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
+    useSubmitAction({ actionData })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
     useRegisterAccount({
-      connectionId: autoTxData.connectionId,
-      hostConnectionId: autoTxData.hostConnectionId,
+      connectionId: actionData.connectionId,
+      hostConnectionId: actionData.hostConnectionId,
     })
 
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
@@ -111,11 +111,11 @@ export const AutomateComponent = ({
   useEffect(
     () =>
       handleTriggerEffect(
-        !isExecutingSchedule && requestedSubmitAutoTx,
-        handleSubmitAutoTx,
-        setRequestedSubmitAutoTx
+        !isExecutingSchedule && requestedSubmitAction,
+        handleSubmitAction,
+        setRequestedSubmitAction
       ),
-    [isExecutingSchedule, requestedSubmitAutoTx, handleSubmitAutoTx]
+    [isExecutingSchedule, requestedSubmitAction, handleSubmitAction]
   )
 
   const handleSendFundsOnHostClick = () => {
@@ -124,7 +124,7 @@ export const AutomateComponent = ({
   }
 
   const { mutate: handleSubmitTx, isLoading: isExecutingSubmitTx } =
-    useSubmitTx({ autoTxData })
+    useSubmitTx({ actionData })
 
   useEffect(
     () =>
@@ -181,9 +181,9 @@ export const AutomateComponent = ({
   const shouldDisableSendHostChainFundsButton = useMemo(
     () =>
       !icaAddress ||
-      (autoTxData.msgs && autoTxData.msgs.length === 0) ||
+      (actionData.msgs && actionData.msgs.length === 0) ||
       Number(feeFundsHostChain) === 0,
-    [icaAddress, autoTxData.msgs, feeFundsHostChain]
+    [icaAddress, actionData.msgs, feeFundsHostChain]
   )
 
 
@@ -192,24 +192,24 @@ export const AutomateComponent = ({
     return setRequestedRegisterICA(true)
   }
 
-  const handleSubmitAutoTxClick = (autoTxData: AutoTxData) => {
-    onAutoTxChange(autoTxData)
-    return setRequestedSubmitAutoTx(true)
+  const handleSubmitActionClick = (actionData: ActionData) => {
+    onActionChange(actionData)
+    return setRequestedSubmitAction(true)
   }
 
-  //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  //////////////////////////////////////// Action message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
     // if (!isJsonValid) {
     //   return
     // }
     try {
-      let msgs = autoTxData.msgs
+      let msgs = actionData.msgs
       msgs[index] = msg
-      let updatedAutoTxData = {
-        ...autoTxData,
+      let updatedActionData = {
+        ...actionData,
         msgs,
       }
-      onAutoTxChange(updatedAutoTxData)
+      onActionChange(updatedActionData)
       if (
         JSON.parse(msg)
         ['typeUrl'].split('.')
@@ -231,22 +231,22 @@ export const AutomateComponent = ({
     name: string,
     chainSymbol: string
   ) {
-    let updatedAutoTxData = autoTxData
-    updatedAutoTxData.connectionId = connectionId
-    updatedAutoTxData.hostConnectionId = hostConnectionId
-    autoTxData.msgs.map((editMsg, editIndex) => {
+    let updatedActionData = actionData
+    updatedActionData.connectionId = connectionId
+    updatedActionData.hostConnectionId = hostConnectionId
+    actionData.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
-        updatedAutoTxData.msgs[editIndex] = editMsg.replaceAll(
+        updatedActionData.msgs[editIndex] = editMsg.replaceAll(
           prefix + '1...',
           newPrefix + '1...'
         )
-        updatedAutoTxData.msgs[editIndex] = updatedAutoTxData.msgs[
+        updatedActionData.msgs[editIndex] = updatedActionData.msgs[
           editIndex
         ].replaceAll(denom, newDenom)
       }
     })
 
-    onAutoTxChange(updatedAutoTxData)
+    onActionChange(updatedActionData)
     setDenom(newDenom)
     setChainName(name)
     setChainSymbol(chainSymbol)
@@ -254,7 +254,7 @@ export const AutomateComponent = ({
     setPrefix(newPrefix)
     let chainIsConnected = connectionId != undefined && connectionId != ''
     setChainIsConnected(chainIsConnected)
-    setChainHasIAModule(chainId === 'TRST')
+    setChainHasIAModule(chainId === 'INTO')
 
 
     if (!chainIsConnected) {
@@ -263,9 +263,9 @@ export const AutomateComponent = ({
     await sleep(200)
     connectExternalWallet(null)
     refetchICA()
-    // console.log("Connection: ", connectionId, autoTxData.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    // console.log("Connection: ", connectionId, actionData.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     await sleep(5000)
-    //console.log("Connection: ", connectionId, autoTxData.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    //console.log("Connection: ", connectionId, actionData.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     refetchICAData()
 
   }
@@ -273,56 +273,56 @@ export const AutomateComponent = ({
   function setExample(index: number, msgObject: any) {
     try {
       const msg = JSON.stringify(msgObject, null, '\t')
-      let newMsg = msg.replaceAll('trust', prefix)
-      newMsg = newMsg.replaceAll('utrst', denom)
-      let updatedAutoTxData = autoTxData
-      updatedAutoTxData.msgs[index] = newMsg
-      //updatedAutoTxData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+      let newMsg = msg.replaceAll('into', prefix)
+      newMsg = newMsg.replaceAll('uinto', denom)
+      let updatedActionData = actionData
+      updatedActionData.msgs[index] = newMsg
+      //updatedActionData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
 
-      onAutoTxChange(updatedAutoTxData)
+      onActionChange(updatedActionData)
     } catch (e) {
       alert(e)
     }
   }
 
   function setConfig(updatedConfig: ExecutionConfiguration) {
-    let updatedAutoTxData = autoTxData
-    updatedAutoTxData.configuration = updatedConfig
-    onAutoTxChange(updatedAutoTxData)
+    let updatedActionData = actionData
+    updatedActionData.configuration = updatedConfig
+    onActionChange(updatedActionData)
   }
 
   function handleAddMsg() {
-    let newMsgs = [...autoTxData.msgs]
+    let newMsgs = [...actionData.msgs]
     let emptyMsg = ''
     newMsgs.push(emptyMsg)
-    let updatedAutoTxData = autoTxData
-    updatedAutoTxData.msgs = newMsgs
-    onAutoTxChange(updatedAutoTxData)
+    let updatedActionData = actionData
+    updatedActionData.msgs = newMsgs
+    onActionChange(updatedActionData)
   }
   function handleRemoveMsg(index: number) {
-    let updatedAutoTxData = autoTxData
+    let updatedActionData = actionData
 
-    const newMsgs = updatedAutoTxData.msgs.filter(
-      (msg) => msg !== updatedAutoTxData.msgs[index]
+    const newMsgs = updatedActionData.msgs.filter(
+      (msg) => msg !== updatedActionData.msgs[index]
     )
 
     if (index == 0 && newMsgs.length == 0) {
       newMsgs[index] = ''
     }
-    updatedAutoTxData.msgs = newMsgs
-    onAutoTxChange(updatedAutoTxData)
+    updatedActionData.msgs = newMsgs
+    onActionChange(updatedActionData)
   }
 
   const [
-    { isShowing: isSubmitAutoTxDialogShowing },
-    setSubmitAutoTxDialogState,
+    { isShowing: isSubmitActionDialogShowing },
+    setSubmitActionDialogState,
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmitButton =
 
-    (autoTxData.msgs[0] &&
-      autoTxData.msgs[0].length == 0 &&
-      JSON.parse(autoTxData.msgs[0])['typeUrl'].length < 5)
+    (actionData.msgs[0] &&
+      actionData.msgs[0].length == 0 &&
+      JSON.parse(actionData.msgs[0])['typeUrl'].length < 5)
 
   const shouldDisableAutomateButton =
     shouldDisableSubmitButton ||
@@ -371,7 +371,7 @@ export const AutomateComponent = ({
                 /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
                 chainIsConnected &&
                 !isIcaLoading &&
-                autoTxData.connectionId != '' && (
+                actionData.connectionId != '' && (
                   <>
                     <Button
                       css={{
@@ -415,7 +415,7 @@ export const AutomateComponent = ({
                       }
                       hostDenom={denom}
                       chainId={chainId}
-                      autoTxData={autoTxData}
+                      actionData={actionData}
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
                       setFeeFundsHostChain={(fees) =>
                         setFeeFundsHostChain(fees)
@@ -428,7 +428,7 @@ export const AutomateComponent = ({
           </Column>
         </CardContent>
       </Card>
-      {autoTxData.msgs.map((msg, index) => (
+      {actionData.msgs.map((msg, index) => (
         <div key={index}>
           <Inline css={{ margin: '$6', marginTop: '$16' }}>
             <StepIcon step={2} />
@@ -465,14 +465,14 @@ export const AutomateComponent = ({
           </Column>
         }
       </Card>
-      <SubmitAutoTxDialog
+      <SubmitActionDialog
         chainSymbol={chainSymbol}
         icaBalance={icaBalance}
         icaAddress={icaAddress}
-        autoTxData={autoTxData}
-        isDialogShowing={isSubmitAutoTxDialogShowing}
+        actionData={actionData}
+        isDialogShowing={isSubmitActionDialogShowing}
         onRequestClose={() =>
-          setSubmitAutoTxDialogState({
+          setSubmitActionDialogState({
             isShowing: false,
           })
         }
@@ -483,13 +483,13 @@ export const AutomateComponent = ({
         }
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
         setFeeFundsHostChain={setFeeFundsHostChain}
-        handleSubmitAutoTx={(autoTxData) =>
-          handleSubmitAutoTxClick(autoTxData)
+        handleSubmitAction={(actionData) =>
+          handleSubmitActionClick(actionData)
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
       <AutomateConfiguration
-        config={autoTxData.configuration}
+        config={actionData.configuration}
         disabled={!icaAddress && !chainHasIAModule}
         onChange={setConfig}
       />
@@ -516,7 +516,7 @@ export const AutomateComponent = ({
           size="large"
           disabled={shouldDisableAutomateButton}
           onClick={() =>
-            setSubmitAutoTxDialogState({
+            setSubmitActionDialogState({
               isShowing: true,
             })
           }

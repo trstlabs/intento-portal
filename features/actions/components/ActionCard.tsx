@@ -10,25 +10,25 @@ import {
 import Link from 'next/link'
 
 
-import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
 
 
-export declare type autoTxInfoWithDetails = {
-  autoTxInfo: AutoTxInfo
+export declare type actionInfoWithDetails = {
+  actionInfo: ActionInfo
 }
 
-export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
-  //const autoTxInfoAmino = AutoTxInfo.toAmino(autoTxInfo)
-  const ibcInfo = useIBCAssetInfoFromConnection(autoTxInfo.icaConfig.connectionId || '')
+export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
+  //const actionInfoAmino = ActionInfo.toAmino(actionInfo)
+  const ibcInfo = useIBCAssetInfoFromConnection(actionInfo.icaConfig.connectionId || '')
   const isActive =
-    autoTxInfo.endTime &&
-    autoTxInfo.execTime &&
-    autoTxInfo.endTime.getSeconds() >= autoTxInfo.execTime.getSeconds()
-    && autoTxInfo.endTime.getTime() > Date.now()
+    actionInfo.endTime &&
+    actionInfo.execTime &&
+    actionInfo.endTime.getSeconds() >= actionInfo.execTime.getSeconds()
+    && actionInfo.endTime.getTime() > Date.now()
 
   return (
-    <Link href={`/triggers/${autoTxInfo.txId.toString()}`} passHref>
+    <Link href={`/triggers/${actionInfo.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>
         <CardContent size="medium">
           <Column align="center">
@@ -41,14 +41,14 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
                 />
               </StyledDivForTokenLogos>
             )}
-            {autoTxInfo.label ? (
+            {actionInfo.label ? (
               <StyledText
                 variant="title"
                 align="center"
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                {autoTxInfo.label}{' '}
+                {actionInfo.label}{' '}
               </StyledText>
             ) : (
               <StyledText
@@ -57,17 +57,17 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                Trigger {autoTxInfo.txId.toString()}{' '}
+                Trigger {actionInfo.id.toString()}{' '}
               </StyledText>
             )}
-            {autoTxInfo.msgs && (
+            {actionInfo.msgs && (
               <Column align="center">
                 {' '}
                 <StyledText variant="caption">
                   <>
                     Message Type:{' '}
                     {
-                      autoTxInfo.msgs[0].typeUrl
+                      actionInfo.msgs[0].typeUrl
                         .split('.')
                         .find((data) => data.includes('Msg'))
                         .split(',')[0]
@@ -85,17 +85,17 @@ export const AutoTxCard = ({ autoTxInfo }: autoTxInfoWithDetails) => {
               {isActive ? (
                 <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</>
               ) : (
-                <>Execution ended {autoTxInfo.endTime.toLocaleString()}</>
+                <>Execution ended {actionInfo.endTime.toLocaleString()}</>
               )}
               {/* {isActive ? (
                                 <>
                                     <StyledSpanForHighlight>
-                                        🟢  ExecTime: {autoTxInfo.execTime}{' '}
+                                        🟢  ExecTime: {actionInfo.execTime}{' '}
                                     </StyledSpanForHighlight>
-                                    EndTime {autoTxInfo.endTime}
+                                    EndTime {actionInfo.endTime}
                                 </>
                             ) : (
-                                <>🔴 Owner: {autoTxInfo.owner}</>
+                                <>🔴 Owner: {actionInfo.owner}</>
                             )} */}
             </Text>
           </Column>

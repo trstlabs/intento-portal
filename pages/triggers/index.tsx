@@ -4,8 +4,8 @@ import {
   ButtonWithDropdownForSorting,
   SortDirections,
   SortParameters,
-  useSortAutoTxs,
-} from 'features/auto-txs'
+  useSortActions,
+} from 'features/actions'
 import {
   Column,
   ConnectIcon,
@@ -18,17 +18,17 @@ import {
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
-import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
-import { AutoTxCard } from '../../features/auto-txs/components/AutoTxCard'
-import { InfoArgs } from '../../features/auto-txs/hooks/useSortAutoTxs'
+import { useActionInfos } from 'hooks/useActionInfo'
+import { ActionCard } from '../../features/actions/components/ActionCard'
+import { InfoArgs } from '../../features/actions/hooks/useSortActions'
 
-export default function AutoTxs() {
+export default function Actions() {
   const { address } = useRecoilValue(walletState)
-  const [autoTxs, isLoading] = useAutoTxInfos()
+  const [actions, isLoading] = useActionInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs: InfoArgs = { infos: autoTxs, address }
-  const [myAutoTxs, allAutoTxs, isSorting] = useSortAutoTxs({
+  const infoArgs: InfoArgs = { infos: actions, address }
+  const [myActions, allActions, isSorting] = useSortActions({
     infoArgs,
     sortBy: useMemo(
       () => ({
@@ -39,8 +39,8 @@ export default function AutoTxs() {
     ),
   })
 
-  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length
-  const shouldRenderAutoTxs = Boolean(autoTxs?.length)
+  const shouldShowFetchingState = isLoading && isSorting && !actions?.length
+  const shouldRenderActions = Boolean(actions?.length)
 
   const pageHeaderContents = (
     <PageHeader
@@ -72,31 +72,31 @@ export default function AutoTxs() {
         >
           <Inline gap={2}>
             <ConnectIcon color="secondary" />
-            <Text variant="primary">{'Finding your autoTxs...'}</Text>
+            <Text variant="primary">{'Finding your actions...'}</Text>
           </Inline>
         </Column>
       )}
-      {shouldRenderAutoTxs && (
+      {shouldRenderActions && (
         <>
-          {Boolean(myAutoTxs?.length) && (
+          {Boolean(myActions?.length) && (
             <>
               <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
                 Your Personal Triggers
               </Text>
-              <StyledDivForAutoTxsGrid>
-                {myAutoTxs.map((autoTxInfo, index) => (
+              <StyledDivForActionsGrid>
+                {myActions.map((actionInfo, index) => (
                   <div key={index}>
-                    <AutoTxCard autoTxInfo={autoTxInfo} />
+                    <ActionCard actionInfo={actionInfo} />
                   </div>
                 ))}
-              </StyledDivForAutoTxsGrid>
+              </StyledDivForActionsGrid>
             </>
           )}
         </>
       )}
-      <StyledDivForAutoTxsGrid>
+      <StyledDivForActionsGrid>
         <>
-          {Boolean(allAutoTxs?.length) && (
+          {Boolean(allActions?.length) && (
             <Inline
               gap={4}
               css={{
@@ -105,7 +105,7 @@ export default function AutoTxs() {
               }}
             >
               <Text variant="primary">
-                {allAutoTxs.length} {myAutoTxs[0] && <>Other</>} Available
+                {allActions.length} {myActions[0] && <>Other</>} Available
                 Automations
               </Text>
               <ButtonWithDropdownForSorting
@@ -117,22 +117,22 @@ export default function AutoTxs() {
             </Inline>
           )}
         </>
-      </StyledDivForAutoTxsGrid>
+      </StyledDivForActionsGrid>
 
-      <StyledDivForAutoTxsGrid>
-        {allAutoTxs.map((autoTxInfo, index) => (
+      <StyledDivForActionsGrid>
+        {allActions.map((actionInfo, index) => (
           <div key={index}>
-            <AutoTxCard autoTxInfo={autoTxInfo} />
+            <ActionCard actionInfo={actionInfo} />
           </div>
         ))}
-      </StyledDivForAutoTxsGrid>
+      </StyledDivForActionsGrid>
     </AppLayout>
   )
 }
 
 const useSortControllers = () => {
-  const storeKeyForParameter = '@autoTxs/sort/parameter'
-  const storeKeyForDirection = '@autoTxs/sort/direction'
+  const storeKeyForParameter = '@actions/sort/parameter'
+  const storeKeyForDirection = '@actions/sort/direction'
 
   const [sortParameter, setSortParameter] = useState<SortParameters>(
     () =>
@@ -160,7 +160,7 @@ const useSortControllers = () => {
   }
 }
 
-const StyledDivForAutoTxsGrid = styled('div', {
+const StyledDivForActionsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',

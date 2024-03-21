@@ -7,11 +7,11 @@ import { useTokenSend } from '../hooks';
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector';
 import { useRecoilValue } from 'recoil'
-import { SubmitAutoTxDialog } from '../../automate/components/SubmitAutoTxDialog';
+import { SubmitActionDialog } from '../../automate/components/SubmitActionDialog';
 import { ChannelInfo } from './ChannelSelectList';
-import { useSubmitAutoTx } from '../../automate/hooks';
+import { useSubmitAction } from '../../automate/hooks';
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo';
-import { AutoTxData } from '../../../types/trstTypes';
+import { ActionData } from '../../../types/trstTypes';
 
 export class RecipientInfo {
   recipient: string;
@@ -37,22 +37,22 @@ export const RecipientList = ({
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
-  const [prefix, setPrefix] = useState("trust")
+  const [prefix, setPrefix] = useState("into")
   const [requestedSend, setRequestedSend] = useState(false)
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   // set default fields
-  let data = new AutoTxData()
+  let data = new ActionData()
   data.duration = 14 * 86400000;
   data.interval = 86400000;
   data.msgs = [""]
-  const [autoTxData, setAutoTxData] = useState(data)
+  const [actionData, setActionData] = useState(data)
   const { address, status } = useRecoilValue(walletState)
 
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ ibcAsset, recipientInfos: recipients, })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
-    useSubmitAutoTx({ autoTxData })
+    useSubmitAction({ actionData })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -86,7 +86,7 @@ export const RecipientList = ({
 
   }
 
-  const handleScheduleClick = (txData: AutoTxData) => {
+  const handleScheduleClick = (txData: ActionData) => {
 
     if (status === WalletStatusType.connected) {
       let msgs = []
@@ -109,7 +109,7 @@ export const RecipientList = ({
         msgs.push(JSON.stringify(sendMsg))
       }
       txData.msgs = msgs
-      setAutoTxData(txData)
+      setActionData(txData)
 
       return setRequestedSchedule(true)
     }
@@ -337,10 +337,10 @@ export const RecipientList = ({
         </Button>
 
       </Inline>
-      <SubmitAutoTxDialog
+      <SubmitActionDialog
         isLoading={isExecutingSchedule}
         // label="Recurring Send"
-        autoTxData={autoTxData}
+        actionData={actionData}
         isDialogShowing={isScheduleDialogShowing}
         /* initialActionType={actionType} */
         onRequestClose={() =>
@@ -349,7 +349,7 @@ export const RecipientList = ({
 
           })
         }
-        handleSubmitAutoTx={(txData) => handleScheduleClick(txData)}
+        handleSubmitAction={(txData) => handleScheduleClick(txData)}
       />
     </div >)
 }
@@ -395,10 +395,10 @@ const sendObject = {
   "value": {
     "amount": [{
       "amount": "70",
-      "denom": "utrst"
+      "denom": "uinto"
     }],
-    "fromAddress": "trust1....",
-    "toAddress": "trust1..."
+    "fromAddress": "into1....",
+    "toAddress": "into1..."
   }
 }
 
@@ -406,8 +406,8 @@ const transferObject = {
   "typeUrl": "/ibc.applications.transfer.v1.MsgTransfer",
   "value": {
     "token": {},
-    "sender": "trust1....",
-    "receiver": "trust1...",
+    "sender": "into1....",
+    "receiver": "into1...",
     "sourcePort": "transfer",
     "sourceChannel": "",
     "timeoutHeight": "0",

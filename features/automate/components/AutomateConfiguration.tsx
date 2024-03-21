@@ -9,7 +9,7 @@ import {
   Inline,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConfiguration } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { StepIcon } from '../../../icons/StepIcon'
 
 type AutomateConfigurationProps = {
