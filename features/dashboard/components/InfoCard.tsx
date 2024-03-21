@@ -144,7 +144,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 </Text>
                 <Card css={{ padding: '$12' }}>
                   <>
-                    <Text variant="legend"> Trigger Constant Fee</Text>
+                    <Text variant="legend"> Action Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
                         Number(triggerParams.ActionConstantFee),
@@ -152,7 +152,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                       )}{' '}
                       INTO{' '}
                     </Text>
-                    <Text variant="legend"> Trigger Flex Fee per hour</Text>
+                    <Text variant="legend"> Action Flex Fee per hour</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
                         Number(triggerParams.ActionFlexFeeMul) * 60,

@@ -57,7 +57,7 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                Trigger {actionInfo.id.toString()}{' '}
+                Action {actionInfo.id.toString()}{' '}
               </StyledText>
             )}
             {actionInfo.msgs && (
@@ -83,7 +83,7 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
           <Column gap={5} css={{ paddingBottom: '$8' }}>
             <Text variant="legend">
               {isActive ? (
-                <> 🟢 Active Trigger {ibcInfo && <>on {ibcInfo.name}</>}</>
+                <> 🟢 Active Action {ibcInfo && <>on {ibcInfo.name}</>}</>
               ) : (
                 <>Execution ended {actionInfo.endTime.toLocaleString()}</>
               )}

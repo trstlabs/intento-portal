@@ -563,7 +563,7 @@ export const SubmitActionDialog = ({
               )}
               <Tooltip
                 label="Funds to set aside for execution fee of the action. Remaining funds are refunded after execution. If deduct fees from wallet balance is checked, your local balance will be used"
-                aria-label="Fund Trigger - INTO (Optional)"
+                aria-label="Fund Action - INTO (Optional)"
               >
                 <Text align="center" css={{ margin: '$4' }} variant="caption">
                   Fee Funds - INTO
@@ -642,7 +642,7 @@ export const SubmitActionDialog = ({
                   <Inline justifyContent={'space-between'} align="center">
                     <Tooltip
                       label="Name your trigger so you can find it back later by name"
-                      aria-label="Fund Trigger - INTO (Optional)"
+                      aria-label="Fund Action - INTO (Optional)"
                     >
                       <Text color="disabled" wrap={false} variant="legend">
                         Label (optional)

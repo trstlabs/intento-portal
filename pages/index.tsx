@@ -84,7 +84,7 @@ export default function Home() {
       )}
 {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
         <Tooltip label="Automate messages and workflows, move assets on your behalf">
-          <span>Automations</span>
+          <span>Actions</span>
         </Tooltip>
       </Text> */}
       {shouldRenderActions && (
@@ -94,9 +94,9 @@ export default function Home() {
               <Text variant="caption" css={{ padding: '$4' }}>
                 {' '}
                 {myActions.length > 1 ? (
-                  <span> Your Triggers({myActions.length})</span>
+                  <span> Your Actions({myActions.length})</span>
                 ) : (
-                  <span> Your Trigger (1)</span>
+                  <span> Your Action (1)</span>
                 )}
               </Text>
 
@@ -125,7 +125,7 @@ export default function Home() {
             >
               <Text variant="primary">
                 {allActions.length} {myActions[0] && <>Other</>} Available
-                Automations
+                Actions
               </Text>
 
               <ButtonWithDropdownForSorting
@@ -138,7 +138,7 @@ export default function Home() {
           ) : (
             <Text variant="caption" css={{ padding: '$4' }}>
               {' '}
-              No Triggers found
+              No Actions found
             </Text>
           )}
         </>

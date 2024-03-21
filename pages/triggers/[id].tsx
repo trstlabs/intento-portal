@@ -36,7 +36,7 @@ export default function Action() {
         css={{ padding: '$10', height: '100vh' }}
       >
         {' '}
-        <title>Trigger</title>
+        <title>Action</title>
         {/*  {isLoading && (
           <Text variant="header">
             {"Oops, we've messed up. Please try again later."}
@@ -65,7 +65,7 @@ export default function Action() {
         {APP_NAME && actionInfo != undefined && (
           <Head>
             <title>
-              {APP_NAME} — Trigger {actionInfo.id}
+              {APP_NAME} — Action {actionInfo.id}
             </title>
           </Head>
         )}
@@ -84,7 +84,7 @@ export default function Action() {
           ) : (
             <StyledDiv>
               <Text variant="legend">
-                <>Trigger not found in this space continuum 🌌 </>
+                <>Action not found in this space continuum 🌌 </>
               </Text>{' '}
             </StyledDiv>
           ))}
