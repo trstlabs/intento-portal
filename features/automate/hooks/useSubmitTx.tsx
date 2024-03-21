@@ -20,13 +20,13 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
-import { AutoTxData } from '../../../types/trstTypes'
+import { ActionData } from '../../../types/trstTypes'
 
 type UseSubmitTxArgs = {
-  autoTxData: AutoTxData
+  actionData: ActionData
 }
 
-export const useSubmitTx = ({ autoTxData }: UseSubmitTxArgs) => {
+export const useSubmitTx = ({ actionData }: UseSubmitTxArgs) => {
   const { address, client, status } = useRecoilValue(ibcWalletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -35,16 +35,16 @@ export const useSubmitTx = ({ autoTxData }: UseSubmitTxArgs) => {
   const refetchQueries = useRefetchQueries(['tokenBalance'])
 
   return useMutation(
-    'submitAutoTx',
+    'submitAction',
     async () => {
       if (status !== WalletStatusType.connected) {
         throw new Error('Wallet not connected. Please try reconnecting your wallet.')
       }
 
-      console.log(autoTxData)
+      console.log(actionData)
       const response: DeliverTxResponse = await executeSubmitTx({
         owner: address,
-        autoTxData,
+        actionData,
         client,
       })
       return response
@@ -52,10 +52,10 @@ export const useSubmitTx = ({ autoTxData }: UseSubmitTxArgs) => {
     {
       onSuccess(data) {
         console.log(data)
-        let autoTxID = data.events
+        let actionID = data.events
           .find((event) => event.type == 'transaction')
-          .attributes.find((attr) => attr.key == 'tx-id').value
-        console.log(autoTxID)
+          .attributes.find((attr) => attr.key == 'id').value
+        console.log(actionID)
         toast.custom((t) => (
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}

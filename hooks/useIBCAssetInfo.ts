@@ -18,7 +18,7 @@ export const useIBCAssetInfo = (assetSymbol: string) => {
 export const useIBCAssetInfoFromConnection = (ibcConnectionID: string) => {
   const [assetList] = useIBCAssetList()
 
-  const defaultAsset = assetList?.find((asset) => asset.id == "Trustless Hub")
+  const defaultAsset = assetList?.find((asset) => asset.id == "Intento")
   const memoizedAsset = useMemo(
     () => getIBCAssetInfo('connection_id', ibcConnectionID, assetList),
     [assetList, ibcConnectionID]

@@ -1,15 +1,15 @@
 [
   {
-    "id": "Trustless Hub",
+    "id": "Intento",
     "name": "Test Chain 1",
-    "registry_name": "trustlesshub",
-    "symbol": "TRST",
-    "chain_id": "TRST",
-    "denom": "utrst",
+    "registry_name": "intentozone",
+    "symbol": "INTO",
+    "chain_id": "INTO",
+    "denom": "uinto",
     "decimals": 6,
-    "denom_on_trst": "utrst",
+    "denom_on_trst": "uinto",
     "logo_uri": "https://trstlabs.xyz/trst.svg",
-    "prefix": "trust"
+    "prefix": "into"
   },
   {
     "id": "Cosmos Hub",
@@ -46,7 +46,7 @@
     "rpc": "http://osmo-rpc-t.trustlesshub.com"
   },
   {
-    "id": "Trustless Hub Host",
+    "id": "Intento Host",
     "name": "Test Chain 2 (ICA Host)",
     "registry_name": "host",
     "symbol": "COSM",
@@ -57,7 +57,7 @@
     "channel_to_trst": "channel-0",
     "denom_on_trst": "ibc/F2116BE5B0D320180094EEBE3E8D34826EB44CAD8409166CADD1DD9134FD682C",
     "logo_uri": "https://trstlabs.xyz/trst.svg",
-    "prefix": "trust",
+    "prefix": "into",
     "connection_id": "connection-2",
     "counterparty_connection_id": "connection-0",
     "rpc": "http://host-rpc-t.trustlesshub.com"

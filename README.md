@@ -5,7 +5,7 @@ Using Trustless Triggers and Trustless Contracts through the TrustlessJS library
 
 ### Features
 - Dashboard for Triggers
-- Autocompound TRST tokens
+- Autocompound INTO tokens
 - Advanced automation for scheduling transactions with interchain accounts
 - Send tokens on a recurring basis
 

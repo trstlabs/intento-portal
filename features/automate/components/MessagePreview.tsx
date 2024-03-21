@@ -10,16 +10,16 @@ import {
   Inline,
   Union,
 } from 'junoblocks'
-import { SubmitAutoTxDialog } from './SubmitAutoTxDialog'
+import { SubmitActionDialog } from './SubmitActionDialog'
 
 const MessagePreview = ({
-  autoTxData,
+  actionData,
   chainSymbol,
   icaBalance,
   shouldDisableAuthzGrants,
   icaAddress,
-  isSubmitAutoTxDialogShowing,
-  setSubmitAutoTxDialogState,
+  isSubmitActionDialogShowing,
+  setSubmitActionDialogState,
   isExecutingSchedule,
   feeFundsHostChain,
   shouldDisableSendHostChainFundsButton,
@@ -28,15 +28,15 @@ const MessagePreview = ({
   showWarning,
   hideWarning,
   setFeeFundsHostChain,
-  handleSubmitAutoTxClick,
+  handleSubmitActionClick,
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
 }) => {
   return (
     <div>
-      {autoTxData.msgs &&
-        autoTxData.msgs[0] &&
-        autoTxData.msgs[0].length > 3 && (
+      {actionData.msgs &&
+        actionData.msgs[0] &&
+        actionData.msgs[0].length > 3 && (
           <Column>
             <Card
               css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -75,8 +75,8 @@ const MessagePreview = ({
                 )}
               </CardContent>
 
-              {autoTxData.msgs &&
-                autoTxData.msgs.map((msgToDisplay, i) => (
+              {actionData.msgs &&
+                actionData.msgs.map((msgToDisplay, i) => (
                   <div key={msgToDisplay}>
                     {' '}
                     <CardContent
@@ -91,14 +91,14 @@ const MessagePreview = ({
                         Message {i + 1}: <pre>{msgToDisplay}
                         </pre>
                       </Text>{' '}
-                      <SubmitAutoTxDialog
+                      <SubmitActionDialog
                         chainSymbol={chainSymbol}
                         icaBalance={icaBalance}
                         icaAddress={icaAddress}
-                        autoTxData={autoTxData}
-                        isDialogShowing={isSubmitAutoTxDialogShowing}
+                        actionData={actionData}
+                        isDialogShowing={isSubmitActionDialogShowing}
                         onRequestClose={() =>
-                          setSubmitAutoTxDialogState({
+                          setSubmitActionDialogState({
                             isShowing: false,
                           })
                         }
@@ -113,8 +113,8 @@ const MessagePreview = ({
                           !shouldDisableAuthzGrants
                         }
                         setFeeFundsHostChain={setFeeFundsHostChain}
-                        handleSubmitAutoTx={(autoTxData) =>
-                          handleSubmitAutoTxClick(autoTxData)
+                        handleSubmitAction={(actionData) =>
+                          handleSubmitActionClick(actionData)
                         }
                         handleCreateAuthzGrantClick={
                           handleCreateAuthzGrantClick

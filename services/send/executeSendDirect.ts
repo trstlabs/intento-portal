@@ -1,5 +1,5 @@
-import { ibc } from 'trustlessjs'
-import { cosmos } from 'trustlessjs'
+import { ibc } from 'intentojs'
+import { cosmos } from 'intentojs'
 import { SigningStargateClient, StdFee } from '@cosmjs/stargate'
 import { validateTransactionSuccess } from '../../util/validateTx'
 

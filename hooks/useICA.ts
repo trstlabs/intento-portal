@@ -20,8 +20,8 @@ import {
 import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 
-import { useTrstRpcClient } from './useRPCClient'
-import { AutoTxData } from '../types/trstTypes'
+import { useIntentoRpcClient } from './useRPCClient'
+import { ActionData } from '../types/trstTypes'
 import { useChainInfoByChainID } from './useChainList'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
@@ -31,7 +31,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     accAddr = address
   }
 
-  const rpcClient = useTrstRpcClient()
+  const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `interchainAccount/${connectionId}/${address}`,
     async () => {
@@ -48,7 +48,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     {
       enabled: Boolean(
         connectionId != undefined &&
-          rpcClient.trst != undefined &&
+          rpcClient &&
           !!accAddr &&
           accAddr.length > 40
       ),
@@ -94,7 +94,7 @@ export const useICATokenBalance = (
 export const useAuthZGrantsForUser = (
   chainId: string,
   grantee: string,
-  autoTxData?: AutoTxData
+  actionData?: ActionData
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(chainId)
@@ -115,7 +115,7 @@ export const useAuthZGrantsForUser = (
       if (granteeGrants != false) {
         console.log(grants, grantee, ibcState)
 
-        for (const msg of autoTxData.msgs) {
+        for (const msg of actionData.msgs) {
           let msgTypeUrl = JSON.parse(msg)['typeUrl']
           // console.log(msgTypeUrl)
           const grantMatch = granteeGrants?.find(
@@ -146,9 +146,9 @@ export const useAuthZGrantsForUser = (
           chainId &&
           ibcState.status === WalletStatusType.connected &&
           grantee.includes(ibcState.address.slice(0, 5)) &&
-          autoTxData.msgs[0] &&
-          autoTxData.msgs[0].includes('typeUrl') &&
-          autoTxData.connectionId
+          actionData.msgs[0] &&
+          actionData.msgs[0].includes('typeUrl') &&
+          actionData.connectionId
       ),
       refetchOnMount: 'always',
       refetchIntervalInBackground: true,

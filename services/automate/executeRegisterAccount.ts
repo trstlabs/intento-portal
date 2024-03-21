@@ -1,7 +1,7 @@
 import { validateTransactionSuccess } from '../../util/validateTx'
 
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { trst } from 'trustlessjs'
+import { intento } from 'intentojs'
 
 type ExecuteRegisterAccountArgs = {
   owner: string
@@ -28,7 +28,7 @@ export const executeRegisterAccount = async ({
   const version = JSON.stringify(versionObject)
 
   const msgRegisterAccount =
-    trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.registerAccount({
+    intento.intent.v1beta1.MessageComposer.withTypeUrl.registerAccount({
       version,
       connectionId,
       owner,

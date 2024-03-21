@@ -1,7 +1,7 @@
 import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
-import { QueryInterchainAccountFromAddressResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query'
-import { cosmos } from 'trustlessjs'
-import { QueryGranteeGrantsRequest } from 'trustlessjs/dist/codegen/cosmos/authz/v1beta1/query'
+import { QueryInterchainAccountFromAddressResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { cosmos } from 'intentojs'
+import { QueryGranteeGrantsRequest } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/query'
 
 
 export interface ICAQueryInput {
@@ -17,7 +17,7 @@ export const getICA = async ({
 }: ICAQueryInput) => {
   try {
     const response: QueryInterchainAccountFromAddressResponse =
-      await rpcClient.trst.autoibctx.v1beta1.interchainAccountFromAddress({
+      await rpcClient.intento.intent.v1beta1.interchainAccountFromAddress({
         owner,
         connectionId,
       })

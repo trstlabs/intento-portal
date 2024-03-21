@@ -24,8 +24,8 @@ import { wallets as leapWallets } from '@cosmos-kit/leap'
 
 import { assets, chains } from 'chain-registry'
 import {
-  getTrstSigningClientOptions, getSigningCosmosClientOptions
-} from 'trustlessjs'
+  getIntentoSigningClientOptions, getSigningCosmosClientOptions
+} from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
 // import { GasPrice } from '@cosmjs/stargate';
@@ -53,17 +53,17 @@ function TrstApp({ Component, pageProps }: AppProps) {
       // Push your data to assets and chains arrays here
 
       assets.push({
-        chain_name: 'trustlesshub',
+        chain_name: 'intentozone',
         assets: [
           {
-            name: 'Trustless Hub TRST',
-            display: 'TRST',
-            symbol: 'utrst',
+            name: 'Intento INTO',
+            display: 'INTO',
+            symbol: 'uinto',
             denom_units: [
-              { denom: 'utrst', exponent: 0 },
-              { denom: 'TRST', exponent: 6 },
+              { denom: 'uinto', exponent: 0 },
+              { denom: 'INTO', exponent: 6 },
             ],
-            base: 'utrst',
+            base: 'uinto',
             logo_URIs: {
               png: 'https://www.trustlesshub.com/img/brand/icon.png',
               svg: 'https://info.trstlabs.xyz/trst.svg',
@@ -124,8 +124,8 @@ function TrstApp({ Component, pageProps }: AppProps) {
   const isSmallScreen = useMedia('sm')
   const signerOptions: SignerOptions = {
     signingStargate: (chain: Chain) => {
-      if (chain.chain_name == 'trustlesshub') {
-        return getTrstSigningClientOptions({ defaultTypes })
+      if (chain.chain_name == 'intentozone') {
+        return getIntentoSigningClientOptions({ defaultTypes })
       } else {
         return getSigningCosmosClientOptions()
       }
@@ -156,7 +156,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
                 //isLazy = true, no validation because these are not part of the chain registry
                 endpointOptions={{
                   endpoints: {
-                    trustlesshub: {
+                    intentozone: {
                       isLazy: true,
                     },
                     cosmostest: {
@@ -199,10 +199,10 @@ function getEnvVarForSymbol(symbol: string): {
   apiEndpoint: string | undefined
 } {
   switch (symbol) {
-    case 'TRST':
+    case 'INTO':
       return {
-        rpcEndpoint: process.env.NEXT_PUBLIC_TRST_RPC,
-        apiEndpoint: process.env.NEXT_PUBLIC_TRST_API,
+        rpcEndpoint: process.env.NEXT_PUBLIC_INTO_RPC,
+        apiEndpoint: process.env.NEXT_PUBLIC_INTO_API,
       }
     case 'ATOM':
       return {

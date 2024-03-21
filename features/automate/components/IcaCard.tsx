@@ -16,7 +16,7 @@ import { Row, StyledInput } from './AutomateComponent'
 
 import { useAuthZGrantsForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
-import { AutoTxData } from '../../../types/trstTypes'
+import { ActionData } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 interface IcaCardProps {
@@ -29,7 +29,7 @@ interface IcaCardProps {
   isExecutingSendFundsOnHost: boolean
   chainId: string
   hostDenom: string
-  autoTxData: AutoTxData
+  actionData: ActionData
   setFeeFundsHostChain: (fees: string) => void
   handleSendFundsOnHostClick: () => void
 }
@@ -44,7 +44,7 @@ export const IcaCard = ({
   isExecutingSendFundsOnHost,
   chainId,
   hostDenom,
-  autoTxData,
+  actionData,
   setFeeFundsHostChain,
   handleSendFundsOnHostClick,
 }: IcaCardProps) => {
@@ -69,7 +69,7 @@ export const IcaCard = ({
   const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
     chainId,
     icaAddress,
-    autoTxData
+    actionData
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({

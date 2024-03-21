@@ -49,7 +49,7 @@ export const useTokenInfo = (tokenSymbol: string) => {
 /* hook for base token info retrieval */
 export const useBaseTokenInfo = () => {
   const [tokenList] = useIBCAssetList()
-  return  getTokenInfoFromTokenList("TRST", tokenList)
+  return  getTokenInfoFromTokenList("INTO", tokenList)
 }
 
 

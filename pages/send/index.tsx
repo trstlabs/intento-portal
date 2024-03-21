@@ -69,7 +69,7 @@ export default function Send() {
                   <StyledText css={{ padding: '$8' }} variant="caption">
                     Automate payment actions from your wallet on another
                     chain.
-                    <br /> You control the action on Trustless Hub using an
+                    <br /> You control the action on Intento using an
                     Interchain Account.
                   </StyledText>
                 </Column>

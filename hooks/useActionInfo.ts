@@ -4,27 +4,27 @@ import {
 /*   DEFAULT_REFETCH_INTERVAL, */
   DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
-import { useTrstRpcClient } from './useRPCClient'
-import { QueryAutoTxsResponse } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/query'
-import { GlobalDecoderRegistry } from 'trustlessjs'
-import { PageRequest } from 'trustlessjs/dist/codegen/cosmos/base/query/v1beta1/pagination'
+import { useIntentoRpcClient } from './useRPCClient'
+import { QueryActionsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { GlobalDecoderRegistry } from 'intentojs'
+import { PageRequest } from 'intentojs/dist/codegen/cosmos/base/query/v1beta1/pagination'
 
-export const useAutoTxInfos = () => {
-  const client = useTrstRpcClient()
+export const useActionInfos = () => {
+  const client = useIntentoRpcClient()
 
   const { data, isLoading } = useQuery(
-    'useAutoTxInfos',
+    'useActionInfos',
     async () => {
-      const resp: QueryAutoTxsResponse =
-        await client.trst.autoibctx.v1beta1.autoTxs({
+      const resp: QueryActionsResponse =
+        await client.intento.intent.v1beta1.actions({
           pagination: undefined,
         })
 
-      // Transform each msg in autoTxInfos
-      const transformedAutoTxInfos = resp.autoTxInfos.map((autoTxInfo) => {
+      // Transform each msg in actionInfos
+      const transformedActionInfos = resp.actionInfos.map((actionInfo) => {
         return {
-          ...autoTxInfo,
-          msgs: autoTxInfo.msgs.map((msg) => {
+          ...actionInfo,
+          msgs: actionInfo.msgs.map((msg) => {
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
               wrappedMsg.typeUrl ==
@@ -40,10 +40,10 @@ export const useAutoTxInfos = () => {
         }
       })
 
-      return transformedAutoTxInfos
+      return transformedActionInfos
     },
     {
-      enabled: Boolean(client && client.trst),
+      enabled: Boolean(client && client.intento),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
@@ -53,19 +53,19 @@ export const useAutoTxInfos = () => {
   return [data, isLoading] as const
 }
 
-export const useAutoTxInfo = (id) => {
-  const client = useTrstRpcClient()
+export const useActionInfo = (id) => {
+  const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    ['autoTxId', id],
+    ['actionId', id],
     async () => {
-      if (!id || !client || !client.trst) {
+      if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
       }
-      const autoTxInfo = (await client.trst.autoibctx.v1beta1.autoTx({ id }))
-        .autoTxInfo
+      const actionInfo = (await client.intento.intent.v1beta1.action({ id }))
+        .actionInfo
       return {
-        ...autoTxInfo,
-        msgs: autoTxInfo.msgs.map((msg) => {
+        ...actionInfo,
+        msgs: actionInfo.msgs.map((msg) => {
           const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
           wrappedMsg.typeUrl =
             wrappedMsg.typeUrl ==
@@ -81,7 +81,7 @@ export const useAutoTxInfo = (id) => {
       }
     },
     {
-      enabled: !!id && !!client?.trst,
+      enabled: !!id && !!client?.intento,
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
@@ -91,12 +91,12 @@ export const useAutoTxInfo = (id) => {
   return [data, isLoading] as const
 }
 
-export const useAutoTxHistory = (id, limit: number, key: Uint8Array) => {
-  const client = useTrstRpcClient()
+export const useActionHistory = (id, limit: number, key: Uint8Array) => {
+  const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    `autoTxHistory/${id}/${key}`,
+    `actionHistory/${id}/${key}`,
     async () => {
-      if (!id || !client || !client.trst) {
+      if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
       }
 
@@ -107,14 +107,14 @@ export const useAutoTxHistory = (id, limit: number, key: Uint8Array) => {
         countTotal: true,
       })
     
-      const autoTxHistoryResponse = await client.trst.autoibctx.v1beta1.autoTxHistory({
+      const actionHistoryResponse = await client.intento.intent.v1beta1.actionHistory({
         id: id,
         pagination: pageRequest,
       })
-      return autoTxHistoryResponse
+      return actionHistoryResponse
     },
     {
-      enabled: !!id && !!client?.trst,
+      enabled: !!id && !!client?.intento,
       refetchOnMount: true,
       refetchIntervalInBackground: true,
     }

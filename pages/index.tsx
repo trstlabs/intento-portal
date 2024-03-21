@@ -4,8 +4,8 @@ import {
   SortDirections,
   ButtonWithDropdownForSorting,
   SortParameters,
-  useSortAutoTxs,
-} from 'features/auto-txs'
+  useSortActions,
+} from 'features/actions'
 import {
   Column,
   ConnectIcon,
@@ -18,18 +18,18 @@ import {
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
-import { useAutoTxInfos } from 'hooks/useAutoTxInfo'
-import { AutoTxCard } from '../features/auto-txs/components/AutoTxCard'
+import { useActionInfos } from 'hooks/useActionInfo'
+import { ActionCard } from '../features/actions/components/ActionCard'
 // import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
-  const { /* isWalletConnected, connect, */ address } = useChain('trustlesshub')
-  const [autoTxs, isLoading] = useAutoTxInfos()
+  const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
+  const [actions, isLoading] = useActionInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs = { infos: autoTxs, address }
-  const [myAutoTxs, allAutoTxs, isSorting] = useSortAutoTxs({
+  const infoArgs = { infos: actions, address }
+  const [myActions, allActions, isSorting] = useSortActions({
     infoArgs,
     sortBy: useMemo(
       () => ({
@@ -41,10 +41,10 @@ export default function Home() {
   })
 
 /*   const shouldShowAutoCompound =
-    !myAutoTxs?.length ||
-    myAutoTxs.find((tx) => tx.label === 'Autocompound') == undefined */
-  const shouldShowFetchingState = isLoading && isSorting && !autoTxs?.length
-  const shouldRenderAutoTxs = Boolean(autoTxs?.length)
+    !myActions?.length ||
+    myActions.find((tx) => tx.label === 'Autocompound') == undefined */
+  const shouldShowFetchingState = isLoading && isSorting && !actions?.length
+  const shouldRenderActions = Boolean(actions?.length)
 
   const pageHeaderContents = (
     <PageHeader
@@ -87,35 +87,35 @@ export default function Home() {
           <span>Automations</span>
         </Tooltip>
       </Text> */}
-      {shouldRenderAutoTxs && (
+      {shouldRenderActions && (
         <>
-          {Boolean(myAutoTxs?.length) && (
+          {Boolean(myActions?.length) && (
             <>
               <Text variant="caption" css={{ padding: '$4' }}>
                 {' '}
-                {myAutoTxs.length > 1 ? (
-                  <span> Your Triggers({myAutoTxs.length})</span>
+                {myActions.length > 1 ? (
+                  <span> Your Triggers({myActions.length})</span>
                 ) : (
                   <span> Your Trigger (1)</span>
                 )}
               </Text>
 
-              <StyledDivForAutoTxsGrid>
-                {myAutoTxs.map((autoTxInfo, index) => (
-                  <AutoTxCard
+              <StyledDivForActionsGrid>
+                {myActions.map((actionInfo, index) => (
+                  <ActionCard
                     key={index}
                     //structuredClone does not work on ios
-                    autoTxInfo={structuredClone(autoTxInfo)}
+                    actionInfo={structuredClone(actionInfo)}
                   />
                 ))}
-              </StyledDivForAutoTxsGrid>
+              </StyledDivForActionsGrid>
             </>
           )}
         </>
       )}
-      <StyledDivForAutoTxsGrid>
+      <StyledDivForActionsGrid>
         <>
-          {Boolean(allAutoTxs?.length) ? (
+          {Boolean(allActions?.length) ? (
             <Inline
               gap={4}
               css={{
@@ -124,7 +124,7 @@ export default function Home() {
               }}
             >
               <Text variant="primary">
-                {allAutoTxs.length} {myAutoTxs[0] && <>Other</>} Available
+                {allActions.length} {myActions[0] && <>Other</>} Available
                 Automations
               </Text>
 
@@ -142,17 +142,17 @@ export default function Home() {
             </Text>
           )}
         </>
-      </StyledDivForAutoTxsGrid>
+      </StyledDivForActionsGrid>
 
-      <StyledDivForAutoTxsGrid>
-        {allAutoTxs.map((autoTxInfo, index) => (
-          <AutoTxCard
+      <StyledDivForActionsGrid>
+        {allActions.map((actionInfo, index) => (
+          <ActionCard
             key={index}
             //structuredClone does not work on ios
-            autoTxInfo={structuredClone(autoTxInfo)}
+            actionInfo={structuredClone(actionInfo)}
           />
         ))}
-      </StyledDivForAutoTxsGrid>
+      </StyledDivForActionsGrid>
 
       {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout>
@@ -160,8 +160,8 @@ export default function Home() {
 }
 
 const useSortControllers = () => {
-  const storeKeyForParameter = '@autoTxs/sort/parameter'
-  const storeKeyForDirection = '@autoTxs/sort/direction'
+  const storeKeyForParameter = '@actions/sort/parameter'
+  const storeKeyForDirection = '@actions/sort/direction'
 
   const [sortParameter, setSortParameter] = useState<SortParameters>(
     () =>
@@ -189,7 +189,7 @@ const useSortControllers = () => {
   }
 }
 
-const StyledDivForAutoTxsGrid = styled('div', {
+const StyledDivForActionsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',

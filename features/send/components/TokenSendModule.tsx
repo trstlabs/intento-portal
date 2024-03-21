@@ -34,7 +34,7 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
     const shouldSetDefaultTokenState =
       !tokenSymbol && tokenList
     if (shouldSetDefaultTokenState) {
-      setToken("TRST")
+      setToken("INTO")
     }
   }, [tokenList, setToken])
 

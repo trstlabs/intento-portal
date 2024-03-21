@@ -20,8 +20,8 @@ import {
 import Link from 'next/link'
 import React from 'react'
 
-import { MsgUpdateAutoTxParams } from '../../../types/trstTypes'
-import { AutoTxInfo } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
+import { MsgUpdateActionParams } from '../../../types/trstTypes'
+import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
 
 import { convertMicroDenomToDenom } from 'util/conversion'
@@ -33,50 +33,52 @@ import {
 } from '../../../hooks/useICA'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
-import { useSendFundsOnHost, useUpdateAutoTx } from '../../automate/hooks'
+import { useSendFundsOnHost, useUpdateAction } from '../../automate/hooks'
 import { JsonCodeMirrorEditor } from '../../automate/components/Editor/CodeMirror'
 import { getDuration, getRelativeTime } from '../../../util/time'
-import { getTrstSigningClientOptions } from 'trustlessjs'
+import { getIntentoSigningClientOptions } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
-import { useAutoTxHistory } from '../../../hooks/useAutoTxInfo'
+import { useActionHistory } from '../../../hooks/useActionInfo'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
 
-type AutoTxInfoBreakdownProps = {
-  autoTxInfo: AutoTxInfo
+type ActionInfoBreakdownProps = {
+  actionInfo: ActionInfo
   ibcInfo: IBCAssetInfo
 }
 
 type InfoHeaderProps = {
-  txId: string
+  id: string
   owner: string
   active: boolean
   latestExecWasError: boolean
 }
 
-export const AutoTxInfoBreakdown = ({
-  autoTxInfo,
+export const ActionInfoBreakdown = ({
+  actionInfo,
   ibcInfo,
 }: //size = 'large',
-  AutoTxInfoBreakdownProps) => {
-  const [icaAddress, _] = useGetICA(autoTxInfo.icaConfig?.connectionId, autoTxInfo.owner)
+  ActionInfoBreakdownProps) => {
+  const [icaAddress, _] = useGetICA(actionInfo.icaConfig?.connectionId, actionInfo.owner)
 
-  //AutoTx history entries
+  //Action history entries
 
-  const [autoTxHistory, setAutoTxHistory] = useState([]);
-  const [limit] = useState(5); // Define your limit or make it dynamic as needed
+  const [actionHistory, setActionHistory] = useState([]);
+  const [historyLimit] = useState(5); // Define your historyLimit or make it dynamic as needed
   const [fetchNext, setFetchNext] = useState(false);
   const [paginationKey, setPaginationKey] = useState(undefined);
-  const [fetchedHistory, isHistoryLoading] = useAutoTxHistory(autoTxInfo.txId.toString(), limit, paginationKey);
-  const refetchQueries = useRefetchQueries([`autoTxHistory/${autoTxInfo.txId.toString()}/${paginationKey}`], 15);
+  const [fetchedHistory, isHistoryLoading] = useActionHistory(actionInfo.id.toString(), historyLimit, paginationKey);
+  const refetchQueries = useRefetchQueries([`actionHistory/${actionInfo.id.toString()}/${paginationKey}`], 15);
 
   useEffect(() => {
 
-    if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0 && !autoTxHistory.find(entry => entry == fetchedHistory.history[0])) {
-      // Append new entries to the existing history
-      setAutoTxHistory(prevHistory => [...prevHistory, ...fetchedHistory.history]);
+    if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0 && !actionHistory.find(entry => entry == fetchedHistory.history[0])) {
+      if (!actionHistory.includes(fetchedHistory.history[0])) {
+        // Append new entries to the existing history
+        setActionHistory(prevHistory => [...prevHistory, ...fetchedHistory.history]);
+      }
     }
   }, [fetchedHistory]);
 
@@ -92,14 +94,14 @@ export const AutoTxInfoBreakdown = ({
   )
 
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
-    autoTxInfo.feeAddress
+    actionInfo.feeAddress
   )
   const isActive =
-    autoTxInfo.endTime &&
-    autoTxInfo.execTime &&
-    autoTxInfo.endTime.getTime() >= autoTxInfo.execTime.getTime()
+    actionInfo.endTime &&
+    actionInfo.execTime &&
+    actionInfo.endTime.getTime() >= actionInfo.execTime.getTime()
   const latestExecWasError =
-    autoTxHistory && autoTxHistory && autoTxHistory.length > 0 && autoTxHistory[autoTxHistory.length - 1].errors[0] !=
+    actionHistory && actionHistory && actionHistory.length > 0 && actionHistory[actionHistory.length - 1].errors[0] !=
     undefined
 
   //send funds on host
@@ -144,7 +146,7 @@ export const AutoTxInfoBreakdown = ({
     return setRequestedSendFunds(true)
   }
 
-  const { registry } = getTrstSigningClientOptions({
+  const { registry } = getIntentoSigningClientOptions({
     defaultTypes,
   })
 
@@ -160,13 +162,13 @@ export const AutoTxInfoBreakdown = ({
     return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
   }
 
-  //////////////////////////////////////// AutoTx message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  //////////////////////////////////////// Action message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [isJsonValid, setIsJsonValid] = useState(true)
   const [editor, setEditor] = useState(true)
   const [editMsg, setEditMsg] = useState('')
 
-  let autoTxParams: MsgUpdateAutoTxParams
-  const [updatedAutoTxParams, setUpdatedAutoTxParams] = useState(autoTxParams)
+  let actionParams: MsgUpdateActionParams
+  const [updatedActionParams, setUpdatedActionParams] = useState(actionParams)
 
   function showEditor(show: boolean, msg: Any) {
     setEditor(show)
@@ -176,20 +178,20 @@ export const AutoTxInfoBreakdown = ({
     }
     setEditMsg('')
   }
-  const [requestedUpdateAutoTx, setRequestedUpdateAutoTx] = useState(false)
-  const { mutate: handleUpdateAutoTx, isLoading: isExecutingUpdateAutoTx } =
-    useUpdateAutoTx({ autoTxParams: updatedAutoTxParams })
+  const [requestedUpdateAction, setRequestedUpdateAction] = useState(false)
+  const { mutate: handleUpdateAction, isLoading: isExecutingUpdateAction } =
+    useUpdateAction({ actionParams: updatedActionParams })
   useEffect(() => {
-    const shouldTriggerUpdateAutoTx =
-      !isExecutingUpdateAutoTx && requestedUpdateAutoTx
-    if (shouldTriggerUpdateAutoTx) {
-      handleUpdateAutoTx(undefined, {
-        onSettled: () => setRequestedUpdateAutoTx(false),
+    const shouldTriggerUpdateAction =
+      !isExecutingUpdateAction && requestedUpdateAction
+    if (shouldTriggerUpdateAction) {
+      handleUpdateAction(undefined, {
+        onSettled: () => setRequestedUpdateAction(false),
       })
     }
-  }, [isExecutingUpdateAutoTx, requestedUpdateAutoTx, handleUpdateAutoTx])
+  }, [isExecutingUpdateAction, requestedUpdateAction, handleUpdateAction])
 
-  const handleUpdateAutoTxMsgClick = (index: number) => {
+  const handleUpdateActionMsgClick = (index: number) => {
     connectExternalWallet(null)
     if (!isJsonValid) {
       //alert("Invalid JSON")
@@ -198,7 +200,7 @@ export const AutoTxInfoBreakdown = ({
     try {
       let value = JSON.parse(editMsg)
       console.log(value)
-      if (autoTxInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
+      if (actionInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
         //let msgExecMsgs: [];
         value.msgs.forEach((msgExecMsg, i) => {
           console.log('valueA')
@@ -214,35 +216,35 @@ export const AutoTxInfoBreakdown = ({
           value.msgs[i] = msgExecMsgEncoded
         })
       }
-      console.log(autoTxInfo.msgs[0])
+      console.log(actionInfo.msgs[0])
       const encodeObject = {
-        typeUrl: autoTxInfo.msgs[index].typeUrl,
+        typeUrl: actionInfo.msgs[index].typeUrl,
         value,
       }
       const msgEncoded = registry.encodeAsAny(encodeObject)
       let params = {
-        txId: Number(autoTxInfo.txId),
+        id: Number(actionInfo.id),
         msgs: [msgEncoded],
-        owner: autoTxInfo.owner,
+        owner: actionInfo.owner,
       }
-      setUpdatedAutoTxParams(params)
+      setUpdatedActionParams(params)
       console.log(params)
     } catch (e) {
       console.log(e)
     }
-    return setRequestedUpdateAutoTx(true)
+    return setRequestedUpdateAction(true)
   }
-  const shouldDisableUpdateAutoTxButton = false // !updatedAutoTxParams || !updatedAutoTxParams.txId
+  const shouldDisableUpdateActionButton = false // !updatedActionParams || !updatedActionParams.id
 
   ////
 
-  // const [icaUpdateAutoTxs, isUpdateAutoTxsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, autoTxInfo)
+  // const [icaUpdateActions, isUpdateActionsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, actionInfo)
   /*  if (size === 'small') {
          return (
              <>
                  <InfoHeader
-                     txId={autoTxInfo.txId}
-                     owner={autoTxInfo.owner}
+                     id={actionInfo.id}
+                     owner={actionInfo.owner}
                      active={isActive}
                  />
                  <Inline
@@ -266,8 +268,8 @@ export const AutoTxInfoBreakdown = ({
   return (
     <>
       <InfoHeader
-        txId={autoTxInfo.txId.toString()}
-        owner={autoTxInfo.owner}
+        id={actionInfo.id.toString()}
+        owner={actionInfo.owner}
         active={isActive}
         latestExecWasError={latestExecWasError}
       />
@@ -298,10 +300,10 @@ export const AutoTxInfoBreakdown = ({
               {latestExecWasError ? <>🔴</> : <>🟢 </>}
             </Text>
             <Text variant="legend">
-              {autoTxInfo.label != '' ? (
-                <> {autoTxInfo.label}</>
+              {actionInfo.label != '' ? (
+                <> {actionInfo.label}</>
               ) : (
-                <>Trigger {autoTxInfo.txId.toString()}</>
+                <>Trigger {actionInfo.id.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">
@@ -310,7 +312,7 @@ export const AutoTxInfoBreakdown = ({
                 <>
                   {' '}
                   {
-                    autoTxInfo.msgs[0].typeUrl
+                    actionInfo.msgs[0].typeUrl
                       .split('.')
                       .find((fetchedHistory) => fetchedHistory.includes('Msg')).split(',')[0]
 
@@ -339,9 +341,9 @@ export const AutoTxInfoBreakdown = ({
                 Owner
               </Text>
 
-              <Text variant="body">{autoTxInfo.owner} </Text>
+              <Text variant="body">{actionInfo.owner} </Text>
             </Column>
-            {autoTxInfo.icaConfig && (
+            {actionInfo.icaConfig && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <Column
                 css={{ padding: '$3' }}
@@ -353,13 +355,13 @@ export const AutoTxInfoBreakdown = ({
                   IBC Port
                 </Text>
 
-                <Text variant="body">{autoTxInfo.icaConfig.portId} </Text>
+                <Text variant="body">{actionInfo.icaConfig.portId} </Text>
               </Column>
             )}
           </Inline>
         </Row>
 
-        {icaAddress && icaBalance && autoTxInfo.icaConfig && (
+        {icaAddress && icaBalance && actionInfo.icaConfig && (
           <Row>
             <Column
               style={{
@@ -458,18 +460,18 @@ export const AutoTxInfoBreakdown = ({
             </Text>
             <Inline gap={2}>
               <Text css={{ wordBreak: 'break-all' }} variant="body">
-                {autoTxInfo.feeAddress}{' '}
+                {actionInfo.feeAddress}{' '}
               </Text>
             </Inline>
             {!isFeeBalanceLoading && feeBalance > 0 && (
               <Text variant="legend">
                 {' '}
-                Balance: <Text variant="caption"> {feeBalance} TRST</Text>{' '}
+                Balance: <Text variant="caption"> {feeBalance} INTO</Text>{' '}
               </Text>
             )}
           </Column>
         </Row>
-        {autoTxInfo.msgs.map((msg: any, index) => (
+        {actionInfo.msgs.map((msg: any, index) => (
           <div key={index}>
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -539,10 +541,10 @@ export const AutoTxInfoBreakdown = ({
                       css={{ marginTop: '$8', margin: '$2' }}
                       variant="secondary"
                       size="small"
-                      disabled={shouldDisableUpdateAutoTxButton}
-                      onClick={() => handleUpdateAutoTxMsgClick(index)}
+                      disabled={shouldDisableUpdateActionButton}
+                      onClick={() => handleUpdateActionMsgClick(index)}
                     >
-                      {isExecutingUpdateAutoTx ? (
+                      {isExecutingUpdateAction ? (
                         <Spinner instant />
                       ) : (
                         'Update Message'
@@ -555,11 +557,11 @@ export const AutoTxInfoBreakdown = ({
           </div>
         ))}
 
-        {autoTxInfo.startTime.getTime() > 0 && (
+        {actionInfo.startTime.getTime() > 0 && (
           <Row>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {autoTxInfo.startTime && (
+              {actionInfo.startTime && (
                 <>
                   <Tooltip
                     label={
@@ -572,7 +574,7 @@ export const AutoTxInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(autoTxInfo.startTime.getTime())}
+                      {getRelativeTime(actionInfo.startTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -588,10 +590,10 @@ export const AutoTxInfoBreakdown = ({
               </Tooltip>
               <Inline gap={2}>
                 <Text variant="body">
-                  {getRelativeTime(autoTxInfo.execTime.getTime())}
+                  {getRelativeTime(actionInfo.execTime.getTime())}
                 </Text>
               </Inline>
-              {autoTxInfo.interval.seconds.toString() != '0' && (
+              {actionInfo.interval.seconds.toString() != '0' && (
                 <>
                   {' '}
                   <Tooltip
@@ -603,12 +605,12 @@ export const AutoTxInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getDuration(Number(autoTxInfo.interval.seconds))}
+                      {getDuration(Number(actionInfo.interval.seconds))}
                     </Text>
                   </Inline>
                 </>
               )}
-              {autoTxInfo.endTime.getTime() && (
+              {actionInfo.endTime.getTime() && (
                 <>
                   <Tooltip
                     label={'End time is the time last time execution can place'}
@@ -619,7 +621,7 @@ export const AutoTxInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(autoTxInfo.endTime.getTime())}
+                      {getRelativeTime(actionInfo.endTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -627,7 +629,7 @@ export const AutoTxInfoBreakdown = ({
             </Column>
           </Row>
         )}
-        {autoTxInfo.configuration && (
+        {actionInfo.configuration && (
           <Row>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -643,7 +645,7 @@ export const AutoTxInfoBreakdown = ({
                 </Tooltip>
 
                 <Text variant="body">
-                  {autoTxInfo.configuration.saveMsgResponses ? 'True' : 'False'}
+                  {actionInfo.configuration.saveMsgResponses ? 'True' : 'False'}
                 </Text>
               </>
               <>
@@ -657,7 +659,7 @@ export const AutoTxInfoBreakdown = ({
                   </Text>
                 </Tooltip>
                 <Text variant="body">
-                  {autoTxInfo.configuration.updatingDisabled ? 'True' : 'False'}
+                  {actionInfo.configuration.updatingDisabled ? 'True' : 'False'}
                 </Text>
               </>
               <>
@@ -669,7 +671,7 @@ export const AutoTxInfoBreakdown = ({
                   </Text>
                 </Tooltip>
                 <Text variant="body">
-                  {autoTxInfo.configuration.stopOnFailure ? 'True' : 'False'}
+                  {actionInfo.configuration.stopOnFailure ? 'True' : 'False'}
                 </Text>
               </>
               <>
@@ -683,7 +685,7 @@ export const AutoTxInfoBreakdown = ({
                   </Text>
                 </Tooltip>
                 <Text variant="body">
-                  {autoTxInfo.configuration.stopOnSuccess ? 'True' : 'False'}
+                  {actionInfo.configuration.stopOnSuccess ? 'True' : 'False'}
                 </Text>
               </>
               <>
@@ -697,14 +699,14 @@ export const AutoTxInfoBreakdown = ({
                   </Text>
                 </Tooltip>
                 <Text variant="body">
-                  {autoTxInfo.configuration.fallbackToOwnerBalance ? 'True' : 'False'}
+                  {actionInfo.configuration.fallbackToOwnerBalance ? 'True' : 'False'}
                 </Text>
               </>
             </Column>
           </Row>
         )}
 
-        {/* {autoTxInfo.updateHistory.length != 0 && (
+        {/* {actionInfo.updateHistory.length != 0 && (
           <>
             {' '}
             <Row>
@@ -716,7 +718,7 @@ export const AutoTxInfoBreakdown = ({
                     Update History
                   </Text>
                 </Inline>
-                {autoTxInfo.updateHistory?.map((entry, ei) => (
+                {actionInfo.updateHistory?.map((entry, ei) => (
                   <div key={ei}>
                     <Column
                       gap={2}
@@ -734,7 +736,7 @@ export const AutoTxInfoBreakdown = ({
           </>
         )} */}
 
-        {autoTxHistory && autoTxHistory.length > 0 && (
+        {actionHistory && actionHistory.length > 0 && (
           <>
             {' '}
             <Row>
@@ -746,7 +748,7 @@ export const AutoTxInfoBreakdown = ({
                     Execution History
                   </Text>
                 </Inline>
-                {autoTxHistory
+                {actionHistory
                   ?.slice(0)
                   .map(
                     (
@@ -786,7 +788,7 @@ export const AutoTxInfoBreakdown = ({
                           <Column>
                             <Text variant="legend">
                               Exec Fee:{' '}
-                              {convertMicroDenomToDenom(execFee.amount, 6)} TRST
+                              {convertMicroDenomToDenom(execFee.amount, 6)} INTO
                             </Text>
                           </Column>
 
@@ -829,8 +831,8 @@ export const AutoTxInfoBreakdown = ({
             </Row>
           </>
         )}
-        {autoTxInfo.startTime < autoTxInfo.endTime &&
-          !autoTxHistory && (
+        {actionInfo.startTime < actionInfo.endTime &&
+          !actionHistory && (
             <Row>
               {' '}
               <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -869,7 +871,7 @@ function Row({ children }) {
   )
 }
 
-const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
+const InfoHeader = ({ id, active, latestExecWasError }: InfoHeaderProps) => (
   <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
     <Inline gap={6}>
       <Link href="/triggers" passHref>
@@ -880,7 +882,7 @@ const InfoHeader = ({ txId, active, latestExecWasError }: InfoHeaderProps) => (
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {latestExecWasError ? <>🔴</> : active ? <>🟢</> : <>✅</>} Trigger {txId}
+      {latestExecWasError ? <>🔴</> : active ? <>🟢</> : <>✅</>} Trigger {id}
     </Text>
   </Inline>
 )

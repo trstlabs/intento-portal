@@ -3,72 +3,72 @@ import { convertDenomToMicroDenom } from 'junoblocks'
 import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { trst, GlobalDecoderRegistry } from 'trustlessjs'
+import { intento, GlobalDecoderRegistry } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
-import { AutoTxData } from '../../types/trstTypes'
+import { ActionData } from '../../types/trstTypes'
 
-type ExecuteSubmitAutoTxArgs = {
+type ExecuteSubmitActionArgs = {
   owner: string
-  autoTxData: AutoTxData
+  actionData: ActionData
   client: SigningStargateClient
 }
 
-export const executeSubmitAutoTx = async ({
+export const executeSubmitAction = async ({
   client,
-  autoTxData,
+  actionData,
   owner,
-}: ExecuteSubmitAutoTxArgs): Promise<any> => {
+}: ExecuteSubmitActionArgs): Promise<any> => {
   let startAtInt = 0
-  if (autoTxData.startTime && autoTxData.startTime > 0) {
-    startAtInt = Math.floor(Date.now() / 1000) + autoTxData.startTime / 1000
+  if (actionData.startTime && actionData.startTime > 0) {
+    startAtInt = Math.floor(Date.now() / 1000) + actionData.startTime / 1000
   }
   console.log(startAtInt)
   let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
   console.log(startAt.toString())
-  let duration = autoTxData.duration + 'ms'
-  let interval = autoTxData.interval + 'ms'
+  let duration = actionData.duration + 'ms'
+  let interval = actionData.interval + 'ms'
   let msgs = []
 
-  transformAndEncodeMsgs(autoTxData, client, msgs)
+  transformAndEncodeMsgs(actionData, client, msgs)
   console.log(msgs)
 
   if (
-    autoTxData.icaAddressForAuthZGrant &&
-    autoTxData.icaAddressForAuthZGrant != ''
+    actionData.icaAddressForAuthZGrant &&
+    actionData.icaAddressForAuthZGrant != ''
   ) {
     const encodeObject2 = {
       typeUrl: '/cosmos.authz.v1beta1.MsgExec',
       value: {
         msgs,
-        grantee: autoTxData.icaAddressForAuthZGrant,
+        grantee: actionData.icaAddressForAuthZGrant,
       },
     }
     msgs = [client.registry.encodeAsAny(encodeObject2)]
   }
 
   let feeFunds: Coin[] = []
-  if (autoTxData.feeFunds > 0) {
+  if (actionData.feeFunds > 0) {
     feeFunds = [
       {
-        denom: 'utrst',
-        amount: convertDenomToMicroDenom(autoTxData.feeFunds, 6).toString(),
+        denom: 'uinto',
+        amount: convertDenomToMicroDenom(actionData.feeFunds, 6).toString(),
       },
     ]
   }
-  const msgSubmitAutoTx =
-    trst.autoibctx.v1beta1.MessageComposer.withTypeUrl.submitAutoTx({
+  const msgSubmitAction =
+    intento.intent.v1beta1.MessageComposer.withTypeUrl.submitAction({
       owner,
       msgs,
-      label: autoTxData.label ? autoTxData.label : '',
+      label: actionData.label ? actionData.label : '',
       duration,
       interval,
       startAt,
-      connectionId: autoTxData.connectionId ? autoTxData.connectionId : '',
-      hostConnectionId: autoTxData.hostConnectionId
-        ? autoTxData.hostConnectionId
+      connectionId: actionData.connectionId ? actionData.connectionId : '',
+      hostConnectionId: actionData.hostConnectionId
+        ? actionData.hostConnectionId
         : '',
-      configuration: autoTxData.configuration
-        ? autoTxData.configuration
+      configuration: actionData.configuration
+        ? actionData.configuration
         : {
             saveMsgResponses: false,
             updatingDisabled: false,
@@ -79,20 +79,20 @@ export const executeSubmitAutoTx = async ({
           },
       feeFunds,
     })
-  console.log(msgSubmitAutoTx)
+  console.log(msgSubmitAction)
   return validateTransactionSuccess(
-    await client.signAndBroadcast(owner, [msgSubmitAutoTx], {
+    await client.signAndBroadcast(owner, [msgSubmitAction], {
       amount: [],
       gas: '300000',
     })
   )
 }
 function transformAndEncodeMsgs(
-  autoTxData: AutoTxData,
+  actionData: ActionData,
   client: SigningStargateClient,
   msgs: any[]
 ) {
-  for (let msgJSON of autoTxData.msgs) {
+  for (let msgJSON of actionData.msgs) {
     let value = JSON.parse(msgJSON)['value']
     let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
 

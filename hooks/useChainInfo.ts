@@ -3,14 +3,14 @@ import { useQuery } from 'react-query'
 import { queryClient } from '../services/queryClient'
 
 import { convertMicroDenomToDenom } from 'util/conversion'
-import { cosmos } from 'trustlessjs'
+import { cosmos } from 'intentojs'
 import {
   DEFAULT_REFETCH_INTERVAL,
   DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
 
 import {
-  useTrstRpcClient,
+  useIntentoRpcClient,
   useCosmosRpcClient,
   useTendermintRpcClient,
 } from './useRPCClient'
@@ -18,9 +18,9 @@ import {
   getStakeBalanceForAcc,
   getAPR,
   getAPY,
-  getExpectedAutoTxFee,
+  getExpectedActionFee,
   getAPYForAutoCompound,
-  getAutoTxParams,
+  getActionParams,
   getModuleParams,
 } from '../services/chain-info'
 import { useRecoilState, useRecoilValue } from 'recoil'
@@ -28,10 +28,10 @@ import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
 import {
   paramsStateAtom,
-  triggerModuleParamsAtom,
+  intentModuleParamsAtom,
 } from '../state/atoms/moduleParamsAtoms'
 import { useEffect } from 'react'
-import { AutoTxData } from '../types/trstTypes'
+import { ActionData } from '../types/trstTypes'
 
 const chainInfoQueryKey = '@chain-info'
 
@@ -56,41 +56,41 @@ export const useIBCChainInfo = (chainId: string) => {
   return [data, isLoading] as const
 }
 
-export const useGetExpectedAutoTxFee = (
+export const useGetExpectedActionFee = (
   durationSeconds: number,
-  autoTxData: AutoTxData,
+  actionData: ActionData,
   isDialogShowing: boolean,
   intervalSeconds?: number
 ) => {
-  const [triggerModuleParams, setTriggerModuleData] = useRecoilState(
-    triggerModuleParamsAtom
+  const [intentModuleParams, setTriggerModuleData] = useRecoilState(
+    intentModuleParamsAtom
   )
-  const client = useTrstRpcClient()
+  const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    `expectedAutoTxFee/${durationSeconds}/${intervalSeconds}`,
+    `expectedActionFee/${durationSeconds}/${intervalSeconds}`,
     async () => {
-      const triggerModuleParams = await getAutoTxParams(client)
-      setTriggerModuleData(triggerModuleParams)
-      const fee = getExpectedAutoTxFee(
-        triggerModuleParams,
+      const intentModuleParams = await getActionParams(client)
+      setTriggerModuleData(intentModuleParams)
+      const fee = getExpectedActionFee(
+        intentModuleParams,
         durationSeconds,
-        autoTxData.msgs.length,
+        actionData.msgs.length,
         intervalSeconds
       )
 
       return fee
     },
     {
-      enabled: Boolean(durationSeconds && autoTxData.msgs && isDialogShowing),
+      enabled: Boolean(durationSeconds && actionData.msgs && isDialogShowing),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
   useEffect(() => {
-    if (triggerModuleParams && triggerModuleParams.AutoTxFlexFeeMul) {
+    if (intentModuleParams && intentModuleParams.ActionFlexFeeMul) {
     }
-  }, [triggerModuleParams])
+  }, [intentModuleParams])
 
   return [data, isLoading] as const
 }
@@ -121,7 +121,7 @@ export const useGetAllValidators = () => {
 
 export const useGetStakeBalanceForAcc = () => {
   const { address, status } = useRecoilValue(walletState)
-  const client = useTrstRpcClient()
+  const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
     'getStakeBalanceForAcc',
     async () => {
@@ -169,7 +169,7 @@ export const useGetAPR = () => {
 }
 
 export const useSetModuleParams = () => {
-  const trstClient = useTrstRpcClient()
+  const trstClient = useIntentoRpcClient()
   const cosmosClient = useCosmosRpcClient()
   const [paramsState, setParamsState] = useRecoilState(paramsStateAtom)
 
@@ -199,22 +199,22 @@ export const useGetAPYForWithFees = (
   stakingBalance: number,
   nrMessages: number
 ) => {
-  const [triggerModuleParams, setTriggerModuleData] = useRecoilState(
-    triggerModuleParamsAtom
+  const [intentModuleParams, setTriggerModuleData] = useRecoilState(
+    intentModuleParamsAtom
   )
   const paramsState = useRecoilValue(paramsStateAtom)
   const cosmosClient = useCosmosRpcClient()
-  const trstClient = useTrstRpcClient()
+  const trstClient = useIntentoRpcClient()
   const { client } = useRecoilValue(walletState)
 
   const { data, isLoading } = useQuery(
     'useGetAPYForWithFees',
     async () => {
-      const triggerModuleParams = await getAutoTxParams(trstClient)
-      setTriggerModuleData(triggerModuleParams)
+      const intentModuleParams = await getActionParams(trstClient)
+      setTriggerModuleData(intentModuleParams)
 
       return getAPYForAutoCompound(
-        triggerModuleParams,
+        intentModuleParams,
         paramsState,
         cosmosClient,
         client,
@@ -235,9 +235,9 @@ export const useGetAPYForWithFees = (
   )
 
   useEffect(() => {
-    if (triggerModuleParams && triggerModuleParams.AutoTxFlexFeeMul) {
+    if (intentModuleParams && intentModuleParams.ActionFlexFeeMul) {
     }
-  }, [triggerModuleParams])
+  }, [intentModuleParams])
 
   return [data, isLoading] as const
 }

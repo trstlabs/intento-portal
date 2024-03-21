@@ -13,8 +13,8 @@ import {
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 
-import { SubmitAutoTxDialog } from '../../automate/components/SubmitAutoTxDialog'
-import { useSubmitAutoTx } from '../../automate/hooks'
+import { SubmitActionDialog } from '../../automate/components/SubmitActionDialog'
+import { useSubmitAction } from '../../automate/hooks'
 import {
   useGetAPR,
   useGetAPYForWithFees,
@@ -24,10 +24,10 @@ import {
 } from '../../../hooks/useChainInfo'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
 import { useRecoilValue } from 'recoil'
-import { triggerModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
+import { intentModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
 import IssuanceChart from './Chart'
 import { getDuration } from '../../../util/time'
-import { AutoTxData } from '../../../types/trstTypes'
+import { ActionData } from '../../../types/trstTypes'
 
 type InfoCardProps = {
   shouldShowAutoCompound: Boolean
@@ -35,14 +35,14 @@ type InfoCardProps = {
 
 export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const [params, _] = useSetModuleParams()
-  const triggerParams = useRecoilValue(triggerModuleParamsAtom)
-  const [requestedSubmitAutoTx, setRequestedSubmitAutoTx] = useState(false)
-  let data = new AutoTxData()
+  const triggerParams = useRecoilValue(intentModuleParamsAtom)
+  const [requestedSubmitAction, setRequestedSubmitAction] = useState(false)
+  let data = new ActionData()
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
   // data.typeUrls = [""]
-  const [autoTxData, setAutoTxData] = useState(data)
+  const [actionData, setActionData] = useState(data)
   const [APR, isAPRLoading] = useGetAPR()
   const week = 60 * 60 * 24 * 7
 
@@ -54,22 +54,22 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
     stakeBalance ? stakeBalance.stakingBalanceAmount : 0,
     stakeBalance ? stakeBalance.validators.length : 1
   )
-  const { balance, isLoading } = useTokenBalance('TRST')
+  const { balance, isLoading } = useTokenBalance('INTO')
 
-  const { mutate: handleSubmitAutoTx, isLoading: isExecutingSchedule } =
-    useSubmitAutoTx({ autoTxData })
+  const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
+    useSubmitAction({ actionData })
 
   useEffect(() => {
-    const shouldTriggerSubmitAutoTx =
-      !isExecutingSchedule && requestedSubmitAutoTx
-    if (shouldTriggerSubmitAutoTx) {
-      handleSubmitAutoTx(undefined, {
-        onSettled: () => setRequestedSubmitAutoTx(false),
+    const shouldTriggerSubmitAction =
+      !isExecutingSchedule && requestedSubmitAction
+    if (shouldTriggerSubmitAction) {
+      handleSubmitAction(undefined, {
+        onSettled: () => setRequestedSubmitAction(false),
       })
     }
-  }, [isExecutingSchedule, requestedSubmitAutoTx, handleSubmitAutoTx])
+  }, [isExecutingSchedule, requestedSubmitAction, handleSubmitAction])
 
-  const handleSubmitAutoTxClick = (newAutoTxData: AutoTxData) => {
+  const handleSubmitActionClick = (newActionData: ActionData) => {
     const msgs = []
     for (const validator of stakeBalance.validators) {
       let claimMsg = claimRewardSDKMessage
@@ -77,18 +77,18 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
       claimMsg.value.validatorAddress = validator
       msgs.push(JSON.stringify(claimMsg))
     }
-    const autoTx = {
-      ...newAutoTxData,
+    const action = {
+      ...newActionData,
       msgs,
     }
-    // console.log(autoTx)
-    setAutoTxData(autoTx)
-    return setRequestedSubmitAutoTx(true)
+    // console.log(action)
+    setActionData(action)
+    return setRequestedSubmitAction(true)
   }
 
   const [
-    { isShowing: isSubmitAutoTxDialogShowing },
-    setSubmitAutoTxDialogState,
+    { isShowing: isSubmitActionDialogShowing },
+    setSubmitActionDialogState,
   ] = useState({ isShowing: false })
 
   return (
@@ -109,7 +109,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 {(
                   Number(params.annualProvision) / 1000000000000000000000000
                 ).toLocaleString()}{' '}
-                TRST annually
+                INTO annually
               </Text>
 
               {params.allocModuleParams.distributionProportions.communityPool !=
@@ -147,18 +147,18 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     <Text variant="legend"> Trigger Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.AutoTxConstantFee),
+                        Number(triggerParams.ActionConstantFee),
                         6
                       )}{' '}
-                      TRST{' '}
+                      INTO{' '}
                     </Text>
                     <Text variant="legend"> Trigger Flex Fee per hour</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.AutoTxFlexFeeMul) * 60,
+                        Number(triggerParams.ActionFlexFeeMul) * 60,
                         6
                       ) + ' '}
-                      TRST{' '}
+                      INTO{' '}
                     </Text>
                   </>
                 </Card>
@@ -171,7 +171,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             variant="title"
             css={{ paddingLeft: '$4', paddingBottom: '$8' }}
           >
-            <Tooltip label="Staking allows you to earn TRST by securing the Trustless Hub network">
+            <Tooltip label="Staking allows you to earn INTO by securing the Intento network">
               <span> Staking Info</span>
             </Tooltip>
           </Text>
@@ -220,7 +220,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   <>
                     <Inline>
                       <Text variant="legend"> APY (Weekly Compound)</Text>
-                      <Tooltip label="Annual Percentage Yield (APY) represents the effective annual rate of return of staked TRST that is compounded for a year. For Weekly Compound APY, rewards are calculated and added to your staking balance every week.">
+                      <Tooltip label="Annual Percentage Yield (APY) represents the effective annual rate of return of staked INTO that is compounded for a year. For Weekly Compound APY, rewards are calculated and added to your staking balance every week.">
                         <Button
                           variant="ghost"
                           size="small"
@@ -247,7 +247,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                       {formatTokenBalance(balance, {
                         includeCommaSeparation: true,
                       })}{' '}
-                      TRST{' '}
+                      INTO{' '}
                     </Text>
                   </>
                 )}
@@ -267,7 +267,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                       </>
                     ) : (
                       <>
-                        You hold {formatTokenBalance(balance)} TRST and have not
+                        You hold {formatTokenBalance(balance)} INTO and have not
                         staked tokens yet, stake to secure the network and earn
                         staking rewards. Staking rewards can be compounded to
                         earn additional yield.
@@ -313,7 +313,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     (stakeBalance && stakeBalance.stakingBalanceAmount == 0)
                   }
                   onClick={() =>
-                    setSubmitAutoTxDialogState({
+                    setSubmitActionDialogState({
                       isShowing: true,
                     })
                   }
@@ -329,18 +329,18 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             </>
           )}
         </Column>
-        <SubmitAutoTxDialog
+        <SubmitActionDialog
           isLoading={isExecutingSchedule}
-          autoTxData={autoTxData}
+          actionData={actionData}
           customLabel="Autocompound"
-          isDialogShowing={isSubmitAutoTxDialogShowing}
+          isDialogShowing={isSubmitActionDialogShowing}
           onRequestClose={() =>
-            setSubmitAutoTxDialogState({
+            setSubmitActionDialogState({
               isShowing: false,
             })
           }
-          handleSubmitAutoTx={(autoTxData) =>
-            handleSubmitAutoTxClick(autoTxData)
+          handleSubmitAction={(actionData) =>
+            handleSubmitActionClick(actionData)
           }
         />
       </StyledDivForInfoGrid>
@@ -355,7 +355,7 @@ const StyledDivForContainer = styled('div', {
 const claimRewardSDKMessage = {
   typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
   value: {
-    delegatorAddress: 'trust1....',
+    delegatorAddress: 'into1....',
     validatorAddress: 'trustvaloper1...',
   },
 }

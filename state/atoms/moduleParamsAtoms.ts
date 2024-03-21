@@ -1,13 +1,13 @@
 import { atom } from 'recoil'
-import { Params as TriggerModuleParams } from 'trustlessjs/dist/codegen/trst/autoibctx/v1beta1/types'
-import { Params as DistrModuleParams } from 'trustlessjs/dist/codegen/cosmos/distribution/v1beta1/distribution'
-import { Params as MintModuleParams } from 'trustlessjs/dist/codegen/trst/mint/v1beta1/mint'
-import { Params as AllocModuleParams } from 'trustlessjs/dist/codegen/trst/alloc/v1beta1/params'
-import { Params as StakingModuleParams } from 'trustlessjs/dist/codegen/cosmos/staking/v1beta1/staking'
+import { Params as IntentModuleParams } from 'intentojs/dist/codegen/intento/intent/v1beta1/params'
+import { Params as DistrModuleParams } from 'intentojs/dist/codegen/cosmos/distribution/v1beta1/distribution'
+import { Params as MintModuleParams } from 'intentojs/dist/codegen/intento/mint/v1beta1/mint'
+import { Params as AllocModuleParams } from 'intentojs/dist/codegen/intento/alloc/v1beta1/params'
+import { Params as StakingModuleParams } from 'intentojs/dist/codegen/cosmos/staking/v1beta1/staking'
 
 // Define an atom state for the session data
-export const triggerModuleParamsAtom = atom<TriggerModuleParams>({
-  key: 'triggerModuleParams',
+export const intentModuleParamsAtom = atom<IntentModuleParams>({
+  key: 'intentModuleParams',
   default: null,
 })
 

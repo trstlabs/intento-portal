@@ -1,5 +1,5 @@
 import { AppLayout, NavigationSidebar } from 'components'
-import { AutoTxInfoBreakdown } from 'features/auto-txs'
+import { ActionInfoBreakdown } from 'features/actions'
 import {
   Button,
   ChevronIcon,
@@ -14,18 +14,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { APP_NAME } from 'util/constants'
-import { useAutoTxInfo } from '../../hooks/useAutoTxInfo'
+import { useActionInfo } from '../../hooks/useActionInfo'
 import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
 
-export default function AutoTx() {
+export default function Action() {
   const {
     query: { id },
   } = useRouter()
 
   const isMobile = useMedia('sm')
 
-  const [autoTxInfo, isLoading] = useAutoTxInfo(id)
-  const connectionId = autoTxInfo && autoTxInfo.icaConfig ? autoTxInfo.icaConfig.connectionId : ''
+  const [actionInfo, isLoading] = useActionInfo(id)
+  const connectionId = actionInfo && actionInfo.icaConfig ? actionInfo.icaConfig.connectionId : ''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {
@@ -55,17 +55,17 @@ export default function AutoTx() {
           <NavigationSidebar
             shouldRenderBackButton={isMobile}
             backButton={
-              <Link href="/autotxs" passHref>
+              <Link href="#" passHref>
                 <Button as="a" variant="ghost" icon={<ChevronIcon />} />
               </Link>
             }
           />
         }
       >
-        {APP_NAME && autoTxInfo != undefined && (
+        {APP_NAME && actionInfo != undefined && (
           <Head>
             <title>
-              {APP_NAME} — Trigger {autoTxInfo.txId}
+              {APP_NAME} — Trigger {actionInfo.id}
             </title>
           </Head>
         )}
@@ -77,9 +77,9 @@ export default function AutoTx() {
         )}
 
         {!isLoading &&
-          (autoTxInfo && autoTxInfo.feeAddress ? (
+          (actionInfo && actionInfo.feeAddress ? (
             <>
-              <AutoTxInfoBreakdown autoTxInfo={autoTxInfo} ibcInfo={ibcInfo} />
+              <ActionInfoBreakdown actionInfo={actionInfo} ibcInfo={ibcInfo} />
             </>
           ) : (
             <StyledDiv>

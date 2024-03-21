@@ -19,7 +19,7 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
-import { useTrstRpcClient } from '../../../hooks/useRPCClient'
+import { useIntentoRpcClient } from '../../../hooks/useRPCClient'
 
 type UseRegisterAccountParams = {
   connectionId: string
@@ -30,7 +30,7 @@ export const useRegisterAccount = ({
   connectionId,
   hostConnectionId,
 }: UseRegisterAccountParams) => {
-  const rpcClient = useTrstRpcClient()
+  const rpcClient = useIntentoRpcClient()
   const { client, address, status } = useRecoilValue(walletState)
   const setTransactionState = useSetRecoilState(transactionStatusState)
   const [_, popConfetti] = useRecoilState(particleState)
@@ -47,7 +47,7 @@ export const useRegisterAccount = ({
         throw new Error('Please connect your wallet.')
       }
 
-      if (rpcClient.trst == undefined) {
+      if (rpcClient.intento == undefined) {
         throw new Error('client')
       }
 
@@ -61,7 +61,7 @@ export const useRegisterAccount = ({
         <Toast
           icon={<IconWrapper icon={<Valid />} color="primary" />}
           title="Now registering on destination chain"
-          body={`Created an Interchain Account on Trustless Hub`}
+          body={`Created an Interchain Account on Intento`}
           onClose={() => toast.dismiss(t.id)}
         />
       ))

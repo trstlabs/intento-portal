@@ -56,7 +56,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     username,
     address,
     openView, assets,
-  } = useChain('trustlesshub')
+  } = useChain('intentozone')
 
   const { mutate: afterConnectWallet } = useAfterConnectWallet()
 
@@ -154,7 +154,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
         </Button>
       </Link> */}
-      {process.env.NEXT_PUBLIC_AUTO_TX_ENABLED == 'true' && (
+      {process.env.NEXT_PUBLIC_ACTION_ENABLED == 'true' && (
         <Link href="/automate" passHref>
           <Button
             as="a"
