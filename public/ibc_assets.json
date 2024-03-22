@@ -29,6 +29,23 @@
     "rpc": "http://gaia-rpc-t.trustlesshub.com"
   },
   {
+    "id": "Dymension Hub",
+    "name": "Dymension Test",
+    "registry_name": "dymensiontest",
+    "symbol": "DYM",
+    "chain_id": "dymension_100-1",
+    "denom": "adym",
+    "decimals": 18,
+    "channel": "channel-0",
+    "channel_to_trst": "channel-0",
+    "denom_on_trst": "ibc/FECACB927EB3102CCCB240FFB3B6FCCEEB8D944C6FEA8DFF079650FEFF59781D",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/dymension/images/dymension-logo.svg",
+    "connection_id": "connection-0",
+    "counterparty_connection_id": "connection-2",
+    "prefix": "cosmos",
+    "rpc": "http://juno-rpc-t.trustlesshub.com"
+  },
+  {
     "id": "Osmosis",
     "name": "Osmosis Test",
     "symbol": "OSMO",

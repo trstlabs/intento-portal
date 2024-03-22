@@ -44,8 +44,8 @@ export default function Actions() {
 
   const pageHeaderContents = (
     <PageHeader
-      title="Automated Actions"
-      subtitle="View your trigger configurations and interact with them"
+      title="Actions"
+      subtitle="View, manage and update actions"
     />
   )
 
