@@ -66,10 +66,10 @@ export const ActionInfoBreakdown = ({
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
     actionInfo.feeAddress
   )
-  const isGood =
+  const isActive =
     actionInfo.endTime &&
     actionInfo.execTime &&
-    actionInfo.endTime.getTime() >= actionInfo.execTime.getTime() && (actionInfo.endTime.getTime() > Date.now() || actionInfo.execTime.getTime() < Date.now())
+    actionInfo.endTime.getTime() >= actionInfo.execTime.getTime() && actionInfo.endTime.getTime() > Date.now()
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -200,7 +200,7 @@ export const ActionInfoBreakdown = ({
                  <InfoHeader
                      id={actionInfo.id}
                      owner={actionInfo.owner}
-                     good={isGood}
+                     good={isActive}
                  />
                  <Inline
                      css={{
@@ -225,14 +225,14 @@ export const ActionInfoBreakdown = ({
       <InfoHeader
         id={actionInfo.id.toString()}
         owner={actionInfo.owner}
-        good={isGood}
+        good={isActive}
       />
       {/* <Row> */}
 
       <Card
         variant="secondary"
         disabled
-        active={isGood}
+        active={isActive}
         css={{
           margin: '$6',
           padding: '$6',
@@ -251,7 +251,7 @@ export const ActionInfoBreakdown = ({
             )}
             <Text variant="title" align="center" css={{ padding: '$8' }}>
               {' '}
-              {isGood ? <>🔴</> : <>🟢 </>}
+              {isActive && <>🟢 </>}
             </Text>
             <Text variant="legend">
               {actionInfo.label != '' ? (
@@ -737,7 +737,7 @@ const InfoHeader = ({ id, good }: InfoHeaderProps) => (
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {good ? <>🔴</> : good ? <>🟢</> : <>✅</>} Action {id}
+      {good && <>🟢</> } Action {id}
     </Text>
   </Inline>
 )
