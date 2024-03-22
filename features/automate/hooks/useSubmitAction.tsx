@@ -68,7 +68,7 @@ export const useSubmitAction = ({ actionData }: UseSubmitActionArgs) => {
               <Button
                 as="a"
                 variant="ghost"
-                href={`/triggers/${actionID}`}
+                href={`/actions/${actionID}`}
                 target="__blank"
                 rel="noopener noreferrer"
                 iconRight={<UpRightArrow />}

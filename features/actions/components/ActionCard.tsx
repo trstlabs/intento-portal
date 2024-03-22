@@ -28,7 +28,7 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
     && actionInfo.endTime.getTime() > Date.now()
 
   return (
-    <Link href={`/triggers/${actionInfo.id.toString()}`} passHref>
+    <Link href={`/actions/${actionInfo.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>
         <CardContent size="medium">
           <Column align="center">
