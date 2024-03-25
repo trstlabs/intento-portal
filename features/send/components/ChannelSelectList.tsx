@@ -50,11 +50,11 @@ export const ChannelSelectList = ({
     let selectedChannel = new ChannelInfo();
     selectedChannel.channelID = selectedInfo.channel
     selectedChannel.name = selectedInfo.id
-    selectedChannel.logoURI = selectedInfo.logoURI
+    selectedChannel.logoURI = selectedInfo.logo_uri
     selectedChannel.denom = selectedInfo.denom
     selectedChannel.denom_on_trst = selectedInfo.denom_on_trst
     selectedChannel.symbol = selectedInfo.symbol
-    selectedChannel.connectionID = selectedInfo.connectionID
+    selectedChannel.connectionID = selectedInfo.connection_id
     selectedChannel.prefix = selectedInfo.prefix
     console.log(selectedChannel)
     return selectedChannel

@@ -257,7 +257,7 @@ export const RecipientList = ({
                 <Column><Row>
                   <Text align="center"
                     variant="caption">
-                    To Chain (Optional)</Text>
+                    To chain (optional)</Text>
                   <ChannelSelector
                     channel={recipient.channelID}
                     onChange={(updateChannel) => {
