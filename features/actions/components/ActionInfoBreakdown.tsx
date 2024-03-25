@@ -751,7 +751,7 @@ const StyledInput = styled('input', {
 
 
 const StringifyBigints = (msg: any) => {
-  const jsonString = JSON.stringify(msg, (key, value) => 
+  const jsonString = JSON.stringify(msg, (_, value) => 
     typeof value === 'bigint' ? value.toString() : value, 2);
 
   return (
