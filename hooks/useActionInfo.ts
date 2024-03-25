@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query'
 
 import {
-/*   DEFAULT_REFETCH_INTERVAL, */
+  /*   DEFAULT_REFETCH_INTERVAL, */
   DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
 import { useIntentoRpcClient } from './useRPCClient'
@@ -106,11 +106,12 @@ export const useActionHistory = (id, limit: number, key: Uint8Array) => {
         reverse: true,
         countTotal: true,
       })
-    
-      const actionHistoryResponse = await client.intento.intent.v1beta1.actionHistory({
-        id: id,
-        pagination: pageRequest,
-      })
+
+      const actionHistoryResponse =
+        await client.intento.intent.v1beta1.actionHistory({
+          id: id,
+          pagination: pageRequest,
+        })
       return actionHistoryResponse
     },
     {

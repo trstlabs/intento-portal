@@ -478,7 +478,7 @@ export const ActionInfoBreakdown = ({
                           }}
                         >
 
-                          {JSON.stringify(msg.valueDecoded, null, 2)}
+                          {StringifyBigints(msg.valueDecoded)}
 
                         </pre>
                       </Text>
@@ -729,7 +729,7 @@ type InfoHeaderProps = {
 const InfoHeader = ({ id, good }: InfoHeaderProps) => (
   <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
     <Inline gap={6}>
-      <Link href="/triggers" passHref>
+      <Link href="/actions" passHref>
         <Button as="a" variant="ghost" size="large" iconLeft={<WalletIcon />}>
           <Inline css={{ paddingLeft: '$4' }}>All Actions</Inline>
         </Button>
@@ -748,3 +748,13 @@ const StyledInput = styled('input', {
   padding: '$2',
   margin: '$2',
 })
+
+
+const StringifyBigints = (msg: any) => {
+  const jsonString = JSON.stringify(msg, (key, value) => 
+    typeof value === 'bigint' ? value.toString() : value, 2);
+
+  return (
+    <div>{jsonString}</div>
+  );
+};
