@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
-import { useRecoilState } from 'recoil'
-import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import {
+  ibcWalletState,
+  walletState,
+  WalletStatusType,
+} from '../state/atoms/walletAtoms'
 
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
@@ -18,6 +22,9 @@ export const useConnectIBCWallet = (
   const [{ status /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
     useRecoilState(ibcWalletState)
 
+  const walletInfo = useRecoilValue(walletState).status
+
+ 
   let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
   if (fromRegistry) {
     assetInfo = useChainInfoByChainID(chainId)
@@ -53,6 +60,9 @@ export const useConnectIBCWallet = (
     }))
 
     try {
+      if (chainId == 'INTO' || walletInfo != WalletStatusType.connected) {
+        return
+      }
       if (
         !isWalletConnected ||
         !assets?.assets.find((asset) => asset.symbol == tokenSymbol)
