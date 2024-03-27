@@ -112,7 +112,7 @@ function transformAndEncodeMsgs(
     console.log(encodeObject)
 
     let msgAny = client.registry.encodeAsAny(encodeObject)
-    msgAny = GlobalDecoderRegistry.wrapAny(value)
+    msgAny = GlobalDecoderRegistry.wrapAny(msgAny)
 
     msgs.push(msgAny)
   }
