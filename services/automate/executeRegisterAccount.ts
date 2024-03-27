@@ -37,7 +37,7 @@ export const executeRegisterAccount = async ({
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgRegisterAccount], {
       amount: [],
-      gas: '190000',
+      gas: '210000',
     })
   )
 }
