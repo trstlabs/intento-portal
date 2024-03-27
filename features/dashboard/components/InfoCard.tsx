@@ -94,78 +94,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   return (
     <StyledDivForContainer>
       <StyledDivForInfoGrid>
-        {params && (
-          <Column>
-            <Text
-              variant="title"
-              css={{ paddingLeft: '$4', paddingBottom: '$8' }}
-            >
-              <span> Chain Info</span>
-            </Text>
 
-            <Card css={{ padding: '$12' }}>
-              <Text variant="legend"> Token Issuance </Text>
-              <Text css={{ padding: '$8' }} variant="title">
-                {(
-                  Number(params.annualProvision) / 1000000000000000000000000
-                ).toLocaleString()}{' '}
-                INTO annually
-              </Text>
-
-              {params.allocModuleParams.distributionProportions.communityPool !=
-                '' && (
-                <Inline>
-                  <IssuanceChart params={params} />
-                </Inline>
-              )}
-              {/* todo: needs to be updated for after first fourthning.. */}
-              {APR && (
-                <Text variant="caption" css={{ paddingTop: '$8' }}>
-                  {' '}
-                  25% issuance decrease in ~
-                  {getDuration(
-                    (APR.blockParams.actualBlockTime *
-                      (Number(APR.blockParams.actualBlocksPerYear) -
-                        APR.blockParams.currentBlockHeight)) /
-                      1000
-                  )}
-                </Text>
-              )}
-              {/* <Text variant="legend"> Genesis Time</Text>
-              <Text css={{ padding: '$8' }} variant="title">
-                {' '}
-                {getRelativeTime(params.mintModuleParams.startTime.seconds)}
-              </Text> */}
-            </Card>
-            {triggerParams && (
-              <Column>
-                <Text variant="title" css={{ padding: '$8' }}>
-                  <span> Fee Info</span>
-                </Text>
-                <Card css={{ padding: '$12' }}>
-                  <>
-                    <Text variant="legend"> Action Constant Fee</Text>
-                    <Text css={{ padding: '$8' }} variant="title">
-                      {convertMicroDenomToDenom(
-                        Number(triggerParams.ActionConstantFee),
-                        6
-                      )}{' '}
-                      INTO{' '}
-                    </Text>
-                    <Text variant="legend"> Action Flex Fee per hour</Text>
-                    <Text css={{ padding: '$8' }} variant="title">
-                      {convertMicroDenomToDenom(
-                        Number(triggerParams.ActionFlexFeeMul) * 60,
-                        6
-                      ) + ' '}
-                      INTO{' '}
-                    </Text>
-                  </>
-                </Card>
-              </Column>
-            )}
-          </Column>
-        )}
         <Column css={{ paddingBottom: '$6' }}>
           <Text
             variant="title"
@@ -210,72 +139,75 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 </>
               </Card>
 
-              <Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time.">
-                <Text variant="title" css={{ padding: '$8' }}>
-                  Autocompound
-                </Text>
-              </Tooltip>
-              <Card css={{ padding: '$8' }}>
-                {weeklyAPY && (
-                  <>
-                    <Inline>
-                      <Text variant="legend"> APY (Weekly Compound)</Text>
-                      <Tooltip label="Annual Percentage Yield (APY) represents the effective annual rate of return of staked INTO that is compounded for a year. For Weekly Compound APY, rewards are calculated and added to your staking balance every week.">
-                        <Button
-                          variant="ghost"
-                          size="small"
-                          icon={<InfoIcon />}
-                        />
-                      </Tooltip>
-                    </Inline>
-                    <Text css={{ padding: '$8' }} variant="title">
-                      {weeklyAPY.toPrecision(5).toString()}%
-                      {!isAPYWFeesLoading && APYWFees < weeklyAPY && (
-                        <Text css={{ paddingTop: '$1' }} variant="caption">
-                          {' '}
-                          Estimated at {APYWFees.toPrecision(5).toString()}%
-                          with current fees applied and your staked balance
+
+              {balance || weeklyAPY &&
+                <>
+                  <Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time.">
+                    <Text variant="title" css={{ padding: '$8' }}>
+                      Autocompound
+                    </Text>
+                  </Tooltip>
+                  <Card css={{ padding: '$8' }}>
+                    {weeklyAPY && (
+                      <>
+                        <Inline>
+                          <Text variant="legend"> APY (Weekly Compound)</Text>
+                          <Tooltip label="Annual Percentage Yield (APY) represents the effective annual rate of return of staked INTO that is compounded for a year. For Weekly Compound APY, rewards are calculated and added to your staking balance every week.">
+                            <Button
+                              variant="ghost"
+                              size="small"
+                              icon={<InfoIcon />}
+                            />
+                          </Tooltip>
+                        </Inline>
+                        <Text css={{ padding: '$8' }} variant="title">
+                          {weeklyAPY.toPrecision(5).toString()}%
+                          {!isAPYWFeesLoading && APYWFees < weeklyAPY && (
+                            <Text css={{ paddingTop: '$1' }} variant="caption">
+                              {' '}
+                              Estimated at {APYWFees.toPrecision(5).toString()}%
+                              with current fees applied and your staked balance
+                            </Text>
+                          )}
                         </Text>
-                      )}
-                    </Text>
-                  </>
-                )}
-                {!isLoading && balance > 0 && (
-                  <>
-                    <Text variant="legend">Local Balance </Text>
-                    <Text css={{ padding: '$8' }} variant="title">
-                      {formatTokenBalance(balance, {
-                        includeCommaSeparation: true,
-                      })}{' '}
-                      INTO{' '}
-                    </Text>
-                  </>
-                )}
-                {!isLoading && balance > 0 && (
-                  <Text variant="legend">
-                    {' '}
-                    {!isStakeBalanceLoading &&
-                    stakeBalance &&
-                    stakeBalance.stakingBalanceAmount > 0 ? (
-                      <>
-                        Stake Balance is{' '}
-                        {formatTokenBalance(stakeBalance.stakingBalanceAmount, {
-                          includeCommaSeparation: true,
-                        })}{' '}
-                        with {stakeBalance.validators.length} validator
-                        {stakeBalance.validators.length > 1 && <>s</>}{' '}
-                      </>
-                    ) : (
-                      <>
-                        You hold {formatTokenBalance(balance)} INTO and have not
-                        staked tokens yet, stake to secure the network and earn
-                        staking rewards. Staking rewards can be compounded to
-                        earn additional yield.
                       </>
                     )}
-                  </Text>
-                )}
-              </Card>
+                    {!isLoading && balance > 0 && (
+                      <>
+                        <Text variant="legend">Local Balance </Text>
+                        <Text css={{ padding: '$8' }} variant="title">
+                          {formatTokenBalance(balance, {
+                            includeCommaSeparation: true,
+                          })}{' '}
+                          INTO{' '}
+                        </Text>
+                      </>
+                    )}
+                    {!isLoading && balance > 0 && (
+                      <Text variant="legend">
+                        {' '}
+                        {!isStakeBalanceLoading &&
+                          stakeBalance &&
+                          stakeBalance.stakingBalanceAmount > 0 ? (
+                          <>
+                            Stake Balance is{' '}
+                            {formatTokenBalance(stakeBalance.stakingBalanceAmount, {
+                              includeCommaSeparation: true,
+                            })}{' '}
+                            with {stakeBalance.validators.length} validator
+                            {stakeBalance.validators.length > 1 && <>s</>}{' '}
+                          </>
+                        ) : (
+                          <>
+                            You hold {formatTokenBalance(balance)} INTO and have not
+                            staked tokens yet, stake to secure the network and earn
+                            staking rewards. Staking rewards can be compounded to
+                            earn additional yield.
+                          </>
+                        )}
+                      </Text>
+                    )}
+                  </Card></>}
             </>
           ) : (
             <Card css={{ padding: '$12' }}>
@@ -299,7 +231,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   size="large"
                   disabled={isStakeBalanceLoading}
                   as="a"
-                  href={'https://interact.trustlesshub.com/validators/'}
+                  href={'https://wallet.keplr.app/?tab=staking'}
                   target="__blank"
                 >
                   {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
@@ -329,11 +261,84 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             </>
           )}
         </Column>
+        {params && (
+          <Column>
+            <Text
+              variant="title"
+              css={{ paddingLeft: '$4', paddingBottom: '$8' }}
+            >
+              <span> Chain Info</span>
+            </Text>
+
+            <Card css={{ padding: '$12' }}>
+              <Text variant="legend"> Token Issuance </Text>
+              <Text css={{ padding: '$8' }} variant="title">
+                {(
+                  Number(params.annualProvision) / 1000000000000000000000000
+                ).toLocaleString()}{' '}
+                INTO annually
+              </Text>
+
+              {params.allocModuleParams.distributionProportions.communityPool !=
+                '' && (
+                  <Inline>
+                    <IssuanceChart params={params} />
+                  </Inline>
+                )}
+              {/* todo: needs to be updated for after first fourthning.. */}
+              {APR && (
+                <Text variant="caption" css={{ paddingTop: '$8' }}>
+                  {' '}
+                  25% issuance decrease in ~
+                  {getDuration(
+                    (APR.blockParams.actualBlockTime *
+                      (Number(APR.blockParams.actualBlocksPerYear) -
+                        APR.blockParams.currentBlockHeight)) /
+                    1000
+                  )}
+                </Text>
+              )}
+              {/* <Text variant="legend"> Genesis Time</Text>
+              <Text css={{ padding: '$8' }} variant="title">
+                {' '}
+                {getRelativeTime(params.mintModuleParams.startTime.seconds)}
+              </Text> */}
+            </Card>
+            {/* {triggerParams && (
+              <Column>
+                <Text variant="title" css={{ padding: '$8' }}>
+                  <span> Fee Info</span>
+                </Text>
+                <Card css={{ padding: '$12' }}>
+                  <>
+                    <Text variant="legend"> Action Constant Fee</Text>
+                    <Text css={{ padding: '$8' }} variant="title">
+                      {convertMicroDenomToDenom(
+                        Number(triggerParams.ActionConstantFee),
+                        6
+                      )}{' '}
+                      INTO{' '}
+                    </Text>
+                    <Text variant="legend"> Action Flex Fee per hour</Text>
+                    <Text css={{ padding: '$8' }} variant="title">
+                      {convertMicroDenomToDenom(
+                        Number(triggerParams.ActionFlexFeeMul) * 60,
+                        6
+                      ) + ' '}
+                      INTO{' '}
+                    </Text>
+                  </>
+                </Card>
+              </Column>
+            )} */}
+          </Column>
+        )}
         <SubmitActionDialog
           isLoading={isExecutingSchedule}
           actionData={actionData}
           customLabel="Autocompound"
           isDialogShowing={isSubmitActionDialogShowing}
+          chainSymbol={"INTO"}
           onRequestClose={() =>
             setSubmitActionDialogState({
               isShowing: false,
