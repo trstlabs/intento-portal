@@ -22,7 +22,7 @@ export const ChainSelectorToggle = ({
   chainLogoURI,
   chainName,
 }: ChainSelectorToggleProps) => {
-  const chainSelected = Boolean(chainName)
+  const chainSelected = Boolean(chainName) && Boolean(chainLogoURI)
   const iconRotation = chainName ? '90deg' : '-90deg'
 
   const renderContent = () => {

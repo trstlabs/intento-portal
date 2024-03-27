@@ -12,7 +12,7 @@ import React, { useRef, useState } from 'react'
 
 import { QueryInput } from 'components//Input/QueryInput'
 
-import { SelectorToggle } from './SelectorToggle'
+import { TokenSelectorToggle } from './TokenSelectorToggle'
 import { TokenOptionsList } from './TokenOptionsList'
 
 type TokenSelectorProps = {
@@ -74,7 +74,7 @@ export const TokenSelector = ({
         )}
         {!isTokenListShowing && (
           <Inline css={{ padding: '$6 $4', display: 'grid' }}>
-            <SelectorToggle
+            <TokenSelectorToggle
               availableAmount={availableAmount}
               tokenSymbol={tokenSymbol}
               isSelecting={isTokenListShowing}
@@ -121,7 +121,7 @@ export const TokenSelector = ({
             />
           )}
           {!isTokenListShowing && (
-            <SelectorToggle
+            <TokenSelectorToggle
               availableAmount={availableAmount}
               tokenSymbol={tokenSymbol}
               isSelecting={isTokenListShowing}

@@ -11,19 +11,19 @@ import React from 'react'
 import { getPropsForInteractiveElement } from 'util/getPropsForInteractiveElement'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 
-type SelectorToggleProps = {
+type TokenSelectorToggleProps = {
   isSelecting: boolean
   onToggle: () => void
   tokenSymbol: string
   availableAmount: number
 }
 
-export const SelectorToggle = ({
+export const TokenSelectorToggle = ({
   isSelecting,
   onToggle,
   availableAmount,
   tokenSymbol,
-}: SelectorToggleProps) => {
+}: TokenSelectorToggleProps) => {
   const { logo_uri } = useIBCAssetInfo(tokenSymbol) || {}
 
   const formattedAvailableAmount = formatTokenBalance(availableAmount, {
@@ -32,7 +32,7 @@ export const SelectorToggle = ({
 
   const hasTokenSelected = Boolean(tokenSymbol)
 
-  return (<><Text variant="legend"  css={{ marginRight: '$4' }}>Coin</Text>
+  return (<><Text  css={{ marginRight: '$4' }}>Token</Text>
     <StyledDivForSelector
       state={isSelecting || !tokenSymbol ? 'selecting' : 'selected'}
       {...getPropsForInteractiveElement({ onClick: onToggle })}

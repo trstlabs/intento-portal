@@ -35,7 +35,6 @@ export const ChannelSelector = ({
 
   const [isChannelListShowing, setChannelListShowing] = useState(false)
 
-
   const [chainLogoURI, setChainLogoURI] = useState('')
   const [chainName, setChainName] = useState('')
 
@@ -89,6 +88,7 @@ export const ChannelSelector = ({
   return (
     <StyledDivForContainer
       ref={wrapperRef}
+
     >
       <StyledDivForWrapper>
         <StyledDivForSelector>
@@ -178,7 +178,21 @@ const StyledDivForOverlay = styled('div', {
  
 })
 
+const selectedVariantForInputWrapper = {
+  true: {
+    boxShadow: '0 0 0 $space$1 $borderColors$selected',
+  },
+  false: {
+    boxShadow: '0 0 0 $space$1 $colors$dark0',
+  },
+}
+
+
 const StyledDivForContainer = styled('div', {
-  borderRadius: '$4',
+  borderRadius: '$2',
   transition: 'box-shadow .1s ease-out',
+  variants: {
+    selected: selectedVariantForInputWrapper,
+  },
 })
+

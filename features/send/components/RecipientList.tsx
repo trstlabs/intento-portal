@@ -1,23 +1,39 @@
-import { Inline, Card, Spinner, CardContent, IconWrapper, PlusIcon, Union, CopyIcon, Button, styled, Text, Column, convertDenomToMicroDenom, ImageForTokenLogo } from 'junoblocks'
-
+import {
+  Inline,
+  Card,
+  Spinner,
+  CardContent,
+  media,
+  IconWrapper,
+  PlusIcon,
+  Union,
+  CopyIcon,
+  Button,
+  styled,
+  Text,
+  Column,
+  convertDenomToMicroDenom,
+  ImageForTokenLogo,
+} from 'junoblocks'
 
 import React, { HTMLProps, useEffect, useState, useRef } from 'react'
 
-import { useTokenSend } from '../hooks';
+import { useTokenSend } from '../hooks'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { ChannelSelector } from './ChannelSelector';
+import { ChannelSelector } from './ChannelSelector'
 import { useRecoilValue } from 'recoil'
-import { SubmitActionDialog } from '../../automate/components/SubmitActionDialog';
-import { ChannelInfo } from './ChannelSelectList';
-import { useSubmitAction } from '../../automate/hooks';
-import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo';
-import { ActionData } from '../../../types/trstTypes';
+import { SubmitActionDialog } from '../../automate/components/SubmitActionDialog'
+import { ChannelInfo } from './ChannelSelectList'
+import { useSubmitAction } from '../../automate/hooks'
+import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
+import { ActionData } from '../../../types/trstTypes'
+
 
 export class RecipientInfo {
-  recipient: string;
-  amount: string | number;
-  channelID: string;
-  memo: string;
+  recipient: string
+  amount: string | number
+  channelID: string
+  memo: string
 }
 
 type RecipientsInputProps = {
@@ -25,7 +41,6 @@ type RecipientsInputProps = {
   tokenSymbol: string
   onRecipientsChange: (recipients: RecipientInfo[]) => void
   onRemoveRecipient: (recipient: RecipientInfo) => void
-
 } & HTMLProps<HTMLInputElement>
 
 export const RecipientList = ({
@@ -33,24 +48,23 @@ export const RecipientList = ({
   tokenSymbol,
   onRecipientsChange,
   onRemoveRecipient,
-
 }: RecipientsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
-  const [prefix, setPrefix] = useState("into")
+  const [prefix, setPrefix] = useState('into')
   const [requestedSend, setRequestedSend] = useState(false)
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   // set default fields
   let data = new ActionData()
-  data.duration = 14 * 86400000;
-  data.interval = 86400000;
-  data.msgs = [""]
+  data.duration = 14 * 86400000
+  data.interval = 86400000
+  data.msgs = ['']
   const [actionData, setActionData] = useState(data)
   const { address, status } = useRecoilValue(walletState)
 
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
-    useTokenSend({ ibcAsset, recipientInfos: recipients, })
+    useTokenSend({ ibcAsset, recipientInfos: recipients })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
     useSubmitAction({ actionData })
 
@@ -62,8 +76,7 @@ export const RecipientList = ({
 
   /* proceed with send*/
   useEffect(() => {
-    const shouldTriggerDirectTx =
-      !isExecutingTransaction && requestedSend;
+    const shouldTriggerDirectTx = !isExecutingTransaction && requestedSend
     if (shouldTriggerDirectTx) {
       handleSend(undefined, { onSettled: () => setRequestedSend(false) })
     }
@@ -71,11 +84,11 @@ export const RecipientList = ({
 
   /* proceed with schedule*/
   useEffect(() => {
-    const shouldTriggerScheduledTx =
-      !isExecutingSchedule && requestedSchedule;
+    const shouldTriggerScheduledTx = !isExecutingSchedule && requestedSchedule
     if (shouldTriggerScheduledTx) {
-
-      handleSchedule(undefined, { onSettled: () => setRequestedSchedule(false) })
+      handleSchedule(undefined, {
+        onSettled: () => setRequestedSchedule(false),
+      })
     }
   }, [isExecutingSchedule, requestedSchedule, handleSchedule])
 
@@ -83,55 +96,65 @@ export const RecipientList = ({
     if (status === WalletStatusType.connected) {
       return setRequestedSend(true)
     }
-
   }
 
   const handleScheduleClick = (txData: ActionData) => {
-
     if (status === WalletStatusType.connected) {
       let msgs = []
       for (let recipient of recipients) {
-        let sendMsg;
+        let sendMsg
         if (recipient.channelID) {
+
           sendMsg = transferObject
-          sendMsg.value.token = { amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.denom_on_trst }
+          sendMsg.value.token = {
+            amount: convertDenomToMicroDenom(recipient.amount, 6).toString(),
+            denom: ibcAsset.denom_on_trst,
+          }
           sendMsg.value.sender = address
           sendMsg.value.receiver = recipient.recipient
           sendMsg.value.sourceChannel = recipient.channelID
-          sendMsg.value.timeoutTimestamp = Math.floor(new Date().getTime() + 60*1000).toString()
+          sendMsg.value.timeoutTimestamp = Math.floor(
+            new Date().getTime() + 60 * 1000
+          ).toString()
         } else {
-          sendMsg = sendObject;
+          sendMsg = sendObject
           sendMsg.value.fromAddress = address
           sendMsg.value.toAddress = recipient.recipient
-          sendMsg.value.amount = [{ amount: convertDenomToMicroDenom(recipient.amount, 6).toString(), denom: ibcAsset.denom_on_trst }]
+          sendMsg.value.amount = [
+            {
+              amount: convertDenomToMicroDenom(recipient.amount, 6).toString(),
+              denom: ibcAsset.denom_on_trst,
+            },
+          ]
         }
 
-        msgs.push(JSON.stringify(sendMsg))
+        msgs.push(JSON.stringify(sendMsg, null, 2))
       }
       txData.msgs = msgs
       setActionData(txData)
 
       return setRequestedSchedule(true)
     }
-
   }
 
-  const handleChange = (index: number, key: keyof RecipientInfo) => (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newRecipients = [...recipients]
-    newRecipients[index] = {
-      ...newRecipients[index],
-      [key]: event.target.value
-    }
-    console.log(newRecipients)
+  const handleChange =
+    (index: number, key: keyof RecipientInfo) =>
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+        const newRecipients = [...recipients]
+        newRecipients[index] = {
+          ...newRecipients[index],
+          [key]: event.target.value,
+        }
+        console.log(newRecipients)
 
-    onRecipientsChange(newRecipients)
-  }
+        onRecipientsChange(newRecipients)
+      }
 
   const handleChannelChange = (index: number, channelInfo: ChannelInfo) => {
     const newRecipients = [...recipients]
     newRecipients[index] = {
       ...newRecipients[index],
-      channelID: channelInfo.channelID
+      channelID: channelInfo.channelID,
     }
     console.log(newRecipients)
 
@@ -145,36 +168,34 @@ export const RecipientList = ({
   function handleAddRecipient() {
     // Create a new RecipientInfo object
     const newRecipients = [...recipients]
-    let newRecipient = new RecipientInfo();
+    let newRecipient = new RecipientInfo()
     console.log(newRecipients.length)
-    if (newRecipients[newRecipients.length - 1].recipient != "") {
+    if (newRecipients[newRecipients.length - 1].recipient != '') {
       // Add the new recipient to the recipients array
-      console.log("adding to", newRecipients[newRecipients.length - 1])
+      console.log('adding to', newRecipients[newRecipients.length - 1])
       console.log(newRecipients)
-      newRecipients.push(newRecipient);
+      newRecipients.push(newRecipient)
       onRecipientsChange(newRecipients)
     }
   }
 
-
   //  a function to handle clicks on the "Add recipient" button
   function handleRemoveRecipient(index) {
-    console.log("removing", index)
+    console.log('removing', index)
     if (index == 0) {
       const newRecipients = [...recipients]
-      let newRecipient = new RecipientInfo();
-      newRecipients[index] = newRecipient;
+      let newRecipient = new RecipientInfo()
+      newRecipients[index] = newRecipient
       console.log(newRecipients)
       onRecipientsChange(newRecipients)
 
       return
     }
     if (index == 10) {
-      alert("Maximum recipients reached, provide feedback to the developers")
+      alert('Maximum recipients reached, provide feedback to the developers')
       return
     }
     onRemoveRecipient(recipients[index])
-
   }
 
   function handlePaste(index: number, key: keyof RecipientInfo) {
@@ -196,129 +217,142 @@ export const RecipientList = ({
   }
 
   const [
-    { isShowing: isScheduleDialogShowing/* , actionType  */ },
+    { isShowing: isScheduleDialogShowing /* , actionType  */ },
     setScheduleDialogState,
-  ] = useState({ isShowing: false/* , actionType: 'recurrence' as 'recurrence' | "occurrence" } */ })
+  ] = useState({
+    isShowing:
+      false /* , actionType: 'recurrence' as 'recurrence' | "occurrence" } */,
+  })
 
   const shouldDisableSubmissionButton =
     isExecutingTransaction ||
-    status !== WalletStatusType.connected || !recipients[0].recipient || (recipients[0].recipient && recipients[0].recipient.length < 40) || (Number(recipients[0].amount) == 0)
-
-
+    status !== WalletStatusType.connected ||
+    !recipients[0].recipient ||
+    (recipients[0].recipient && recipients[0].recipient.length < 40) ||
+    Number(recipients[0].amount) == 0
 
   return (
-    <div >
+    <div>
       <Card variant="secondary" disabled css={{ margin: '$2' }}>
         {recipients.map((recipient, index) => (
           <div key={index}>
-
             <Card variant="secondary" disabled css={{ marginBottom: '$2' }}>
               <CardContent size="medium" css={{ paddingTop: '$2' }}>
                 <Column>
                   <Row>
-                    <Text align="center"
-                      variant="caption">
-                      Recipient</Text>
-                    <Text>  <StyledInput
-                      placeholder={prefix + "1..."}
-                      value={recipient.recipient}
-                      onChange={handleChange(index, 'recipient')}
-                    /></Text>
+                    <Text align="center" variant="caption">
+                      Recipient
+                    </Text>
+                    <Text>
+                      {' '}
+                      <StyledInput
+                        placeholder={prefix + '1...'}
+                        value={recipient.recipient}
+                        onChange={handleChange(index, 'recipient')}
+                      />
+                    </Text>
                     {/*  <Text align="right" variant="caption" color="secondary" >
                     Tip: You can paste an address using paste button
-                  </Text>  */}<Button variant="ghost" icon={<CopyIcon />} onClick={() => handlePaste(index, 'recipient')} /> {index != 0 && recipient.recipient != '' && (<Button
-                      icon={<IconWrapper icon={<Union />} />}
+                  </Text>  */}
+                    <Button
                       variant="ghost"
-                      iconColor="tertiary"
-
-                      onClick={() => handleRemoveRecipient(index)}
-                    />)}
+                      icon={<CopyIcon />}
+                      onClick={() => handlePaste(index, 'recipient')}
+                    />{' '}
+                    {index != 0 && recipient.recipient != '' && (
+                      <Button
+                        icon={<IconWrapper icon={<Union />} />}
+                        variant="ghost"
+                        iconColor="tertiary"
+                        onClick={() => handleRemoveRecipient(index)}
+                      />
+                    )}
                   </Row>
                   <Row>
-                    <Text align="center"
-                      variant="caption">
-                      Amount</Text>
-                    <Text>  <StyledInput
-                      placeholder="0" type="number"
-                      value={recipient.amount}
-                      onChange={handleChange(index, 'amount')}
-                    /> {tokenSymbol}</Text></Row>
+                    <Column>
+                      {' '}
+                      <Text align="center" variant="caption">
+                        Amount
+                      </Text>
+                    </Column>
+                    <Column>
+                      <Text>
+                        <StyledTokenInput
+                          placeholder="0"
+                          type="number"
+                          value={recipient.amount}
+                          onChange={handleChange(index, 'amount')}
+                        />
+                      </Text>
+                    </Column>{' '}
+                    <Column>
+                      {ibcAsset && (
+                        <ImageForTokenLogo logoURI={ibcAsset.logo_uri} />
+                      )}
+                    </Column>
+                  </Row>
                   <Row>
-                    <Text align="center"
-                      variant="caption">
-                      Memo</Text>
-                    <Text>  <StyledInput
-                      placeholder="for your hard work"
-                      value={recipient.memo}
-                      onChange={handleChange(index, 'memo')}
-                    /></Text></Row>
+                    <Text align="center" variant="caption">
+                      Memo (optional){' '}
+                    </Text>
+                    <Text>
+                      {' '}
+                      <StyledInput
+                        placeholder="for your hard work"
+                        value={recipient.memo}
+                        onChange={handleChange(index, 'memo')}
+                      />
+                    </Text>
+                  </Row>
                 </Column>
 
-                <Column><Row>
-                  <Text align="center"
-                    variant="caption">
-                    To chain (optional)</Text>
-                  <ChannelSelector
-                    channel={recipient.channelID}
-                    onChange={(updateChannel) => {
-                      handleChannelChange(index, updateChannel)
+                <Column>
+                  <Inline
+                    css={{
+                      alignItems: 'start',
+                      margin: '$3',
+                      columnGap: '$space$1',
                     }}
-                    size={'large'}
-                  /></Row></Column>
-
+                  >
+                    {' '}
+                    <Column>
+                      <Text variant="caption">To chain (optional)</Text>
+                    </Column>
+                    <Column>
+                      <ChannelSelector
+                        channel={recipient.channelID}
+                        onChange={(updateChannel) => {
+                          handleChannelChange(index, updateChannel)
+                        }}
+                        size={'large'}
+                      />
+                    </Column>
+                  </Inline>
+                </Column>
               </CardContent>
             </Card>
-            <Column >
-              <Button css={{ display: 'end', margin: '$2', }}
+            <Column>
+              <Button
+                css={{ display: 'end', margin: '$2' }}
                 icon={<IconWrapper icon={<PlusIcon />} />}
                 variant="ghost"
                 iconColor="tertiary"
-
                 onClick={handleAddRecipient}
               />
             </Column>
-          </div>))
-        }
-      </Card>
-      {recipients[0].recipient && recipients[0].recipient.length >= 40 && (<Card css={{ margin: '$6', paddingLeft: '$8', paddingTop: '$2' }} variant="secondary" disabled >
-        <CardContent size="large" css={{ padding: '$6', marginTop: '$12' }}>
-          <Text align="left"
-            variant="header">
-            Recipients</Text>
-
-        </CardContent>
-        {/* <Divider offsetTop="$5" offsetBottom="$2" /> */}
-
-        {recipients.map((recipient, index) => (
-          recipient.amount != "0" && <CardContent size="medium" css={{ padding: '$2', margin: '$4', }}>
-            <div key={"a" + index}>       <Text variant="legend" css={{ wordBreak: "break-all", paddingBottom: '$5', marginBottom: '$4', }}>
-              {(recipient.amount != "0") && (<div>
-                <Row>Recipient {index + 1}: </Row> <i>{recipient.recipient}</i>
-                <Row>Amount {recipient.amount} <ImageForTokenLogo css={{ marginLeft: '$5', border: 'none !important' }}
-                  logoURI={ibcAsset.logo_uri}
-                  size="medium"
-                  alt={ibcAsset.symbol}
-                  loading="lazy"
-                /> </Row>
-                {recipient.channelID && (<Row>Channel ID: <i >{recipient.channelID}</i></Row>)}
-                {recipient.memo && (<Row>Memo: <i >{recipient.memo}</i></Row>)}
-              </div>)}</Text>
-            </div>
-          </CardContent>
-
+          </div>
         ))}
-      </Card>)}
-      <Inline css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}>
+      </Card>
 
-        <Button css={{ marginRight: '$4' }}
+      <Inline
+        css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}
+      >
+        <Button
+          css={{ marginRight: '$4' }}
           variant="secondary"
           size="large"
           disabled={shouldDisableSubmissionButton}
-          onClick={
-            !isExecutingTransaction
-              ? handleSendClick
-              : undefined
-          }
+          onClick={!isExecutingTransaction ? handleSendClick : undefined}
         >
           {isExecutingTransaction ? <Spinner instant /> : 'Send'}
         </Button>
@@ -329,13 +363,11 @@ export const RecipientList = ({
           onClick={() =>
             setScheduleDialogState({
               isShowing: true,
-
             })
           }
         >
           {isExecutingSchedule ? <Spinner instant /> : 'Schedule Recurrence'}
         </Button>
-
       </Inline>
       <SubmitActionDialog
         isLoading={isExecutingSchedule}
@@ -343,27 +375,35 @@ export const RecipientList = ({
         actionData={actionData}
         isDialogShowing={isScheduleDialogShowing}
         /* initialActionType={actionType} */
+        chainSymbol={'INTO'}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,
-
           })
         }
         handleSubmitAction={(txData) => handleScheduleClick(txData)}
       />
-    </div >)
+    </div>
+  )
 }
 
 const StyledInput = styled('input', {
-  minWidth: '180px',
-  maxWidth: '400px',
-  color: 'inherit',
-  fontSize: `12px`,
+  minWidth: '330px',
+  fontSize: `11px`,
+  padding: '$2',
+  margin: '$2',
+  [media.sm]: {
+    minWidth: '130px !important',
+  },
+})
+
+const StyledTokenInput = styled('input', {
+  minWidth: '10px',
+  maxWidth: '50px',
+  fontSize: `11px`,
   padding: '$2',
   margin: '$2',
 })
-
-
 
 function Row({ children }) {
   const baseCss = { padding: '$2 $4' }
@@ -383,35 +423,34 @@ function Row({ children }) {
       {children}
     </Inline>
   )
-
-
 }
 
-
-
-
 const sendObject = {
-  "typeUrl": "/cosmos.bank.v1beta1.MsgSend",
-  "value": {
-    "amount": [{
-      "amount": "70",
-      "denom": "uinto"
-    }],
-    "fromAddress": "into1....",
-    "toAddress": "into1..."
-  }
+  typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+  value: {
+    amount: [
+      {
+        amount: '70',
+        denom: 'uinto',
+      },
+    ],
+    fromAddress: 'into1....',
+    toAddress: 'into1...',
+  },
 }
 
 const transferObject = {
-  "typeUrl": "/ibc.applications.transfer.v1.MsgTransfer",
-  "value": {
-    "token": {},
-    "sender": "into1....",
-    "receiver": "into1...",
-    "sourcePort": "transfer",
-    "sourceChannel": "",
-    "timeoutHeight": "0",
-    "timeoutTimestamp": "0",
-    "memo": "",
-  }
+  typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
+  value: {
+    token: {},
+    sender: 'into1....',
+    receiver: 'into1...',
+    sourcePort: 'transfer',
+    sourceChannel: '',
+    timeoutHeight: {
+      revisionNumber: '0',
+      revisionHeight: '0',
+    },
+    timeoutTimestamp: '0',
+  },
 }
