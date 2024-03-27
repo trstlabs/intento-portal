@@ -54,7 +54,7 @@ export const useSubmitTx = ({ actionData }: UseSubmitTxArgs) => {
         console.log(data)
         let actionID = data.events
           .find((event) => event.type == 'transaction')
-          .attributes.find((attr) => attr.key == 'id').value
+          .attributes.find((attr) => attr.key == 'action-id').value
         console.log(actionID)
         toast.custom((t) => (
           <Toast
