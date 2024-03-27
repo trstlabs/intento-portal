@@ -14,13 +14,13 @@ import {
   Spinner,
   styled,
   Text,
-/*   Tooltip, */
+  /*   Tooltip, */
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useActionInfos } from 'hooks/useActionInfo'
 import { ActionCard } from '../features/actions/components/ActionCard'
-// import { InfoCard } from '../features/dashboard/components/InfoCard'
+import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
@@ -40,9 +40,9 @@ export default function Home() {
     ),
   })
 
-/*   const shouldShowAutoCompound =
+  const shouldShowAutoCompound =
     !myActions?.length ||
-    myActions.find((tx) => tx.label === 'Autocompound') == undefined */
+    myActions.find((tx) => tx.label === 'Autocompound') == undefined
   const shouldShowFetchingState = isLoading && isSorting && !actions?.length
   const shouldRenderActions = Boolean(actions?.length)
 
@@ -68,7 +68,7 @@ export default function Home() {
         </>
       )}
       <Column css={{ paddingTop: '12' }}>
-{/*         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} /> */}
+        <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>
       {!isLoading && isSorting && address && (
         <Column
@@ -82,7 +82,7 @@ export default function Home() {
           </Inline>
         </Column>
       )}
-{/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
+      {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
         <Tooltip label="Automate messages and workflows, move assets on your behalf">
           <span>Actions</span>
         </Tooltip>

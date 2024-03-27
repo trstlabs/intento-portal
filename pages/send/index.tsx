@@ -34,7 +34,7 @@ export default function Send() {
       <StyledContainer>
         <PageHeader
           title="Coin Sender"
-          subtitle={`Configure (IBC) token and coin transfers, schedule ahead and make recurring payments. Supports chains connected to the testnet.`}
+          subtitle={`Configure token transfers, schedule ahead and make recurring transfers.`}
         />
         <TokenSendModule initialToken={getInitialTokenFromSearchParams()} />
 
