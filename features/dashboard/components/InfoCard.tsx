@@ -8,7 +8,6 @@ import {
   Tooltip,
   media,
   InfoIcon,
-  convertMicroDenomToDenom,
   formatTokenBalance,
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
@@ -23,8 +22,7 @@ import {
   useSetModuleParams,
 } from '../../../hooks/useChainInfo'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
-import { useRecoilValue } from 'recoil'
-import { intentModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
+
 import IssuanceChart from './Chart'
 import { getDuration } from '../../../util/time'
 import { ActionData } from '../../../types/trstTypes'
@@ -35,7 +33,7 @@ type InfoCardProps = {
 
 export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const [params, _] = useSetModuleParams()
-  const triggerParams = useRecoilValue(intentModuleParamsAtom)
+  // const triggerParams = useRecoilValue(intentModuleParamsAtom)
   const [requestedSubmitAction, setRequestedSubmitAction] = useState(false)
   let data = new ActionData()
   data.duration = 14 * 86400000
