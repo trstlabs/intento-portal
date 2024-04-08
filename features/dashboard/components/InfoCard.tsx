@@ -225,7 +225,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               <StyledDivForButtons>
                 <Button
                   css={{ marginleft: '$8' }}
-                  variant="primary"
+                  variant="secondary"
                   size="large"
                   disabled={isStakeBalanceLoading}
                   as="a"
@@ -236,7 +236,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 </Button>
                 <Button
                   css={{ marginleft: '$8' }}
-                  variant="primary"
+                  variant="secondary"
                   size="large"
                   disabled={
                     isStakeBalanceLoading ||

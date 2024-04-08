@@ -47,7 +47,7 @@ export const WalletButton = ({
   if (!connected) {
     return (
       <Column css={{ paddingBottom: '$6' }}>
-        <Button onClick={onConnect} size="large" variant="primary" {...props}>
+        <Button onClick={onConnect} size="large" variant="secondary" {...props}>
           Connect Wallet
         </Button>
       </Column>
