@@ -120,10 +120,10 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   <Text css={{ padding: '$8' }} variant="title">
                     {APR.estimatedApr.toPrecision(4)}%
                   </Text>
-                  <Inline>
+                {/*   <Inline>
                     {' '}
-                    <Text variant="legend"> RealTime APR</Text>{' '}
-                    <Tooltip label="RealTime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time.">
+                    <Text variant="legend"> Realtime APR</Text>{' '}
+                    <Tooltip label="Realtime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time.">
                       <Button
                         variant="ghost"
                         size="small"
@@ -133,7 +133,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   </Inline>
                   <Text css={{ padding: '$8' }} variant="title">
                     {APR.calculatedApr.toPrecision(4)}%
-                  </Text>
+                  </Text> */}
                 </>
               </Card>
 

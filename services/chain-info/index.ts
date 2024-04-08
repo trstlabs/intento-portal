@@ -172,7 +172,7 @@ export const getAPY = async (
     const periodsPerYear = (60 * 60 * 24 * 365) / intervalSeconds
 
     return (
-      ((1 + apr.calculatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) *
+      ((1 + apr.estimatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) *
       100
     )
   } catch (e) {
