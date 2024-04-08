@@ -113,6 +113,7 @@ const StyledChildrenLight = styled('div', {
   backgroundColor: 'rgba(255, 255, 255, 0.3) !important',
   position: 'relative',
   zIndex: 1,
+  padding: '$12',
 })
 
 const StyledChildrenDark = styled('div', {

@@ -99,7 +99,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             css={{ paddingLeft: '$4', paddingBottom: '$8' }}
           >
             <Tooltip label="Staking allows you to earn INTO by securing the Intento network">
-              <span> Staking Info</span>
+              <span> Staking</span>
             </Tooltip>
           </Text>
           {!isAPRLoading && APR ? (
@@ -120,7 +120,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   <Text css={{ padding: '$8' }} variant="title">
                     {APR.estimatedApr.toPrecision(4)}%
                   </Text>
-                {/*   <Inline>
+                  {/*   <Inline>
                     {' '}
                     <Text variant="legend"> Realtime APR</Text>{' '}
                     <Tooltip label="Realtime APR refers to the annual percentage rate that is calculated and updated in real-time base based on the current block time.">
@@ -265,7 +265,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               variant="title"
               css={{ paddingLeft: '$4', paddingBottom: '$8' }}
             >
-              <span> Chain Info</span>
+              <span> Distribution</span>
             </Text>
 
             <Card css={{ padding: '$12' }}>

@@ -82,7 +82,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   async function connectWallet() {
     await connect()
     let attempts = 0
-    while ( status !== WalletStatusType.connecting && attempts < 5) {
+    while (status !== WalletStatusType.connecting && attempts < 5) {
       console.log(
         walletStatusesConnected,
         isClientConnected,
@@ -94,7 +94,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       if (isClientConnected) {
         attempts = attempts + 30
       }
-  
+
       afterConnectWallet(null)
       await new Promise((resolve) => setTimeout(resolve, 1000))
       attempts++
@@ -315,23 +315,23 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   return (
     <StyledWrapper>
       <StyledMenuContainer dark={themeController.theme.name === 'dark'}>
-        <Link href="/" passHref>
-          <>
-            <StyledDivForLogo as="a">
-              <div data-logo-label="">
-                <StyledPNG src="/img/triggerportal-text-logo-blue.png" />
-              </div>
-            </StyledDivForLogo>
-            <Text
-              variant="caption"
-              color="primary"
-              css={{ textAlign: 'center', paddingBottom: '$5' }}
-            >
-              {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
-            </Text>
-          </>
-        </Link>
+        <Link href="/" passHref >
 
+          <StyledDivForLogo as="a">
+            <div data-logo-label="">
+              <StyledPNG src="/img/triggerportal-text-logo-blue.png" />
+            </div>
+          </StyledDivForLogo>
+
+
+        </Link>
+        <Text
+          variant="caption"
+          color="primary"
+          css={{ textAlign: 'center', paddingBottom: '$5' }}
+        >
+          {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
+        </Text>
         {walletButton}
 
         {menuLinks}
@@ -477,7 +477,7 @@ const StyledDivForLogo = styled('div', {
   gridTemplateColumns: '50px 1fr',
   columnGap: '$space$8',
   alignItems: 'center',
-  paddingBottom: '$8',
+  paddingLeft: '$4',
 
   '& [data-logo]': {
     marginBottom: '$2',
@@ -511,7 +511,7 @@ const buttonIconCss = {
 }
 
 const StyledPNG = styled('img', {
-  width: '400%',
+  width: '350%',
   maxWidth: '1000px',
   zIndex: '$1',
   userSelect: 'none',
