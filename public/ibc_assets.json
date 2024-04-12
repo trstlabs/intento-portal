@@ -29,23 +29,6 @@
     "rpc": "http://gaia-rpc-t.trustlesshub.com"
   },
   {
-    "id": "Dymension Hub",
-    "name": "Dymension Test",
-    "registry_name": "dymensiontest",
-    "symbol": "DYM",
-    "chain_id": "dymension_100-1",
-    "denom": "adym",
-    "decimals": 18,
-    "channel": "channel-3",
-    "channel_to_trst": "channel-0",
-    "denom_on_trst": "ibc/FECACB927EB3102CCCB240FFB3B6FCCEEB8D944C6FEA8DFF079650FEFF59781D",
-    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/dymension/images/dymension-logo.svg",
-    "connection_id": "connection-0",
-    "counterparty_connection_id": "connection-2",
-    "prefix": "cosmos",
-    "rpc": "http://juno-rpc-t.trustlesshub.com"
-  },
-  {
     "id": "Osmosis",
     "name": "Osmosis Test",
     "symbol": "OSMO",
@@ -61,22 +44,5 @@
     "counterparty_connection_id": "connection-0",
     "prefix": "osmo",
     "rpc": "http://osmo-rpc-t.trustlesshub.com"
-  },
-  {
-    "id": "Intento Host",
-    "name": "Test Chain 2 (ICA Host)",
-    "registry_name": "host",
-    "symbol": "COSM",
-    "chain_id": "HOST",
-    "denom": "ucosm",
-    "decimals": 6,
-    "channel": "channel-2",
-    "channel_to_trst": "channel-0",
-    "denom_on_trst": "ibc/F2116BE5B0D320180094EEBE3E8D34826EB44CAD8409166CADD1DD9134FD682C",
-    "logo_uri": "https://trstlabs.xyz/trst.svg",
-    "prefix": "into",
-    "connection_id": "connection-2",
-    "counterparty_connection_id": "connection-0",
-    "rpc": "http://host-rpc-t.trustlesshub.com"
   }
 ]
