@@ -74,7 +74,7 @@ export const executeSubmitAction = async ({
             updatingDisabled: false,
             stopOnSuccess: false,
             stopOnFailure: false,
-            fallbackToOwnerBalance: false,
+            fallbackToOwnerBalance: true,
             reregisterIcaAfterTimeout: false,
           },
       feeFunds,
