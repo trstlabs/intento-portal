@@ -67,9 +67,9 @@ export default function Home() {
           </Column>
         </>
       )}
-      <Column css={{ paddingTop: '12' }}>
+      {/* <Column css={{ paddingTop: '12' }}>
         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
-      </Column>
+      </Column> */}
       {!isLoading && isSorting && address && (
         <Column
           justifyContent="center"
