@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Column,
@@ -35,15 +35,35 @@ export const ActionHistory = ({
   const [fetchedHistory, isHistoryLoading] = useActionHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`actionHistory/${id.toString()}/${paginationKey}`], 15);
 
-  useEffect(() => {
 
-    if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0 && !actionHistory.find(entry => entry == fetchedHistory.history[0])) {
-      if (actionHistory.length == 0 || !actionHistory.includes(fetchedHistory.history[0])) {
-        // Append new entries to the existing history
-        setActionHistory(prevHistory => [...prevHistory, ...fetchedHistory.history]);
-      }
+  const uniqueFetchedHistory = useMemo(() => {
+    if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0) {
+      const existingIds = new Set(actionHistory.map(entry => entry.actualExecTime));
+      // console.log('Existing IDs:', existingIds);
+      
+      const uniqueEntries = fetchedHistory.history.filter(entry => !existingIds.has(entry.actualExecTime));
+      // console.log('Filtered Unique Entries:', uniqueEntries);
+
+      return uniqueEntries;
     }
-  }, [fetchedHistory]);
+    return [];
+  }, [fetchedHistory, actionHistory]);
+
+  useEffect(() => {
+    if (uniqueFetchedHistory.length > 0) {
+      console.log('Unique Fetched History:', uniqueFetchedHistory);
+      setActionHistory(prevHistory => {
+        const combinedHistory = [...prevHistory, ...uniqueFetchedHistory];
+        // console.log('Combined History Before Removing Duplicates:', combinedHistory);
+
+        const uniqueCombinedHistory = Array.from(new Set(combinedHistory.map(entry => entry.actualExecTime)))
+          .map(actualExecTime => combinedHistory.find(entry => entry.actualExecTime === actualExecTime));
+        // console.log('Combined History After Removing Duplicates:', uniqueCombinedHistory);
+
+        return uniqueCombinedHistory;
+      });
+    }
+  }, [uniqueFetchedHistory]);
 
   //  fetching next page
   const fetchNextPage = () => {
@@ -79,7 +99,7 @@ export const ActionHistory = ({
                     {
                       execFee,
                       actualExecTime,
-
+                      msgResponses,
                       executed,
                       errors,
                       timedOut,
@@ -147,6 +167,21 @@ export const ActionHistory = ({
                           )}
                         </Column>
                       </Column>
+                      {msgResponses.map((msg: any, i) => (
+                        <div key={i}>
+                          <Row>
+                            <Column gap={8} align="flex-start" justifyContent="flex-start">
+                              <Text variant="legend" color="secondary" align="left">
+                                Message response
+                              </Text>
+                              <Inline gap={2}>
+                                <Text variant="body">{msg.typeUrl} </Text>
+                                <Text variant="body">{msg.value} </Text>
+                              </Inline>
+                            </Column>
+                          </Row>
+
+                        </div>))}
                     </div>
                   )
                 )}

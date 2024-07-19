@@ -116,8 +116,9 @@ export const useActionHistory = (id, limit: number, key: Uint8Array) => {
     },
     {
       enabled: !!id && !!client?.intento,
-      refetchOnMount: true,
-      refetchIntervalInBackground: true,
+      refetchOnMount: false, // Prevent refetch on remount
+      staleTime: 60000, // Cache data for 60 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
     }
   )
 
