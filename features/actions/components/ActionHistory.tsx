@@ -35,14 +35,20 @@ export const ActionHistory = ({
   const [fetchedHistory, isHistoryLoading] = useActionHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`actionHistory/${id.toString()}/${paginationKey}`], 15);
 
+  // Clear actionHistory when id changes
+  useEffect(() => {
+    setActionHistory([]);
+    setPaginationKey(undefined);
+  }, [fetchedHistory]);
+
 
   const uniqueFetchedHistory = useMemo(() => {
     if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0) {
-      const existingIds = new Set(actionHistory.map(entry => entry.actualExecTime));
-      // console.log('Existing IDs:', existingIds);
-      
-      const uniqueEntries = fetchedHistory.history.filter(entry => !existingIds.has(entry.actualExecTime));
-      // console.log('Filtered Unique Entries:', uniqueEntries);
+      const existingIds = new Set(actionHistory.map(entry => entry.scheduledExecTime));
+      //console.log('Existing IDs:', existingIds);
+
+      const uniqueEntries = fetchedHistory.history.filter(entry => !existingIds.has(entry.scheduledExecTime));
+      //console.log('Filtered Unique Entries:', uniqueEntries);
 
       return uniqueEntries;
     }
@@ -54,11 +60,16 @@ export const ActionHistory = ({
       console.log('Unique Fetched History:', uniqueFetchedHistory);
       setActionHistory(prevHistory => {
         const combinedHistory = [...prevHistory, ...uniqueFetchedHistory];
-        // console.log('Combined History Before Removing Duplicates:', combinedHistory);
-
-        const uniqueCombinedHistory = Array.from(new Set(combinedHistory.map(entry => entry.actualExecTime)))
-          .map(actualExecTime => combinedHistory.find(entry => entry.actualExecTime === actualExecTime));
-        // console.log('Combined History After Removing Duplicates:', uniqueCombinedHistory);
+        const uniqueCombinedHistory = combinedHistory.reduce((acc, current) => {
+          const x = acc.find(item => item.scheduledExecTime === current.scheduledExecTime); // Ensure this 'id' is unique and reliable
+          if (!x) {
+            return acc.concat([current]);
+          } else {
+            return acc;
+          }
+        }, []);
+        //console.log('Combined History Before Removing Duplicates:', combinedHistory);
+        //console.log('Combined History After Removing Duplicates:', uniqueCombinedHistory);
 
         return uniqueCombinedHistory;
       });
@@ -93,7 +104,7 @@ export const ActionHistory = ({
                 </Text>
               </Inline>
               {actionHistory
-                ?.slice(0)
+                ?.slice(0).filter((entry, index, self) => self.findIndex(e => e.scheduledExecTime === entry.scheduledExecTime) === index)
                 .map(
                   (
                     {
@@ -149,7 +160,7 @@ export const ActionHistory = ({
 
                         <Column>
                           <Text variant="legend">
-                            Executed: {executed && <>🟢</>}{' '}
+                            Executed {index}: {executed && <>🟢</>}{' '}
                             {!executed &&
                               (Date.now() - actualExecTime.valueOf() >
                                 3000000 ? (
@@ -167,6 +178,7 @@ export const ActionHistory = ({
                           )}
                         </Column>
                       </Column>
+                      
                       {msgResponses.map((msg: any, i) => (
                         <div key={i}>
                           <Row>
