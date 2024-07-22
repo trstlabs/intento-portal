@@ -38,8 +38,8 @@ export const useSendFundsOnHost = ({
     return useMutation(
         'SendFunds',
         async () => {
-            if (status !== WalletStatusType.connected) {
-                throw new Error('Please connect your wallet.')
+            if (status !== WalletStatusType.connected || client == null) {
+                throw new Error('Please retry or connect your wallet.')
             }
             if (coin.amount == "0") {
                 coin = undefined

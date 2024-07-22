@@ -31,11 +31,13 @@ import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
 import { ActionData } from '../../../types/trstTypes'
-import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { GearIcon, TransferIcon } from '../../../icons'
 import { SubmitActionDialog } from './SubmitActionDialog'
-import { AutomateConfiguration } from './AutomateConfiguration'
+import { AutomateConfiguration } from './Conditions/AutomateConfiguration'
 import { StepIcon } from '../../../icons/StepIcon'
+import { AutomateConditions } from './Conditions/AutomateConditions'
+
 
 
 type ActionsInputProps = {
@@ -291,6 +293,22 @@ export const AutomateComponent = ({
     onActionChange(updatedActionData)
   }
 
+
+  function setConditions(updatedConfig: ExecutionConditions) {
+    let updatedActionData = actionData
+    updatedActionData.conditions = updatedConfig
+    onActionChange(updatedActionData)
+  }
+
+  const ensureDefaultConditions = (conditions?: ExecutionConditions): ExecutionConditions => ({
+    stopOnSuccessOf: conditions?.stopOnSuccessOf ?? [],
+    stopOnFailureOf: conditions?.stopOnFailureOf ?? [],
+    skipOnFailureOf: conditions?.skipOnFailureOf ?? [],
+    skipOnSuccessOf: conditions?.skipOnSuccessOf ?? [],
+    useResponseValue: conditions?.useResponseValue,
+    responseComparison: conditions?.responseComparison
+  })
+
   function handleAddMsg() {
     let newMsgs = [...actionData.msgs]
     let emptyMsg = ''
@@ -339,9 +357,10 @@ export const AutomateComponent = ({
           color="tertiary"
           css={{ padding: '0 $15 0 $6' }}
         >
-          Choose where to automate
+          Choose where to execute
         </Text>{' '}
       </Inline>
+      
       <Card
         css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$1' }}
         variant="secondary"
@@ -438,7 +457,7 @@ export const AutomateComponent = ({
               color="tertiary"
               css={{ padding: '0 $15 0 $6' }}
             >
-              Define what to automate
+              Define what to execute
             </Text>{' '}
           </Inline>
           <JsonFormWrapper
@@ -487,11 +506,15 @@ export const AutomateComponent = ({
           handleSubmitActionClick(actionData)
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-      />
+      />  
       <AutomateConfiguration
         config={actionData.configuration}
         disabled={!icaAddress && !chainHasIAModule}
         onChange={setConfig}
+      />
+      <AutomateConditions conditions={ensureDefaultConditions(actionData.conditions)}
+        disabled={!icaAddress && !chainHasIAModule}
+        onChange={setConditions}
       />
       <Inline
         css={{

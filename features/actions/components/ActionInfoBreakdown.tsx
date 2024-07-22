@@ -95,7 +95,7 @@ export const ActionInfoBreakdown = ({
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
 
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(chainId, symbol)
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol, chainId,)
   const handleSendFundsOnHostClick = () => {
     connectExternalWallet(null)
     return setRequestedSendFunds(true)
@@ -430,16 +430,12 @@ export const ActionInfoBreakdown = ({
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
                 <Text variant="legend" color="secondary" align="left">
-                  Message Type
+                  Message {index + 1} Type
                 </Text>
                 <Inline gap={2}>
                   <Text variant="body">{msg.typeUrl} </Text>
                 </Inline>
-              </Column>
-            </Row>
 
-            <Row>
-              <Column gap={8} align="flex-start" justifyContent="flex-start">
                 {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
                   <Button
                     variant="ghost"
@@ -659,6 +655,162 @@ export const ActionInfoBreakdown = ({
             </Column>
           </Row>
         )}
+        {actionInfo.conditions && (
+          <Row>
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              {actionInfo.conditions.responseComparison && (
+                <>
+                  <Tooltip
+                    label={
+                      "Compare responses to determine if execution should take place"
+                    }
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Response Comparision
+                    </Text>
+                  </Tooltip>
+
+                  <>
+                    {actionInfo.conditions.responseComparison.actionId.toString() != "0" && (<Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.responseComparison.actionId}
+                    </Text>)}
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.responseComparison.responseIndex}
+                    </Text>
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.responseComparison.responseKey}
+                    </Text>
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {actionInfo.conditions.responseComparison.comparisonOperand}
+                    </Text>
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {actionInfo.conditions.responseComparison.comparisonOperator}
+                    </Text>
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.responseComparison.valueType}
+                    </Text>
+                  </>
+                </>
+              )}
+            </Column>
+
+            {actionInfo.conditions.useResponseValue && (
+              <>
+                <Tooltip
+                  label={
+                    "Use a response value as a value for a message"
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Feedback loop  🔁
+                  </Text>
+                </Tooltip>
+
+                <>
+                  {actionInfo.conditions.useResponseValue.actionId.toString() != "0" && (<Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.useResponseValue.actionId}
+                  </Text>)}
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.useResponseValue.responseIndex}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.useResponseValue.responseKey}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Msgs Index</Text>  {actionInfo.conditions.useResponseValue.msgsIndex}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Msg Key</Text>  {actionInfo.conditions.useResponseValue.msgKey}
+                  </Text>
+
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.useResponseValue.valueType}
+                  </Text>
+                </>
+
+              </>
+            )}
+
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              {actionInfo.conditions.skipOnFailureOf.length != 0 && (
+                <>
+                  <Tooltip
+                    label={
+                      "Skip execution when dependent actions fail"
+                    }
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Skip on failure of
+                    </Text>
+                  </Tooltip>
+
+                  <Text variant="body">
+                    {actionInfo.conditions.skipOnFailureOf}
+                  </Text>
+                </>
+              )}
+            </Column>
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              {actionInfo.conditions.skipOnSuccessOf.length != 0 && (
+                <>
+                  <Tooltip
+                    label={
+                      "Skip execution when dependent actions succeed"
+                    }
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Skip on success of
+                    </Text>
+                  </Tooltip>
+
+                  <Text variant="body">
+                    {actionInfo.conditions.skipOnSuccessOf}
+                  </Text>
+                </>
+              )}
+            </Column>
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              {actionInfo.conditions.stopOnFailureOf.length != 0 && (
+                <>
+                  <Tooltip
+                    label={
+                      "Stop execution when dependent actions fail"
+                    }
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Stop on failure of
+                    </Text>
+                  </Tooltip>
+
+                  <Text variant="body">
+                    {actionInfo.conditions.stopOnFailureOf}
+                  </Text>
+                </>
+              )}
+            </Column>
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
+              {actionInfo.conditions.stopOnSuccessOf.length != 0 && (
+                <>
+                  <Tooltip
+                    label={
+                      "Stop execution when dependent actions succeed"
+                    }
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Stop on success of
+                    </Text>
+                  </Tooltip>
+
+                  <Text variant="body">
+                    {actionInfo.conditions.stopOnSuccessOf}
+                  </Text>
+                </>
+              )}
+            </Column>
+
+
+          </Row>
+        )}
 
         {/* {actionInfo.updateHistory.length != 0 && (
           <>
@@ -737,7 +889,7 @@ const InfoHeader = ({ id, good }: InfoHeaderProps) => (
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {good && <>🟢</> } Action {id}
+      {good && <>🟢</>} Action {id}
     </Text>
   </Inline>
 )
@@ -751,7 +903,7 @@ const StyledInput = styled('input', {
 
 
 const StringifyBigints = (msg: any) => {
-  const jsonString = JSON.stringify(msg, (_, value) => 
+  const jsonString = JSON.stringify(msg, (_, value) =>
     typeof value === 'bigint' ? value.toString() : value, 2);
 
   return (

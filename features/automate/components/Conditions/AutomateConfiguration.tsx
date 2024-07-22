@@ -10,7 +10,7 @@ import {
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
-import { StepIcon } from '../../../icons/StepIcon'
+import { StepIcon } from '../../../../icons/StepIcon'
 
 type AutomateConfigurationProps = {
   config: ExecutionConfiguration
@@ -64,7 +64,7 @@ export const AutomateConfiguration = ({
           color="tertiary"
           css={{ padding: '0 $15 0 $6' }}
         >
-          Configure when to execute
+          Configure execution
         </Text>{' '}
       </Inline>
       {isConfigItemsShowing && (
@@ -75,7 +75,7 @@ export const AutomateConfiguration = ({
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
             <Text css={{ paddingBottom: '$4' }} align="center">
-              Action Configuration
+               Configuration
             </Text>
 
             <Tooltip

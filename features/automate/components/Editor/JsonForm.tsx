@@ -177,7 +177,8 @@ export const JsonFormEditor = ({
 
 
   return (
-    <StyledDivForContainer>   <ErrorStack validationErrors={validationErrors} />
+    <StyledDivForContainer>
+      <ErrorStack validationErrors={validationErrors} />
       <StyledFormWrapper>
         <Form tagName="div"
           showErrorList='top'

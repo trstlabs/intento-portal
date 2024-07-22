@@ -20,15 +20,15 @@ export const TestnetDialog = () => {
       </DialogHeader>
       <DialogContent>
         {' '}
-        <Text css={{ paddingBottom: '$12' }} variant="body">
+{/*         <Text css={{ paddingBottom: '$12' }} variant="body">
           <b> To mess around, get some tokens from our Discord! </b>
-        </Text>{' '}
+        </Text>{' '} */}
       </DialogContent>
       <DialogContent css={{ paddingBottom: '$12' }}>
         <Text css={{ paddingBottom: '$12' }} variant="body">
           This app is currently operating in demo mode. The app serves only the
-          presentation and testing purposes. You will not be able to automate
-          real assets.
+          presentation and testing purposes. You will not be able to trigger
+          actions on mainnet chains.
         </Text>
 
         <Button css={{ width: '100%' }} size="large" onClick={requestClose}>

@@ -86,8 +86,6 @@ export const ActionHistory = ({
 
   };
 
-
-
   return (
 
     <>
@@ -151,7 +149,7 @@ export const ActionHistory = ({
                           <Column>
                             {/*    <span key={'b' + ei}> */}
                             <Text variant="legend">
-                              🔴 Execution error: {err}
+                              🔴 {err}
                             </Text>
 
                             {/*    </span> */}
@@ -160,10 +158,10 @@ export const ActionHistory = ({
 
                         <Column>
                           <Text variant="legend">
-                            Executed {index}: {executed && <>🟢</>}{' '}
+                            Executed: {executed && <>🟢</>}{' '}
                             {!executed &&
                               (Date.now() - actualExecTime.valueOf() >
-                                3000000 ? (
+                              60000 ? (
                                   <>🔴</>
                                 ) || errors[0] : (
                                 <>⌛</>
@@ -178,7 +176,7 @@ export const ActionHistory = ({
                           )}
                         </Column>
                       </Column>
-                      
+
                       {msgResponses.map((msg: any, i) => (
                         <div key={i}>
                           <Row>
@@ -188,7 +186,7 @@ export const ActionHistory = ({
                               </Text>
                               <Inline gap={2}>
                                 <Text variant="body">{msg.typeUrl} </Text>
-                                <Text variant="body">{msg.value} </Text>
+                                <Text variant="body"> {msg.valueDecoded}</Text>
                               </Inline>
                             </Column>
                           </Row>

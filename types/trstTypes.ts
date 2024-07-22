@@ -1,6 +1,6 @@
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { Coin } from '@cosmjs/stargate'
-import { ExecutionConfiguration, /* ActionHistoryEntry */ } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { ExecutionConditions, ExecutionConfiguration} from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
 export interface MsgUpdateActionParams {
   owner: string
@@ -23,6 +23,7 @@ export class ActionData {
   startTime?: number
   interval?: number
   configuration?: ExecutionConfiguration
+  conditions?: ExecutionConditions
   feeFunds?: number
   label?: string
   connectionId?: string

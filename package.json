@@ -37,7 +37,7 @@
     "eslint-plugin-testing-library": "^5.5.1",
     "focus-visible": "^5.2.0",
     "gsap": "^3.7.1",
-    "intentojs": "0.7.5-alpha.3",
+    "intentojs": "^0.8.0-alpha.2",
     "jsonschema": "^1.4.1",
     "junoblocks": "0.2.93",
     "next": "^14.2.5",
