@@ -655,164 +655,164 @@ export const ActionInfoBreakdown = ({
             </Column>
           </Row>
         )}
-        {actionInfo.conditions && (
-          <Row>
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {actionInfo.conditions.responseComparison && (
-                <>
-                  <Tooltip
-                    label={
-                      "Compare responses to determine if execution should take place"
-                    }
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      Response Comparision
-                    </Text>
-                  </Tooltip>
 
-                  <>
-                    {actionInfo.conditions.responseComparison.actionId.toString() != "0" && (<Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.responseComparison.actionId}
-                    </Text>)}
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.responseComparison.responseIndex}
-                    </Text>
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.responseComparison.responseKey}
-                    </Text>
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {actionInfo.conditions.responseComparison.comparisonOperand}
-                    </Text>
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {actionInfo.conditions.responseComparison.comparisonOperator}
-                    </Text>
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.responseComparison.valueType}
-                    </Text>
-                  </>
-                </>
-              )}
-            </Column>
+        {actionInfo.conditions.responseComparison && (<Row>
+          <Column gap={8} align="flex-start" justifyContent="flex-start">
 
-            {actionInfo.conditions.useResponseValue && (
+            <>
+              <Tooltip
+                label={
+                  "Compare responses to determine if execution should take place"
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Response Comparision
+                </Text>
+              </Tooltip>
+
               <>
-                <Tooltip
-                  label={
-                    "Use a response value as a value for a message"
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Feedback loop  🔁
-                  </Text>
-                </Tooltip>
-
-                <>
-                  {actionInfo.conditions.useResponseValue.actionId.toString() != "0" && (<Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.useResponseValue.actionId}
-                  </Text>)}
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.useResponseValue.responseIndex}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.useResponseValue.responseKey}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Msgs Index</Text>  {actionInfo.conditions.useResponseValue.msgsIndex}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Msg Key</Text>  {actionInfo.conditions.useResponseValue.msgKey}
-                  </Text>
-
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.useResponseValue.valueType}
-                  </Text>
-                </>
-
+                {actionInfo.conditions.responseComparison.actionId.toString() != "0" && (<Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.responseComparison.actionId}
+                </Text>)}
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.responseComparison.responseIndex}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.responseComparison.responseKey}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {actionInfo.conditions.responseComparison.comparisonOperand}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {actionInfo.conditions.responseComparison.comparisonOperator}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.responseComparison.valueType}
+                </Text>
               </>
-            )}
+            </>
 
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {actionInfo.conditions.skipOnFailureOf.length != 0 && (
-                <>
-                  <Tooltip
-                    label={
-                      "Skip execution when dependent actions fail"
-                    }
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      Skip on failure of
-                    </Text>
-                  </Tooltip>
+          </Column>
+        </Row>)}
+        {actionInfo.conditions.useResponseValue && (
+          <Row>
+            <Tooltip
+              label={
+                "Use a response value as a value for a message"
+              }
+            >
+              <Text variant="legend" color="secondary" align="left">
+                Feedback loop  🔁
+              </Text>
+            </Tooltip>
 
-                  <Text variant="body">
-                    {actionInfo.conditions.skipOnFailureOf}
-                  </Text>
-                </>
-              )}
-            </Column>
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {actionInfo.conditions.skipOnSuccessOf.length != 0 && (
-                <>
-                  <Tooltip
-                    label={
-                      "Skip execution when dependent actions succeed"
-                    }
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      Skip on success of
-                    </Text>
-                  </Tooltip>
+            <>
+              {actionInfo.conditions.useResponseValue.actionId.toString() != "0" && (<Text variant="body">
+                <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.useResponseValue.actionId}
+              </Text>)}
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.useResponseValue.responseIndex}
+              </Text>
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.useResponseValue.responseKey}
+              </Text>
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Msgs Index</Text>  {actionInfo.conditions.useResponseValue.msgsIndex}
+              </Text>
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Msg Key</Text>  {actionInfo.conditions.useResponseValue.msgKey}
+              </Text>
 
-                  <Text variant="body">
-                    {actionInfo.conditions.skipOnSuccessOf}
-                  </Text>
-                </>
-              )}
-            </Column>
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {actionInfo.conditions.stopOnFailureOf.length != 0 && (
-                <>
-                  <Tooltip
-                    label={
-                      "Stop execution when dependent actions fail"
-                    }
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      Stop on failure of
-                    </Text>
-                  </Tooltip>
-
-                  <Text variant="body">
-                    {actionInfo.conditions.stopOnFailureOf}
-                  </Text>
-                </>
-              )}
-            </Column>
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {actionInfo.conditions.stopOnSuccessOf.length != 0 && (
-                <>
-                  <Tooltip
-                    label={
-                      "Stop execution when dependent actions succeed"
-                    }
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      Stop on success of
-                    </Text>
-                  </Tooltip>
-
-                  <Text variant="body">
-                    {actionInfo.conditions.stopOnSuccessOf}
-                  </Text>
-                </>
-              )}
-            </Column>
-
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.useResponseValue.valueType}
+              </Text>
+            </>
 
           </Row>
         )}
 
-        {/* {actionInfo.updateHistory.length != 0 && (
+        <Column gap={8} align="flex-start" justifyContent="flex-start">
+          {actionInfo.conditions.skipOnFailureOf.length != 0 && (
+            <Row>
+              <Tooltip
+                label={
+                  "Skip execution when dependent actions fail"
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Skip on failure of
+                </Text>
+              </Tooltip>
+
+              <Text variant="body">
+                {actionInfo.conditions.skipOnFailureOf}
+              </Text>
+            </Row>
+          )}
+        </Column>
+        <Column gap={8} align="flex-start" justifyContent="flex-start">
+          {actionInfo.conditions.skipOnSuccessOf.length != 0 && (
+            <Row>
+              <Tooltip
+                label={
+                  "Skip execution when dependent actions succeed"
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Skip on success of
+                </Text>
+              </Tooltip>
+
+              <Text variant="body">
+                {actionInfo.conditions.skipOnSuccessOf}
+              </Text>
+            </Row>
+          )}
+        </Column>
+        <Column gap={8} align="flex-start" justifyContent="flex-start">
+          {actionInfo.conditions.stopOnFailureOf.length != 0 && (
+            <Row>
+              <Tooltip
+                label={
+                  "Stop execution when dependent actions fail"
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Stop on failure of
+                </Text>
+              </Tooltip>
+
+              <Text variant="body">
+                {actionInfo.conditions.stopOnFailureOf}
+              </Text>
+            </Row>
+          )}
+        </Column>
+        <Column gap={8} align="flex-start" justifyContent="flex-start">
+          {actionInfo.conditions.stopOnSuccessOf.length != 0 && (
+            <Row>
+              <Tooltip
+                label={
+                  "Stop execution when dependent actions succeed"
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Stop on success of
+                </Text>
+              </Tooltip>
+
+              <Text variant="body">
+                {actionInfo.conditions.stopOnSuccessOf}
+              </Text>
+            </Row>
+          )}
+        </Column>
+
+
+    
+
+
+      {/* {actionInfo.updateHistory.length != 0 && (
           <>
             {' '}
             <Row>
@@ -841,10 +841,10 @@ export const ActionInfoBreakdown = ({
             </Row>
           </>
         )} */}
-        <ActionHistory id={actionInfo.id.toString()} />
+      <ActionHistory id={actionInfo.id.toString()} />
 
 
-      </>
+    </>
     </>
   )
 }
