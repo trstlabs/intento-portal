@@ -5,14 +5,13 @@ import {
   Inline,
   Text,
   Spinner,
+  Card,
 } from 'junoblocks'
 
 import React from 'react'
 
-
+import { GlobalDecoderRegistry } from 'intentojs'
 import { convertMicroDenomToDenom } from 'util/conversion'
-
-
 import { useActionHistory } from '../../../hooks/useActionInfo'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
@@ -161,7 +160,7 @@ export const ActionHistory = ({
                             Executed: {executed && <>🟢</>}{' '}
                             {!executed &&
                               (Date.now() - actualExecTime.valueOf() >
-                              60000 ? (
+                                60000 ? (
                                   <>🔴</>
                                 ) || errors[0] : (
                                 <>⌛</>
@@ -175,23 +174,30 @@ export const ActionHistory = ({
                             </Text>
                           )}
                         </Column>
+                        {msgResponses.map((msg: any, i) => (
+                          <div key={i}>
+                            <Card css={{ padding: '$4', marginTop: '$4' }}>
+                              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                <Text variant="legend" color="secondary" align="left">
+                                  Response type
+                                </Text>
+                                <Text variant="body">{msg.typeUrl} </Text>
+                              </Column>
+                              {msg.value != null &&
+                                <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                  <Text variant="legend" color="secondary" align="left">
+                                    Response value
+                                  </Text>
+
+                                  <Text variant="body"> {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), null, 2)}</Text>
+                                </Column>
+                              }
+                            </Card>
+
+                          </div>))}
                       </Column>
 
-                      {msgResponses.map((msg: any, i) => (
-                        <div key={i}>
-                          <Row>
-                            <Column gap={8} align="flex-start" justifyContent="flex-start">
-                              <Text variant="legend" color="secondary" align="left">
-                                Message response
-                              </Text>
-                              <Inline gap={2}>
-                                <Text variant="body">{msg.typeUrl} </Text>
-                                <Text variant="body"> {msg.valueDecoded}</Text>
-                              </Inline>
-                            </Column>
-                          </Row>
 
-                        </div>))}
                     </div>
                   )
                 )}
