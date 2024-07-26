@@ -20,13 +20,13 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 
 type UseSubmitActionArgs = {
-  actionData: ActionData
+  actionInput: ActionInput
 }
 
-export const useSubmitAction = ({ actionData }: UseSubmitActionArgs) => {
+export const useSubmitAction = ({ actionInput }: UseSubmitActionArgs) => {
   const { client, address, status } = useRecoilValue(walletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -43,10 +43,10 @@ export const useSubmitAction = ({ actionData }: UseSubmitActionArgs) => {
       // if (client == null) {
       //   throw new Error('Please try reconnecting your wallet.')
       // }
-      console.log(actionData)
+      console.log(actionInput)
       const response: DeliverTxResponse = await executeSubmitAction({
         owner: address,
-        actionData,
+        actionInput,
         client,
       })
       return response

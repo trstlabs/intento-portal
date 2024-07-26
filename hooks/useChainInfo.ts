@@ -31,7 +31,7 @@ import {
   intentModuleParamsAtom,
 } from '../state/atoms/moduleParamsAtoms'
 import { useEffect } from 'react'
-import { ActionData } from '../types/trstTypes'
+import { ActionInput } from '../types/trstTypes'
 
 const chainInfoQueryKey = '@chain-info'
 
@@ -58,7 +58,7 @@ export const useIBCChainInfo = (chainId: string) => {
 
 export const useGetExpectedActionFee = (
   durationSeconds: number,
-  actionData: ActionData,
+  actionInput: ActionInput,
   isDialogShowing: boolean,
   intervalSeconds?: number
 ) => {
@@ -74,14 +74,14 @@ export const useGetExpectedActionFee = (
       const fee = getExpectedActionFee(
         intentModuleParams,
         durationSeconds,
-        actionData.msgs.length,
+        actionInput.msgs.length,
         intervalSeconds
       )
 
       return fee
     },
     {
-      enabled: Boolean(durationSeconds && actionData.msgs && isDialogShowing),
+      enabled: Boolean(durationSeconds && actionInput.msgs && isDialogShowing),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,

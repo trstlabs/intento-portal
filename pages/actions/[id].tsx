@@ -25,7 +25,7 @@ export default function Action() {
   const isMobile = useMedia('sm')
 
   const [actionInfo, isLoading] = useActionInfo(id)
-  const connectionId = actionInfo && actionInfo.icaConfig ? actionInfo.icaConfig.connectionId : ''
+  const connectionId = actionInfo && actionInfo.icaConfig ? actionInfo.icaConfig.connectionId : /* TODO use a mapping (actionInfo.hostedConfig ? actionInfo.hostedConfig.hostedAddress : '') */''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {

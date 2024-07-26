@@ -21,11 +21,11 @@ import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useGetExpectedActionFee } from '../../../hooks/useChainInfo'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 
 type SubmitActionDialogProps = {
   isDialogShowing: boolean
-  actionData: ActionData
+  actionInput: ActionInput
   chainSymbol?: string
   icaAddress?: string
   icaBalance?: number
@@ -37,7 +37,7 @@ type SubmitActionDialogProps = {
   shouldDisableAuthzGrantButton?: boolean
   shouldDisableSendHostChainFundsButton?: boolean
   onRequestClose: () => void
-  handleSubmitAction: (data: ActionData) => void
+  handleSubmitAction: (data: ActionInput) => void
   handleCreateAuthzGrantClick?: (withFunds: boolean) => void
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
@@ -49,7 +49,7 @@ export const SubmitActionDialog = ({
   icaBalance,
   customLabel,
   chainSymbol,
-  actionData,
+  actionInput,
   feeFundsHostChain,
   isExecutingAuthzGrant,
   isExecutingSendFundsOnHost,
@@ -205,14 +205,14 @@ export const SubmitActionDialog = ({
 
   const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedActionFee(
     duration / 1000,
-    actionData,
+    actionInput,
     isDialogShowing,
     interval / 1000
   )
-  const refetchExpectedActionFee = useRefetchQueries([`expectedActionFee/${duration}/${actionData}/${isDialogShowing}/${interval}`])
+  const refetchExpectedActionFee = useRefetchQueries([`expectedActionFee/${duration}/${actionInput}/${isDialogShowing}/${interval}`])
   const canSchedule = duration > 0 && interval > 0
 
-  const handleData = (icaAddressForAuthZGrant: string) => {
+  const handleData = (icaAddressForAuthZ: string) => {
     if (duration < interval || startTime > duration) {
       toast.custom((t) => (
         <Toast
@@ -233,11 +233,11 @@ export const SubmitActionDialog = ({
       startTime,
       duration,
       interval,
-      connectionId: actionData.connectionId,
-      configuration: actionData.configuration,
-      // retries: actionData.retries,
-      msgs: actionData.msgs,
-      icaAddressForAuthZGrant,
+      connectionId: actionInput.connectionId,
+      configuration: actionInput.configuration,
+      // retries: actionInput.retries,
+      msgs: actionInput.msgs,
+      icaAddressForAuthZ,
       feeFunds,
       label: txLabel,
     })
@@ -679,7 +679,7 @@ export const SubmitActionDialog = ({
           </Button>
         }
       >
-        {actionData.connectionId && (
+        {actionInput.connectionId && (
           <Button
             disabled={shouldDisableAuthzGrantButton}
             variant="secondary"

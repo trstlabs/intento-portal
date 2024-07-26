@@ -46,6 +46,7 @@ export const ResponseComparisonForm = ({ responseComparison, onChange, disabled 
       />
       <Field
         label="Response Key"
+        type="string"
         value={responseComparison?.responseKey}
         onChange={(e) => handleFieldChange('responseKey', e.target.value)}
         disabled={disabled}
@@ -66,6 +67,7 @@ export const ResponseComparisonForm = ({ responseComparison, onChange, disabled 
       />
       <Field
         label="Comparison Operand"
+        type="string"
         value={responseComparison?.comparisonOperand}
         onChange={(e) => handleFieldChange('comparisonOperand', e.target.value)}
         disabled={disabled}

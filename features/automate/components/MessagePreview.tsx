@@ -13,7 +13,7 @@ import {
 import { SubmitActionDialog } from './SubmitActionDialog'
 
 const MessagePreview = ({
-  actionData,
+  ActionInput,
   chainSymbol,
   icaBalance,
   shouldDisableAuthzGrants,
@@ -34,9 +34,9 @@ const MessagePreview = ({
 }) => {
   return (
     <div>
-      {actionData.msgs &&
-        actionData.msgs[0] &&
-        actionData.msgs[0].length > 3 && (
+      {ActionInput.msgs &&
+        ActionInput.msgs[0] &&
+        ActionInput.msgs[0].length > 3 && (
           <Column>
             <Card
               css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -75,8 +75,8 @@ const MessagePreview = ({
                 )}
               </CardContent>
 
-              {actionData.msgs &&
-                actionData.msgs.map((msgToDisplay, i) => (
+              {ActionInput.msgs &&
+                ActionInput.msgs.map((msgToDisplay, i) => (
                   <div key={msgToDisplay}>
                     {' '}
                     <CardContent
@@ -95,7 +95,7 @@ const MessagePreview = ({
                         chainSymbol={chainSymbol}
                         icaBalance={icaBalance}
                         icaAddress={icaAddress}
-                        actionData={actionData}
+                        ActionInput={ActionInput}
                         isDialogShowing={isSubmitActionDialogShowing}
                         onRequestClose={() =>
                           setSubmitActionDialogState({
@@ -113,8 +113,8 @@ const MessagePreview = ({
                           !shouldDisableAuthzGrants
                         }
                         setFeeFundsHostChain={setFeeFundsHostChain}
-                        handleSubmitAction={(actionData) =>
-                          handleSubmitActionClick(actionData)
+                        handleSubmitAction={(ActionInput) =>
+                          handleSubmitActionClick(ActionInput)
                         }
                         handleCreateAuthzGrantClick={
                           handleCreateAuthzGrantClick

@@ -21,7 +21,7 @@ import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 
 import { useIntentoRpcClient } from './useRPCClient'
-import { ActionData } from '../types/trstTypes'
+import { ActionInput } from '../types/trstTypes'
 import { useChainInfoByChainID } from './useChainList'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
@@ -94,7 +94,7 @@ export const useICATokenBalance = (
 export const useAuthZGrantsForUser = (
   chainId: string,
   grantee: string,
-  actionData?: ActionData
+  ActionInput?: ActionInput
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(chainId)
@@ -115,7 +115,7 @@ export const useAuthZGrantsForUser = (
       if (granteeGrants != false) {
         console.log(grants, grantee, ibcState)
 
-        for (const msg of actionData.msgs) {
+        for (const msg of ActionInput.msgs) {
           let msgTypeUrl = JSON.parse(msg)['typeUrl']
           // console.log(msgTypeUrl)
           const grantMatch = granteeGrants?.find(
@@ -146,9 +146,9 @@ export const useAuthZGrantsForUser = (
           chainId &&
           ibcState.status === WalletStatusType.connected &&
           grantee.includes(ibcState.address.slice(0, 5)) &&
-          actionData.msgs[0] &&
-          actionData.msgs[0].includes('typeUrl') &&
-          actionData.connectionId
+          ActionInput.msgs[0] &&
+          ActionInput.msgs[0].includes('typeUrl') &&
+          ActionInput.connectionId
       ),
       refetchOnMount: 'always',
       refetchIntervalInBackground: true,

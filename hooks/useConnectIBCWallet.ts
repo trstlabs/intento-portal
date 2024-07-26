@@ -30,7 +30,8 @@ export const useConnectIBCWallet = (
     assetInfo = useChainInfoByChainID(chainId)
   }
 
-  const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
+  //const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
+  const chainRegistryName = assetInfo ? assetInfo.registry_name : ''
   const {
     isWalletConnected,
     getSigningStargateClient,

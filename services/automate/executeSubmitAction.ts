@@ -5,53 +5,50 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
 import { intento, GlobalDecoderRegistry } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
-import { ActionData } from '../../types/trstTypes'
+import { ActionInput } from '../../types/trstTypes'
 
 type ExecuteSubmitActionArgs = {
   owner: string
-  actionData: ActionData
+  actionInput: ActionInput
   client: SigningStargateClient
 }
 
 export const executeSubmitAction = async ({
   client,
-  actionData,
+  actionInput,
   owner,
 }: ExecuteSubmitActionArgs): Promise<any> => {
   let startAtInt = 0
-  if (actionData.startTime && actionData.startTime > 0) {
-    startAtInt = Math.floor(Date.now() / 1000) + actionData.startTime / 1000
+  if (actionInput.startTime && actionInput.startTime > 0) {
+    startAtInt = Math.floor(Date.now() / 1000) + actionInput.startTime / 1000
   }
   console.log(startAtInt)
   let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
   console.log(startAt.toString())
-  let duration = actionData.duration + 'ms'
-  let interval = actionData.interval + 'ms'
+  let duration = actionInput.duration + 'ms'
+  let interval = actionInput.interval + 'ms'
   let msgs = []
 
-  transformAndEncodeMsgs(actionData, client, msgs)
+  transformAndEncodeMsgs(actionInput, client, msgs)
   console.log(msgs)
 
-  if (
-    actionData.icaAddressForAuthZGrant &&
-    actionData.icaAddressForAuthZGrant != ''
-  ) {
+  if (actionInput.icaAddressForAuthZ && actionInput.icaAddressForAuthZ != '') {
     const encodeObject2 = {
       typeUrl: '/cosmos.authz.v1beta1.MsgExec',
       value: {
         msgs,
-        grantee: actionData.icaAddressForAuthZGrant,
+        grantee: actionInput.icaAddressForAuthZ,
       },
     }
     msgs = [client.registry.encodeAsAny(encodeObject2)]
   }
 
   let feeFunds: Coin[] = []
-  if (actionData.feeFunds > 0) {
+  if (actionInput.feeFunds > 0) {
     feeFunds = [
       {
         denom: 'uinto',
-        amount: convertDenomToMicroDenom(actionData.feeFunds, 6).toString(),
+        amount: convertDenomToMicroDenom(actionInput.feeFunds, 6).toString(),
       },
     ]
   }
@@ -59,16 +56,16 @@ export const executeSubmitAction = async ({
     intento.intent.v1beta1.MessageComposer.withTypeUrl.submitAction({
       owner,
       msgs,
-      label: actionData.label ? actionData.label : '',
+      label: actionInput.label ? actionInput.label : '',
       duration,
       interval,
       startAt,
-      connectionId: actionData.connectionId ? actionData.connectionId : '',
-      hostConnectionId: actionData.hostConnectionId
-        ? actionData.hostConnectionId
+      connectionId: actionInput.connectionId ? actionInput.connectionId : '',
+      hostConnectionId: actionInput.hostConnectionId
+        ? actionInput.hostConnectionId
         : '',
-      configuration: actionData.configuration
-        ? actionData.configuration
+      configuration: actionInput.configuration
+        ? actionInput.configuration
         : {
             saveMsgResponses: false,
             updatingDisabled: false,
@@ -78,6 +75,7 @@ export const executeSubmitAction = async ({
             reregisterIcaAfterTimeout: false,
           },
       feeFunds,
+      conditions: actionInput.conditions,
     })
   console.log(msgSubmitAction)
   return validateTransactionSuccess(
@@ -88,11 +86,11 @@ export const executeSubmitAction = async ({
   )
 }
 function transformAndEncodeMsgs(
-  actionData: ActionData,
+  actionInput: ActionInput,
   client: SigningStargateClient,
   msgs: any[]
 ) {
-  for (let msgJSON of actionData.msgs) {
+  for (let msgJSON of actionInput.msgs) {
     let value = JSON.parse(msgJSON)['value']
     let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
 
@@ -117,36 +115,3 @@ function transformAndEncodeMsgs(
     msgs.push(msgAny)
   }
 }
-
-// function deepEnccodeProtoTypes(
-//   obj: any,
-//   targetProperty: string,
-//   client: SigningStargateClient
-// ): any | undefined {
-//   console.log(client.registry)
-//   if (typeof obj === 'object' && obj !== null) {
-//     if (obj.hasOwnProperty(targetProperty)) {
-//       let decoder = GlobalDecoderRegistry.getDecoderByInstance(
-//         obj[targetProperty]
-//       )
-//       console.log(decoder)
-//       if (targetProperty === 'typeUrl' && obj.hasOwnProperty('value')) {
-//         const encodeObject = {
-//           typeUrl: obj[targetProperty],
-//           value: obj['value'],
-//         }
-//         obj['value'] = GlobalDecoderRegistry.wrapAny(obj['value'])
-//       }
-
-//       return obj
-//     } else {
-//       for (const key in obj) {
-//         const result = deepEnccodeProtoTypes(obj[key], targetProperty, client)
-//         if (result !== undefined) {
-//           return obj
-//         }
-//       }
-//     }
-//   }
-//   return undefined
-// }

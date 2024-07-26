@@ -41,6 +41,7 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, disabled }: U
       />
       <Field
         label="Response Key"
+        type="string"
         value={useResponseValue?.responseKey}
         onChange={(e) => handleFieldChange('responseKey', e.target.value)}
         disabled={disabled}
@@ -54,6 +55,7 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, disabled }: U
       />
       <Field
         label="Message Key"
+        type="string"
         value={useResponseValue?.msgKey}
         onChange={(e) => handleFieldChange('msgKey', e.target.value)}
         disabled={disabled}

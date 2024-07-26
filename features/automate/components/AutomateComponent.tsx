@@ -30,7 +30,7 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { GearIcon, TransferIcon } from '../../../icons'
 import { SubmitActionDialog } from './SubmitActionDialog'
@@ -41,12 +41,12 @@ import { AutomateConditions } from './Conditions/AutomateConditions'
 
 
 type ActionsInputProps = {
-  actionData: ActionData
-  onActionChange: (actionData: ActionData) => void
+  actionInput: ActionInput
+  onActionChange: (actionInput: ActionInput) => void
 } & HTMLProps<HTMLInputElement>
 
 export const AutomateComponent = ({
-  actionData,
+  actionInput,
   onActionChange,
 }: ActionsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
@@ -65,7 +65,7 @@ export const AutomateComponent = ({
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
 
-  const [icaAddress, isIcaLoading] = useGetICA(actionData.connectionId, '')
+  const [icaAddress, isIcaLoading] = useGetICA(actionInput.connectionId, '')
 
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
     chainId,
@@ -76,20 +76,20 @@ export const AutomateComponent = ({
 
 
   const refetchICAData = useRefetchQueries([
-    //`userAuthZGrants/${icaAddress}/${actionData}`,
+    //`userAuthZGrants/${icaAddress}/${actionInput}`,
     `icaTokenBalance/${chainId}/${icaAddress}`,
   ])
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance/${denom}/${icaAddress}`,
-    `interchainAccount/${actionData.connectionId}/${icaAddress}`,
+    `interchainAccount/${actionInput.connectionId}/${icaAddress}`,
   ])
 
   const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
-    useSubmitAction({ actionData })
+    useSubmitAction({ actionInput })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
     useRegisterAccount({
-      connectionId: actionData.connectionId,
-      hostConnectionId: actionData.hostConnectionId,
+      connectionId: actionInput.connectionId,
+      hostConnectionId: actionInput.hostConnectionId,
     })
 
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
@@ -126,7 +126,7 @@ export const AutomateComponent = ({
   }
 
   const { mutate: handleSubmitTx, isLoading: isExecutingSubmitTx } =
-    useSubmitTx({ actionData })
+    useSubmitTx({ actionInput })
 
   useEffect(
     () =>
@@ -183,9 +183,9 @@ export const AutomateComponent = ({
   const shouldDisableSendHostChainFundsButton = useMemo(
     () =>
       !icaAddress ||
-      (actionData.msgs && actionData.msgs.length === 0) ||
+      (actionInput.msgs && actionInput.msgs.length === 0) ||
       Number(feeFundsHostChain) === 0,
-    [icaAddress, actionData.msgs, feeFundsHostChain]
+    [icaAddress, actionInput.msgs, feeFundsHostChain]
   )
 
 
@@ -194,8 +194,8 @@ export const AutomateComponent = ({
     return setRequestedRegisterICA(true)
   }
 
-  const handleSubmitActionClick = (actionData: ActionData) => {
-    onActionChange(actionData)
+  const handleSubmitActionClick = (actionInput: ActionInput) => {
+    onActionChange(actionInput)
     return setRequestedSubmitAction(true)
   }
 
@@ -205,13 +205,13 @@ export const AutomateComponent = ({
     //   return
     // }
     try {
-      let msgs = actionData.msgs
+      let msgs = actionInput.msgs
       msgs[index] = msg
-      let updatedActionData = {
-        ...actionData,
+      let updatedactionInput = {
+        ...actionInput,
         msgs,
       }
-      onActionChange(updatedActionData)
+      onActionChange(updatedactionInput)
       if (
         JSON.parse(msg)
         ['typeUrl'].split('.')
@@ -233,22 +233,22 @@ export const AutomateComponent = ({
     name: string,
     chainSymbol: string
   ) {
-    let updatedActionData = actionData
-    updatedActionData.connectionId = connectionId
-    updatedActionData.hostConnectionId = hostConnectionId
-    actionData.msgs.map((editMsg, editIndex) => {
+    let updatedactionInput = actionInput
+    updatedactionInput.connectionId = connectionId
+    updatedactionInput.hostConnectionId = hostConnectionId
+    actionInput.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
-        updatedActionData.msgs[editIndex] = editMsg.replaceAll(
+        updatedactionInput.msgs[editIndex] = editMsg.replaceAll(
           prefix + '1...',
           newPrefix + '1...'
         )
-        updatedActionData.msgs[editIndex] = updatedActionData.msgs[
+        updatedactionInput.msgs[editIndex] = updatedactionInput.msgs[
           editIndex
         ].replaceAll(denom, newDenom)
       }
     })
 
-    onActionChange(updatedActionData)
+    onActionChange(updatedactionInput)
     setDenom(newDenom)
     setChainName(name)
     setChainSymbol(chainSymbol)
@@ -265,9 +265,9 @@ export const AutomateComponent = ({
     await sleep(200)
     connectExternalWallet(null)
     refetchICA()
-    // console.log("Connection: ", connectionId, actionData.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    // console.log("Connection: ", connectionId, actionInput.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     await sleep(5000)
-    //console.log("Connection: ", connectionId, actionData.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    //console.log("Connection: ", connectionId, actionInput.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     refetchICAData()
 
   }
@@ -277,27 +277,27 @@ export const AutomateComponent = ({
       const msg = JSON.stringify(msgObject, null, '\t')
       let newMsg = msg.replaceAll('into', prefix)
       newMsg = newMsg.replaceAll('uinto', denom)
-      let updatedActionData = actionData
-      updatedActionData.msgs[index] = newMsg
-      //updatedActionData.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+      let updatedactionInput = actionInput
+      updatedactionInput.msgs[index] = newMsg
+      //updatedactionInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
 
-      onActionChange(updatedActionData)
+      onActionChange(updatedactionInput)
     } catch (e) {
       alert(e)
     }
   }
 
   function setConfig(updatedConfig: ExecutionConfiguration) {
-    let updatedActionData = actionData
-    updatedActionData.configuration = updatedConfig
-    onActionChange(updatedActionData)
+    let updatedactionInput = actionInput
+    updatedactionInput.configuration = updatedConfig
+    onActionChange(updatedactionInput)
   }
 
 
   function setConditions(updatedConfig: ExecutionConditions) {
-    let updatedActionData = actionData
-    updatedActionData.conditions = updatedConfig
-    onActionChange(updatedActionData)
+    let updatedactionInput = actionInput
+    updatedactionInput.conditions = updatedConfig
+    onActionChange(updatedactionInput)
   }
 
   const ensureDefaultConditions = (conditions?: ExecutionConditions): ExecutionConditions => ({
@@ -310,25 +310,25 @@ export const AutomateComponent = ({
   })
 
   function handleAddMsg() {
-    let newMsgs = [...actionData.msgs]
+    let newMsgs = [...actionInput.msgs]
     let emptyMsg = ''
     newMsgs.push(emptyMsg)
-    let updatedActionData = actionData
-    updatedActionData.msgs = newMsgs
-    onActionChange(updatedActionData)
+    let updatedactionInput = actionInput
+    updatedactionInput.msgs = newMsgs
+    onActionChange(updatedactionInput)
   }
   function handleRemoveMsg(index: number) {
-    let updatedActionData = actionData
+    let updatedactionInput = actionInput
 
-    const newMsgs = updatedActionData.msgs.filter(
-      (msg) => msg !== updatedActionData.msgs[index]
+    const newMsgs = updatedactionInput.msgs.filter(
+      (msg) => msg !== updatedactionInput.msgs[index]
     )
 
     if (index == 0 && newMsgs.length == 0) {
       newMsgs[index] = ''
     }
-    updatedActionData.msgs = newMsgs
-    onActionChange(updatedActionData)
+    updatedactionInput.msgs = newMsgs
+    onActionChange(updatedactionInput)
   }
 
   const [
@@ -338,9 +338,9 @@ export const AutomateComponent = ({
 
   const shouldDisableSubmitButton =
 
-    (actionData.msgs[0] &&
-      actionData.msgs[0].length == 0 &&
-      JSON.parse(actionData.msgs[0])['typeUrl'].length < 5)
+    (actionInput.msgs[0] &&
+      actionInput.msgs[0].length == 0 &&
+      JSON.parse(actionInput.msgs[0])['typeUrl'].length < 5)
 
   const shouldDisableAutomateButton =
     shouldDisableSubmitButton ||
@@ -390,7 +390,7 @@ export const AutomateComponent = ({
                 /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
                 chainIsConnected &&
                 !isIcaLoading &&
-                actionData.connectionId != '' && (
+                actionInput.connectionId != '' && (
                   <>
                     <Button
                       css={{
@@ -434,7 +434,7 @@ export const AutomateComponent = ({
                       }
                       hostDenom={denom}
                       chainId={chainId}
-                      actionData={actionData}
+                      actionInput={actionInput}
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
                       setFeeFundsHostChain={(fees) =>
                         setFeeFundsHostChain(fees)
@@ -447,7 +447,7 @@ export const AutomateComponent = ({
           </Column>
         </CardContent>
       </Card>
-      {actionData.msgs.map((msg, index) => (
+      {actionInput.msgs.map((msg, index) => (
         <div key={index}>
           <Inline css={{ margin: '$6', marginTop: '$16' }}>
             <StepIcon step={2} />
@@ -488,7 +488,7 @@ export const AutomateComponent = ({
         chainSymbol={chainSymbol}
         icaBalance={icaBalance}
         icaAddress={icaAddress}
-        actionData={actionData}
+        actionInput={actionInput}
         isDialogShowing={isSubmitActionDialogShowing}
         onRequestClose={() =>
           setSubmitActionDialogState({
@@ -502,17 +502,17 @@ export const AutomateComponent = ({
         }
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
         setFeeFundsHostChain={setFeeFundsHostChain}
-        handleSubmitAction={(actionData) =>
-          handleSubmitActionClick(actionData)
+        handleSubmitAction={(actionInput) =>
+          handleSubmitActionClick(actionInput)
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />  
       <AutomateConfiguration
-        config={actionData.configuration}
+        config={actionInput.configuration}
         disabled={!icaAddress && !chainHasIAModule}
         onChange={setConfig}
       />
-      <AutomateConditions conditions={ensureDefaultConditions(actionData.conditions)}
+      <AutomateConditions conditions={ensureDefaultConditions(actionInput.conditions)}
         disabled={!icaAddress && !chainHasIAModule}
         onChange={setConditions}
       />

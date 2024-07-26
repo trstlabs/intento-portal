@@ -2,7 +2,7 @@ import { styled } from 'junoblocks'
 import { useState, useRef, useEffect } from 'react'
 import { AutomateComponent } from './AutomateComponent'
 import { generalExamples } from './ExampleMsgs'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 
 type AutomateWrapperProps = {
   /* will be used if provided on first render instead of internal state */
@@ -15,10 +15,10 @@ export const AutomateWrapper = ({
   initialExample,
   initialMessage,
 }: AutomateWrapperProps) => {
-  let initialActionData = new ActionData()
-  initialActionData.duration = 14 * 86400000
-  initialActionData.interval = 86400000
-  initialActionData.msgs = [JSON.stringify(generalExamples[0], null, 2)]
+  let initialActionInput = new ActionInput()
+  initialActionInput.duration = 14 * 86400000
+  initialActionInput.interval = 86400000
+  initialActionInput.msgs = [JSON.stringify(generalExamples[0], null, 2)]
   const initConfig = {
     saveMsgResponses: true,
     updatingDisabled: false,
@@ -27,10 +27,10 @@ export const AutomateWrapper = ({
     fallbackToOwnerBalance: true,
     reregisterIcaAfterTimeout: true,
   }
-  initialActionData.configuration = initConfig
+  initialActionInput.configuration = initConfig
   //data.typeUrls = [""]
   //works faster than without array for some reason
-  const [actionDatas, setActionDatas] = useState([initialActionData])
+  const [ActionInputs, setActionInputs] = useState([initialActionInput])
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
@@ -38,26 +38,26 @@ export const AutomateWrapper = ({
   useEffect(
     function setInitialIfProvided() {
       if (initialMessageValue) {
-        actionDatas[0].msgs[0] = initialMessageValue
-        setActionDatas(actionDatas)
+        ActionInputs[0].msgs[0] = initialMessageValue
+        setActionInputs(ActionInputs)
       } else if (initialExampleValue) {
         const exampleIndex = initialExampleValue
-        actionDatas[0].msgs[0] = JSON.stringify(
+        ActionInputs[0].msgs[0] = JSON.stringify(
           generalExamples[exampleIndex],
           null,
           '\t'
         )
-        setActionDatas(actionDatas)
+        setActionInputs(ActionInputs)
       }
     },
-    [initialExampleValue, setActionDatas]
+    [initialExampleValue, setActionInputs]
   )
 
   return (
     <StyledDivForWrapper>
       <AutomateComponent
-        actionData={actionDatas[0]}
-        onActionChange={(action) => setActionDatas([action])}
+        actionInput={ActionInputs[0]}
+        onActionChange={(action) => setActionInputs([action])}
       />
     </StyledDivForWrapper>
   )

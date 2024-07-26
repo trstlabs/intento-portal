@@ -26,7 +26,7 @@ import { SubmitActionDialog } from '../../automate/components/SubmitActionDialog
 import { ChannelInfo } from './ChannelSelectList'
 import { useSubmitAction } from '../../automate/hooks'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 
 
 export class RecipientInfo {
@@ -56,17 +56,17 @@ export const RecipientList = ({
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   // set default fields
-  let data = new ActionData()
+  let data = new ActionInput()
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
-  const [actionData, setActionData] = useState(data)
+  const [actionInput, setactionInput] = useState(data)
   const { address, status } = useRecoilValue(walletState)
 
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ ibcAsset, recipientInfos: recipients })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
-    useSubmitAction({ actionData })
+    useSubmitAction({ actionInput })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -98,7 +98,7 @@ export const RecipientList = ({
     }
   }
 
-  const handleScheduleClick = (txData: ActionData) => {
+  const handleScheduleClick = (txData: ActionInput) => {
     if (status === WalletStatusType.connected) {
       let msgs = []
       for (let recipient of recipients) {
@@ -131,7 +131,7 @@ export const RecipientList = ({
         msgs.push(JSON.stringify(sendMsg, null, 2))
       }
       txData.msgs = msgs
-      setActionData(txData)
+      setactionInput(txData)
 
       return setRequestedSchedule(true)
     }
@@ -372,7 +372,7 @@ export const RecipientList = ({
       <SubmitActionDialog
         isLoading={isExecutingSchedule}
         // label="Recurring Send"
-        actionData={actionData}
+        actionInput={actionInput}
         isDialogShowing={isScheduleDialogShowing}
         /* initialActionType={actionType} */
         chainSymbol={'INTO'}

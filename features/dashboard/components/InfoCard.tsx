@@ -25,7 +25,7 @@ import { useTokenBalance } from '../../../hooks/useTokenBalance'
 
 import IssuanceChart from './Chart'
 import { getDuration } from '../../../util/time'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 
 type InfoCardProps = {
   shouldShowAutoCompound: Boolean
@@ -35,12 +35,12 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const [params, _] = useSetModuleParams()
   // const triggerParams = useRecoilValue(intentModuleParamsAtom)
   const [requestedSubmitAction, setRequestedSubmitAction] = useState(false)
-  let data = new ActionData()
+  let data = new ActionInput()
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
   // data.typeUrls = [""]
-  const [actionData, setActionData] = useState(data)
+  const [ActionInput, setActionInput] = useState(data)
   const [APR, isAPRLoading] = useGetAPR()
   const week = 60 * 60 * 24 * 7
 
@@ -55,7 +55,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const { balance, isLoading } = useTokenBalance('INTO')
 
   const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
-    useSubmitAction({ actionData })
+    useSubmitAction({ ActionInput })
 
   useEffect(() => {
     const shouldTriggerSubmitAction =
@@ -67,7 +67,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
     }
   }, [isExecutingSchedule, requestedSubmitAction, handleSubmitAction])
 
-  const handleSubmitActionClick = (newActionData: ActionData) => {
+  const handleSubmitActionClick = (newActionInput: ActionInput) => {
     const msgs = []
     for (const validator of stakeBalance.validators) {
       let claimMsg = claimRewardSDKMessage
@@ -76,11 +76,11 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
       msgs.push(JSON.stringify(claimMsg))
     }
     const action = {
-      ...newActionData,
+      ...newActionInput,
       msgs,
     }
     // console.log(action)
-    setActionData(action)
+    setActionInput(action)
     return setRequestedSubmitAction(true)
   }
 
@@ -333,7 +333,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
         )}
         <SubmitActionDialog
           isLoading={isExecutingSchedule}
-          actionData={actionData}
+          ActionInput={ActionInput}
           customLabel="Autocompound"
           isDialogShowing={isSubmitActionDialogShowing}
           chainSymbol={"INTO"}
@@ -342,8 +342,8 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               isShowing: false,
             })
           }
-          handleSubmitAction={(actionData) =>
-            handleSubmitActionClick(actionData)
+          handleSubmitAction={(ActionInput) =>
+            handleSubmitActionClick(ActionInput)
           }
         />
       </StyledDivForInfoGrid>

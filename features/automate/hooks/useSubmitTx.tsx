@@ -20,13 +20,13 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
-import { ActionData } from '../../../types/trstTypes'
+import { ActionInput } from '../../../types/trstTypes'
 
 type UseSubmitTxArgs = {
-  actionData: ActionData
+  actionInput: ActionInput
 }
 
-export const useSubmitTx = ({ actionData }: UseSubmitTxArgs) => {
+export const useSubmitTx = ({ actionInput }: UseSubmitTxArgs) => {
   const { address, client, status } = useRecoilValue(ibcWalletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -41,10 +41,10 @@ export const useSubmitTx = ({ actionData }: UseSubmitTxArgs) => {
         throw new Error('Wallet not connected. Please try reconnecting your wallet.')
       }
 
-      console.log(actionData)
+      console.log(actionInput)
       const response: DeliverTxResponse = await executeSubmitTx({
         owner: address,
-        actionData,
+        actionInput,
         client,
       })
       return response

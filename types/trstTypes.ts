@@ -3,6 +3,7 @@ import { Coin } from '@cosmjs/stargate'
 import {
   ExecutionConditions,
   ExecutionConfiguration,
+  HostedConfig,
 } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
 export interface MsgUpdateActionParams {
@@ -19,16 +20,17 @@ export interface MsgUpdateActionParams {
   configuration?: ExecutionConfiguration
 }
 
-export class ActionData {
-  duration: number
+export class ActionInput {
+  label?: string
   msgs: string[]
-  icaAddressForAuthZGrant?: string
-  startTime?: number
+  duration: number
   interval?: number
+  startTime?: number
+  feeFunds?: number
   configuration?: ExecutionConfiguration
   conditions?: ExecutionConditions
-  feeFunds?: number
-  label?: string
+  hostedConfig?: HostedConfig
+  icaAddressForAuthZ?: string
   connectionId?: string
   hostConnectionId?: string
 }
