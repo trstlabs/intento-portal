@@ -95,7 +95,7 @@ const MessagePreview = ({
                         chainSymbol={chainSymbol}
                         icaBalance={icaBalance}
                         icaAddress={icaAddress}
-                        ActionInput={ActionInput}
+                        actionInput={ActionInput}
                         isDialogShowing={isSubmitActionDialogShowing}
                         onRequestClose={() =>
                           setSubmitActionDialogState({
