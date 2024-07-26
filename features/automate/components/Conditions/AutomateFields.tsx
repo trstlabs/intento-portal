@@ -1,56 +1,59 @@
 import { Text } from "junoblocks"
 import { StyledInput } from "../AutomateComponent"
 import { useState } from "react"
+import toast from "react-hot-toast"
 
-type FieldArrayProps = {
-  label: string
-  values?: bigint[]  // Make values optional
-  onChange: (values: bigint[] | undefined) => void
-  disabled?: boolean
-}
 
-export const FieldArray = ({ label, values = [], onChange, disabled }: FieldArrayProps) => {
-  const parseBigIntArray = (inputValue: string): bigint[] | undefined => {
-    return inputValue
-      .split(',')
-      .map(v => v.trim())
-      .filter(v => v !== '')
-      .reduce<bigint[]>((acc, val) => {
-        try {
-          const bigIntValue = BigInt(val)
-          acc.push(bigIntValue)
-        } catch (error) {
-          // Log or handle the error if needed
-          console.error(`Invalid input value for BigInt: ${val}`)
-        }
-        return acc
-      }, [])
-  }
+
+export const FieldArray = ({ label, values = [], onChange, disabled }) => {
   // Handle input change event
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
-    const newValues = parseBigIntArray(inputValue)
-    onChange(newValues.length > 0 ? newValues : undefined)
-  }
+  const handleChange = (e, index) => {
+    const inputValue = e.target.value;
+    if (!/^\d*$/.test(inputValue)) {
+      toast.error('Please enter a valid number.');
+      return;
+    }
 
+    const newValues = [...values];
+    newValues[index] = inputValue !== '' ? BigInt(inputValue) : '';
+    onChange(newValues.filter(v => v !== ''));
+  };
+
+  // Add a new input field
+  const addField = () => {
+    if (values.length < 5) {
+      onChange([...values, '']);
+    }
+  };
 
   return (
     <div>
-      <Text css={{ padding: '$2', margin: '$2', }} variant="caption" color="secondary" align="left">{label}</Text>
-      <Text variant="body">
-        <StyledInput
-          type="text"
-          value={values?.map(v => v.toString()).join(',') || ''}
-          onChange={handleChange}
-          disabled={disabled}
-          style={{ width: '15%', border: '1px ridge #ccc', borderRadius: '8px', }}
-        />
+      <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="primary" align="left">
+        {label}
       </Text>
-
+      <Text>
+        {/*  <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">
+          Action IDs
+        </Text> */}
+        {values.map((value, index) => (
+          <StyledInput
+            key={index}
+            type="text"
+            value={value.toString()}
+            onChange={(e) => handleChange(e, index)}
+            disabled={disabled}
+            style={{ width: '15%', border: '1px ridge #ccc', borderRadius: '8px', marginBottom: '8px' }}
+          />
+        ))}
+        {values.length < 10 && !disabled && (
+          <button type="button" onClick={addField} style={{ marginBottom: '8px', fontSize: '11px' }}>
+            + Add Action ID
+          </button>
+        )}
+      </Text>
     </div>
-  )
-}
-
+  );
+};
 
 type FieldProps = {
   label: string
@@ -86,17 +89,20 @@ export const Field = ({ label, value, onChange, disabled, type = 'text' }: Field
 
   // Handle input change event
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value
+    let inputValue: number | bigint | string = e.target.value
     try {
-      const newValue = parseValue(inputValue)
-      if (newValue === null || typeof newValue === 'string') {
+      if (type != "string") {
+        const newValue = parseValue(inputValue)
+        inputValue = newValue
+      }
+      if (inputValue === null) {
         // Check if newValue is not a valid number or BigInt
         throw new Error('Invalid input: not a number')
       }
       setError(null) // Clear error if valid
-      onChange({ target: { value: newValue.toString() } } as React.ChangeEvent<HTMLInputElement>)
+      onChange({ target: { value: inputValue.toString() } } as React.ChangeEvent<HTMLInputElement>)
     } catch (err) {
-      setError('Invalid input: Please enter a valid number')
+      setError('Invalid input: Please enter a valid input value')
     }
   }
   return (
