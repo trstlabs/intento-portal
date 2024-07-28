@@ -447,9 +447,7 @@ export const AutomateComponent = ({
           </Column>
         </CardContent>
       </Card>
-      {actionInput.msgs.map((msg, index) => (
-        <div key={index}>
-          <Inline css={{ margin: '$6', marginTop: '$16' }}>
+      <Inline css={{ margin: '$6', marginTop: '$16' }}>
             <StepIcon step={2} />
             <Text
               align="center"
@@ -460,6 +458,8 @@ export const AutomateComponent = ({
               Define what to execute
             </Text>{' '}
           </Inline>
+      {actionInput.msgs.map((msg, index) => (
+        <div key={index}>
           <JsonFormWrapper
             index={index}
             chainSymbol={chainSymbol}

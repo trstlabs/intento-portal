@@ -18,7 +18,7 @@ export const CosmosMessageSelector: React.FC<{
   index: number
   setMessageSearchQuery: Dispatch<SetStateAction<string>>
   setInputForSearchFocused: Dispatch<SetStateAction<boolean>>
-  setExampleSchema: Dispatch<any>
+  setSchema: Dispatch<any>
   setExample: (index: number, msg: any) => void
   setMessageListShowing: Dispatch<SetStateAction<boolean>>
 }> = ({
@@ -30,7 +30,7 @@ export const CosmosMessageSelector: React.FC<{
   index,
   setMessageSearchQuery,
   setInputForSearchFocused,
-  setExampleSchema,
+  setSchema,
   setExample,
   setMessageListShowing,
 }) => {
@@ -62,7 +62,7 @@ export const CosmosMessageSelector: React.FC<{
         onSelect={(msgFile) => {
           console.log('generateDefaultObject1')
           // if (msgFile.value != null) {
-          setExampleSchema(msgFile.value)
+          setSchema(msgFile.value)
           console.log('generateDefaultObject')
           // console.log(
           //   generateDefaultObject(

@@ -39,6 +39,7 @@ import { getIntentoSigningClientOptions } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { ActionHistory } from './ActionHistory'
+import ActionTransformButton from './ActionTransformButton'
 
 
 type ActionInfoBreakdownProps = {
@@ -279,6 +280,14 @@ export const ActionInfoBreakdown = ({
       </Card>
       {/* </Row> */}
       <>
+        <Column
+          css={{ padding: '$6' }}
+          gap={8}
+          align="flex-end"
+
+        >
+          <ActionTransformButton actionInfo={actionInfo} />
+        </Column>
         <Row>
           <Inline
             style={{
@@ -809,10 +818,10 @@ export const ActionInfoBreakdown = ({
         </Column>
 
 
-    
 
 
-      {/* {actionInfo.updateHistory.length != 0 && (
+
+        {/* {actionInfo.updateHistory.length != 0 && (
           <>
             {' '}
             <Row>
@@ -841,10 +850,10 @@ export const ActionInfoBreakdown = ({
             </Row>
           </>
         )} */}
-      <ActionHistory id={actionInfo.id.toString()} />
+        <ActionHistory id={actionInfo.id.toString()} />
 
 
-    </>
+      </>
     </>
   )
 }

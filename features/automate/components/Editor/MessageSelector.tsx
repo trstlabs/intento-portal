@@ -14,12 +14,12 @@ import { CosmosMessageSelector } from './CosmosMessageSelector'
 export const MessageSelector = ({
   index,
   msgTypeName,
-  setExampleSchema,
+  setSchema,
   setExample,
 }: {
   index: number
   msgTypeName: string
-  setExampleSchema: Dispatch<SetStateAction<boolean>>
+  setSchema: Dispatch<SetStateAction<boolean>>
   setExample: (index: number, msg: any) => void
 }): JSX.Element => {
   const wrapperRef = useRef<HTMLDivElement>()
@@ -74,7 +74,7 @@ export const MessageSelector = ({
             index={index}
             setMessageSearchQuery={setMessageSearchQuery}
             setInputForSearchFocused={setInputForSearchFocused}
-            setExampleSchema={setExampleSchema}
+            setSchema={setSchema}
             setExample={setExample}
             setMessageListShowing={setMessageListShowing}
           />{' '}
