@@ -22,9 +22,6 @@
     "@interchain-ui/react": "^1.23.24",
     "@next/bundle-analyzer": "^12.1.0",
     "@react-spring/web": "^9.4.2",
-    "@rjsf/core": "^5.7.3",
-    "@rjsf/utils": "^5.10.0",
-    "@rjsf/validator-ajv8": "^5.7.3",
     "@stitches/react": "^1.2.6",
     "@uiw/react-codemirror": "^4.19.6",
     "ajv-draft-04": "^1.0.0",
@@ -36,6 +33,7 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "eslint-plugin-testing-library": "^5.5.1",
     "focus-visible": "^5.2.0",
+    "formik": "^2.4.6",
     "gsap": "^3.7.1",
     "intentojs": "^0.8.0-alpha.2",
     "jsonschema": "^1.4.1",
@@ -51,7 +49,8 @@
     "react-use": "^17.4.0",
     "recoil": "^0.7.4",
     "sass": "^1.45.0",
-    "tsparticles": "^2.6.0"
+    "tsparticles": "^2.6.0",
+    "yup": "^1.4.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",

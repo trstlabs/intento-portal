@@ -11,7 +11,8 @@ import {
   CardContent, styled
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { JsonFormEditor } from './JsonForm'
+import JsonFormEditor from './DynamicForm'
+
 import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
 
 import { MessageSelector } from './MessageSelector'
@@ -36,26 +37,28 @@ export const JsonFormWrapper = ({
   setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>
 }): JSX.Element => {
   const [showJsonForm, setShowJsonForm] = useState(true)
-  const extractedMsg =
+  const extractedMsgTypeUrl =
     msg.length > 32 && msg.split('.').find((name) => name.includes('Msg'))
-  const msgTypeName = (extractedMsg && extractedMsg.split('"')[0]) || 'Unknown'
+  const msgTypeName = (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown'
   const [validationErrors, setValidationErrors] = useState([""])
-  const [exampleSchema, setExampleSchema] = useState(
-    findFileBySuffix(msgTypeName) || findFileBySuffix('MsgSend')
+  const [schema, setSchema] = useState(
+    findFileBySuffix(msgTypeName)
   )
 
   const wasmEnabledList = JSON.parse(
     process.env.NEXT_PUBLIC_WASM_ENABLED_LIST || '[]'
   )
 
-  function setMsg(example) {
+  function setMsgFromExample(msg) {
+
     const schema = findFileBySuffix(
-      example.typeUrl
+      msg.typeUrl
         .split('.')
         .find((data) => data.includes('Msg'))
     )
-    let errors = validateJSON(example, schema)
-    setExampleSchema(
+
+    let errors = validateJSON(msg, schema)
+    setSchema(
       schema
     )
     setValidationErrors([""])
@@ -65,7 +68,7 @@ export const JsonFormWrapper = ({
 
     }
 
-    return setExample(index, example)
+    return setExample(index, msg)
 
   }
 
@@ -81,7 +84,7 @@ export const JsonFormWrapper = ({
             <Inline css={{ justifyContent: 'space-between' }} >
               <MessageSelector
                 msgTypeName={msgTypeName}
-                setExampleSchema={setExampleSchema}
+                setSchema={setSchema}
                 setExample={setExample}
                 index={index}
               /><Text variant="legend" color="disabled" align={'center'}>
@@ -97,15 +100,7 @@ export const JsonFormWrapper = ({
 
 
             <Column>
-              {/*   <Divider offsetY="$6" /> */}
               <Inline css={{ display: 'inline', paddingTop: '$4' }} >
-                {/*   <Text
-                  css={{ paddingLeft: '$4', paddingBottom: '$4' }}
-                  variant="legend"
-                >
-                  {' '}
-                  Examples
-                </Text> */}
                 {generalExamples.map((example, ei) => (
                   <span key={ei}>
                     {' '}
@@ -118,7 +113,7 @@ export const JsonFormWrapper = ({
                         .replace(/([A-Z])/g, ' $1')
                         .trim()}
                       onClick={() => {
-                        setMsg(example)
+                        setMsgFromExample(example)
                       }}
                     />
                   </span>
@@ -137,7 +132,7 @@ export const JsonFormWrapper = ({
                             .replace(/([A-Z])/g, ' $1')
                             .trim()}
                           onClick={() => {
-                            setMsg(example)
+                            setMsgFromExample(example)
                           }}
                         />
                       </span>
@@ -158,7 +153,7 @@ export const JsonFormWrapper = ({
                             .replace(/([A-Z])/g, ' $1')
                             .trim()}
                           onClick={() => {
-                            setMsg(example)
+                            setMsgFromExample(example)
                           }}
                         />
                       </span>
@@ -201,16 +196,16 @@ export const JsonFormWrapper = ({
               {showJsonForm && msgTypeName != 'Unknown' ? (
                 <JsonFormEditor
                   jsonValue={msg}
-                  exampleSchema={exampleSchema}
+                  schema={schema}
                   onChange={handleChangeMsg(index)}
                   onValidate={setIsJsonValid}
                   validationErrors={validationErrors}
-                  setValidationErrors={setValidationErrors}
+
                 />
 
               ) : (
                 <JsonCodeMirrorEditor
-                  jsonSchema={exampleSchema}
+                  jsonSchema={schema}
                   jsonValue={msg}
                   onChange={handleChangeMsg(index)}
                   onValidate={setIsJsonValid}
