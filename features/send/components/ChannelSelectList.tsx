@@ -22,14 +22,14 @@ export class ChannelInfo {
   denom: string;
   symbol: string
   connectionID: string;
-  denom_on_trst: string;
+  denom_local: string;
   prefix: string
 }
 
 
 export type ChannelSelectListProps = {
   activeChannel?: string
-  channelList: Array<Pick<SelectChainInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'denom_on_trst' | 'logo_uri' | 'name' | 'symbol'| 'connection_id'>>
+  channelList: Array<Pick<SelectChainInfo, 'channel' | 'chain_id' | 'prefix' | 'denom'|  'denom_local' | 'logo_uri' | 'name' | 'symbol'| 'connection_id'>>
   onSelect: (channelInfo: ChannelInfo) => void
   fetchingBalanceMode: 'native' | 'ibc'
   visibleNumberOfTokensInViewport?: number
@@ -52,7 +52,7 @@ export const ChannelSelectList = ({
     selectedChannel.name = selectedInfo.id
     selectedChannel.logoURI = selectedInfo.logo_uri
     selectedChannel.denom = selectedInfo.denom
-    selectedChannel.denom_on_trst = selectedInfo.denom_on_trst
+    selectedChannel.denom_local = selectedInfo.denom_local
     selectedChannel.symbol = selectedInfo.symbol
     selectedChannel.connectionID = selectedInfo.connection_id
     selectedChannel.prefix = selectedInfo.prefix

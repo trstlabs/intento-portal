@@ -13,7 +13,7 @@ export type IBCAssetInfo = {
   rpc: string
   denom: string
   decimals: number
-  denom_on_trst: string
+  denom_local: string
   channel_to_trst: string
   channel: string
   logo_uri: string
@@ -99,7 +99,7 @@ function transformChain(chain: Chain) {
         ? chain.fees.fee_tokens[0].denom
         : '',
     decimals: 6, // Standard, TODO: Adjust as needed
-    denom_on_trst: '', // TODO: Find in ibc assets
+    denom_local: '', // TODO: Find in ibc assets
     channel_to_trst: '', // TODO: Find in ibc assets
     channel: '', // TODO: Find in ibc assets
     logo_uri: chain.logo_URIs

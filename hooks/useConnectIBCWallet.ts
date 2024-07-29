@@ -61,7 +61,7 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-      if (chainId == 'INTO' || walletInfo != WalletStatusType.connected) {
+      if (chainId == process.env.NEXT_PUBLIC_INTO_CHAINID || walletInfo != WalletStatusType.connected) {
         return
       }
       if (

@@ -15,6 +15,7 @@ import {
   getAuthZGrantsForGrantee,
   getFeeGrantAllowance,
   GrantResponse,
+  getHostedAccounts,
 } from '../services/automate'
 
 import { StargateClient } from '@cosmjs/stargate'
@@ -61,19 +62,86 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
   return [ica, isLoading] as const
 }
 
+export const useGetHostedICA = (connectionId: string) => {
+  const rpcClient = useIntentoRpcClient()
+  const { data: ica, isLoading } = useQuery(
+    `hostedAccount/${connectionId}`,
+    async () => {
+      if (connectionId == '') {
+        return ''
+      }
+      const hostedAccs = await getHostedAccounts({ rpcClient })
+      // console.log(hostedAccs)
+      const hostedAcc = hostedAccs?.find(
+        (account) => account.icaConfig.connectionId == connectionId
+      )
+      // const resp: string = await getICA({
+      //   owner: hostedAcc.hostedAddress,
+      //   connectionId,
+      //   rpcClient,
+      // })
+      return hostedAcc
+    },
+    {
+      enabled: Boolean(connectionId && rpcClient),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [ica, isLoading] as const
+}
+
+
+export const useGetHostICAAddress = (connectionId: string, accAddr?: string) => {
+  const { address } = useRecoilValue(walletState)
+
+  if (accAddr === '') {
+    accAddr = address
+  }
+
+  const rpcClient = useIntentoRpcClient()
+  const { data: ica, isLoading } = useQuery(
+    `hostInterchainAccount/${connectionId}/${address}`,
+    async () => {
+      if (connectionId == '') {
+        return ''
+      }
+      const resp: string = await getICA({
+        owner: accAddr,
+        connectionId,
+        rpcClient,
+      })
+      return resp
+    },
+    {
+      enabled: Boolean(
+        connectionId != undefined &&
+          rpcClient &&
+          !!accAddr &&
+          accAddr.length > 40
+      ),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [ica, isLoading] as const
+}
+
 export const useICATokenBalance = (
   chainId: string,
   ibcWalletAddress: string,
   isICAChain: boolean
 ) => {
   const chain = useChainInfoByChainID(chainId)
-
+  const { denom, decimals } = chain
   const { data, isLoading } = useQuery(
     `icaTokenBalance/${chainId}/${ibcWalletAddress}`,
     async () => {
-      const { denom, decimals } = chain
       const chainClient = await StargateClient.connect(chain.rpc)
-
       const coin = await chainClient.getBalance(ibcWalletAddress, denom)
 
       const amount = coin ? Number(coin.amount) : 0
@@ -81,7 +149,9 @@ export const useICATokenBalance = (
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(ibcWalletAddress != '' && isICAChain),
+      enabled: Boolean(
+        ibcWalletAddress && denom && ibcWalletAddress != '' && isICAChain
+      ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,

@@ -9,7 +9,7 @@ import {
   styled,
   IconWrapper,
   PlusIcon,
-  convertDenomToMicroDenom,
+
 } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
 import {
@@ -21,6 +21,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
+  useGetHostedICA,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -37,6 +38,8 @@ import { SubmitActionDialog } from './SubmitActionDialog'
 import { AutomateConfiguration } from './Conditions/AutomateConfiguration'
 import { StepIcon } from '../../../icons/StepIcon'
 import { AutomateConditions } from './Conditions/AutomateConditions'
+import { convertDenomToMicroDenom } from '../../../util/conversion'
+import { HostedAccountCard } from './HostedAccountCard'
 
 
 
@@ -56,7 +59,7 @@ export const AutomateComponent = ({
   const [chainName, setChainName] = useState('')
 
   const [chainSymbol, setChainSymbol] = useState('INTO')
-  const [chainId, setChainId] = useState('INTO')
+  const [chainId, setChainId] = useState(process.env.NEXT_PUBLIC_INTO_CHAINID || "")
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
@@ -72,7 +75,7 @@ export const AutomateComponent = ({
     icaAddress,
     chainIsConnected
   )
-
+  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(actionInput.connectionId)
 
 
   const refetchICAData = useRefetchQueries([
@@ -207,11 +210,11 @@ export const AutomateComponent = ({
     try {
       let msgs = actionInput.msgs
       msgs[index] = msg
-      let updatedactionInput = {
+      let updatedActionInput = {
         ...actionInput,
         msgs,
       }
-      onActionChange(updatedactionInput)
+      onActionChange(updatedActionInput)
       if (
         JSON.parse(msg)
         ['typeUrl'].split('.')
@@ -233,22 +236,22 @@ export const AutomateComponent = ({
     name: string,
     chainSymbol: string
   ) {
-    let updatedactionInput = actionInput
-    updatedactionInput.connectionId = connectionId
-    updatedactionInput.hostConnectionId = hostConnectionId
+    let updatedActionInput = actionInput
+    updatedActionInput.connectionId = connectionId
+    updatedActionInput.hostConnectionId = hostConnectionId
     actionInput.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
-        updatedactionInput.msgs[editIndex] = editMsg.replaceAll(
+        updatedActionInput.msgs[editIndex] = editMsg.replaceAll(
           prefix + '1...',
           newPrefix + '1...'
         )
-        updatedactionInput.msgs[editIndex] = updatedactionInput.msgs[
+        updatedActionInput.msgs[editIndex] = updatedActionInput.msgs[
           editIndex
         ].replaceAll(denom, newDenom)
       }
     })
 
-    onActionChange(updatedactionInput)
+    onActionChange(updatedActionInput)
     setDenom(newDenom)
     setChainName(name)
     setChainSymbol(chainSymbol)
@@ -277,58 +280,49 @@ export const AutomateComponent = ({
       const msg = JSON.stringify(msgObject, null, '\t')
       let newMsg = msg.replaceAll('into', prefix)
       newMsg = newMsg.replaceAll('uinto', denom)
-      let updatedactionInput = actionInput
-      updatedactionInput.msgs[index] = newMsg
-      //updatedactionInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+      let updatedActionInput = actionInput
+      updatedActionInput.msgs[index] = newMsg
+      //updatedActionInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
 
-      onActionChange(updatedactionInput)
+      onActionChange(updatedActionInput)
     } catch (e) {
       alert(e)
     }
   }
 
   function setConfig(updatedConfig: ExecutionConfiguration) {
-    let updatedactionInput = actionInput
-    updatedactionInput.configuration = updatedConfig
-    onActionChange(updatedactionInput)
+    let updatedActionInput = actionInput
+    updatedActionInput.configuration = updatedConfig
+    onActionChange(updatedActionInput)
   }
 
 
   function setConditions(updatedConfig: ExecutionConditions) {
-    let updatedactionInput = actionInput
-    updatedactionInput.conditions = updatedConfig
-    onActionChange(updatedactionInput)
+    let updatedActionInput = actionInput
+    updatedActionInput.conditions = updatedConfig
+    onActionChange(updatedActionInput)
   }
-
-  const ensureDefaultConditions = (conditions?: ExecutionConditions): ExecutionConditions => ({
-    stopOnSuccessOf: conditions?.stopOnSuccessOf ?? [],
-    stopOnFailureOf: conditions?.stopOnFailureOf ?? [],
-    skipOnFailureOf: conditions?.skipOnFailureOf ?? [],
-    skipOnSuccessOf: conditions?.skipOnSuccessOf ?? [],
-    useResponseValue: conditions?.useResponseValue,
-    responseComparison: conditions?.responseComparison
-  })
 
   function handleAddMsg() {
     let newMsgs = [...actionInput.msgs]
     let emptyMsg = ''
     newMsgs.push(emptyMsg)
-    let updatedactionInput = actionInput
-    updatedactionInput.msgs = newMsgs
-    onActionChange(updatedactionInput)
+    let updatedActionInput = actionInput
+    updatedActionInput.msgs = newMsgs
+    onActionChange(updatedActionInput)
   }
   function handleRemoveMsg(index: number) {
-    let updatedactionInput = actionInput
+    let updatedActionInput = actionInput
 
-    const newMsgs = updatedactionInput.msgs.filter(
-      (msg) => msg !== updatedactionInput.msgs[index]
+    const newMsgs = updatedActionInput.msgs.filter(
+      (msg) => msg !== updatedActionInput.msgs[index]
     )
 
     if (index == 0 && newMsgs.length == 0) {
       newMsgs[index] = ''
     }
-    updatedactionInput.msgs = newMsgs
-    onActionChange(updatedactionInput)
+    updatedActionInput.msgs = newMsgs
+    onActionChange(updatedActionInput)
   }
 
   const [
@@ -360,7 +354,7 @@ export const AutomateComponent = ({
           Choose where to execute
         </Text>{' '}
       </Inline>
-      
+
       <Card
         css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$1' }}
         variant="secondary"
@@ -405,7 +399,7 @@ export const AutomateComponent = ({
                       {isExecutingRegisterICA ? (
                         <Spinner instant />
                       ) : (
-                        'Register Interchain Account '
+                        'Self-Host ICA'
                       )}
                     </Button>
                   </>
@@ -418,10 +412,15 @@ export const AutomateComponent = ({
                 <Spinner size={18} style={{ margin: 0 }} />
               ) : (
                 <>
-                  {!icaAddress ? (
-                    <Text variant="caption">
-                      No Interchain Account for selected chain: {chainName}.
-                    </Text>
+                  {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
+                    hostedAccount={hostedAccount}
+                    chainSymbol={chainSymbol}
+                    chainId={chainId}
+                    actionInput={actionInput}
+                  />}
+                    {/* <Text variant="caption">
+                      No Self-hosted Interchain Account for selected chain: {chainName}.
+                    </Text> */}</>
                   ) : (
                     <IcaCard
                       icaAddress={icaAddress}
@@ -448,16 +447,16 @@ export const AutomateComponent = ({
         </CardContent>
       </Card>
       <Inline css={{ margin: '$6', marginTop: '$16' }}>
-            <StepIcon step={2} />
-            <Text
-              align="center"
-              variant="body"
-              color="tertiary"
-              css={{ padding: '0 $15 0 $6' }}
-            >
-              Define what to execute
-            </Text>{' '}
-          </Inline>
+        <StepIcon step={2} />
+        <Text
+          align="center"
+          variant="body"
+          color="tertiary"
+          css={{ padding: '0 $15 0 $6' }}
+        >
+          Define what to execute
+        </Text>{' '}
+      </Inline>
       {actionInput.msgs.map((msg, index) => (
         <div key={index}>
           <JsonFormWrapper
@@ -506,14 +505,14 @@ export const AutomateComponent = ({
           handleSubmitActionClick(actionInput)
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-      />  
+      />
       <AutomateConfiguration
         config={actionInput.configuration}
         disabled={!icaAddress && !chainHasIAModule}
         onChange={setConfig}
       />
-      <AutomateConditions conditions={ensureDefaultConditions(actionInput.conditions)}
-        disabled={!icaAddress && !chainHasIAModule}
+      <AutomateConditions conditions={actionInput.conditions}
+        disabled={!chainHasIAModule || !actionInput.conditions}
         onChange={setConditions}
       />
       <Inline

@@ -48,5 +48,5 @@ export type SelectChainInfo = {
   connection_id?: string
   counterparty_connection_id?: string
   prefix?: string
-  denom_on_trst?: string
+  denom_local?: string
 }

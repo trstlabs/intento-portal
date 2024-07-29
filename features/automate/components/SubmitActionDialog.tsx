@@ -110,7 +110,7 @@ export const SubmitActionDialog = ({
 
   function handleInterval(label, value: number) {
     console.log("value", value, "duration", duration)
-    if (value >= duration) {
+    if (value > duration) {
       toast.custom((t) => (
         <Toast
           icon={<IconWrapper icon={<Error />} color="error" />}
@@ -233,13 +233,10 @@ export const SubmitActionDialog = ({
       startTime,
       duration,
       interval,
-      connectionId: actionInput.connectionId,
-      configuration: actionInput.configuration,
-      // retries: actionInput.retries,
-      msgs: actionInput.msgs,
       icaAddressForAuthZ,
       feeFunds,
       label: txLabel,
+      ...actionInput
     })
   }
   return (
@@ -675,11 +672,11 @@ export const SubmitActionDialog = ({
             variant="secondary"
             onClick={() => (isLoading ? undefined : handleData(''))}
           >
-            {isLoading ? <Spinner instant={true} size={16} /> : <>Automate</>}
+            {isLoading ? <Spinner instant={true} size={16} /> : <>Submit</>}
           </Button>
         }
       >
-        {actionInput.connectionId && (
+        {actionInput.connectionId && actionInput.msgs[0] && !actionInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
           <Button
             disabled={shouldDisableAuthzGrantButton}
             variant="secondary"
@@ -688,7 +685,7 @@ export const SubmitActionDialog = ({
             {isLoading ? (
               <Spinner instant={true} size={16} />
             ) : (
-              <>Automate with Grant</>
+              <>Submit as MsgExec</>
             )}
           </Button>
         )}

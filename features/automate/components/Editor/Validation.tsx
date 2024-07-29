@@ -1,8 +1,5 @@
 
 import Ajv, { ErrorObject } from "ajv-draft-04"
-import {
-    RJSFValidationError,
-} from '@rjsf/utils'
 import { Text } from "junoblocks"
 import * as cosmosMsgsJsonFiles from '../../../../util/scripts/schemas/msgs'
 
@@ -104,15 +101,6 @@ export function extractErrorMessages(errors: Array<ErrorObject>): Array<string> 
         // Construct a meaningful message for each error
         // If `message` is not defined, use a default message
 
-    });
-}
-
-// Function to extract error messages
-export function extractRJSFErrorMessages(errors: Array<RJSFValidationError>): Array<string> {
-    return errors.map(error => {
-        // Construct a meaningful message for each error
-        // If `message` is not defined, use a default message
-        return error.message ?? "Form error: " + error.stack/* `Error at ${error.instancePath}: Validation failed for ${error.keyword}` */
     });
 }
 

@@ -41,7 +41,7 @@ export type ChainSelectorListProps = {
       | 'name'
       | 'prefix'
       | 'denom'
-      | 'denom_on_trst'
+      | 'denom_local'
       | 'id'
     >
   >
@@ -56,7 +56,7 @@ export type ChainSelectorListProps = {
       | 'name'
       | 'prefix'
       | 'denom'
-      | 'denom_on_trst'
+      | 'denom_local'
       | 'id'
     >
   >
@@ -88,7 +88,7 @@ export const ChainSelectorList = ({
     selectedChain.denom = selectedInfo.denom
     selectedChain.symbol = selectedInfo.symbol
     selectedChain.prefix = selectedInfo.prefix
-    selectedChain.trstDenom = selectedInfo.denom_on_trst
+    selectedChain.trstDenom = selectedInfo.denom_local
     return selectedChain
   }
 

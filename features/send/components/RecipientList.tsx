@@ -108,7 +108,7 @@ export const RecipientList = ({
           sendMsg = transferObject
           sendMsg.value.token = {
             amount: convertDenomToMicroDenom(recipient.amount, 6).toString(),
-            denom: ibcAsset.denom_on_trst,
+            denom: ibcAsset.denom_local,
           }
           sendMsg.value.sender = address
           sendMsg.value.receiver = recipient.recipient
@@ -123,7 +123,7 @@ export const RecipientList = ({
           sendMsg.value.amount = [
             {
               amount: convertDenomToMicroDenom(recipient.amount, 6).toString(),
-              denom: ibcAsset.denom_on_trst,
+              denom: ibcAsset.denom_local,
             },
           ]
         }

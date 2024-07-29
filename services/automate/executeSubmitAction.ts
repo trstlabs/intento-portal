@@ -24,13 +24,15 @@ export const executeSubmitAction = async ({
   }
   console.log(startAtInt)
   let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
-  console.log(startAt.toString())
+  console.log('startAt s', startAtInt / 1000)
+  console.log('duration s', actionInput.duration / 1000)
+  console.log('interval s', actionInput.interval / 1000)
   let duration = actionInput.duration + 'ms'
   let interval = actionInput.interval + 'ms'
   let msgs = []
 
   transformAndEncodeMsgs(actionInput, client, msgs)
-  console.log(msgs)
+  // console.log(msgs)
 
   if (actionInput.icaAddressForAuthZ && actionInput.icaAddressForAuthZ != '') {
     const encodeObject2 = {
@@ -51,6 +53,9 @@ export const executeSubmitAction = async ({
         amount: convertDenomToMicroDenom(actionInput.feeFunds, 6).toString(),
       },
     ]
+  }
+  if (actionInput.connectionId && actionInput.hostConnectionId) {
+    actionInput.hostedConfig = undefined
   }
   const msgSubmitAction =
     intento.intent.v1beta1.MessageComposer.withTypeUrl.submitAction({
@@ -76,8 +81,9 @@ export const executeSubmitAction = async ({
           },
       feeFunds,
       conditions: actionInput.conditions,
+      hostedConfig: actionInput.hostedConfig,
     })
-  console.log(msgSubmitAction)
+  //console.log(msgSubmitAction)
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitAction], {
       amount: [],
@@ -94,12 +100,24 @@ function transformAndEncodeMsgs(
     let value = JSON.parse(msgJSON)['value']
     let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
 
+    //todo: test and adjust accordingly
     if (typeUrl.startsWith('/cosmwasm')) {
       let msgString: string = JSON.stringify(value['msg'])
       console.log(msgString)
       let msg2: Uint8Array = toUtf8(msgString)
       console.log(msg2)
       value['msg'] = msg2
+    }
+    if (typeUrl.includes('authz.v1beta1.MsgExec')) {
+      // for (let authzMsg; authzMsgI of value.msgs) {
+      value.msgs.forEach((authzMsg, authzMsgI) => {
+        const encodeObject = {
+          typeUrl: authzMsg.typeUrl,
+          value: authzMsg.value,
+        }
+        let msgAny = client.registry.encodeAsAny(encodeObject)
+        value.msgs[authzMsgI] = msgAny
+      })
     }
     console.log(value)
 

@@ -116,7 +116,7 @@ export const useTransferAssetMutation = ({
             tokenAmount,
             ibcAssetInfo.decimals
           ).toString(),
-          denom: ibcAssetInfo.denom_on_trst,
+          denom: ibcAssetInfo.denom_local,
         },
         'transfer',
         ibcAssetInfo.channel_to_trst,

@@ -1,8 +1,10 @@
 import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
-import { QueryInterchainAccountFromAddressResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import {
+  QueryHostedAccountsResponse,
+  QueryInterchainAccountFromAddressResponse,
+} from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { cosmos } from 'intentojs'
 import { QueryGranteeGrantsRequest } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/query'
-
 
 export interface ICAQueryInput {
   owner: string
@@ -28,6 +30,21 @@ export const getICA = async ({
     } /* else {
       console.error('err(getICA):', e)
     } */
+  }
+}
+
+export const getHostedAccounts = async ({ rpcClient }) => {
+  try {
+    const response: QueryHostedAccountsResponse =
+      await rpcClient.intento.intent.v1beta1.hostedAccounts({})
+
+    return response.hostedAccounts
+  } catch (e) {
+    if (e.message.includes('account found')) {
+      return []
+    }  else {
+      console.error('err(getHostedAccounts):', e)
+    } 
   }
 }
 

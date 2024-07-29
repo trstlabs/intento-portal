@@ -40,7 +40,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   data.interval = 86400000
   data.msgs = ['']
   // data.typeUrls = [""]
-  const [ActionInput, setActionInput] = useState(data)
+  const [actionInput, setActionInput] = useState(data)
   const [APR, isAPRLoading] = useGetAPR()
   const week = 60 * 60 * 24 * 7
 
@@ -55,7 +55,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const { balance, isLoading } = useTokenBalance('INTO')
 
   const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
-    useSubmitAction({ ActionInput })
+    useSubmitAction({ actionInput })
 
   useEffect(() => {
     const shouldTriggerSubmitAction =
@@ -333,7 +333,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
         )}
         <SubmitActionDialog
           isLoading={isExecutingSchedule}
-          ActionInput={ActionInput}
+          actionInput={actionInput}
           customLabel="Autocompound"
           isDialogShowing={isSubmitActionDialogShowing}
           chainSymbol={"INTO"}
@@ -342,8 +342,8 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               isShowing: false,
             })
           }
-          handleSubmitAction={(ActionInput) =>
-            handleSubmitActionClick(ActionInput)
+          handleSubmitAction={(actionInput) =>
+            handleSubmitActionClick(actionInput)
           }
         />
       </StyledDivForInfoGrid>

@@ -14,32 +14,32 @@ import { useCosmosRpcClient } from './useRPCClient'
 
 async function fetchTokenBalance({
   client,
-  token: { denom_on_trst, decimals },
+  token: { denom_local, decimals },
   address,
 }: {
   client: SigningStargateClient
   token: {
     decimals?: number
-    denom_on_trst?: string
+    denom_local?: string
   }
   address: string
 }) {
-  if (!denom_on_trst) {
+  if (!denom_local) {
     throw new Error(
       `No denom provided to fetch the balance.`
     )
   }
 
   /*
-   * if this is a native asset or an ibc asset that has denom_on_trst
+   * if this is a native asset or an ibc asset that has denom_local
    *  */
 
-  const resp = await client.getBalance(address, denom_on_trst)
+  const resp = await client.getBalance(address, denom_local)
   const amount = resp ? Number(resp.amount) : 0
   return convertMicroDenomToDenom(amount, decimals)
 
-  //  (denom_on_trst) {
-  //   const resp = await client.getBalance(address, denom_on_trst)
+  //  (denom_local) {
+  //   const resp = await client.getBalance(address, denom_local)
   //   const amount = resp ? Number(resp.amount) : 0
   //   return convertMicroDenomToDenom(amount, decimals)
   // }
@@ -48,11 +48,11 @@ async function fetchTokenBalance({
 }
 
 const mapIbcTokenToNative = (ibcToken?: IBCAssetInfo) => {
-  if (ibcToken?.denom_on_trst) {
+  if (ibcToken?.denom_local) {
     return {
       ...ibcToken,
       native: true,
-      denom: ibcToken.denom_on_trst,
+      denom: ibcToken.denom_local,
     }
   }
   return undefined

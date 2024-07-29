@@ -1,55 +1,47 @@
 import {
-  Card,
   Spinner,
-  CardContent,
   Tooltip,
   Button,
   Text,
   Chevron,
   IconWrapper,
-  Divider,
   useMedia,
-  convertDenomToMicroDenom,
+  Divider,
 } from 'junoblocks'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Row, StyledInput } from './AutomateComponent'
-
-import { useAuthZGrantsForUser } from '../../../hooks/useICA'
+import { Row } from './AutomateComponent'
+import { convertFromMicroDenom } from '../../../util/conversion'
+import { useAuthZGrantsForUser, useGetHostICAAddress } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
 import { ActionInput } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
+import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 
-interface IcaCardProps {
-  icaAddress: string
+interface HostedAccountCardProps {
+  hostedAccount: HostedAccount
   chainSymbol: string
-  feeFundsHostChain: string
-  icaBalance: number
-  isIcaBalanceLoading: boolean
-  shouldDisableSendHostChainFundsButton: boolean
-  isExecutingSendFundsOnHost: boolean
   chainId: string
-  hostDenom: string
+  // hostDenom: string
   actionInput: ActionInput
-  setFeeFundsHostChain: (fees: string) => void
-  handleSendFundsOnHostClick: () => void
 }
 
-export const IcaCard = ({
-  icaAddress,
+export const HostedAccountCard = ({
+  hostedAccount,
   chainSymbol,
-  feeFundsHostChain,
-  icaBalance,
-  isIcaBalanceLoading,
-  shouldDisableSendHostChainFundsButton,
-  isExecutingSendFundsOnHost,
   chainId,
-  hostDenom,
+  //  hostDenom,
   actionInput,
-  setFeeFundsHostChain,
-  handleSendFundsOnHostClick,
-}: IcaCardProps) => {
+}: HostedAccountCardProps) => {
   const [showICAInfo, setShowICAInfo] = useState(false)
   const isMobile = useMedia('sm')
+
+  const [hostedAccountAddress, _isIcaLoading] = useGetHostICAAddress(actionInput.connectionId, hostedAccount.hostedAddress)
+
+  /*  const [hostedAccountBalance, ishostedAccountBalanceLoading] = useICATokenBalance(
+     chainId,
+     hostedAccountAddress,
+     true
+   ) */
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
@@ -68,21 +60,16 @@ export const IcaCard = ({
     useState(false)
   const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
     chainId,
-    icaAddress,
+    hostedAccountAddress,
     actionInput
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
-      grantee: icaAddress,
+      grantee: hostedAccountAddress,
       grantInfos: icaAuthzGrants
         ? icaAuthzGrants.filter((grant) => grant.hasGrant == false)
         : [],
-      coin: requestedSendAndAuthzGrant
-        ? {
-          denom: hostDenom,
-          amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
-        }
-        : undefined,
+      coin: undefined,
     })
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
     if (shouldTrigger) {
@@ -144,38 +131,46 @@ export const IcaCard = ({
       >
         <Text variant="body">
           {' '}
-          {showICAInfo ? <span>Hide</span> : <span>View</span>} Interchain
-          Account Details{' '}
+          {showICAInfo ? <span>Hide</span> : <span>View</span>} Hosted Account{' '}
         </Text>
       </Button>
 
       {showICAInfo && (
         <>
           <Divider offsetY="$4" />
+          <Text variant="legend">  Current fee coins supported </Text>
+
+
+          {hostedAccount.hostFeeConfig.feeCoinsSuported.map((coin, coinIndex) => (
+            <div key={coinIndex}>
+              <Text wrap={true} css={{ padding: '$4' }} variant="caption">  <li>{/* {convertMicroDenomToDenom(coin.amount, 6)}  */} {convertFromMicroDenom(coin.denom)}  </li></Text>
+            </div>))}
+
+          <Divider offsetY="$4" />
           <Text variant="legend"> Address </Text>
           {isMobile ? (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
-              {icaAddress.substring(0, 33) + '..'}
+              {hostedAccountAddress.substring(0, 33) + '..'}
             </Text>
           ) : (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
-              {icaAddress}
+              {hostedAccountAddress}
             </Text>
           )}
-          {icaBalance &&
-            (!isIcaBalanceLoading ? (
+          {/*   {hostedAccountBalance &&
+            (!ishostedAccountBalanceLoading ? (
               <>
-                {' '}
+
                 <Text variant="legend"> Balance </Text>{' '}
                 <Text css={{ padding: '$4' }} variant="caption">
-                  {' '}
-                  {icaBalance} {chainSymbol}
+
+                  {hostedAccountBalance} {chainSymbol}
                 </Text>
               </>
             ) : (
               <Spinner instant />
-            ))}
-          {icaAuthzGrants != undefined  && <><Text variant="legend"> Grants</Text>
+            ))} */}
+          {icaAuthzGrants != undefined && <><Text variant="legend"> Grants</Text>
             {isAuthzGrantsLoading && !icaAuthzGrants ? (
               <Spinner />
             ) : (
@@ -202,9 +197,9 @@ export const IcaCard = ({
               </>
             )}
           </>}
-          {!shouldDisableAuthzGrantButton && (
+          {(
             <>
-              <Card
+              {/*  <Card
                 variant="secondary"
                 disabled
                 css={{ padding: '$4', margin: '$4' }}
@@ -244,7 +239,7 @@ export const IcaCard = ({
                     </Button>
                   </Row>
                 </CardContent>
-              </Card>
+              </Card> */}
               <Row>
                 {icaAuthzGrants && (
                   <>
@@ -267,23 +262,6 @@ export const IcaCard = ({
                         )}
                       </Button>
                     </Tooltip>
-                    <Button
-                      css={{ marginTop: '$8', margin: '$2' }}
-                      variant="secondary"
-                      size="small"
-                      disabled={
-                        shouldDisableSendHostChainFundsButton ||
-                        (shouldDisableAuthzGrantButton &&
-                          Number(feeFundsHostChain) != 0)
-                      }
-                      onClick={() => handleCreateAuthzGrantClick(true)}
-                    >
-                      {isExecutingAuthzGrant && requestedSendAndAuthzGrant ? (
-                        <Spinner instant />
-                      ) : (
-                        'AuthZ Grant + Send'
-                      )}
-                    </Button>
                   </>
                 )}
               </Row>

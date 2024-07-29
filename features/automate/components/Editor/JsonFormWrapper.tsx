@@ -40,7 +40,7 @@ export const JsonFormWrapper = ({
   const extractedMsgTypeUrl =
     msg.length > 32 && msg.split('.').find((name) => name.includes('Msg'))
   const msgTypeName = (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown'
-  const [validationErrors, setValidationErrors] = useState([""])
+  const [validationErrors, setValidationErrors] = useState([])
   const [schema, setSchema] = useState(
     findFileBySuffix(msgTypeName)
   )
@@ -61,7 +61,7 @@ export const JsonFormWrapper = ({
     setSchema(
       schema
     )
-    setValidationErrors([""])
+    setValidationErrors([])
     setIsJsonValid(errors && errors.length >= 0)
     if (errors) {
       setValidationErrors(errors)
@@ -93,9 +93,10 @@ export const JsonFormWrapper = ({
                   href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
                   rel="noopener noreferrer"
                 >
-                  Ask <b>Cosmonaut GPT</b> to generate a message!
+                  <b>Cosmonaut GPT</b>
                 </a>
-              </Text></Inline>
+              </Text>
+            </Inline>
 
 
 
@@ -164,23 +165,26 @@ export const JsonFormWrapper = ({
 
               <div style={{ margin: '$4', padding: '$4' }}>
                 <Divider offsetY="$6" />
-                <Inline css={{ justifyContent: 'space-between' }}><Button
-                  variant="ghost"
-                  size="large"
-                  onClick={() => setShowJsonForm((show) => !show)}
-                  css={{ columnGap: '$12' }}
-                  iconRight={
-                    <ToggleSwitch
-                      id="advanced-toggle"
-                      name="advanced-mode"
-                      onChange={() => setShowJsonForm((show) => !show)}
-                      checked={!showJsonForm}
-                      optionLabels={['Advanced', 'Editor View']}
-                    />
-                  }
-                >
-                  Advanced mode
-                </Button>
+                <Inline css={{ justifyContent: 'space-between' }}>
+                  <Button
+                    variant="ghost"
+                    size="large"
+                    onClick={() => setShowJsonForm((show) => !show)}
+                    css={{ columnGap: '$12' }}
+                    disabled={validationErrors.length != 0}
+                    iconRight={
+                      <ToggleSwitch
+                        id="advanced-toggle"
+                        name="advanced-mode"
+                        onChange={() => setShowJsonForm((show) => !show)}
+                        checked={!showJsonForm}
+
+                        optionLabels={['Advanced', 'Editor View']}
+                      />
+                    }
+                  >
+                    Advanced mode
+                  </Button>
                   {msg && msg.length > 32 && (
                     <div style={{ display: 'flex', justifyContent: 'end' }}>
                       <Button

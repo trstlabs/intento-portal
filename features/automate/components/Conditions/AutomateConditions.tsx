@@ -34,8 +34,8 @@ export const AutomateConditions = ({
   const [showComparison, setShowComparison] = useState(false)
 
   const handleInputChange = (field: keyof ExecutionConditions, value: any) => {
-    const newConditions = { ...conditions, [field]: value }
-    onChange(newConditions)
+      const newConditions = { ...conditions, [field]: value }
+      onChange(newConditions)
   }
 
   return (
@@ -57,7 +57,7 @@ export const AutomateConditions = ({
           variant="secondary"
           disabled>
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-          <Text css={{ paddingBottom: '$4' }} align="center">
+            <Text css={{ paddingBottom: '$4' }} align="center">
               Conditions
             </Text>
             <Button css={{ marginBottom: '$6' }}

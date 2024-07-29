@@ -21,6 +21,9 @@ export function convertDenomToMicroDenom(
 }
 
 export function convertFromMicroDenom(denom: string) {
+  if (denom?.startsWith('i')) {
+    return denom?.toUpperCase()
+  }
   return denom?.substring(1).toUpperCase()
 }
 

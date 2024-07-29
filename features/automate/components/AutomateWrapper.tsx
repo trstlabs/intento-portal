@@ -29,29 +29,46 @@ export const AutomateWrapper = ({
     reregisterIcaAfterTimeout: true,
   }
   initialActionInput.configuration = initConfig
+  const initConditions = {
+    stopOnSuccessOf: [],
+    stopOnFailureOf: [],
+    skipOnFailureOf: [],
+    skipOnSuccessOf: [],
+    useResponseValue: {
+      actionId: BigInt(0),
+      responseIndex: 0,
+      msgsIndex: 0,
+      responseKey: "",
+      msgKey: "",
+      valueType: "string"
+    },
+    responseComparison: undefined
+
+  }
+  initialActionInput.conditions = initConditions
+
 
   const router = useRouter();
   const { actionInput } = router.query;
-  //data.typeUrls = [""]
+
   //works faster than without array for some reason
-  const [ActionInputs, setActionInputs] = useState([initialActionInput])
+  const [actionInputs, setActionInputs] = useState([initialActionInput])
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
-
   useEffect(
     function setInitialIfProvided() {
       if (initialMessageValue) {
-        ActionInputs[0].msgs[0] = initialMessageValue
-        setActionInputs(ActionInputs)
+        actionInputs[0].msgs[0] = initialMessageValue
+        setActionInputs(actionInputs)
       } else if (initialExampleValue) {
         const exampleIndex = initialExampleValue
-        ActionInputs[0].msgs[0] = JSON.stringify(
+        actionInputs[0].msgs[0] = JSON.stringify(
           generalExamples[exampleIndex],
           null,
           '\t'
         )
-        setActionInputs(ActionInputs)
+        setActionInputs(actionInputs)
       }
     },
     [initialExampleValue, setActionInputs]
@@ -59,7 +76,6 @@ export const AutomateWrapper = ({
 
   useEffect(() => {
     if (actionInput) {
-      //console.log(actionInput)
       const parsedInput = Array.isArray(actionInput) ? actionInput[0] : actionInput;
       setActionInputs([JSON.parse(parsedInput)]);
     }
@@ -68,7 +84,7 @@ export const AutomateWrapper = ({
   return (
     <StyledDivForWrapper>
       <AutomateComponent
-        actionInput={ActionInputs[0]}
+        actionInput={actionInputs[0]}
         onActionChange={(action) => setActionInputs([action])}
       />
     </StyledDivForWrapper>
