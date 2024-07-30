@@ -155,13 +155,13 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link> */}
       {process.env.NEXT_PUBLIC_ACTION_ENABLED == 'true' && (
-        <Link href="/automate" passHref>
+        <Link href="/build" passHref>
           <Button
             as="a"
             variant="menu"
             size="large"
             iconLeft={<GearIcon />}
-            selected={getIsLinkActive('/automate')}
+            selected={getIsLinkActive('/build')}
           >
             <Inline css={{ paddingLeft: '$4' }}>Action Builder </Inline>
           </Button>

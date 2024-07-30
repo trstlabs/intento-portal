@@ -8,7 +8,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeCreateAuthzGrant, GrantResponse } from '../../../services/automate'
+import { executeCreateAuthzGrant, GrantResponse } from '../../../services/build'
 import {
   TransactionStatus,
   transactionStatusState,

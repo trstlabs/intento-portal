@@ -242,7 +242,7 @@ export const SubmitActionDialog = ({
   return (
     <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
       <DialogHeader paddingBottom={canSchedule ? '$4' : '6'}>
-        <Text variant="header">Automate Action</Text>
+        <Text variant="header">Build Action</Text>
       </DialogHeader>
 
       <DialogContent>

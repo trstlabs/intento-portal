@@ -16,7 +16,7 @@ import {
   getFeeGrantAllowance,
   GrantResponse,
   getHostedAccounts,
-} from '../services/automate'
+} from '../services/build'
 
 import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'

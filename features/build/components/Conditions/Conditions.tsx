@@ -13,21 +13,21 @@ import {
 import React, { useState } from 'react'
 import { ExecutionConditions, } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { StepIcon } from '../../../../icons/StepIcon'
-import { FieldArray } from './AutomateFields'
+import { FieldArray } from './Fields'
 import { ResponseComparisonForm } from './ResponseComparisonForm'
 import { UseResponseValueForm } from './UseResponseValueForm'
 
-type AutomateConditionsProps = {
+type ConditionsProps = {
   conditions: ExecutionConditions
   disabled?: boolean
   onChange: (conditions: ExecutionConditions) => void
 }
 
-export const AutomateConditions = ({
+export const Conditions = ({
   conditions,
   disabled,
   onChange,
-}: AutomateConditionsProps) => {
+}: ConditionsProps) => {
 
   const [showStoplights, setShowStoplights] = useState(false)
   const [showFeedbackLoop, setShowFeedbackLoop] = useState(false)

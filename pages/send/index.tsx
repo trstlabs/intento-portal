@@ -38,7 +38,7 @@ export default function Send() {
         />
         <TokenSendModule initialToken={getInitialTokenFromSearchParams()} />
 
-        <a href={`/automate?example=0`} target={'_blank'} rel="noreferrer">
+        <a href={`/build?example=0`} target={'_blank'} rel="noreferrer">
           <Card variant="secondary" css={{ padding: '$8' }}>
             {' '}
             <CardContent size="medium">
@@ -67,7 +67,7 @@ export default function Send() {
                       ))}
                   </Inline>
                   <StyledText css={{ padding: '$8' }} variant="caption">
-                    Automate payment actions from your wallet on another
+                    Build payment actions from your wallet on another
                     chain.
                     <br /> You control the action on Intento using an
                     Interchain Account.

@@ -1,5 +1,5 @@
 import { Text } from "junoblocks"
-import { StyledInput } from "../AutomateComponent"
+import { StyledInput } from "../BuildComponent"
 import { useState } from "react"
 import toast from "react-hot-toast"
 

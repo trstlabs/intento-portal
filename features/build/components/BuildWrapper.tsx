@@ -1,21 +1,21 @@
 import { styled } from 'junoblocks'
 import { useState, useRef, useEffect } from 'react'
-import { AutomateComponent } from './AutomateComponent'
+import { BuildComponent } from './BuildComponent'
 import { generalExamples } from './ExampleMsgs'
 import { ActionInput } from '../../../types/trstTypes'
 import { useRouter } from 'next/router'
 
-type AutomateWrapperProps = {
+type BuildWrapperProps = {
   /* will be used if provided on first render instead of internal state */
   initialExample?: string
   initialMessage?: string
   mode?: string
 }
 
-export const AutomateWrapper = ({
+export const BuildWrapper = ({
   initialExample,
   initialMessage,
-}: AutomateWrapperProps) => {
+}: BuildWrapperProps) => {
   let initialActionInput = new ActionInput()
   initialActionInput.duration = 14 * 86400000
   initialActionInput.interval = 86400000
@@ -83,7 +83,7 @@ export const AutomateWrapper = ({
 
   return (
     <StyledDivForWrapper>
-      <AutomateComponent
+      <BuildComponent
         actionInput={actionInputs[0]}
         onActionChange={(action) => setActionInputs([action])}
       />

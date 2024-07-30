@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeSubmitAction } from '../../../services/automate'
+import { executeSubmitAction } from '../../../services/build'
 import {
   TransactionStatus,
   transactionStatusState,

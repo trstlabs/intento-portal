@@ -35,9 +35,9 @@ import { ActionInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { GearIcon, TransferIcon } from '../../../icons'
 import { SubmitActionDialog } from './SubmitActionDialog'
-import { AutomateConfiguration } from './Conditions/AutomateConfiguration'
+import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
-import { AutomateConditions } from './Conditions/AutomateConditions'
+import { Conditions } from './Conditions/Conditions'
 import { convertDenomToMicroDenom } from '../../../util/conversion'
 import { HostedAccountCard } from './HostedAccountCard'
 
@@ -48,7 +48,7 @@ type ActionsInputProps = {
   onActionChange: (actionInput: ActionInput) => void
 } & HTMLProps<HTMLInputElement>
 
-export const AutomateComponent = ({
+export const BuildComponent = ({
   actionInput,
   onActionChange,
 }: ActionsInputProps) => {
@@ -336,7 +336,7 @@ export const AutomateComponent = ({
       actionInput.msgs[0].length == 0 &&
       JSON.parse(actionInput.msgs[0])['typeUrl'].length < 5)
 
-  const shouldDisableAutomateButton =
+  const shouldDisableBuildButton =
     shouldDisableSubmitButton ||
     isExecutingRegisterICA ||
     (!icaAddress && !chainHasIAModule)
@@ -506,13 +506,13 @@ export const AutomateComponent = ({
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
-      <AutomateConfiguration
+      <Configuration
         config={actionInput.configuration}
         disabled={!icaAddress && !chainHasIAModule}
         onChange={setConfig}
       />
-      <AutomateConditions conditions={actionInput.conditions}
-        disabled={!chainHasIAModule || !actionInput.conditions}
+      <Conditions conditions={actionInput.conditions}
+        disabled={!actionInput.conditions}
         onChange={setConditions}
       />
       <Inline
@@ -536,7 +536,7 @@ export const AutomateComponent = ({
           css={{ margin: '$4', columnGap: '$4' }}
           variant="primary"
           size="large"
-          disabled={shouldDisableAutomateButton}
+          disabled={shouldDisableBuildButton}
           onClick={() =>
             setSubmitActionDialogState({
               isShowing: true,
@@ -544,7 +544,7 @@ export const AutomateComponent = ({
           }
           iconLeft={<GearIcon />}
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Automate Action'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Build Action'}
         </Button>
       </Inline>
     </StyledDivForContainer>

@@ -89,7 +89,7 @@ export const ActionTransformButton = ({ actionInfo }) => {
         let actionInput = await transformActionInfo(actionInfo);
         actionInput = convertBigIntToString(actionInput);
         router.push({
-            pathname: '/automate',
+            pathname: '/build',
             query: { actionInput: JSON.stringify(actionInput) }
         });
     };

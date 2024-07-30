@@ -9,7 +9,7 @@ import {
   Divider,
 } from 'junoblocks'
 import React, { useEffect, useMemo, useState } from 'react'
-import { Row } from './AutomateComponent'
+import { Row } from './BuildComponent'
 import { convertFromMicroDenom } from '../../../util/conversion'
 import { useAuthZGrantsForUser, useGetHostICAAddress } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
@@ -244,7 +244,7 @@ export const HostedAccountCard = ({
                 {icaAuthzGrants && (
                   <>
                     <Tooltip
-                      label="An AuthZ grant allows the Interchain Account that automates your transaction to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"
+                      label="An AuthZ grant allows the Interchain Account to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"
                       aria-label="Fee Funds"
                     >
                       <Button

@@ -49,7 +49,7 @@ export default function Home() {
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="View and manage configurations of automated actions 🌟"
+      subtitle="View and manage action configurations 🌟"
     />
   )
 
@@ -83,7 +83,7 @@ export default function Home() {
         </Column>
       )}
       {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
-        <Tooltip label="Automate messages and workflows, move assets on your behalf">
+        <Tooltip label="Build messages and workflows, move assets on your behalf">
           <span>Actions</span>
         </Tooltip>
       </Text> */}

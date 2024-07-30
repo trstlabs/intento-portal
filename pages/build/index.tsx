@@ -2,7 +2,7 @@ import { AppLayout, PageHeader } from 'components'
 
 import { styled } from 'junoblocks'
 import React from 'react'
-import { AutomateWrapper } from 'features/automate'
+import { BuildWrapper } from '../../features/build'
 
 const StyledContainer = styled('div', {
   //maxWidth: '53.75rem',
@@ -21,15 +21,15 @@ function getInitialMessageFromSearchParams() {
   return message ? (message as string) : undefined
 }
 
-export default function Automate() {
+export default function Build() {
   return (
     <AppLayout>
       <StyledContainer>
         <PageHeader
-          title="Automate"
-          subtitle={`Create actions on any connected chain 🌌. Submit messages for direct execution or automate them with a trigger account. 💫`}
+          title="Build"
+          subtitle={`Create actions on any connected chain 🌌. Submit messages for direct execution or as intents with feedback loops and condition-based logic. 💫`}
         />
-        <AutomateWrapper
+        <BuildWrapper
           initialExample={getInitialExampleFromSearchParams()}
           initialMessage={getInitialMessageFromSearchParams()}
         />

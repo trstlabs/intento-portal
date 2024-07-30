@@ -4,7 +4,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeSendFunds } from '../../../services/automate'
+import { executeSendFunds } from '../../../services/build'
 import {
     TransactionStatus,
     transactionStatusState,

@@ -1,5 +1,5 @@
 import { Card, Text, Tooltip } from "junoblocks"
-import { Field } from "./AutomateFields"
+import { Field } from "./Fields"
 import { ComparisonOperator, ResponseComparison } from "intentojs/dist/codegen/intento/intent/v1beta1/action"
 import ConditionDropdown from "./ConditionDropdown"
 import ComparisonOperatorDropdown from "./ComparisonOperatorDropdown"

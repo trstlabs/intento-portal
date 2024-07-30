@@ -12,8 +12,8 @@ import {
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 
-import { SubmitActionDialog } from '../../automate/components/SubmitActionDialog'
-import { useSubmitAction } from '../../automate/hooks'
+import { SubmitActionDialog } from '../../build/components/SubmitActionDialog'
+import { useSubmitAction } from '../../build/hooks'
 import {
   useGetAPR,
   useGetAPYForWithFees,

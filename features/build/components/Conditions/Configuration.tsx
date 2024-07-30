@@ -12,17 +12,17 @@ import React, { useState } from 'react'
 import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { StepIcon } from '../../../../icons/StepIcon'
 
-type AutomateConfigurationProps = {
+type ConfigurationProps = {
   config: ExecutionConfiguration
   disabled?: boolean
   onChange: (config: ExecutionConfiguration) => void
 }
 
-export const AutomateConfiguration = ({
+export const Configuration = ({
   config,
   disabled,
   onChange,
-}: AutomateConfigurationProps) => {
+}: ConfigurationProps) => {
   const [isConfigItemsShowing, _setConfigItemsShowing] = useState(!disabled)
 
   function saveMsgResponses() {
@@ -205,7 +205,7 @@ export const AutomateConfiguration = ({
               </Button></Tooltip>
 
             {/*       {isConfigItemsShowing && (
-        <AutomateConfigurationDialog
+        <ConfigurationDialog
           activeConfig={selectedConfig.name}
           onSelect={(slct) => handleSelectConfig(slct)}
           css={{ padding: '$2 $4 $2' }}
