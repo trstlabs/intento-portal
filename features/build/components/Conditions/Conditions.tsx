@@ -48,7 +48,7 @@ export const Conditions = ({
           color="tertiary"
           css={{ padding: '0 $15 0 $6' }}
         >
-          Configure execution conditions
+          Set execution conditions
         </Text>
       </Inline>
       {!disabled && (

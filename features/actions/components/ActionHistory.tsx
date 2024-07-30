@@ -176,21 +176,21 @@ export const ActionHistory = ({
                         </Column>
                         {msgResponses.map((msg: any, i) => (
                           <div key={i}>
-                            <Card css={{ padding: '$4', marginTop: '$4' }}>
+                            <Card css={{ padding: '$6', marginTop: '$4' }}>
                               <Column gap={8} align="flex-start" justifyContent="flex-start">
                                 <Text variant="legend" color="secondary" align="left">
                                   Response type
                                 </Text>
-                                <Text variant="body">{msg.typeUrl} </Text>
+                                <Text variant="caption" >{msg.typeUrl} </Text>
                               </Column>
-                              {msg.value != null &&
-                                <Column gap={8} align="flex-start" justifyContent="flex-start">
-                                  <Text variant="legend" color="secondary" align="left">
-                                    Response value
-                                  </Text>
+                              {msg.value.length != 0 &&
+                              <Column gap={8} align="flex-start" justifyContent="flex-start">
+                                <Text variant="legend" color="secondary" align="left">
+                                  Response value 
+                                </Text>
 
-                                  <Text variant="body"> {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), null, 2)}</Text>
-                                </Column>
+                                <Text variant="caption"> {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), null, 2)}</Text>
+                              </Column>
                               }
                             </Card>
 
