@@ -56,6 +56,11 @@ export const useConnectChains = (chains: IBCAssetInfo[]) => {
 export const useChainInfoByChainID = (chainId: string) => {
   //idea: use useChainRegistryList here
   const chainRegistyChain = chains.find((chain) => chain.chain_id == chainId)
+  if (chainRegistyChain == undefined) {
+    return transformChain(
+      chains.find((chain) => chain.chain_name == 'intentozone')
+    )
+  }
   const chain = transformChain(chainRegistyChain)
   return chain
 }
@@ -76,7 +81,11 @@ export const useChainRegistryList = () => {
 
 function transformChain(chain: Chain) {
   // Check for missing logo URIs and other conditions
-  if (!chain.logo_URIs || (!chain.logo_URIs.svg && !chain.logo_URIs.png)) {
+  if (
+    !chain ||
+    !chain.logo_URIs ||
+    (!chain.logo_URIs.svg && !chain.logo_URIs.png)
+  ) {
     return null
   }
   const symbol =

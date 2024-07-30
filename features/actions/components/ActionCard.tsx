@@ -26,21 +26,20 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
     actionInfo.execTime &&
     actionInfo.endTime.getSeconds() >= actionInfo.execTime.getSeconds()
     && actionInfo.endTime.getTime() > Date.now()
-
   return (
     <Link href={`/actions/${actionInfo.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>
         <CardContent size="medium">
           <Column align="center">
-            {ibcInfo && (
+          
               <StyledDivForTokenLogos css={{ paddingTop: '$20' }}>
-                <ImageForTokenLogo
+                {ibcInfo?.logo_uri ? <ImageForTokenLogo
                   size="big"
-                  logoURI={ibcInfo.logo_uri}
+                  logoURI={ibcInfo?.logo_uri}
                   css={{ backgroundColor: 'transparent !important' }}
-                />
+                /> :<text style={{ fontSize: "28px" }}> 🌐 </text>}
               </StyledDivForTokenLogos>
-            )}
+          
             {actionInfo.label ? (
               <StyledText
                 variant="title"
@@ -62,10 +61,14 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
             )}
             {actionInfo.msgs && (
               <Column align="center">
-                {' '}
+
                 <StyledText variant="caption">
+
                   <>
-                    Message Type:{' '}
+                    {actionInfo.hostedConfig.hostedAddress ? <>Hosted</> :
+                      actionInfo.icaConfig.connectionId ? <>Self-Hosted</> : <>Local</>
+                    } {' '}| {' '}
+
                     {
                       actionInfo.msgs[0].typeUrl
                         .split('.')
@@ -101,7 +104,7 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
           </Column>
         </CardContent>
       </Card>
-    </Link>
+    </Link >
   )
 }
 
