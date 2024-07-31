@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import * as yup from 'yup';
 import { styled, Text, Button, PlusIcon, Inline } from 'junoblocks';
 import { ErrorStack } from './Validation';
@@ -63,6 +63,10 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
     const [errors, setErrors] = useState({}); // State for validation errors
 
     const validationSchema = yup.object().shape(createValidationSchema(properties));
+
+    useEffect(() => {
+        setValues(JSON.parse(jsonValue).value || {});
+      }, [jsonValue]);
 
     // Validation function
     const validateValues = async (values) => {
