@@ -24,14 +24,14 @@ export const useConnectIBCWallet = (
 
   const walletInfo = useRecoilValue(walletState).status
 
- 
   let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
   if (fromRegistry) {
     assetInfo = useChainInfoByChainID(chainId)
   }
 
   //const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
-  const chainRegistryName = assetInfo ? assetInfo.registry_name : ''
+  const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
+
   const {
     isWalletConnected,
     getSigningStargateClient,
@@ -39,7 +39,6 @@ export const useConnectIBCWallet = (
     address,
     assets,
   } = useChain(chainRegistryName, true)
-
   const mutation = useMutation(async () => {
     if (!tokenSymbol /* && !storedTokenSymbol */) {
       throw new Error(
@@ -61,7 +60,10 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-      if (chainId == process.env.NEXT_PUBLIC_INTO_CHAINID || walletInfo != WalletStatusType.connected) {
+      if (
+        chainId == process.env.NEXT_PUBLIC_INTO_CHAINID ||
+        walletInfo != WalletStatusType.connected
+      ) {
         return
       }
       if (

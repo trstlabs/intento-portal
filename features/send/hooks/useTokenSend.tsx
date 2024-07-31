@@ -34,7 +34,7 @@ export const useTokenSend = ({
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
 
     return useMutation(
         'sendTokens',

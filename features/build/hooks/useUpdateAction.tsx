@@ -34,7 +34,7 @@ export const useUpdateAction = ({
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
-    const refetchQueries = useRefetchQueries(['tokenBalance'])
+    const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
     return useMutation(
         'updateAction',
         async () => {

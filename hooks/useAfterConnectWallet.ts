@@ -3,6 +3,8 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
+import { useRefetchQueries } from './useRefetchQueries'
+
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
@@ -10,26 +12,29 @@ export const useAfterConnectWallet = (
     useChain('intentozone')
 
   const [{ status, client }, setWalletState] = useRecoilState(walletState)
-
+  const refetchQueries = useRefetchQueries([
+    `tokenBalance/INTO/${address}`,
+    'ibcTokenBalance',
+  ])
   const mutation = useMutation(async () => {
     setWalletState((value) => ({
       ...value,
       state: WalletStatusType.connecting,
     }))
-
+    console.log(username, address)
     try {
-      if (address && !client) {
-        const trstChainClient = await getSigningStargateClient()
+      if (address) {
+        const chainClient = await getSigningStargateClient()
 
-        if (trstChainClient) {
-          //console.log("CLIENT", trstChainClient)
+        if (chainClient) {
           setWalletState({
             key: username,
             address,
-            client: trstChainClient,
+            client: chainClient,
             status: WalletStatusType.connected,
             assets: undefined,
           })
+
         } else {
           // Handle the case where the client could not be obtained
           throw new Error('Failed to obtain the client')
@@ -58,23 +63,28 @@ export const useAfterConnectWallet = (
     [status]
   )
 
-  useEffect(
-    function listenToWalletAddressChangeInKeplr() {
-      function reconnectWallet() {
-        if (status === WalletStatusType.connected) {
-          connect()
-          mutation.mutate(null)
-        }
-      }
+  // useEffect(
+  //   function listenToWalletAddressChangeInKeplr() {
+  //     function reconnectWallet() {
+  //       disconnect()
 
-      window.addEventListener('keplr_keystorechange', reconnectWallet)
-      return () => {
-        window.removeEventListener('keplr_keystorechange', reconnectWallet)
-      }
-    },
-    // eslint-disable-next-line
-    [status]
-  )
+  //       console.log(username, address, status)
+
+  //       connect()
+  //       mutation.mutate(null)
+  //       console.log(username, address, status)
+  //       console.log("REFTC", address)
+  //       refetchQueries()
+  //     }
+
+  //     window.addEventListener('keplr_keystorechange', reconnectWallet)
+  //     return () => {
+  //       window.removeEventListener('keplr_keystorechange', reconnectWallet)
+  //     }
+  //   },
+  //   // eslint-disable-next-line
+  //   [status]
+  // )
 
   return mutation
 }

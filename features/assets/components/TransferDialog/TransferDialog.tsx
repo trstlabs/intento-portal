@@ -50,7 +50,7 @@ export const TransferDialog = ({
   const { balance: nativeAssetBalance } = useTokenBalance(tokenSymbol)
 
   const [tokenAmount, setTokenAmount] = useState(0)
-  const refetchQueries = useRefetchQueries(['tokenBalance', 'ibcTokenBalance'])
+  const refetchQueries = useRefetchQueries([`tokenBalance/INTO`, 'ibcTokenBalance'])
 
   const { isLoading, mutate: mutateTransferAsset } = useTransferAssetMutation({
     transactionKind,

@@ -1,7 +1,7 @@
 [
   {
     "id": "Intento",
-    "name": "Test Chain 1",
+    "name": "intento-test-1",
     "registry_name": "intentozone",
     "symbol": "INTO",
     "chain_id": "intento-test-1",
@@ -13,7 +13,7 @@
   },
   {
     "id": "Cosmos Hub",
-    "name": "Cosmos Hub Test",
+    "name": "Cosmos Hub Local",
     "registry_name": "cosmostest",
     "symbol": "ATOM",
     "chain_id": "GAIA",
@@ -30,19 +30,19 @@
   },
   {
     "id": "Osmosis",
-    "name": "Osmosis Test",
+    "name": "Osmosis Testnet",
     "symbol": "OSMO",
-    "chain_id": "OSMO",
+    "chain_id": "osmo-test-5",
     "registry_name": "osmosistest",
     "denom": "uosmo",
     "decimals": 6,
-    "channel": "channel-1",
-    "channel_to_trst": "channel-0",
+    "channel": "channel-3",
+    "channel_to_trst": "channel-8650",
     "denom_local": "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
     "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
-    "connection_id": "connection-1",
-    "counterparty_connection_id": "connection-0",
+    "connection_id": "connection-4",
+    "counterparty_connection_id": "connection-3376",
     "prefix": "osmo",
-    "rpc": "http://osmo-rpc-t.trustlesshub.com"
+    "rpc": "'https://rpc.osmotest5.osmosis.zone"
   }
 ]

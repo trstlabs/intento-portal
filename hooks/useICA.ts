@@ -34,7 +34,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
-    `interchainAccount/${connectionId}/${address}`,
+    `interchainAccount/${connectionId}`,
     async () => {
       if (connectionId == '') {
         return ''

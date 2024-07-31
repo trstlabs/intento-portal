@@ -96,9 +96,11 @@ export const ActionInfoBreakdown = ({
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
 
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol, chainId,)
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol, chainId)
   const handleSendFundsOnHostClick = () => {
-    connectExternalWallet(null)
+    if (chainId != '') {
+      connectExternalWallet(null)
+    }
     return setRequestedSendFunds(true)
   }
 

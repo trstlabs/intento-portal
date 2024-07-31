@@ -25,7 +25,7 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactNode, useState } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
 
@@ -35,6 +35,7 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
+import { useRefetchQueries } from '../../hooks/useRefetchQueries'
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -48,7 +49,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
 
-  const {
+  let {
     isWalletConnected,
     status: walletStatus,
     connect,
@@ -57,15 +58,23 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     address,
     openView, assets,
   } = useChain('intentozone')
+  const refetchQueries = useRefetchQueries([
+    `tokenBalance/INTO/${address}`,
+    'ibcTokenBalance',
+  ])
 
   const { mutate: afterConnectWallet } = useAfterConnectWallet()
-
+  // Watch for address changes and trigger the mutation
+  useEffect(() => {
+    if (address) {
+     
+      afterConnectWallet(null)
+      refetchQueries()
+    }
+  }, [address])
   const walletStatusesConnected = isWalletConnected && (status === WalletStatusType.connected || status === WalletStatusType.restored)
   const isClientConnected = client != null && client != undefined
-  // const { address: ibcAddress, client: ibcClient } =
-  //   useRecoilValue(ibcWalletState)
 
-  // const { mutate: connectIBCWallet } = useConnectIBCWallet()
 
   function resetWalletConnection() {
     disconnect()
@@ -82,6 +91,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   async function connectWallet() {
     await connect()
     let attempts = 0
+
     while (status !== WalletStatusType.connecting && attempts < 5) {
       console.log(
         walletStatusesConnected,
@@ -96,10 +106,11 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       }
 
       afterConnectWallet(null)
+
       await new Promise((resolve) => setTimeout(resolve, 1000))
+
       attempts++
     }
-
   }
 
   const walletButton = (
@@ -113,18 +124,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       css={{ marginBottom: '$8' }}
     />
   )
-
-  // const ibcWalletButton = (
-  //   <WalletButton
-  //     onClick={openView}
-  //     connected={isWalletConnected && status === WalletStatusType.connected}
-  //     walletName={username}
-  //     address={address}
-  //     onConnect={connectWallet}
-  //     onDisconnect={resetWalletConnection}
-  //     css={{ marginBottom: '$8' }}
-  //   />
-  // )
 
   const { pathname } = useRouter()
   const getIsLinkActive = (path) => pathname === path

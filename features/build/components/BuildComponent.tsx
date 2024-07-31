@@ -84,7 +84,7 @@ export const BuildComponent = ({
   ])
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance/${denom}/${icaAddress}`,
-    `interchainAccount/${actionInput.connectionId}/${icaAddress}`,
+    `interchainAccount/${actionInput.connectionId}`,
   ])
 
   const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
