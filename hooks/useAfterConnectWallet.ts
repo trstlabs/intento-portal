@@ -3,7 +3,6 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
-import { useRefetchQueries } from './useRefetchQueries'
 
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
@@ -11,11 +10,11 @@ export const useAfterConnectWallet = (
   let { connect, getSigningStargateClient, address, username } =
     useChain('intentozone')
 
-  const [{ status, client }, setWalletState] = useRecoilState(walletState)
-  const refetchQueries = useRefetchQueries([
-    `tokenBalance/INTO/${address}`,
-    'ibcTokenBalance',
-  ])
+  const [{ status }, setWalletState] = useRecoilState(walletState)
+  // const refetchQueries = useRefetchQueries([
+  //   `tokenBalance/INTO/${address}`,
+  //   'ibcTokenBalance',
+  // ])
   const mutation = useMutation(async () => {
     setWalletState((value) => ({
       ...value,
@@ -34,7 +33,6 @@ export const useAfterConnectWallet = (
             status: WalletStatusType.connected,
             assets: undefined,
           })
-
         } else {
           // Handle the case where the client could not be obtained
           throw new Error('Failed to obtain the client')
