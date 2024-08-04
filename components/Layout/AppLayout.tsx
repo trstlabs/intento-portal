@@ -1,14 +1,14 @@
 import { media, styled, useControlTheme, useMedia } from 'junoblocks'
-import { APP_MAX_WIDTH, MAIN_PANE_MAX_WIDTH } from 'util/constants'
+import { MAIN_PANE_MAX_WIDTH } from 'util/constants'
 
 import { ExtensionSidebar } from './ExtensionSidebar'
 import { FooterBar } from './FooterBar'
 import { NavigationSidebar } from './NavigationSidebar'
 
-import { useCallback } from 'react'
-import type { Container, Engine } from 'tsparticles-engine'
-import Particles from 'react-particles'
-import { loadFull } from 'tsparticles'
+import { useRef, useEffect, useState } from 'react'
+import type { Container } from '@tsparticles/engine'
+import Particles, { initParticlesEngine } from '@tsparticles/react'
+import { loadSlim } from '@tsparticles/slim'
 import { useRecoilState } from 'recoil'
 import { particleState } from '../../state/atoms/particlesAtoms'
 
@@ -22,36 +22,49 @@ export const AppLayout = ({
   const isMediumScreen = useMedia('md')
   const themeController = useControlTheme()
 
-  ///let isConfetti = useRecoilValue(particleState)
   const [isConfetti, popConfetti] = useRecoilState(particleState)
   if (isConfetti) {
     setTimeout(() => popConfetti(false), 4000)
   }
 
-  const particlesInit = useCallback(async (engine: Engine) => {
-    // you can initialize the tsParticles instance (engine) here, adding custom shapes or presets
-    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-    // starting from v2 you can add only the features you need reducing the bundle size
-    await loadFull(engine)
-  }, [])
+  const [init, setInit] = useState(false);
 
+  // this should be run only once per application lifetime
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
+      // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
+      // starting from v2 you can add only the features you need reducing the bundle size
+      //await loadAll(engine);
+      //await loadFull(engine);
+      await loadSlim(engine);
+      //await loadBasic(engine);
+    }).then(() => {
+      setInit(true);
+    });
+  }, []);
+
+  const particlesLoaded = async (container?: Container): Promise<void> => {
+    console.log(container);
+  };
+
+  const particlesRef = useRef<Container | null>(null)
   const isDarkMode = themeController.theme.name === 'dark'
 
-  const particlesLoaded = useCallback(
-    async (container: Container | undefined) => {
-      await console.log(container)
-    },
-    []
-  )
+  useEffect(() => {
+    if (particlesRef.current) {
+      // Update particles configuration if needed
+      particlesRef.current.refresh()
+    }
+  }, [isDarkMode, isConfetti])
+
   if (isSmallScreen) {
     return (
       <StyledWrapperForMobile>
         <StyledContainerForMobile>
           {navigationSidebar}
-
           <main data-content="">{children}</main>
         </StyledContainerForMobile>
-
         <StyledContainerForMobile>
           <div data-content="">{footerBar}</div>
         </StyledContainerForMobile>
@@ -70,26 +83,15 @@ export const AppLayout = ({
             <StyledChildrenLight>{children}</StyledChildrenLight>
           )}
         </StyledContainer>
-      
         {!isMediumScreen && extensionSidebar}
       </StyledWrapper>
-      {isConfetti ? (
+      {init &&
         <Particles
           id="tsparticles"
-          url={'/confetti.json'}
-          init={particlesInit}
-          loaded={particlesLoaded}
+          particlesLoaded={particlesLoaded}
+          url={isDarkMode ? (isConfetti ? '/confetti.json' : '/stars_bg.json') : (isConfetti ? '/confetti.json' : '')}
         />
-      ) : (
-        isDarkMode && (
-            <Particles
-              id="tsparticles"
-              init={particlesInit}
-              loaded={particlesLoaded}
-              url={'/stars_bg.json'}
-            />
-        )
-      )}
+      }
     </>
   )
 }
@@ -100,15 +102,11 @@ const StyledWrapper = styled('div', {
   justifyContent: 'space-between',
   minHeight: '100vh',
   backgroundColor: '$backgroundColors$base',
-  width: APP_MAX_WIDTH,
-  maxWidth: '100%',
-  margin: '0 auto',
   [media.md]: {
-    gridTemplateColumns: '15rem 1fr',
+    gridTemplateColumns: '25rem 1fr',
   },
 })
 
-// Separate styled components for light and dark themes
 const StyledChildrenLight = styled('div', {
   backgroundColor: 'rgba(255, 255, 255, 0.3) !important',
   position: 'relative',
@@ -135,7 +133,6 @@ const StyledContainer = styled('div', {
   },
   maxWidth: '100%',
   width: MAIN_PANE_MAX_WIDTH,
-  [media.sm]: {},
 })
 
 const StyledWrapperForMobile = styled('div', {

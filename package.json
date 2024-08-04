@@ -23,6 +23,9 @@
     "@next/bundle-analyzer": "^12.1.0",
     "@react-spring/web": "^9.4.2",
     "@stitches/react": "^1.2.6",
+    "@tsparticles/engine": "^3.5.0",
+    "@tsparticles/react": "^3.0.0",
+    "@tsparticles/slim": "^3.5.0",
     "@uiw/react-codemirror": "^4.19.6",
     "ajv": "^8.17.1",
     "ajv-draft-04": "^1.0.0",
@@ -45,12 +48,10 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.2.0",
-    "react-particles": "^2.6.0",
     "react-query": "^3.39.1",
     "react-use": "^17.4.0",
     "recoil": "^0.7.4",
     "sass": "^1.45.0",
-    "tsparticles": "^2.6.0",
     "yup": "^1.4.0"
   },
   "devDependencies": {

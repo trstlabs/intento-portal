@@ -1,5 +1,6 @@
 import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
 import {
+  QueryHostedAccountResponse,
   QueryHostedAccountsResponse,
   QueryInterchainAccountFromAddressResponse,
 } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
@@ -42,9 +43,20 @@ export const getHostedAccounts = async ({ rpcClient }) => {
   } catch (e) {
     if (e.message.includes('account found')) {
       return []
-    }  else {
+    } else {
       console.error('err(getHostedAccounts):', e)
-    } 
+    }
+  }
+}
+
+export const getHostedAccount = async ({ rpcClient, address }) => {
+  try {
+    const response: QueryHostedAccountResponse =
+      await rpcClient.intento.intent.v1beta1.hostedAccount({ address })
+
+    return response
+  } catch (e) {
+    console.error('err(getHostedAccount):', e, address)
   }
 }
 

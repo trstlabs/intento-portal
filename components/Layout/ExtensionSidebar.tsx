@@ -1,6 +1,7 @@
 import { Button, ErrorIcon, styled, Text, UpRightArrowIcon } from 'junoblocks'
 
 import { __TEST_MODE__ } from '../../util/constants'
+import ImageRotator from './ImageRotator'
 
 export const ExtensionSidebar = () => {
   return (
@@ -11,7 +12,7 @@ export const ExtensionSidebar = () => {
       </StyledDivForTitleWrapper>
       <Text css={{ padding: '$9 0 $11' }}>
         {process.env.NEXT_PUBLIC_SITE_TITLE} is currently{' '}
-        {__TEST_MODE__ ? 'operating in localnet mode' : 'in beta'}. 
+        {__TEST_MODE__ ? 'operating in localnet mode' : 'in beta'}.
       </Text>
       <Button
         as="a"
@@ -23,7 +24,8 @@ export const ExtensionSidebar = () => {
       >
         Report an issue
       </Button>
-     <StyledPNGBottom src="/img/cosmonaut.png" />  
+      <ImageRotator />
+
     </StyledDivForWrapper>
   )
 }
@@ -48,15 +50,4 @@ const StyledDivForTitleWrapper = styled('div', {
   display: 'flex',
   alignItems: 'center',
   columnGap: '$4',
-})
-
-const StyledPNGBottom = styled('img', {
-  position: 'absolute',
-  right: 0,
-  bottom: 0,
-  width: '300%',
-  maxWidth: '500px',
-  zIndex: '$1',
-  userSelect: 'none',
-  userDrag: 'none',
 })

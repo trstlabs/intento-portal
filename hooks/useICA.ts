@@ -16,6 +16,7 @@ import {
   getFeeGrantAllowance,
   GrantResponse,
   getHostedAccounts,
+  getHostedAccount,
 } from '../services/build'
 
 import { StargateClient } from '@cosmjs/stargate'
@@ -76,7 +77,7 @@ export const useGetHostedICA = (connectionId: string) => {
         (account) => account.icaConfig.connectionId == connectionId
       )
       // const resp: string = await getICA({
-      //   owner: hostedAcc.hostedAddress,
+      //   owner: hostedAcc.address,
       //   connectionId,
       //   rpcClient,
       // })
@@ -93,8 +94,58 @@ export const useGetHostedICA = (connectionId: string) => {
   return [ica, isLoading] as const
 }
 
+export const useGetHostICAAddressFromHostAddress = (address: string) => {
+  const rpcClient = useIntentoRpcClient()
 
-export const useGetHostICAAddress = (connectionId: string, accAddr?: string) => {
+  const { data: ica, isLoading } = useQuery(
+    `geHostICAAddressFromHostAddress/${address}`,
+    async () => {
+      const resp = await getHostedAccount({ rpcClient, address })
+      let [icaAddress, _] = useGetHostICAAddress(
+        resp.hostedAccount.icaConfig.connectionId
+      )
+      return icaAddress
+    },
+    {
+      enabled: Boolean(
+        rpcClient && !!address && address.length > 40
+      ),
+      refetchOnMount: 'always',
+      // refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: false,
+    }
+  )
+
+  return [ica, isLoading] as const
+}
+
+export const useGetConnectionIDFromHostAddress = (address: string) => {
+  const rpcClient = useIntentoRpcClient()
+
+  const { data: connectionID, isLoading } = useQuery(
+    `geHostICAAddressFromHostAddress/${address}`,
+    async () => {
+      const resp = await getHostedAccount({ rpcClient, address })
+
+      return resp.hostedAccount.icaConfig.connectionId
+    },
+    {
+      enabled: Boolean(
+        rpcClient && !!address && address.length > 40
+      ),
+      refetchOnMount: 'always',
+      // refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchIntervalInBackground: false,
+    }
+  )
+
+  return [connectionID, isLoading] as const
+}
+
+export const useGetHostICAAddress = (
+  connectionId: string,
+  accAddr?: string
+) => {
   const { address } = useRecoilValue(walletState)
 
   if (accAddr === '') {

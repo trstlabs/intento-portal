@@ -12,6 +12,7 @@ import Link from 'next/link'
 
 import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
+import { useGetConnectionIDFromHostAddress } from '../../../hooks/useICA'
 
 
 export declare type actionInfoWithDetails = {
@@ -20,7 +21,9 @@ export declare type actionInfoWithDetails = {
 
 export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
   //const actionInfoAmino = ActionInfo.toAmino(actionInfo)
-  const ibcInfo = useIBCAssetInfoFromConnection(actionInfo.icaConfig.connectionId || '')
+  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(actionInfo.hostedConfig?.hostedAddress)
+  const ibcInfo = useIBCAssetInfoFromConnection(actionInfo.icaConfig.connectionId || hostedConnectionID)
+
   const isActive =
     actionInfo.endTime &&
     actionInfo.execTime &&
@@ -31,15 +34,15 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
       <Card variant="secondary" active={isActive}>
         <CardContent size="medium">
           <Column align="center">
-          
-              <StyledDivForTokenLogos css={{ paddingTop: '$20' }}>
-                {ibcInfo?.logo_uri ? <ImageForTokenLogo
-                  size="big"
-                  logoURI={ibcInfo?.logo_uri}
-                  css={{ backgroundColor: 'transparent !important' }}
-                /> :<text style={{ fontSize: "28px" }}> 🌐 </text>}
-              </StyledDivForTokenLogos>
-          
+
+            <StyledDivForTokenLogos css={{ paddingTop: '$20' }}>
+              {ibcInfo?.logo_uri ? <ImageForTokenLogo
+                size="big"
+                logoURI={ibcInfo?.logo_uri}
+                css={{ backgroundColor: 'transparent !important' }}
+              /> : <text style={{ fontSize: "28px" }}> 🌐 </text>}
+            </StyledDivForTokenLogos>
+
             {actionInfo.label ? (
               <StyledText
                 variant="title"

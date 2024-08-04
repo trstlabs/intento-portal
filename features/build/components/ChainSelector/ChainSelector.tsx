@@ -22,9 +22,15 @@ export const ChainSelector = ({
 }: ChainSelectorProps) => {
   const wrapperRef = useRef()
   const [isChainListShowing, setChainListShowing] = useState(false)
-  const [selectedChain, setSelectedChain] = useState({ logoURI: '', name: '' })
+  // const ibcInfo = useIBCAssetInfoFromConnection(connectionID)
+  const [selectedChain, setSelectedChain] = useState({ logoURI: undefined, name: undefined })
+
+  // useEffect(() => {
+  //   if (ibcInfo && !selectedChain.logoURI) {
 
 
+  //   }
+  // }, [ibcInfo])
 
   const handleSelectChain = (chainInfo: ChainInfo) => {
     setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })
@@ -42,6 +48,8 @@ export const ChainSelector = ({
         <StyledDivForSelector>
           {!isChainListShowing && (
             <ChainSelectorToggle
+              // chainLogoURI={selectedChain.logoURI != undefined ? selectedChain.logoURI : ibcInfo.logo_uri}
+              // chainName={selectedChain.name ? selectedChain.name : ibcInfo.name}
               chainLogoURI={selectedChain.logoURI}
               chainName={selectedChain.name}
               isSelecting={isChainListShowing}

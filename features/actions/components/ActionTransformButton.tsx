@@ -27,7 +27,43 @@ export const ActionTransformButton = ({ actionInfo }) => {
 
 
     const transformActionInfo = async (info: ActionInfo) => {
-        // let msgs: string[] = []
+
+
+        const msgs = await transformActionMsgs(info)
+        console.log(msgs)
+        // Transform ActionInfo to ActionInput
+        const actionInput: ActionInput = {
+            // Your transformation logic here
+            duration: info.endTime.getMilliseconds() - info.startTime.getMilliseconds(),
+            msgs: msgs,
+            conditions: info.conditions,
+            configuration: info.configuration,
+            connectionId: info.icaConfig.connectionId,
+            hostConnectionId: info.icaConfig.hostConnectionId,
+            hostedConfig: info.hostedConfig,
+            label: info.label
+
+        };
+        console.log(actionInput)
+        return actionInput;
+
+    };
+
+    const handleClick = async () => {
+        let actionInput = await transformActionInfo(actionInfo);
+        actionInput = convertBigIntToString(actionInput);
+        router.push({
+            pathname: '/build',
+            query: { actionInput: JSON.stringify(actionInput) }
+        });
+    };
+
+    return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
+};
+
+///temporary solution as typeUrls get lost in retrieving from intentojs/telescope as the objects are unwrapped there with the GlobalRegistry. We cannnot transpile without that setting becasue then we loose the full registry  needed to unwrap/wrap ourselves and  osmosis.gamm.v1beta1.load(registry) is unavailable without the useGlobalDecoderRegistry setting
+async function transformActionMsgs(info) {
+            // let msgs: string[] = []
         // info.msgs.forEach((msgAny: any, index) => {
         //     // console.log(msgAny.valueDecoded)
         //     // let msgObj = GlobalDecoderRegistry.unwrapAny(msgAny);
@@ -64,41 +100,6 @@ export const ActionTransformButton = ({ actionInfo }) => {
         //     msgs[index] = msg
         //     console.log(msgs)
         // });
-
-        const msgs = await transformActionMsgs(info)
-        console.log(msgs)
-        // Transform ActionInfo to ActionInput
-        const actionInput: ActionInput = {
-            // Your transformation logic here
-            duration: info.endTime.getMilliseconds() - info.startTime.getMilliseconds(),
-            msgs: msgs,
-            conditions: info.conditions,
-            configuration: info.configuration,
-            connectionId: info.icaConfig.connectionId,
-            hostConnectionId: info.icaConfig.hostConnectionId,
-            hostedConfig: info.hostedConfig,
-            label: info.label
-
-        };
-        console.log(actionInput)
-        return actionInput;
-
-    };
-
-    const handleClick = async () => {
-        let actionInput = await transformActionInfo(actionInfo);
-        actionInput = convertBigIntToString(actionInput);
-        router.push({
-            pathname: '/build',
-            query: { actionInput: JSON.stringify(actionInput) }
-        });
-    };
-
-    return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
-};
-
-///temporary solution as typeUrls get lost in retrieving from intentojs/telescope as the objects are unwrapped there with the GlobalRegistry. We cannnot transpile without that setting becasue then we loose the full registry  needed to unwrap/wrap ourselves and  osmosis.gamm.v1beta1.load(registry) is unavailable without the useGlobalDecoderRegistry setting
-async function transformActionMsgs(info) {
     let msgs: string[] = []
     if (info.msgs[0].typeUrl === '/cosmos.authz.v1beta1.MsgExec') {
         const msgsObj = await fetchActionMsgs(info.id.toString());
