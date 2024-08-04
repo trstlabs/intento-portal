@@ -50,7 +50,7 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                {actionInfo.label}{' '}
+                {/*      {actionInfo.label}{' '} */} {actionInfo.label.length < 35 ? actionInfo.label : actionInfo.label.substring(0, 32) + '...'}
               </StyledText>
             ) : (
               <StyledText
