@@ -48,15 +48,15 @@ export const AppLayout = ({
     console.log(container);
   };
 
-  const particlesRef = useRef<Container | null>(null)
+ /// const particlesRef = useRef<Container | null>(null)
   const isDarkMode = themeController.theme.name === 'dark'
 
-  useEffect(() => {
-    if (particlesRef.current) {
-      // Update particles configuration if needed
-      particlesRef.current.refresh()
-    }
-  }, [isDarkMode, isConfetti])
+  // useEffect(() => {
+  //   if (particlesRef.current) {
+  //     // Update particles configuration if needed
+  //     particlesRef.current.refresh()
+  //   }
+  // }, [isDarkMode, isConfetti])
 
   if (isSmallScreen) {
     return (

@@ -23,8 +23,8 @@
     "channel_to_trst": "channel-0",
     "denom_local": "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
     "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
-    "connection_id": "connection-0",
-    "counterparty_connection_id": "connection-1",
+    "connection_id": "connection-1",
+    "counterparty_connection_id": "connection-0",
     "prefix": "cosmos",
     "rpc": "http://gaia-rpc-t.trustlesshub.com"
   },

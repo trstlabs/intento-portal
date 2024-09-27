@@ -15,7 +15,7 @@ import {
   TransactionStatus,
   transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
@@ -27,7 +27,7 @@ type UseSubmitTxArgs = {
 }
 
 export const useSubmitTx = ({ actionInput }: UseSubmitTxArgs) => {
-  const { address, client, status } = useRecoilValue(ibcWalletState)
+  const { address, client, status } = useRecoilValue(walletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
   const [_, popConfetti] = useRecoilState(particleState)
@@ -37,8 +37,13 @@ export const useSubmitTx = ({ actionInput }: UseSubmitTxArgs) => {
   return useMutation(
     'submitAction',
     async () => {
+      const error = "Could not submit action: "
       if (status !== WalletStatusType.connected) {
-        throw new Error('Wallet not connected. Please try reconnecting your wallet.')
+        throw new Error(error + 'Wallet not connected. Please try reconnecting your wallet.')
+      }
+      if (actionInput.msgs.length == 0) {
+        throw new Error(error + "no messages")
+
       }
 
       console.log(actionInput)
