@@ -236,6 +236,7 @@ export const BuildComponent = ({
     name: string,
     chainSymbol: string
   ) {
+    alert(denom + newDenom)
     let updatedActionInput = actionInput
     updatedActionInput.connectionId = connectionId
     updatedActionInput.hostConnectionId = hostConnectionId
@@ -245,10 +246,11 @@ export const BuildComponent = ({
           prefix + '1...',
           newPrefix + '1...'
         )
-        updatedActionInput.msgs[editIndex] = updatedActionInput.msgs[
-          editIndex
-        ].replaceAll(denom, newDenom)
+
       }
+      updatedActionInput.msgs[editIndex] = updatedActionInput.msgs[
+        editIndex
+      ].replaceAll(denom, newDenom)
     })
 
     onActionChange(updatedActionInput)
@@ -278,8 +280,9 @@ export const BuildComponent = ({
   function setExample(index: number, msgObject: any) {
     try {
       const msg = JSON.stringify(msgObject, null, '\t')
-      let newMsg = msg.replaceAll('into', prefix)
-      newMsg = newMsg.replaceAll('uinto', denom)
+      let newMsg = msg.replaceAll('uinto', denom)
+       newMsg = newMsg.replaceAll('into', prefix)
+      
       let updatedActionInput = actionInput
       updatedActionInput.msgs[index] = newMsg
       //updatedActionInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")

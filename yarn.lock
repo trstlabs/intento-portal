@@ -6158,10 +6158,10 @@ inline-style-prefixer@^7.0.0:
     css-in-js-utils "^3.1.0"
     fast-loops "^1.1.3"
 
-intentojs@^0.8.0-alpha.2:
-  version "0.8.0-alpha.3"
-  resolved "https://registry.npmjs.org/intentojs/-/intentojs-0.8.0-alpha.3.tgz"
-  integrity sha512-q/lDXyTYcHga+0OrrXeu1Ab+XOG1Y1ZmrvrI5Fp6WIqbFnrc3qT9Zk8ZgtOF3SVD8eLqyFn04GyNgiWwGuSP1w==
+intentojs@^0.8.0-alpha.8:
+  version "0.8.0-alpha.8"
+  resolved "https://registry.npmjs.org/intentojs/-/intentojs-0.8.0-alpha.8.tgz"
+  integrity sha512-spim4anWy//dF6jmMleDpudLhdibhIHidZ2w1R/UEu9fYhQqjK6P7Htquzi6NH3iEnk/sEE9E2mc/wIrmAA+Tw==
   dependencies:
     "@cosmjs/amino" "^0.32.0"
     "@cosmjs/proto-signing" "^0.32.0"

@@ -1,6 +1,6 @@
-import { Text } from "junoblocks"
+import { Text, Tooltip } from "junoblocks"
 import { StyledInput } from "../BuildComponent"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import toast from "react-hot-toast"
 
 
@@ -59,10 +59,11 @@ type FieldProps = {
   label: string
   value: string | number
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  tooltip?: string
   disabled?: boolean
   type?: string
 }
-export const Field = ({ label, value, onChange, disabled, type = 'text' }: FieldProps) => {
+export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text' }: FieldProps) => {
   const [error, setError] = useState<string | null>(null)
 
   // Function to validate and convert input value
@@ -105,20 +106,48 @@ export const Field = ({ label, value, onChange, disabled, type = 'text' }: Field
       setError('Invalid input: Please enter a valid input value')
     }
   }
+  const [inputWidth, setInputWidth] = useState('auto'); // Set initial width to auto
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (inputRef.current) {
+      // Get the scrollWidth of the input to set its width dynamically
+      const currentWidth = inputRef.current.scrollWidth;
+      setInputWidth(`${currentWidth}px`); // Set the width based on content
+    }
+  }, [value]); // Update width whenever the value changes
+
   return (
     <div>
-      <Text css={{ padding: '$2', margin: '$2', }} variant="caption" color="secondary" align="left">{label}</Text>
+      {tooltip ? (
+        <Tooltip placement="left" label={tooltip}>
+          <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">
+            {label}
+          </Text>
+        </Tooltip>
+      ) : (
+        <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">
+          {label}
+        </Text>
+      )}
       <Text variant="body">
         <StyledInput
+          ref={inputRef} // Attach ref to StyledInput
           type={type}
           value={value}
           onChange={handleChange}
           disabled={disabled}
-          style={{ width: '15%', border: '1px ridge #ccc', borderRadius: '8px', }}
+          style={{
+            width: inputWidth, // Set dynamic width
+            minWidth: '15%', // Minimum width
+            maxWidth: '100%', // Maximum width
+            border: '1px ridge #ccc',
+            borderRadius: '8px',
+            transition: 'width 0.2s ease', // Optional: smooth transition for width changes
+          }}
         />
         {error && <Text variant="caption" css={{ marginTop: '2px', color: 'red' }}>{error}</Text>}
       </Text>
-    </div >
-  )
-}
-
+    </div>
+  );
+};

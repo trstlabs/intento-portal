@@ -90,34 +90,45 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             const newValues = { ...prevValues };
             let current = newValues;
             const keys = key.split('.');
-
+    
             for (let i = 0; i < keys.length - 1; i++) {
                 const k = keys[i];
-                if (!current[k]) current[k] = isNaN(keys[i + 1]) ? {} : [];
-                current = current[k];
+                // Handle array index (e.g., amount[0])
+                if (k.includes('[')) {
+                    const [arrKey, index] = k.split('[');
+                    const arrIndex = parseInt(index.replace(']', ''), 10);
+                    
+                    if (!Array.isArray(current[arrKey])) {
+                        current[arrKey] = [];
+                    }
+    
+                    // Clone the array and object at the specific index
+                    current[arrKey] = [...current[arrKey]];
+                    if (!current[arrKey][arrIndex]) {
+                        current[arrKey][arrIndex] = {}; // Ensure the object exists at the index
+                    }
+                    current = current[arrKey][arrIndex]; // Move to the next level
+                } else {
+                    if (!current[k]) current[k] = isNaN(keys[i + 1]) ? {} : [];
+                    current = current[k];
+                }
             }
-
+    
             const lastKey = keys[keys.length - 1];
-            if (lastKey.includes('[')) {
-                const [arrKey, index] = lastKey.split('[');
-                const arrIndex = parseInt(index.replace(']', ''), 10);
-                if (!current[arrKey]) current[arrKey] = [];
-                current[arrKey][arrIndex] = value;
-            } else {
-                current[lastKey] = value;
-            }
-
+            current[lastKey] = value; // Assign the value at the last key
+    
             // Trigger validation after updating the values
             validateValues(newValues);
-
+    
             // Trigger onChange callback with updated values
             const updatedJSON = { ...JSON.parse(jsonValue), value: newValues };
             onChange?.(JSON.stringify(updatedJSON, null, 2));
-
+    
             return newValues;
         });
     }, [jsonValue, onChange, validateValues]);
-
+    
+    
 
     const handleNewFieldKeyChange = useCallback((path, value) => {
         setNewFieldKeys((prevKeys) => ({

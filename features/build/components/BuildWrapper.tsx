@@ -4,6 +4,7 @@ import { BuildComponent } from './BuildComponent'
 import { generalExamples } from './ExampleMsgs'
 import { ActionInput } from '../../../types/trstTypes'
 import { useRouter } from 'next/router'
+// import { ICQConfig } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
 type BuildWrapperProps = {
   /* will be used if provided on first render instead of internal state */
@@ -34,16 +35,27 @@ export const BuildWrapper = ({
     stopOnFailureOf: [],
     skipOnFailureOf: [],
     skipOnSuccessOf: [],
-    useResponseValue: {
-      actionId: BigInt(0),
-      responseIndex: 0,
-      msgsIndex: 0,
-      responseKey: "",
-      msgKey: "",
-      valueType: "string"
-    },
-    responseComparison: undefined
-
+    useResponseValue: undefined,
+    responseComparison: undefined,
+    ICQConfig: undefined
+    // useResponseValue: {
+    //   actionId: BigInt(0),
+    //   responseIndex: 0,
+    //   msgsIndex: 0,
+    //   responseKey: "",
+    //   msgKey: "",
+    //   valueType: "",
+    //   fromIcq: false,
+    // },
+    // responseComparison: {
+    //   actionId: BigInt(0),
+    //   responseIndex: 0,
+    //   responseKey: "",
+    //   valueType: "string",
+    //   fromIcq: false,
+    //   comparisonOperator: -1,
+    //   comparisonOperand: ""
+    // }
   }
   initialActionInput.conditions = initConditions
 

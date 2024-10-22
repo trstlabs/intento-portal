@@ -160,7 +160,7 @@ export const osmoExamples = [
     value: {
       sender: 'into1....',
       routes: [{
-        poolId: "1", tokenOutDenom: "ucosm"
+        poolId: "1", tokenOutDenom: "uinto"
       }],
       tokenIn: { denom: "uosmo", amount: "1000000" },
       tokenOutMinAmount: '2000000',
@@ -171,7 +171,7 @@ export const osmoExamples = [
     value: {
       sender: 'into1....',
       tokenInMaxAmount: '1000000',
-      tokenOut: { denom: "uosmo", amount: "1000000" },
+      tokenOut: { denom: "uinto", amount: "1000000" },
     },
   },
   {
@@ -188,7 +188,7 @@ export const osmoExamples = [
       sender: 'into1....',
       poolId: 'into1...',
       shareInAmount: '1000000',
-      tokenOutMins: [{ denom: "uosmo", amount: "1000000" }],
+      tokenOutMins: [{ denom: "uinto", amount: "1000000" }],
     },
   },
 ]

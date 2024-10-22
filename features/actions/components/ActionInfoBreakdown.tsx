@@ -40,6 +40,7 @@ import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { ActionHistory } from './ActionHistory'
 import ActionTransformButton from './ActionTransformButton'
+import { ComparisonOperatorLabels } from '../../build/components/Conditions/ResponseComparisonForm'
 
 
 type ActionInfoBreakdownProps = {
@@ -683,7 +684,7 @@ export const ActionInfoBreakdown = ({
 
               <>
                 {actionInfo.conditions.responseComparison.actionId.toString() != "0" && (<Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.responseComparison.actionId}
+                  <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.responseComparison.actionId.toString()}
                 </Text>)}
                 <Text variant="body">
                   <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.responseComparison.responseIndex}
@@ -695,7 +696,7 @@ export const ActionInfoBreakdown = ({
                   <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {actionInfo.conditions.responseComparison.comparisonOperand}
                 </Text>
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {actionInfo.conditions.responseComparison.comparisonOperator}
+                  <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {ComparisonOperatorLabels[actionInfo.conditions.responseComparison.comparisonOperator]}
                 </Text>
                 <Text variant="body">
                   <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.responseComparison.valueType}
@@ -719,7 +720,7 @@ export const ActionInfoBreakdown = ({
 
             <>
               {actionInfo.conditions.useResponseValue.actionId.toString() != "0" && (<Text variant="body">
-                <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.useResponseValue.actionId}
+                <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.useResponseValue.actionId.toString()}
               </Text>)}
               <Text variant="body">
                 <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.useResponseValue.responseIndex}

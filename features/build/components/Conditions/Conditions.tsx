@@ -16,6 +16,7 @@ import { StepIcon } from '../../../../icons/StepIcon'
 import { FieldArray } from './Fields'
 import { ResponseComparisonForm } from './ResponseComparisonForm'
 import { UseResponseValueForm } from './UseResponseValueForm'
+import { ICQConfigForm } from './ICQConfigForm'
 
 type ConditionsProps = {
   conditions: ExecutionConditions
@@ -31,11 +32,12 @@ export const Conditions = ({
 
   const [showStoplights, setShowStoplights] = useState(false)
   const [showFeedbackLoop, setShowFeedbackLoop] = useState(false)
+  const [showICQConfig, setShowICQConfig] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
 
   const handleInputChange = (field: keyof ExecutionConditions, value: any) => {
-      const newConditions = { ...conditions, [field]: value }
-      onChange(newConditions)
+    const newConditions = { ...conditions, [field]: value }
+    onChange(newConditions)
   }
 
   return (
@@ -77,9 +79,10 @@ export const Conditions = ({
               <UseResponseValueForm
                 useResponseValue={conditions.useResponseValue}
                 onChange={(value) => handleInputChange('useResponseValue', value)}
-                disabled={disabled}
+                setDisabled={() => setShowFeedbackLoop(!showFeedbackLoop)}
               />
             }
+
             <Button css={{ marginBottom: '$6' }}
               onClick={() => setShowComparison(!showComparison)}
               variant="ghost"
@@ -95,7 +98,29 @@ export const Conditions = ({
               <ResponseComparisonForm
                 responseComparison={conditions.responseComparison}
                 onChange={(value) => handleInputChange('responseComparison', value)}
-                disabled={disabled}
+                setDisabled={() => setShowComparison(!showComparison)}
+              />
+            }
+            <Button css={{ marginBottom: '$6' }}
+              onClick={() => setShowICQConfig(!showICQConfig)}
+              variant="ghost"
+              
+              iconRight={
+                <IconWrapper
+                  size="medium"
+                  rotation="-90deg"
+                  color="tertiary"
+                  icon={showICQConfig ? <ChevronIcon rotation="-90deg" /> : <Chevron />}
+                />}>
+              Interchain Query
+            
+            </Button>
+
+            {showICQConfig &&
+              <ICQConfigForm
+                icqConfig={conditions.icqConfig}
+                onChange={(value) => handleInputChange('icqConfig', value)}
+                setDisabled={() => setShowICQConfig(!showICQConfig)}
               />
             }
             <Button css={{ marginBottom: '$6' }}
@@ -115,9 +140,10 @@ export const Conditions = ({
                 variant="secondary"
                 disabled
                 css={{ padding: '$6', margin: '$2' }}
-              >  <Tooltip
-                label={
-                  "Depend execution on result of other intent-based actions"}>
+              >
+                <Tooltip
+                  label={
+                    "Depend execution on result of other actions"}>
                   <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Stoplights🚦 </Text>
                 </Tooltip>
                 {/* <Text variant="body"> Depend execution on result of other intent-based actions</Text> */}
@@ -126,25 +152,25 @@ export const Conditions = ({
                   label="Stop On Success Of "
                   values={conditions.stopOnSuccessOf}
                   onChange={(value) => handleInputChange('stopOnSuccessOf', value)}
-                  disabled={disabled}
+                  disabled={false}
                 />
                 <FieldArray
                   label="Stop On Failure Of "
                   values={conditions.stopOnFailureOf}
                   onChange={(value) => handleInputChange('stopOnFailureOf', value)}
-                  disabled={disabled}
+                  disabled={false}
                 />
                 <FieldArray
                   label="Skip On Failure Of "
                   values={conditions.skipOnFailureOf}
                   onChange={(value) => handleInputChange('skipOnFailureOf', value)}
-                  disabled={disabled}
+                  disabled={false}
                 />
                 <FieldArray
                   label="Skip On Success Of "
                   values={conditions.skipOnSuccessOf}
                   onChange={(value) => handleInputChange('skipOnSuccessOf', value)}
-                  disabled={disabled}
+                  disabled={false}
                 /></Card>
             </>
             }
