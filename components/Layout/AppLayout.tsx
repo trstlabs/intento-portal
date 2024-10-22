@@ -5,7 +5,7 @@ import { ExtensionSidebar } from './ExtensionSidebar'
 import { FooterBar } from './FooterBar'
 import { NavigationSidebar } from './NavigationSidebar'
 
-import { useRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { Container } from '@tsparticles/engine'
 import Particles, { initParticlesEngine } from '@tsparticles/react'
 import { loadSlim } from '@tsparticles/slim'
