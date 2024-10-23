@@ -231,14 +231,14 @@ export const SubmitActionDialog = ({
     }
     console.log({ startTime, duration, interval })
     handleSubmitAction({
+      ...actionInput, // Spread first
       startTime,
       duration,
       interval,
       icaAddressForAuthZ,
       feeFunds,
       label: txLabel,
-      ...actionInput
-    })
+    });
   }
   return (
     <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
