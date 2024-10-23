@@ -236,7 +236,7 @@ export const BuildComponent = ({
     name: string,
     chainSymbol: string
   ) {
-    alert(denom + newDenom)
+   // alert(denom + newDenom)
     let updatedActionInput = actionInput
     updatedActionInput.connectionId = connectionId
     updatedActionInput.hostConnectionId = hostConnectionId

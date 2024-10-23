@@ -113,7 +113,7 @@ export const ResponseComparisonForm = ({ responseComparison, onChange, setDisabl
             id="reregisterIcaAfterTimeout"
             name="reregisterIcaAfterTimeout"
             onChange={() => handleFieldChange('fromIcq', !responseComparison.fromIcq)}
-            checked={responseComparison.fromIcq}
+            checked={responseComparison?.fromIcq || false}
             optionLabels={['no icq', 'icq']}
           />
         }

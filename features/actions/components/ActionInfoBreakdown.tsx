@@ -41,6 +41,7 @@ import { Any } from 'cosmjs-types/google/protobuf/any'
 import { ActionHistory } from './ActionHistory'
 import ActionTransformButton from './ActionTransformButton'
 import { ComparisonOperatorLabels } from '../../build/components/Conditions/ResponseComparisonForm'
+import { TimeoutPolicy } from 'intentojs/dist/codegen/intento/interchainquery/v1/genesis'
 
 
 type ActionInfoBreakdownProps = {
@@ -742,7 +743,45 @@ export const ActionInfoBreakdown = ({
 
           </Row>
         )}
+        {actionInfo.conditions.icqConfig && (<Row>
+          <Column gap={8} align="flex-start" justifyContent="flex-start">
 
+            <>
+              <Tooltip
+                label={
+                  "Perform an interchain query for conditions"
+                }
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Interchain Query
+                </Text>
+              </Tooltip>
+
+              <>
+
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Chain ID</Text>    {actionInfo.conditions.icqConfig.chainId}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Connection ID</Text>      {actionInfo.conditions.icqConfig.connectionId}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Query Type</Text>  {actionInfo.conditions.icqConfig.queryType}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Query Key</Text>  {actionInfo.conditions.icqConfig.queryKey}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(actionInfo.conditions.icqConfig.timeoutDuration.seconds))}
+                </Text>
+                <Text variant="body">
+                  <Text variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[actionInfo.conditions.icqConfig.timeoutPolicy]}
+                </Text>
+              </>
+            </>
+
+          </Column>
+        </Row>)}
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {actionInfo.conditions.skipOnFailureOf.length != 0 && (
             <Row>

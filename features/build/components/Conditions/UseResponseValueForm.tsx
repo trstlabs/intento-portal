@@ -109,7 +109,7 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, setDisabled }
             id="reregisterIcaAfterTimeout"
             name="reregisterIcaAfterTimeout"
             onChange={() => handleFieldChange('fromIcq', !useResponseValue.fromIcq)}
-            checked={useResponseValue.fromIcq}
+            checked={useResponseValue?.fromIcq || false}
             optionLabels={['no icq', 'icq']}
           />
         }
