@@ -5,7 +5,6 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 const withBundleJunoblocks = require('next-bundle-junoblocks');
 
 const config = {
-  output: 'export',
   reactStrictMode: true,
   images: {
     loader: 'cloudinary',
