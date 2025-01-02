@@ -25,9 +25,9 @@ export const Configuration = ({
 }: ConfigurationProps) => {
   const [isConfigItemsShowing, _setConfigItemsShowing] = useState(!disabled)
 
-  function saveMsgResponses() {
+  function saveResponses() {
     let newConfig = config
-    newConfig.saveMsgResponses = !config.saveMsgResponses
+    newConfig.saveResponses = !config.saveResponses
     onChange(newConfig)
   }
 
@@ -86,13 +86,13 @@ export const Configuration = ({
               variant="ghost"
               size="large"
               css={{ columnGap: '$4', margin: '$2' }}
-              onClick={() => saveMsgResponses()}
+              onClick={() => saveResponses()}
               iconLeft={
                 <ToggleSwitch
                   id="saveresp"
                   name="msgsresp"
-                  onChange={() => saveMsgResponses()}
-                  checked={config.saveMsgResponses}
+                  onChange={() => saveResponses()}
+                  checked={config.saveResponses}
                   optionLabels={['Save money', 'Save Responses']}
                 />
               }

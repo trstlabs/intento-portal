@@ -22,7 +22,7 @@ export const BuildWrapper = ({
   initialActionInput.interval = 86400000
   initialActionInput.msgs = [/* JSON.stringify(generalExamples[0], null, 2) */]
   const initConfig = {
-    saveMsgResponses: true,
+    saveResponses: true,
     updatingDisabled: false,
     stopOnFailure: false,
     stopOnSuccess: false,

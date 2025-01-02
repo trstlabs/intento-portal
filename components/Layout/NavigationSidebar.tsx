@@ -67,7 +67,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   // Watch for address changes and trigger the mutation
   useEffect(() => {
     if (address) {
-     
+
       afterConnectWallet(null)
       refetchQueries()
     }
@@ -166,6 +166,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Button>
         </Link>
       )}
+
       <Link href="/send" passHref>
         <Button
           as="a"
@@ -216,7 +217,19 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Link>
         </>
       )}
-
+      {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' && (
+        <Link href="/claim" passHref>
+          <Button
+            as="a"
+            variant="menu"
+            size="large"
+            iconLeft={<PoolsIcon />}
+            selected={getIsLinkActive('/claim')}
+          >
+            <Inline css={{ paddingLeft: '$4' }}> Airdrop </Inline>
+          </Button>
+        </Link>
+      )}
       {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"

@@ -608,7 +608,7 @@ export const ActionInfoBreakdown = ({
                 </Tooltip>
 
                 <Text variant="body">
-                  {actionInfo.configuration.saveMsgResponses ? 'True' : 'False'}
+                  {actionInfo.configuration.saveResponses ? 'True' : 'False'}
                 </Text>
               </>
               <>

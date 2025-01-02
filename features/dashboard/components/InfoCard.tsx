@@ -170,17 +170,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                         </Text>
                       </>
                     )}
-                    {!isLoading && balance > 0 && (
-                      <>
-                        <Text variant="legend">Local Balance </Text>
-                        <Text css={{ padding: '$8' }} variant="title">
-                          {formatTokenBalance(balance, {
-                            includeCommaSeparation: true,
-                          })}{' '}
-                          INTO{' '}
-                        </Text>
-                      </>
-                    )}
+                    
                     {!isLoading && balance > 0 && (
                       <Text variant="legend">
                         {' '}

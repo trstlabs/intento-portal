@@ -72,7 +72,7 @@ export const executeSubmitAction = async ({
       configuration: actionInput.configuration
         ? actionInput.configuration
         : {
-            saveMsgResponses: false,
+            saveResponses: false,
             updatingDisabled: false,
             stopOnSuccess: false,
             stopOnFailure: false,

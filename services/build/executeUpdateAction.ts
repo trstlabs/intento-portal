@@ -27,7 +27,7 @@ export const executeUpdateAction = async ({
       configuration: actionParams.configuration
         ? actionParams.configuration
         : {
-            saveMsgResponses: false,
+            saveResponses: false,
             updatingDisabled: false,
             stopOnSuccess: false,
             stopOnFailure: false,
