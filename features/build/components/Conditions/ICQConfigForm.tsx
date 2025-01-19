@@ -1,4 +1,4 @@
-import { Card, Text, Tooltip, Button, UnionIcon } from "junoblocks";
+import { Text, Tooltip, Button, UnionIcon, Divider } from "junoblocks";
 import { Field } from "./Fields";
 import { ICQConfig } from "intentojs/dist/codegen/intento/intent/v1beta1/action";
 import Dropdown from "./Dropdown";
@@ -8,6 +8,7 @@ import { useState } from "react";
 import * as bech32 from "bech32";
 import { Duration } from "intentojs/dist/codegen/google/protobuf/duration";
 import { Chip } from "../../../../components/Layout/Chip";
+
 
 type ICQConfigProps = {
   icqConfig?: ICQConfig;
@@ -179,10 +180,11 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
   };
 
   return (
-    <Card variant="secondary" disabled css={{ padding: "$6", margin: "$2" }}>
+    <>
+      <Divider offsetTop="$10" offsetBottom="$5"  />
       <Tooltip label={"Perform an interchain query for conditions"}>
-        <Text variant="header" color="secondary" align="center" css={{ marginBottom: "$12", marginTop: "$12" }}>
-          Interchain Query 🌐 🔍
+        <Text variant="header" color="secondary" align="center" css={{ marginBottom: "$5", marginTop: "$12" }}>
+          Interchain Query 🔍
         </Text>
       </Tooltip>
       <div style={{ display: 'flex', justifyContent: 'end' }}>
@@ -259,7 +261,7 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
         disabled={false}
         options={TimeoutPolicyLabels}
       />
-    </Card>
+    </>
   );
 };
 

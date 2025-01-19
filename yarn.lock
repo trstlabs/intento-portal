@@ -6630,10 +6630,10 @@ inline-style-prefixer@^7.0.0:
     css-in-js-utils "^3.1.0"
     fast-loops "^1.1.3"
 
-intentojs@0.8.1-alpha.2:
-  version "0.8.1-alpha.2"
-  resolved "https://registry.yarnpkg.com/intentojs/-/intentojs-0.8.1-alpha.2.tgz#3d3408566af495b9164afc6c92ab9c72b8db1f18"
-  integrity sha512-qyVZFeHJjuySbM1mm7JIKrpTzTXRx4EnTEbIzQAUWXoNKRzM4mC9jurNXJPDPocOaxHFuuvbHcggHU26mpYNiw==
+intentojs@0.8.1-alpha.4:
+  version "0.8.1-alpha.4"
+  resolved "https://registry.yarnpkg.com/intentojs/-/intentojs-0.8.1-alpha.4.tgz#c27ff544a80fc680e6819f1807ccb246edbc1a33"
+  integrity sha512-oZk0j0ZwVZ0UZ2J9zdgeNNLPVKvhi0nigi4kCfhRWeajBexKNYt9S2dMYke00MCI6SZ8+wDDFaw9ptotNUJjSQ==
   dependencies:
     "@cosmjs/amino" "^0.32.0"
     "@cosmjs/proto-signing" "^0.32.0"

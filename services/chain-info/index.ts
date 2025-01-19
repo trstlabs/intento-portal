@@ -374,10 +374,14 @@ async function getStakeProvisionPercent(client: any) {
   try {
     const resp: QueryAllocParamsResponse =
       await client.intento.alloc.v1beta1.params({})
-
-    const stakeProvision = resp.params.distributionProportions.staking
+    console.log(resp.params.distributionProportions)
+    const stakeProvision =
+      1 -
+      Number(resp.params.distributionProportions.communityPool) -
+      Number(resp.params.distributionProportions.developerRewards) -
+      Number(resp.params.distributionProportions.relayerIncentives)
     console.log('stakeProvision', Number(stakeProvision))
-    //   const communityTax = parseFloat(distribution.params.community_tax)
+
     return Number(stakeProvision)
   } catch (e) {
     console.error('err(getStakeProvisionPercent):', e)

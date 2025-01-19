@@ -40,7 +40,7 @@ import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { ActionHistory } from './ActionHistory'
 import ActionTransformButton from './ActionTransformButton'
-import { ComparisonOperatorLabels } from '../../build/components/Conditions/ResponseComparisonForm'
+import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
 import { TimeoutPolicy } from 'intentojs/dist/codegen/intento/interchainquery/v1/genesis'
 
 
@@ -151,6 +151,8 @@ export const ActionInfoBreakdown = ({
     }
   }, [isExecutingUpdateAction, requestedUpdateAction, handleUpdateAction])
 
+
+  //todo add support for multiple messages in exec message array
   const handleUpdateActionMsgClick = (index: number) => {
     connectExternalWallet(null)
     if (!isJsonValid) {
@@ -159,34 +161,41 @@ export const ActionInfoBreakdown = ({
     }
     try {
       let value = JSON.parse(editMsg)
+      let params: MsgUpdateActionParams = {
+        id: Number(actionInfo.id),
+        msgs: [],
+        owner: actionInfo.owner,
+      }
       console.log(value)
       if (actionInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
-        //let msgExecMsgs: [];
-        value.msgs.forEach((msgExecMsg, i) => {
-          console.log('valueA')
-          console.log(msgExecMsg)
+        const msgExecDecoded = registry.decode(actionInfo.msgs[index])
+
+        msgExecDecoded.msgs.forEach((msgExecMsg, i) => {
+
+          console.log(msgExecDecoded)
           const encodeObject = {
             typeUrl: msgExecMsg.typeUrl,
-            value: msgExecMsg.value,
+            value: value,
           }
           console.log(encodeObject)
           const msgExecMsgEncoded = registry.encodeAsAny(encodeObject)
           console.log(msgExecMsgEncoded)
+          msgExecDecoded.msgs[i] = msgExecMsgEncoded
 
-          value.msgs[i] = msgExecMsgEncoded
         })
+        params.msgs = msgExecDecoded
+
+
+      } else {
+        console.log(actionInfo.msgs[0])
+        const encodeObject = {
+          typeUrl: actionInfo.msgs[index].typeUrl,
+          value,
+        }
+        const msgEncoded = registry.encodeAsAny(encodeObject)
+        params.msgs = [msgEncoded]
       }
-      console.log(actionInfo.msgs[0])
-      const encodeObject = {
-        typeUrl: actionInfo.msgs[index].typeUrl,
-        value,
-      }
-      const msgEncoded = registry.encodeAsAny(encodeObject)
-      let params = {
-        id: Number(actionInfo.id),
-        msgs: [msgEncoded],
-        owner: actionInfo.owner,
-      }
+
       setUpdatedActionParams(params)
       console.log(params)
     } catch (e) {
@@ -310,7 +319,7 @@ export const ActionInfoBreakdown = ({
 
               <Text variant="body">{actionInfo.owner} </Text>
             </Column>
-            {actionInfo.icaConfig && (
+            {actionInfo.icaConfig.portId && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <Column
                 css={{ padding: '$3' }}
@@ -325,6 +334,7 @@ export const ActionInfoBreakdown = ({
                 <Text variant="body">{actionInfo.icaConfig.portId} </Text>
               </Column>
             )}
+
           </Inline>
         </Row>
 
@@ -422,9 +432,16 @@ export const ActionInfoBreakdown = ({
         )}
         <Row>
           <Column gap={8} align="flex-start" justifyContent="flex-start">
-            <Text variant="legend" color="secondary" align="left">
-              Fee Address
-            </Text>
+            <Tooltip
+              label={
+                "Address that can be funded to pay for execution fees. When self-hosting an Interchain Account, it is based on this unique address."
+              }
+            >
+
+              <Text variant="legend" color="secondary" align="left">
+                Action Address
+              </Text>
+            </Tooltip>
             <Inline gap={2}>
               <Text css={{ wordBreak: 'break-all' }} variant="body">
                 {actionInfo.feeAddress}{' '}
@@ -435,6 +452,32 @@ export const ActionInfoBreakdown = ({
                 {' '}
                 Balance: <Text variant="caption"> {feeBalance} INTO</Text>{' '}
               </Text>
+            )}
+
+            {actionInfo.hostedConfig.hostedAddress && (
+              /* (icaActive && !isIcaActiveLoading ?  */
+              <>
+                <Tooltip
+                  label={
+                    "Address of the Hosted Account that is used to execute actions on the target chain. A hosted account has it's own fee configuration"
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Hosted Account Address
+                  </Text></Tooltip>
+
+                <Text css={{ wordBreak: 'break-all' }} variant="body">
+                  {actionInfo.hostedConfig.hostedAddress}{' '}<a
+                    target={'_blank'}
+                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1beta1/hosted-account/${actionInfo.hostedConfig.hostedAddress}`}
+                    rel="noopener noreferrer"
+                  >
+                    <b>View</b>
+                  </a>
+                </Text>
+
+
+              </>
             )}
           </Column>
         </Row>
@@ -595,7 +638,16 @@ export const ActionInfoBreakdown = ({
         {actionInfo.configuration && (
           <Row>
             {' '}
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
+            <Column gap={6} align="flex-start" justifyContent="flex-start">
+              <Tooltip
+                label={
+                  "Configuration for the action"
+                }
+              >
+                <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+                  Configuration
+                </Text>
+              </Tooltip>
               <>
                 <Tooltip
                   label={
@@ -665,123 +717,109 @@ export const ActionInfoBreakdown = ({
                   {actionInfo.configuration.fallbackToOwnerBalance ? 'True' : 'False'}
                 </Text>
               </>
+              <>
+                <Tooltip
+                  label={
+                    'If set to true, will use AND for comparisons. On default execution happends when any condition returns true.'
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Use AND for Conditions
+                  </Text>
+                </Tooltip>
+                <Text variant="body">
+                  {actionInfo.conditions.useAndForComparisons ? 'True' : 'False'}
+                </Text>
+              </>
             </Column>
           </Row>
         )}
-
-        {actionInfo.conditions.responseComparison && (<Row>
-          <Column gap={8} align="flex-start" justifyContent="flex-start">
-
-            <>
-              <Tooltip
-                label={
-                  "Compare responses to determine if execution should take place"
-                }
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Response Comparision
-                </Text>
-              </Tooltip>
-
-              <>
-                {actionInfo.conditions.responseComparison.actionId.toString() != "0" && (<Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.responseComparison.actionId.toString()}
-                </Text>)}
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.responseComparison.responseIndex}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.responseComparison.responseKey}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {actionInfo.conditions.responseComparison.comparisonOperand}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {ComparisonOperatorLabels[actionInfo.conditions.responseComparison.comparisonOperator]}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.responseComparison.valueType}
-                </Text>
-              </>
-            </>
-
-          </Column>
-        </Row>)}
-        {actionInfo.conditions.useResponseValue && (
+        {actionInfo.conditions.comparisons && actionInfo.conditions.comparisons.map((comparison) => (
           <Row>
-            <Tooltip
-              label={
-                "Use a response value as a value for a message"
-              }
-            >
-              <Text variant="legend" color="secondary" align="left">
-                Feedback loop  🔁
-              </Text>
-            </Tooltip>
+            <Column gap={8} align="flex-start" justifyContent="flex-start">
 
-            <>
-              {actionInfo.conditions.useResponseValue.actionId.toString() != "0" && (<Text variant="body">
-                <Text variant="legend" color="secondary" align="left">ID</Text>  {actionInfo.conditions.useResponseValue.actionId.toString()}
-              </Text>)}
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Response Index</Text>    {actionInfo.conditions.useResponseValue.responseIndex}
-              </Text>
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Response Key</Text>      {actionInfo.conditions.useResponseValue.responseKey}
-              </Text>
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Msgs Index</Text>  {actionInfo.conditions.useResponseValue.msgsIndex}
-              </Text>
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Msg Key</Text>  {actionInfo.conditions.useResponseValue.msgKey}
-              </Text>
+              <>
+                <Tooltip
+                  label={
+                    "Compare responses to determine if execution should take place"
+                  }
+                >
+                  <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+                    Comparision
+                  </Text>
+                </Tooltip>
 
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Value Type</Text>   {actionInfo.conditions.useResponseValue.valueType}
-              </Text>
-            </>
+                <>
+                  {comparison.actionId.toString() != "0" && (<Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">ID</Text>  {comparison.actionId.toString()}
+                  </Text>)}
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Messsage Response Index (optional)</Text>    {comparison.responseIndex}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Messsage Response Key (optional)</Text>      {comparison.responseKey}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {comparison.operand}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {ComparisonOperatorLabels[comparison.operator]}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Value Type</Text>   {comparison.valueType}
+                  </Text>
+                </>
+                {comparison.icqConfig && (icqConfig(comparison))}
+              </>
 
+            </Column>
           </Row>
-        )}
-        {actionInfo.conditions.icqConfig && (<Row>
-          <Column gap={8} align="flex-start" justifyContent="flex-start">
-
-            <>
+        ))}
+        {actionInfo.conditions.feedbackLoops && actionInfo.conditions.feedbackLoops.map((feedbackLoop) => (
+          <><Row>
+            <Column gap={4} align="flex-start" justifyContent="flex-start">
               <Tooltip
                 label={
-                  "Perform an interchain query for conditions"
+                  "Use a response value as a value for a message"
                 }
               >
-                <Text variant="legend" color="secondary" align="left">
-                  Interchain Query
+                <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+                  Feedback Loop  🔁
                 </Text>
               </Tooltip>
 
-              <>
 
+              {feedbackLoop.actionId.toString() != "0" && (
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Chain ID</Text>    {actionInfo.conditions.icqConfig.chainId}
-                </Text>
+                  <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.actionId.toString()}
+                </Text>)}
+              {feedbackLoop.responseIndex != 0 &&
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Connection ID</Text>      {actionInfo.conditions.icqConfig.connectionId}
+                  <Text variant="legend" color="secondary" align="left">Response Index</Text>    {feedbackLoop.responseIndex}
                 </Text>
+              }
+              {feedbackLoop.responseKey != "" &&
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Query Type</Text>  {actionInfo.conditions.icqConfig.queryType}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Query Key</Text>  {actionInfo.conditions.icqConfig.queryKey}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(actionInfo.conditions.icqConfig.timeoutDuration.seconds))}
-                </Text>
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[actionInfo.conditions.icqConfig.timeoutPolicy]}
-                </Text>
-              </>
-            </>
+                  <Text variant="legend" color="secondary" align="left">Response Key</Text>      {feedbackLoop.responseKey}
+                </Text>}
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
+              </Text>
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left"> Key in message to replace</Text>  {feedbackLoop.msgKey}
+              </Text>
 
-          </Column>
-        </Row>)}
+              <Text variant="body">
+                <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
+              </Text>
+              {feedbackLoop.icqConfig && (icqConfig(feedbackLoop))
+              }
+            </Column>
+          </Row>
+          </>
+
+        ))}
+
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {actionInfo.conditions.skipOnFailureOf.length != 0 && (
             <Row>
@@ -898,6 +936,41 @@ export const ActionInfoBreakdown = ({
       </>
     </>
   )
+
+  function icqConfig(parent): React.ReactNode {
+    return <>
+      <Tooltip
+        label={"Perform an interchain query for conditions"}
+      >
+        <Text variant="body" style={{ fontSize: '14px', marginTop: '16px', marginBottom: '10px', fontWeight: '600' }} align="left">
+          Interchain Query
+        </Text>
+      </Tooltip>
+      <Text variant="body">
+        <Text variant="legend" color="secondary" align="left">Chain ID</Text>    {parent.icqConfig.chainId}
+      </Text>
+      <Text variant="body">
+        <Text variant="legend" color="secondary" align="left">Connection ID</Text>      {parent.icqConfig.connectionId}
+      </Text>
+      <Text variant="body">
+        <Text variant="legend" color="secondary" align="left">Query Type</Text>  {parent.icqConfig.queryType}
+      </Text>
+      <Text variant="body">
+        <Text variant="legend" color="secondary" align="left">Query Key</Text>  {parent.icqConfig.queryKey}
+      </Text>
+      <Text variant="body">
+        <Text variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(parent.icqConfig.timeoutDuration.seconds))}
+      </Text>
+      <Text variant="body">
+        <Text variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[parent.icqConfig.timeoutPolicy]}
+      </Text>
+      {parent.icqConfig.response &&
+        <Text variant="body">
+          <Text variant="legend" color="secondary" align="left">Response</Text>  {TimeoutPolicy[parent.icqConfig.response]}
+        </Text>
+      }
+    </>
+  }
 }
 
 function Row({ children }) {

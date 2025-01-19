@@ -67,11 +67,10 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   // Watch for address changes and trigger the mutation
   useEffect(() => {
     if (address) {
-
-      afterConnectWallet(null)
-      refetchQueries()
+      afterConnectWallet(null);
+      refetchQueries();
     }
-  }, [address])
+  }, [address, afterConnectWallet, refetchQueries]);
   const walletStatusesConnected = isWalletConnected && (status === WalletStatusType.connected || status === WalletStatusType.restored)
   const isClientConnected = client != null && client != undefined
 

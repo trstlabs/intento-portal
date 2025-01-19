@@ -18,7 +18,7 @@ export enum ClaimAction {
   UNRECOGNIZED = -1
 }
 
-const ViewAirdropEligibility = ({ claimRecord, total, claimRecordLoaded }: ViewAirdropEligibilityProps) => {
+const ViewAirdropEligibility = ({ claimRecord, total }: ViewAirdropEligibilityProps) => {
 
 
   return (
