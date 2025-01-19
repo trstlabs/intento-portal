@@ -1,9 +1,8 @@
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
-import { useRecoilState, useRecoilValue } from 'recoil'
+import { useRecoilState } from 'recoil'
 import {
   ibcWalletState,
-  walletState,
   WalletStatusType,
 } from '../state/atoms/walletAtoms'
 
@@ -11,6 +10,7 @@ import { useIBCAssetInfo } from './useIBCAssetInfo'
 
 import { useChain } from '@cosmos-kit/react'
 import { useChainInfoByChainID } from './useChainList'
+import toast from 'react-hot-toast'
 
 /* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
@@ -22,25 +22,21 @@ export const useConnectIBCWallet = (
   const [{ status /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
     useRecoilState(ibcWalletState)
 
-  const walletInfo = useRecoilValue(walletState).status
-
   let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
   if (fromRegistry) {
     assetInfo = useChainInfoByChainID(chainId)
   }
 
-  //const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
-  const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmoshub'
-
+  const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmostest'
+  console.log(chainRegistryName)
   const {
-    isWalletConnected,
     getSigningStargateClient,
     connect,
     address,
     assets,
-  } = useChain(chainRegistryName, true)
+  } = useChain(chainRegistryName)
   const mutation = useMutation(async () => {
-    if (!tokenSymbol /* && !storedTokenSymbol */) {
+    if (!tokenSymbol ) {
       throw new Error(
         'You must provide `tokenSymbol` before connecting to the wallet.'
       )
@@ -55,39 +51,29 @@ export const useConnectIBCWallet = (
     setWalletState((value) => ({
       ...value,
       tokenSymbol,
-      client: null,
       state: WalletStatusType.connecting,
     }))
 
     try {
-      if (
-        chainId == process.env.NEXT_PUBLIC_INTO_CHAINID ||
-        walletInfo != WalletStatusType.connected
-      ) {
-        return
+      if (address) {
+
+        const ibcChainClient = await getSigningStargateClient()
+
+
+        /* successfully update the wallet state */
+        setWalletState({
+          tokenSymbol,
+          address,
+          client: ibcChainClient,
+          status: WalletStatusType.connected,
+          assets,
+        })
+      } else {
+        // Handle the case where the client could not be obtained
+        throw new Error('Failed to obtain the client')
       }
-      if (
-        !isWalletConnected ||
-        !assets?.assets.find((asset) => asset.symbol == tokenSymbol)
-      ) {
-        await connect()
-        await sleep(500)
-      }
-
-      const ibcChainClient = await getSigningStargateClient()
-
-      console.log('ibcChainClient', ibcChainClient)
-
-      /* successfully update the wallet state */
-      setWalletState({
-        tokenSymbol,
-        address,
-        client: ibcChainClient,
-        status: WalletStatusType.connected,
-        assets,
-      })
     } catch (e) {
-      // toast.error("Error connecting wallet: ",e)
+      toast.error(e)
       /* set the error state */
       setWalletState({
         tokenSymbol: null,
@@ -101,31 +87,30 @@ export const useConnectIBCWallet = (
     }
   }, mutationOptions)
 
-  const connectWallet = mutation.mutate
-
-  useEffect(() => {
-    /* restore wallet connection */
-    if (status === WalletStatusType.restored && assetInfo) {
-      connectWallet(null)
-    }
-  }, [status, connectWallet, assetInfo])
-
-  useEffect(() => {
-    function reconnectWallet() {
-      if (assetInfo && status === WalletStatusType.connected) {
-        connectWallet(null)
+  useEffect(
+    function restoreWalletConnectionIfHadBeenConnectedBefore() {
+      /* restore wallet connection if the state has been set with the */
+      if (status === WalletStatusType.restored) {
+        connect()
+        mutation.mutate(null)
       }
-    }
+    }, // eslint-disable-next-line
+    [status]
+  )
 
-    window.addEventListener('keplr_keystorechange', reconnectWallet)
-    return () => {
-      window.removeEventListener('keplr_keystorechange', reconnectWallet)
-    }
-  }, [connectWallet, status, assetInfo])
+  // useEffect(() => {
+  //   function reconnectWallet() {
+  //     if (assetInfo && status === WalletStatusType.connected) {
+  //       connectWallet(null)
+  //     }
+  //   }
+
+  //   window.addEventListener('keplr_keystorechange', reconnectWallet)
+  //   return () => {
+  //     window.removeEventListener('keplr_keystorechange', reconnectWallet)
+  //   }
+  // }, [connectWallet, status, assetInfo])
 
   return mutation
 }
 
-async function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
-}
