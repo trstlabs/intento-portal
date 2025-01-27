@@ -98,7 +98,8 @@ export const ActionHistory = ({
             <Column gap={8} align="flex-start" justifyContent="flex-start">
               {' '}
               <Inline>
-                <Text variant="legend" color="secondary" align="left">
+
+                <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
                   Execution History
                 </Text>
               </Inline>
@@ -149,13 +150,11 @@ export const ActionHistory = ({
                         </Column>
 
                         <Column>
-                          <Text variant="legend">
-                            Query Responses
-                          </Text>
+
                           {queryResponses.map((queryResponse) => (
                             <Column>
                               <Text variant="legend">
-                                {queryResponse}
+                                Query Response:  {queryResponse}
                               </Text>
                             </Column>
                           ))}
@@ -193,19 +192,19 @@ export const ActionHistory = ({
                             <Card css={{ padding: '$6', marginTop: '$4' }}>
                               <Column gap={8} align="flex-start" justifyContent="flex-start">
                                 <Text variant="legend" color="secondary" align="left">
-                                  Response type
+                                  Message Response
                                 </Text>
-                                <Text variant="caption" >{msg.typeUrl} </Text>
-                              </Column>
-                              {msg.value.length != 0 &&
-                                <Column gap={8} align="flex-start" justifyContent="flex-start">
-                                  <Text variant="legend" color="secondary" align="left">
-                                    Response value
-                                  </Text>
+                                <Text variant="caption" >{msg.typeUrl} ✓ </Text>
 
-                                  <Text variant="caption"> {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), null, 2)}</Text>
-                                </Column>
-                              }
+                                {msg.value.length != 0 &&
+                                  <>
+                                    <Text variant="legend" color="secondary" align="left">
+                                      Message Response Value
+                                    </Text>
+                                    <Text variant="caption"> {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), null, 2)}</Text>
+                                  </>
+                                }
+                              </Column>
                             </Card>
 
                           </div>))}

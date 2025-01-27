@@ -25,6 +25,7 @@ export const useActionInfos = () => {
         return {
           ...actionInfo,
           msgs: actionInfo.msgs.map((msg) => {
+            //GlobalDecoderRegistry.unwrapAny(msg.value)
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
               wrappedMsg.typeUrl ==
@@ -32,9 +33,9 @@ export const useActionInfos = () => {
                 ? '/cosmos.authz.v1beta1.MsgExec'
                 : wrappedMsg.typeUrl
             return {
-              value: wrappedMsg.value,
+              value: msg.value,
               valueDecoded: msg,
-              typeUrl: wrappedMsg.typeUrl,
+              typeUrl: msg.typeUrl || wrappedMsg.typeUrl,
             }
           }),
         }

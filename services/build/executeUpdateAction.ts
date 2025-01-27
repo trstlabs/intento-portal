@@ -36,11 +36,10 @@ export const executeUpdateAction = async ({
           },
       feeFunds: actionParams.feeFunds ? actionParams.feeFunds : [],
     })
-
   return validateTransactionSuccess(
     await client.signAndBroadcast(actionParams.owner, [msgUpdateAction], {
       amount: [],
-      gas: '130000',
+      gas: '200000',
     })
   )
 }

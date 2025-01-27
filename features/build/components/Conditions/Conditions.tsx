@@ -2,7 +2,6 @@ import {
 
   Card,
   CardContent,
-  Column,
   Button,
   Text,
   Inline,
@@ -13,7 +12,6 @@ import {
 } from 'junoblocks'
 import React, { useState } from 'react'
 import { ExecutionConditions } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
-import { StepIcon } from '../../../../icons/StepIcon'
 import { FieldArray } from './Fields'
 import { ComparisonForm } from './ComparisonForm'
 import { FeedbackLoopForm } from './FeedbackLoopForm'
@@ -88,18 +86,7 @@ export const Conditions = ({
 
 
   return (
-    <Column>
-      <Inline css={{ margin: '$6', marginTop: '$16' }}>
-        <StepIcon step={4} />
-        <Text
-          align="center"
-          variant="body"
-          color="tertiary"
-          css={{ padding: '0 $15 0 $6' }}
-        >
-          Set execution conditions
-        </Text>
-      </Inline>
+    <>
       {!disabled && (
         <Card
           css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -224,13 +211,13 @@ export const Conditions = ({
                   disabled={false}
                 />
                 <FieldArray
-                  label="Stop On Failure Of "
+                  label="Stop On Error Of "
                   values={conditions.stopOnFailureOf}
                   onChange={(value) => handleInputChange('stopOnFailureOf', value)}
                   disabled={false}
                 />
                 <FieldArray
-                  label="Skip On Failure Of "
+                  label="Skip On Error Of "
                   values={conditions.skipOnFailureOf}
                   onChange={(value) => handleInputChange('skipOnFailureOf', value)}
                   disabled={false}
@@ -248,6 +235,6 @@ export const Conditions = ({
         </Card>
       )
       }
-    </Column >
+    </ >
   )
 }

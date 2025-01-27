@@ -206,7 +206,7 @@ export const HostedAccountCard = ({
               >
                 <CardContent>
                   <Tooltip
-                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
                     aria-label="Fee Funds"
                   >
                     <Text variant="legend"> Top up</Text>

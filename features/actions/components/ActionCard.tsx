@@ -73,7 +73,7 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
                     } {' '}| {' '}
 
                     {
-                      actionInfo.msgs[0].typeUrl
+                      actionInfo.msgs[0]?.typeUrl
                         .split('.')
                         .find((data) => data.includes('Msg'))
                         .split(',')[0]

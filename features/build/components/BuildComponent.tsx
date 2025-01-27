@@ -236,7 +236,7 @@ export const BuildComponent = ({
     name: string,
     chainSymbol: string
   ) {
-   // alert(denom + newDenom)
+    // alert(denom + newDenom)
     let updatedActionInput = actionInput
     updatedActionInput.connectionId = connectionId
     updatedActionInput.hostConnectionId = hostConnectionId
@@ -281,8 +281,8 @@ export const BuildComponent = ({
     try {
       const msg = JSON.stringify(msgObject, null, '\t')
       let newMsg = msg.replaceAll('uinto', denom)
-       newMsg = newMsg.replaceAll('into', prefix)
-      
+      newMsg = newMsg.replaceAll('into', prefix)
+
       let updatedActionInput = actionInput
       updatedActionInput.msgs[index] = newMsg
       //updatedActionInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
@@ -509,15 +509,41 @@ export const BuildComponent = ({
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
-      <Configuration
-        config={actionInput.configuration}
-        disabled={!icaAddress && !chainHasIAModule}
-        onChange={setConfig}
-      />
-      <Conditions conditions={actionInput.conditions}
-        disabled={!actionInput.conditions}
-        onChange={setConditions}
-      />
+       <Column>
+        <Inline css={{ margin: '$6', marginTop: '$16' }}>
+          <StepIcon step={3} />
+          <Text
+            align="center"
+            variant="body"
+            color="tertiary"
+            css={{ padding: '0 $15 0 $6' }}
+          >
+            Specify conditions
+          </Text>
+        </Inline>
+        <Conditions conditions={actionInput.conditions}
+          disabled={!actionInput.conditions}
+          onChange={setConditions}
+        />
+      </Column>
+      <Column>
+        <Inline css={{ margin: '$6', marginTop: '$16' }}>
+          <StepIcon step={4} />
+          <Text
+            align="center"
+            variant="body"
+            color="tertiary"
+            css={{ padding: '0 $15 0 $6' }}
+          >
+            Configure execution
+          </Text>{' '}
+        </Inline>
+        <Configuration
+          config={actionInput.configuration}
+          disabled={!icaAddress && !chainHasIAModule}
+          onChange={setConfig}
+        />
+      </Column>
       <Inline
         css={{
           margin: '$4 $6 $8',

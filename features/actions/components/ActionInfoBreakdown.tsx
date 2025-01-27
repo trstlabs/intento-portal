@@ -21,7 +21,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateActionParams } from '../../../types/trstTypes'
-import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { ActionInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
 
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -42,6 +42,9 @@ import { ActionHistory } from './ActionHistory'
 import ActionTransformButton from './ActionTransformButton'
 import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
 import { TimeoutPolicy } from 'intentojs/dist/codegen/intento/interchainquery/v1/genesis'
+import { Configuration } from '../../build/components/Conditions/Configuration'
+import { GlobalDecoderRegistry } from 'intentojs'
+import { MsgExec } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/tx'
 
 
 type ActionInfoBreakdownProps = {
@@ -110,23 +113,34 @@ export const ActionInfoBreakdown = ({
     defaultTypes,
   })
 
-  function getMsgValueForMsgExec(exMsg: Any) {
+  function getMsgValueForMsgExec(exMsg) {
     let msgs = []
-
+    console.log(exMsg)
+    console.log(exMsg.valueDecoded.msgs[0])
     const msgExecDecoded = registry.decode(exMsg)
-    console.log
-    for (let message of msgExecDecoded.msgs) {
-      let messageValue = registry.decode({ typeUrl: message.typeUrl, value: message.value })
-      msgs.push({ typeUrl: message.typeUrl, value: messageValue })
+    const decode = MsgExec.decode(exMsg.value)
+    const json = MsgExec.toAminoMsg(decode)
+    // const msgExecDecodedd = registry.decode(exMsg.valueDecoded.msgs[0])
+    console.log(decode)
+    console.log(json)
+    for (let message of exMsg.valueDecoded.msgs) {
+      console.log(exMsg)
+      // let messageValue = message//registry.decode({ typeUrl: message.typeUrl, value: message.value })
+      let type = GlobalDecoderRegistry.wrapAny(message).typeUrl
+      if (type.includes("Query")) {
+        type = "Could not retrieve at the moment"
+      }
+      // let type = registry.lookupType(message).typeUrl
+      msgs.push({ typeUrl: type, value: message })
     }
     return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
   }
 
   //////////////////////////////////////// Action message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [isJsonValid, setIsJsonValid] = useState(true)
-  const [editor, setEditor] = useState(true)
+  const [editor, setEditor] = useState(false)
   const [editMsg, setEditMsg] = useState('')
-
+  const [editConfig, setEditConfig] = useState(false)
   let actionParams: MsgUpdateActionParams
   const [updatedActionParams, setUpdatedActionParams] = useState(actionParams)
 
@@ -194,6 +208,28 @@ export const ActionInfoBreakdown = ({
         }
         const msgEncoded = registry.encodeAsAny(encodeObject)
         params.msgs = [msgEncoded]
+      }
+
+      setUpdatedActionParams(params)
+      console.log(params)
+    } catch (e) {
+      console.log(e)
+    }
+    return setRequestedUpdateAction(true)
+  }
+
+  const handleUpdateActionConfigClick = (config: ExecutionConfiguration) => {
+    connectExternalWallet(null)
+    if (!isJsonValid) {
+      //alert("Invalid JSON")
+      return
+    }
+    try {
+
+      let params: MsgUpdateActionParams = {
+        id: Number(actionInfo.id),
+        configuration: config,
+        owner: actionInfo.owner,
       }
 
       setUpdatedActionParams(params)
@@ -492,51 +528,53 @@ export const ActionInfoBreakdown = ({
                   <Text variant="body">{msg.typeUrl} </Text>
                 </Inline>
 
-                {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => showEditor(!editor, msg)}
-                  >
-                    {editor ? 'Edit' : 'Discard'}
-                  </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => {
-                      setEditor(!editor)
-                      setEditMsg(getMsgValueForMsgExec(msg))
-                    }}
-                  >
-                    {editor ? 'Edit' : 'Discard'}
-                  </Button>
-                )}
-                {editor ? (
-                  <>
+                <>
+                  <Inline>
                     <Text variant="legend" color="secondary" align="left">
                       Message Value
                     </Text>
 
-                    <Inline gap={2}>
-                      <Text css={{ wordBreak: 'break-word' }} variant="body">
-                        <pre
-                          style={{
-                            display: 'inline-block',
-                            whiteSpace: 'pre-wrap',
-                            overflow: 'hidden',
-                            float: 'left',
-                            fontSize: '0.8rem',
-                          }}
-                        >
+                    {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        onClick={() => showEditor(!editor, msg)}
+                      >
+                        {!editor ? 'Edit' : 'Discard'}
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        onClick={() => {
+                          setEditor(!editor)
+                          setEditMsg(getMsgValueForMsgExec(msg))
+                        }}
+                      >
+                        {!editor ? 'Edit' : 'Discard'}
+                      </Button>
+                    )}
+                  </Inline>
+                  <Inline gap={2}>
+                    <Text css={{ wordBreak: 'break-word' }} variant="body">
+                      <pre
+                        style={{
+                          display: 'inline-block',
+                          whiteSpace: 'pre-wrap',
+                          overflow: 'hidden',
+                          float: 'left',
+                          fontSize: '0.8rem',
+                        }}
+                      >
 
-                          {StringifyBigints(msg.valueDecoded)}
+                        {StringifyBigints(msg.valueDecoded)}
 
-                        </pre>
-                      </Text>
-                    </Inline>
-                  </>
-                ) : (
+                      </pre>
+                    </Text>
+                  </Inline>
+                </>
+
+                {editor &&
                   <>
                     <JsonCodeMirrorEditor
                       jsonValue={editMsg}
@@ -557,7 +595,7 @@ export const ActionInfoBreakdown = ({
                       )}
                     </Button>
                   </>
-                )}
+                }
               </Column>
             </Row>
           </div>
@@ -635,105 +673,8 @@ export const ActionInfoBreakdown = ({
             </Column>
           </Row>
         )}
-        {actionInfo.configuration && (
-          <Row>
-            {' '}
-            <Column gap={6} align="flex-start" justifyContent="flex-start">
-              <Tooltip
-                label={
-                  "Configuration for the action"
-                }
-              >
-                <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
-                  Configuration
-                </Text>
-              </Tooltip>
-              <>
-                <Tooltip
-                  label={
-                    'If set to true, message responses i.e. outputs may be used as inputs for new actions'
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Save Message Responses
-                  </Text>
-                </Tooltip>
 
-                <Text variant="body">
-                  {actionInfo.configuration.saveResponses ? 'True' : 'False'}
-                </Text>
-              </>
-              <>
-                <Tooltip
-                  label={
-                    'If set to true, the action settings can not be updated'
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Updating Disabled
-                  </Text>
-                </Tooltip>
-                <Text variant="body">
-                  {actionInfo.configuration.updatingDisabled ? 'True' : 'False'}
-                </Text>
-              </>
-              <>
-                <Tooltip
-                  label={'If set to true, stops on any errors that occur'}
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Stop On Failure
-                  </Text>
-                </Tooltip>
-                <Text variant="body">
-                  {actionInfo.configuration.stopOnFailure ? 'True' : 'False'}
-                </Text>
-              </>
-              <>
-                <Tooltip
-                  label={
-                    'If set to true, stops when execution of the messages was succesful'
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Stop On Success
-                  </Text>
-                </Tooltip>
-                <Text variant="body">
-                  {actionInfo.configuration.stopOnSuccess ? 'True' : 'False'}
-                </Text>
-              </>
-              <>
-                <Tooltip
-                  label={
-                    'If set to true, as a fallback, the owner balance is used to pay for local fees'
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Wallet Fallback
-                  </Text>
-                </Tooltip>
-                <Text variant="body">
-                  {actionInfo.configuration.fallbackToOwnerBalance ? 'True' : 'False'}
-                </Text>
-              </>
-              <>
-                <Tooltip
-                  label={
-                    'If set to true, will use AND for comparisons. On default execution happends when any condition returns true.'
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Use AND for Conditions
-                  </Text>
-                </Tooltip>
-                <Text variant="body">
-                  {actionInfo.conditions.useAndForComparisons ? 'True' : 'False'}
-                </Text>
-              </>
-            </Column>
-          </Row>
-        )}
+
         {actionInfo.conditions.comparisons && actionInfo.conditions.comparisons.map((comparison) => (
           <Row>
             <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -745,7 +686,7 @@ export const ActionInfoBreakdown = ({
                   }
                 >
                   <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
-                    Comparision
+                    Comparison
                   </Text>
                 </Tooltip>
 
@@ -754,16 +695,16 @@ export const ActionInfoBreakdown = ({
                     <Text variant="legend" color="secondary" align="left">ID</Text>  {comparison.actionId.toString()}
                   </Text>)}
                   <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Messsage Response Index (optional)</Text>    {comparison.responseIndex}
+                    <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {comparison.responseIndex}
                   </Text>
                   <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Messsage Response Key (optional)</Text>      {comparison.responseKey}
+                    <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {comparison.responseKey}
                   </Text>
                   <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Comparision Operand</Text>  {comparison.operand}
+                    <Text variant="legend" color="secondary" align="left">Comparison Operator</Text>  {ComparisonOperatorLabels[comparison.operator]}
                   </Text>
                   <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Comparision Operator</Text>  {ComparisonOperatorLabels[comparison.operator]}
+                    <Text variant="legend" color="secondary" align="left">Comparison Operand</Text>  {comparison.operand}
                   </Text>
                   <Text variant="body">
                     <Text variant="legend" color="secondary" align="left">Value Type</Text>   {comparison.valueType}
@@ -795,12 +736,12 @@ export const ActionInfoBreakdown = ({
                 </Text>)}
               {feedbackLoop.responseIndex != 0 &&
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Response Index</Text>    {feedbackLoop.responseIndex}
+                  <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
                 </Text>
               }
               {feedbackLoop.responseKey != "" &&
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Response Key</Text>      {feedbackLoop.responseKey}
+                  <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
                 </Text>}
               <Text variant="body">
                 <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
@@ -819,7 +760,10 @@ export const ActionInfoBreakdown = ({
           </>
 
         ))}
+        {actionInfo.configuration && (
+          showConfiguration()
 
+        )}
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {actionInfo.conditions.skipOnFailureOf.length != 0 && (
             <Row>
@@ -829,7 +773,7 @@ export const ActionInfoBreakdown = ({
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
-                  Skip on failure of
+                  Skip on Error Od
                 </Text>
               </Tooltip>
 
@@ -848,7 +792,7 @@ export const ActionInfoBreakdown = ({
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
-                  Skip on success of
+                  Skip on Success Of
                 </Text>
               </Tooltip>
 
@@ -867,7 +811,7 @@ export const ActionInfoBreakdown = ({
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
-                  Stop on failure of
+                  Stop on Error Of
                 </Text>
               </Tooltip>
 
@@ -886,7 +830,7 @@ export const ActionInfoBreakdown = ({
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
-                  Stop on success of
+                  Stop on Success Of
                 </Text>
               </Tooltip>
 
@@ -936,6 +880,110 @@ export const ActionInfoBreakdown = ({
       </>
     </>
   )
+
+  function showConfiguration() {
+    return <Row>
+      {' '}
+      <Column gap={4} align="flex-start" justifyContent="flex-start">
+        <Inline css={{ justifyContent: 'space-between' }} >
+          <Tooltip
+            label={"Configuration for the action"}
+          >
+            <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+              Configuration
+            </Text>
+          </Tooltip>
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={() => setEditConfig(!editConfig)}
+          >
+            {!editConfig ? 'Edit' : 'Discard'}
+          </Button>
+        </Inline>
+        {editConfig ?
+          <Configuration config={actionInfo.configuration}
+            disabled={false}
+            onChange={handleUpdateActionConfigClick} />
+          :
+          <> <>
+            <Tooltip
+              label={'If set to true, message responses i.e. outputs may be used as inputs for new actions'}
+            >
+              <Text variant="legend" color="secondary" align="left">
+                Save Responses
+              </Text>
+            </Tooltip>
+
+            <Text variant="header">
+              {actionInfo.configuration.saveResponses ? '✔' : '✖'}
+            </Text>
+          </>
+            <>
+              <Tooltip
+                label={'If set to true, the action settings can not be updated'}
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Updating Disabled
+                </Text>
+              </Tooltip>
+              <Text variant="header">
+                {actionInfo.configuration.updatingDisabled ? '✔' : '✖'}
+              </Text>
+            </>
+            <>
+              <Tooltip
+                label={'If set to true, stops on any errors that occur'}
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Stop On Error
+                </Text>
+              </Tooltip>
+              <Text variant="header">
+                {actionInfo.configuration.stopOnFailure ? '✔' : '✖'}
+              </Text>
+            </>
+            <>
+              <Tooltip
+                label={'If set to true, stops when execution of the messages was succesful'}
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Stop On Success
+                </Text>
+              </Tooltip>
+              <Text variant="header">
+                {actionInfo.configuration.stopOnSuccess ? '✔' : '✖'}
+              </Text>
+            </>
+            <>
+              <Tooltip
+                label={'If set to true, as a fallback, the owner balance is used to pay for local fees'}
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Wallet Fallback
+                </Text>
+              </Tooltip>
+              <Text variant="header">
+                {actionInfo.configuration.fallbackToOwnerBalance ? '✔' : '✖'}
+              </Text>
+            </>
+            <>
+              <Tooltip
+                label={'If set to true, will use AND for comparisons. On default execution happends when any condition returns true.'}
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Use AND for Comparisons
+                </Text>
+              </Tooltip>
+              <Text variant="header">
+                {actionInfo.conditions.useAndForComparisons ? '✔' : '✖'}
+              </Text>
+            </>
+          </>
+        }
+      </Column>
+    </Row>
+  }
 
   function icqConfig(parent): React.ReactNode {
     return <>

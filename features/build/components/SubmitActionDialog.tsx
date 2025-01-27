@@ -512,7 +512,7 @@ export const SubmitActionDialog = ({
                       {chainSymbol}
                     </Text>
                     <Tooltip
-                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
                       aria-label="host chain execution fee funds"
                     >
                       <Text variant="legend" color="disabled">

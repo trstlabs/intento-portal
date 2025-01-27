@@ -1,10 +1,7 @@
 import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
-import {
-  ibcWalletState,
-  WalletStatusType,
-} from '../state/atoms/walletAtoms'
+import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 
@@ -29,14 +26,10 @@ export const useConnectIBCWallet = (
 
   const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmostest'
   console.log(chainRegistryName)
-  const {
-    getSigningStargateClient,
-    connect,
-    address,
-    assets,
-  } = useChain(chainRegistryName)
+  const { getSigningStargateClient, connect, address, assets } =
+    useChain(chainRegistryName)
   const mutation = useMutation(async () => {
-    if (!tokenSymbol ) {
+    if (!tokenSymbol) {
       throw new Error(
         'You must provide `tokenSymbol` before connecting to the wallet.'
       )
@@ -56,9 +49,7 @@ export const useConnectIBCWallet = (
 
     try {
       if (address) {
-
         const ibcChainClient = await getSigningStargateClient()
-
 
         /* successfully update the wallet state */
         setWalletState({
@@ -90,27 +81,13 @@ export const useConnectIBCWallet = (
   useEffect(
     function restoreWalletConnectionIfHadBeenConnectedBefore() {
       /* restore wallet connection if the state has been set with the */
-      if (status === WalletStatusType.restored) {
+      if (status === WalletStatusType.restored && assetInfo) {
         connect()
         mutation.mutate(null)
       }
     }, // eslint-disable-next-line
-    [status]
+    [status, assetInfo]
   )
-
-  // useEffect(() => {
-  //   function reconnectWallet() {
-  //     if (assetInfo && status === WalletStatusType.connected) {
-  //       connectWallet(null)
-  //     }
-  //   }
-
-  //   window.addEventListener('keplr_keystorechange', reconnectWallet)
-  //   return () => {
-  //     window.removeEventListener('keplr_keystorechange', reconnectWallet)
-  //   }
-  // }, [connectWallet, status, assetInfo])
 
   return mutation
 }
-
