@@ -141,7 +141,11 @@ export const ActionInfoBreakdown = ({
   const [editor, setEditor] = useState(false)
   const [editMsg, setEditMsg] = useState('')
   const [editConfig, setEditConfig] = useState(false)
-  let actionParams: MsgUpdateActionParams
+  let actionParams: MsgUpdateActionParams = {
+    id: Number(actionInfo.id),
+    owner: actionInfo.owner,
+  }
+
   const [updatedActionParams, setUpdatedActionParams] = useState(actionParams)
 
   function showEditor(show: boolean, msg: Any) {
@@ -219,7 +223,7 @@ export const ActionInfoBreakdown = ({
   }
 
   const handleUpdateActionConfigClick = (config: ExecutionConfiguration) => {
-    connectExternalWallet(null)
+
     if (!isJsonValid) {
       //alert("Invalid JSON")
       return

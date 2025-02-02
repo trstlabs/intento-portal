@@ -25,7 +25,7 @@ export const useConnectIBCWallet = (
   }
 
   const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmostest'
-  console.log(chainRegistryName)
+  //  console.log(chainRegistryName)
   const { getSigningStargateClient, connect, address, assets } =
     useChain(chainRegistryName)
   const mutation = useMutation(async () => {
