@@ -104,10 +104,10 @@ async function transformFlowMsgs(info) {
     if (info.msgs[0].typeUrl === '/cosmos.authz.v1beta1.MsgExec') {
         const msgsObj = await fetchFlowMsgs(info.id.toString());
         msgsObj.forEach((msgObj: any, index) => {
-            const msg = JSON.stringify(msgObj, (key, value) =>
+            const msg = JSON.stringify(msgObj, (_, value) =>
                 typeof value === "bigint" ? value.toString() : value,
                 2
-              );
+            );
             msgs[index] = msg
         })
     } else {
@@ -115,10 +115,10 @@ async function transformFlowMsgs(info) {
             console.log(msgAny.valueDecoded)
 
             const msgObj = { typeUrl: msgAny.typeUrl, value: msgAny.valueDecoded }
-            const msg = JSON.stringify(msgObj, (key, value) =>
+            const msg = JSON.stringify(msgObj, (_, value) =>
                 typeof value === "bigint" ? value.toString() : value,
                 2
-              );
+            );
             msgs[index] = msg
             console.log(msgs)
         })
