@@ -8,7 +8,7 @@ import {
     ValidIcon,
   } from 'junoblocks'
   
-  import { SortDirections, SortParameters } from '../hooks/useSortActions'
+  import { SortDirections, SortParameters } from '../hooks/useSortFlows'
   type Props = {
     sortParameter: SortParameters
     sortDirection: SortDirections

@@ -4,8 +4,8 @@ import {
   ButtonWithDropdownForSorting,
   SortDirections,
   SortParameters,
-  useSortActions,
-} from 'features/actions'
+  useSortFlows,
+} from '../../features/flows'
 import {
   Column,
   ConnectIcon,
@@ -18,17 +18,17 @@ import {
 import React, { useMemo, useState } from 'react'
 import { walletState } from 'state/atoms/walletAtoms'
 import { useUpdateEffect } from 'react-use'
-import { useActionInfos } from 'hooks/useActionInfo'
-import { ActionCard } from '../../features/actions/components/ActionCard'
-import { InfoArgs } from '../../features/actions/hooks/useSortActions'
+import { useFlowInfos } from 'hooks/useFlowInfo'
+import { FlowCard } from '../../features/flows/components/FlowCard'
+import { InfoArgs } from '../../features/flows/hooks/useSortFlows'
 
-export default function Actions() {
+export default function Flows() {
   const { address } = useRecoilValue(walletState)
-  const [actions, isLoading] = useActionInfos()
+  const [flows, isLoading] = useFlowInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs: InfoArgs = { infos: actions, address }
-  const [myActions, allActions, isSorting] = useSortActions({
+  const infoArgs: InfoArgs = { infos: flows, address }
+  const [myFlows, allFlows, isSorting] = useSortFlows({
     infoArgs,
     sortBy: useMemo(
       () => ({
@@ -39,13 +39,13 @@ export default function Actions() {
     ),
   })
 
-  const shouldShowFetchingState = isLoading && isSorting && !actions?.length
-  const shouldRenderActions = Boolean(actions?.length)
+  const shouldShowFetchingState = isLoading && isSorting && !flows?.length
+  const shouldRenderFlows = Boolean(flows?.length)
 
   const pageHeaderContents = (
     <PageHeader
-      title="Actions"
-      subtitle="View, manage and update actions"
+      title="Flows"
+      subtitle="View, manage and update flows"
     />
   )
 
@@ -72,31 +72,31 @@ export default function Actions() {
         >
           <Inline gap={2}>
             <ConnectIcon color="secondary" />
-            <Text variant="primary">{'Finding your actions...'}</Text>
+            <Text variant="primary">{'Finding your flows...'}</Text>
           </Inline>
         </Column>
       )}
-      {shouldRenderActions && (
+      {shouldRenderFlows && (
         <>
-          {Boolean(myActions?.length) && (
+          {Boolean(myFlows?.length) && (
             <>
               <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
-                Your Personal Actions
+                Your Personal Flows
               </Text>
-              <StyledDivForActionsGrid>
-                {myActions.map((actionInfo, index) => (
+              <StyledDivForFlowsGrid>
+                {myFlows.map((flowInfo, index) => (
                   <div key={index}>
-                    <ActionCard actionInfo={actionInfo} />
+                    <FlowCard flowInfo={flowInfo} />
                   </div>
                 ))}
-              </StyledDivForActionsGrid>
+              </StyledDivForFlowsGrid>
             </>
           )}
         </>
       )}
-      <StyledDivForActionsGrid>
+      <StyledDivForFlowsGrid>
         <>
-          {Boolean(allActions?.length) && (
+          {Boolean(allFlows?.length) && (
             <Inline
               gap={4}
               css={{
@@ -105,8 +105,8 @@ export default function Actions() {
               }}
             >
               <Text variant="primary">
-                {allActions.length} {myActions[0] && <>Other</>} Available
-                Actions
+                {allFlows.length} {myFlows[0] && <>Other</>} Available
+                Flows
               </Text>
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
@@ -117,22 +117,22 @@ export default function Actions() {
             </Inline>
           )}
         </>
-      </StyledDivForActionsGrid>
+      </StyledDivForFlowsGrid>
 
-      <StyledDivForActionsGrid>
-        {allActions.map((actionInfo, index) => (
+      <StyledDivForFlowsGrid>
+        {allFlows.map((flowInfo, index) => (
           <div key={index}>
-            <ActionCard actionInfo={actionInfo} />
+            <FlowCard flowInfo={flowInfo} />
           </div>
         ))}
-      </StyledDivForActionsGrid>
+      </StyledDivForFlowsGrid>
     </AppLayout>
   )
 }
 
 const useSortControllers = () => {
-  const storeKeyForParameter = '@actions/sort/parameter'
-  const storeKeyForDirection = '@actions/sort/direction'
+  const storeKeyForParameter = '@flows/sort/parameter'
+  const storeKeyForDirection = '@flows/sort/direction'
 
   const [sortParameter, setSortParameter] = useState<SortParameters>(
     () =>
@@ -160,7 +160,7 @@ const useSortControllers = () => {
   }
 }
 
-const StyledDivForActionsGrid = styled('div', {
+const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',

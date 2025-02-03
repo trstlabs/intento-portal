@@ -10,7 +10,7 @@ import React, { useRef, useState } from 'react'
 
 import { QueryInput } from 'components//Input/QueryInput'
 
-type ActionInfosProps = {
+type FlowInfosProps = {
   readOnly?: boolean
   disabled?: boolean
   // codeId: number
@@ -18,15 +18,15 @@ type ActionInfosProps = {
   size?: 'small' | 'large'
 }
 
-export const ActionInfos = ({
+export const FlowInfos = ({
   readOnly,
   // codeId,
   size = 'large',
-}: ActionInfosProps) => {
+}: FlowInfosProps) => {
   const wrapperRef = useRef<HTMLDivElement>()
   const inputRef = useRef<HTMLInputElement>()
-  // const infos = useActionInfos(codeId)
-  const [isActionListShowing, setActionListShowing] = useState(false)
+  // const infos = useFlowInfos(codeId)
+  const [isFlowListShowing, setFlowListShowing] = useState(false)
 
   // const { balance: availableAmount } = useTokenBalance(tokenSymbol)
   const [tokenSearchQuery, setTokenSearchQuery] = useState('')
@@ -35,7 +35,7 @@ export const ActionInfos = ({
 
 
   useOnClickOutside([wrapperRef], () => {
-    setActionListShowing(false)
+    setFlowListShowing(false)
   })
 
   if (size === 'small') {
@@ -44,7 +44,7 @@ export const ActionInfos = ({
         selected={isInputForSearchFocused}
         ref={wrapperRef}
       >
-        {isActionListShowing && (
+        {isFlowListShowing && (
           <Inline justifyContent="space-between" css={{ padding: '$5 $6' }}>
             <QueryInput
               searchQuery={tokenSearchQuery}
@@ -59,7 +59,7 @@ export const ActionInfos = ({
             <Button
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
-              onClick={() => setActionListShowing(false)}
+              onClick={() => setFlowListShowing(false)}
               iconColor="tertiary"
             />
           </Inline>
@@ -76,7 +76,7 @@ export const ActionInfos = ({
     >
       <StyledDivForWrapper>
         <StyledDivForSelector>
-          {isActionListShowing && (
+          {isFlowListShowing && (
             <QueryInput
               searchQuery={tokenSearchQuery}
               onQueryChange={setTokenSearchQuery}
@@ -91,11 +91,11 @@ export const ActionInfos = ({
          
         </StyledDivForSelector>
         <StyledDivForAmountWrapper>
-          {isActionListShowing && (
+          {isFlowListShowing && (
             <Button
               icon={<IconWrapper icon={<Union />} />}
               variant="ghost"
-              onClick={() => setActionListShowing(false)}
+              onClick={() => setFlowListShowing(false)}
               iconColor="tertiary"
             />
           )}
@@ -106,8 +106,8 @@ export const ActionInfos = ({
           interactive={readOnly ? false : !isInputForAmountFocused}
           onClick={() => {
             if (!readOnly) {
-              if (isActionListShowing) {
-                setActionListShowing(false)
+              if (isFlowListShowing) {
+                setFlowListShowing(false)
               } else {
                 inputRef.current?.focus()
               }

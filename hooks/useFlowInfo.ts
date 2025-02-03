@@ -5,26 +5,26 @@ import {
   DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
 import { useIntentoRpcClient } from './useRPCClient'
-import { QueryActionsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { QueryFlowsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { GlobalDecoderRegistry } from 'intentojs'
 import { PageRequest } from 'intentojs/dist/codegen/cosmos/base/query/v1beta1/pagination'
 
-export const useActionInfos = () => {
+export const useFlowInfos = () => {
   const client = useIntentoRpcClient()
 
   const { data, isLoading } = useQuery(
-    'useActionInfos',
+    'useFlowInfos',
     async () => {
-      const resp: QueryActionsResponse =
-        await client.intento.intent.v1beta1.actions({
+      const resp: QueryFlowsResponse =
+        await client.intento.intent.v1beta1.flows({
           pagination: undefined,
         })
 
-      // Transform each msg in actionInfos
-      const transformedActionInfos = resp.actionInfos.map((actionInfo) => {
+      // Transform each msg in flowInfos
+      const transformedFlowInfos = resp.flowInfos.map((flowInfo) => {
         return {
-          ...actionInfo,
-          msgs: actionInfo.msgs.map((msg) => {
+          ...flowInfo,
+          msgs: flowInfo.msgs.map((msg) => {
             //GlobalDecoderRegistry.unwrapAny(msg.value)
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
@@ -41,7 +41,7 @@ export const useActionInfos = () => {
         }
       })
 
-      return transformedActionInfos
+      return transformedFlowInfos
     },
     {
       enabled: Boolean(client && client.intento),
@@ -54,19 +54,19 @@ export const useActionInfos = () => {
   return [data, isLoading] as const
 }
 
-export const useActionInfo = (id) => {
+export const useFlowInfo = (id) => {
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    ['actionId', id],
+    ['flowId', id],
     async () => {
       if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
       }
-      const actionInfo = (await client.intento.intent.v1beta1.action({ id }))
-        .actionInfo
+      const flowInfo = (await client.intento.intent.v1beta1.flow({ id }))
+        .flowInfo
       return {
-        ...actionInfo,
-        msgs: actionInfo.msgs.map((msg) => {
+        ...flowInfo,
+        msgs: flowInfo.msgs.map((msg) => {
           const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
           wrappedMsg.typeUrl =
             wrappedMsg.typeUrl ==
@@ -92,10 +92,10 @@ export const useActionInfo = (id) => {
   return [data, isLoading] as const
 }
 
-export const useActionHistory = (id, limit: number, key: Uint8Array) => {
+export const useFlowHistory = (id, limit: number, key: Uint8Array) => {
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    `actionHistory/${id}/${key}`,
+    `flowHistory/${id}/${key}`,
     async () => {
       if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
@@ -108,12 +108,12 @@ export const useActionHistory = (id, limit: number, key: Uint8Array) => {
         countTotal: true,
       })
 
-      const actionHistoryResponse =
-        await client.intento.intent.v1beta1.actionHistory({
+      const flowHistoryResponse =
+        await client.intento.intent.v1beta1.flowHistory({
           id: id,
           pagination: pageRequest,
         })
-      return actionHistoryResponse
+      return flowHistoryResponse
     },
     {
       enabled: !!id && !!client?.intento,

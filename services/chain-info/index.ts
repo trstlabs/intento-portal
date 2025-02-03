@@ -11,7 +11,7 @@ import { Params as StakingModuleParams } from 'intentojs/dist/codegen/cosmos/sta
 import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 
 import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/codegen/intento/alloc/v1beta1/query'
-import { QueryParamsResponse as QueryActionParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1beta1/query'
 
 export interface BaseQueryInput {
@@ -192,7 +192,7 @@ export const getAPYForAutoCompound = async (
 ) => {
   try {
     const apy = await getAPY(cosmosClient, client, paramsState, intervalSeconds)
-    const expectedFees = getExpectedActionFee(
+    const expectedFees = getExpectedFlowFee(
       triggerParams,
       durationSeconds,
       nrMessages,
@@ -204,7 +204,7 @@ export const getAPYForAutoCompound = async (
   }
 }
 
-export const getExpectedActionFee = (
+export const getExpectedFlowFee = (
   triggerParams: Params,
   durationSeconds: number,
   lenMsgs: number,
@@ -222,14 +222,14 @@ export const getExpectedActionFee = (
   const periodMinutes = Math.trunc(periodSeconds / 60)
 
   const flexFeeForPeriod =
-    (Number(triggerParams.ActionFlexFeeMul) / 100) * periodMinutes
+    (Number(triggerParams.flowFlexFeeMul) / 100) * periodMinutes
 
-  const actionFee =
+  const flowFee =
     recurrences * flexFeeForPeriod +
-    recurrences * Number(triggerParams.ActionConstantFee) * lenMsgs
-  const actionFeeDenom = convertMicroDenomToDenom(actionFee, 6)
+    recurrences * Number(triggerParams.flowConstantFee) * lenMsgs
+  const flowFeeDenom = convertMicroDenomToDenom(flowFee, 6)
 
-  return Number(actionFeeDenom.toFixed(4))
+  return Number(flowFeeDenom.toFixed(4))
 }
 
 function blockInfoAndCalculateApr(
@@ -364,8 +364,8 @@ async function getAnnualProvisions(client: any) {
   }
 }
 
-export async function getActionParams(client: any) {
-  const resp: QueryActionParamsResponse =
+export async function getFlowParams(client: any) {
+  const resp: QueryFlowParamsResponse =
     await client.intento.intent.v1beta1.params({})
   return resp.params
 }

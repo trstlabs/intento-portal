@@ -58,15 +58,15 @@
       "properties": {
         "rate": {
           "type": "string",
-          "description": "rate is the commission rate charged to delegators, as a fraction."
+          "description": "rate is the commission rate charged to delegators, as a frflow."
         },
         "maxRate": {
           "type": "string",
-          "description": "max_rate defines the maximum commission rate which validator can ever charge, as a fraction."
+          "description": "max_rate defines the maximum commission rate which validator can ever charge, as a frflow."
         },
         "maxChangeRate": {
           "type": "string",
-          "description": "max_change_rate defines the maximum daily increase of the validator commission, as a fraction."
+          "description": "max_change_rate defines the maximum daily increase of the validator commission, as a frflow."
         }
       },
       "additionalProperties": false,

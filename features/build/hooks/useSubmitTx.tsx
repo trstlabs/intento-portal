@@ -20,13 +20,13 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 
 type UseSubmitTxArgs = {
-  actionInput: ActionInput
+  flowInput: FlowInput
 }
 
-export const useSubmitTx = ({ actionInput }: UseSubmitTxArgs) => {
+export const useSubmitTx = ({ flowInput }: UseSubmitTxArgs) => {
   const { address, client, status } = useRecoilValue(walletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -35,21 +35,21 @@ export const useSubmitTx = ({ actionInput }: UseSubmitTxArgs) => {
   const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
 
   return useMutation(
-    'submitAction',
+    'submitFlow',
     async () => {
-      const error = "Could not submit action: "
+      const error = "Could not submit flow: "
       if (status !== WalletStatusType.connected) {
         throw new Error(error + 'Wallet not connected. Please try reconnecting your wallet.')
       }
-      if (actionInput.msgs.length == 0) {
+      if (flowInput.msgs.length == 0) {
         throw new Error(error + "no messages")
 
       }
 
-      console.log(actionInput)
+      console.log(flowInput)
       const response: DeliverTxResponse = await executeSubmitTx({
         owner: address,
-        actionInput,
+        flowInput,
         client,
       })
       return response
@@ -57,10 +57,10 @@ export const useSubmitTx = ({ actionInput }: UseSubmitTxArgs) => {
     {
       onSuccess(data) {
         console.log(data)
-        let actionID = data.events
+        let flowID = data.events
           .find((event) => event.type == 'transaction')
-          .attributes.find((attr) => attr.key == 'action-id').value
-        console.log(actionID)
+          .attributes.find((attr) => attr.key == 'flow-id').value
+        console.log(flowID)
         toast.custom((t) => (
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}

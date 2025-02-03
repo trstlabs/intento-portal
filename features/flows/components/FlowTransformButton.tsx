@@ -1,11 +1,11 @@
-import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action';
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow';
 import { useRouter } from 'next/router';
-import { ActionInput } from '../../../types/trstTypes';
+import { FlowInput } from '../../../types/trstTypes';
 import { Button, CopyIcon } from 'junoblocks';
-import { fetchActionMsgs } from '../../../hooks/useGetMsgsFromAPI';
+import { fetchFlowMsgs } from '../../../hooks/useGetMsgsFromAPI';
 
 
-export const ActionTransformButton = ({ actionInfo }) => {
+export const FlowTransformButton = ({ flowInfo }) => {
     const router = useRouter();
 
     const convertBigIntToString = (obj) => {
@@ -26,13 +26,13 @@ export const ActionTransformButton = ({ actionInfo }) => {
     };
 
 
-    const transformActionInfo = async (info: ActionInfo) => {
+    const transformFlowInfo = async (info: FlowInfo) => {
 
 
-        const msgs = await transformActionMsgs(info)
+        const msgs = await transformFlowMsgs(info)
         console.log(msgs)
-        // Transform ActionInfo to ActionInput
-        const actionInput: ActionInput = {
+        // Transform FlowInfo to FlowInput
+        const flowInput: FlowInput = {
             // Your transformation logic here
             duration: info.endTime.getMilliseconds() - info.startTime.getMilliseconds(),
             msgs: msgs,
@@ -44,17 +44,17 @@ export const ActionTransformButton = ({ actionInfo }) => {
             label: info.label
 
         };
-        console.log(actionInput)
-        return actionInput;
+        console.log(flowInput)
+        return flowInput;
 
     };
 
     const handleClick = async () => {
-        let actionInput = await transformActionInfo(actionInfo);
-        actionInput = convertBigIntToString(actionInput);
+        let flowInput = await transformFlowInfo(flowInfo);
+        flowInput = convertBigIntToString(flowInput);
         router.push({
             pathname: '/build',
-            query: { actionInput: JSON.stringify(actionInput) }
+            query: { flowInput: JSON.stringify(flowInput) }
         });
     };
 
@@ -62,7 +62,7 @@ export const ActionTransformButton = ({ actionInfo }) => {
 };
 
 ///temporary solution as typeUrls get lost in retrieving from intentojs/telescope as the objects are unwrapped there with the GlobalRegistry. We cannnot transpile without that setting becasue then we loose the full registry  needed to unwrap/wrap ourselves and  osmosis.gamm.v1beta1.load(registry) is unavailable without the useGlobalDecoderRegistry setting
-async function transformActionMsgs(info) {
+async function transformFlowMsgs(info) {
             // let msgs: string[] = []
         // info.msgs.forEach((msgAny: any, index) => {
         //     // console.log(msgAny.valueDecoded)
@@ -91,7 +91,7 @@ async function transformActionMsgs(info) {
         //         //     msgAny.valueDecoded.msgs[indexExec].typeUrl = wrappedMsg.typeUrl
 
         //         // })
-        //         msgAny.valueDecoded = await fetchActionMsgs(info.id.toString())
+        //         msgAny.valueDecoded = await fetchFlowMsgs(info.id.toString())
         //     }
         //     console.log(msgAny.valueDecoded)
 
@@ -102,9 +102,12 @@ async function transformActionMsgs(info) {
         // });
     let msgs: string[] = []
     if (info.msgs[0].typeUrl === '/cosmos.authz.v1beta1.MsgExec') {
-        const msgsObj = await fetchActionMsgs(info.id.toString());
+        const msgsObj = await fetchFlowMsgs(info.id.toString());
         msgsObj.forEach((msgObj: any, index) => {
-            const msg = JSON.stringify(msgObj, null, 2)
+            const msg = JSON.stringify(msgObj, (key, value) =>
+                typeof value === "bigint" ? value.toString() : value,
+                2
+              );
             msgs[index] = msg
         })
     } else {
@@ -112,7 +115,10 @@ async function transformActionMsgs(info) {
             console.log(msgAny.valueDecoded)
 
             const msgObj = { typeUrl: msgAny.typeUrl, value: msgAny.valueDecoded }
-            const msg = JSON.stringify(msgObj, null, 2)
+            const msg = JSON.stringify(msgObj, (key, value) =>
+                typeof value === "bigint" ? value.toString() : value,
+                2
+              );
             msgs[index] = msg
             console.log(msgs)
         })
@@ -122,5 +128,5 @@ async function transformActionMsgs(info) {
     return msgs;
 }
 
-export default ActionTransformButton;
+export default FlowTransformButton;
 

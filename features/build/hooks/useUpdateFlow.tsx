@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeUpdateAction } from '../../../services/build'
+import { executeUpdateFlow } from '../../../services/build'
 import {
     TransactionStatus,
     transactionStatusState,
@@ -20,33 +20,33 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 
-import { MsgUpdateActionParams } from '../../../types/trstTypes'
+import { MsgUpdateFlowParams } from '../../../types/trstTypes'
 
 
-type UseUpdateActionArgs = {
-    actionParams: MsgUpdateActionParams
+type UseUpdateFlowArgs = {
+    flowParams: MsgUpdateFlowParams
 }
 
-export const useUpdateAction = ({
-    actionParams,
-}: UseUpdateActionArgs) => {
+export const useUpdateFlow = ({
+    flowParams,
+}: UseUpdateFlowArgs) => {
     const { client, status, address } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
     const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
     return useMutation(
-        'updateAction',
+        'updateFlow',
         async () => {
             if (status !== WalletStatusType.connected) {
                 throw new Error('Please connect your wallet.')
             }
-            if (address !== actionParams.owner) {
-                throw new Error('This feature will only work for the owner: '+ actionParams.owner)
+            if (address !== flowParams.owner) {
+                throw new Error('This feature will only work for the owner: '+ flowParams.owner)
             }
 
-            return await executeUpdateAction({
-                actionParams,
+            return await executeUpdateFlow({
+                flowParams,
                 client,
             })
 
@@ -59,7 +59,7 @@ export const useUpdateAction = ({
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
                         title="Your trigger is updated!"
-                        body={`An on-chain trigger was updated succesfully`}
+                        body={`An on-chain flow was updated succesfully`}
 
                         onClose={() => toast.dismiss(t.id)}
                     />

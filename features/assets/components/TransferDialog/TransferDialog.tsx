@@ -102,9 +102,9 @@ export const TransferDialog = ({
   const capitalizedTransactionType =
     transactionKind === 'deposit' ? 'Deposit' : 'Withdraw'
 
-  const WalletInfoPerformingActionFrom =
+  const WalletInfoPerformingFlowFrom =
     transactionKind === 'deposit' ? KeplrWalletInfo : AppWalletInfo
-  const WalletInfoPerformingActionAgainst =
+  const WalletInfoPerformingFlowAgainst =
     transactionKind === 'withdraw' ? KeplrWalletInfo : AppWalletInfo
 
   return (
@@ -113,7 +113,7 @@ export const TransferDialog = ({
         <Text variant="header">{capitalizedTransactionType}</Text>
       </DialogHeader>
       <DialogContent>
-        <WalletInfoPerformingActionFrom css={{ paddingBottom: '$12' }} />
+        <WalletInfoPerformingFlowFrom css={{ paddingBottom: '$12' }} />
         <AssetSelector
           activeTokenSymbol={tokenSymbol}
           onTokenSymbolSelect={onTokenSelect}
@@ -139,7 +139,7 @@ export const TransferDialog = ({
       </DialogContent>
       <DialogDivider offsetY="$10" />
       <DialogContent css={{ paddingBottom: '$8' }}>
-        <WalletInfoPerformingActionAgainst depositing={true} />
+        <WalletInfoPerformingFlowAgainst depositing={true} />
       </DialogContent>
       <DialogButtons
         cancellationButton={

@@ -1,8 +1,8 @@
 import { Text, Tooltip, Button, UnionIcon, Divider } from "junoblocks";
 import { Field } from "./Fields";
-import { ICQConfig } from "intentojs/dist/codegen/intento/intent/v1beta1/action";
+import { ICQConfig } from "intentojs/dist/codegen/intento/intent/v1beta1/flow";
 import Dropdown from "./Dropdown";
-import { TimeoutPolicy } from "intentojs/dist/codegen/intento/interchainquery/v1/genesis";
+import { TimeoutPolicy } from "intentojs/dist/codegen/stride/interchainquery/v1/genesis";
 import { ChainSelector } from "../ChainSelector/ChainSelector";
 import { useState } from "react";
 import * as bech32 from "bech32";
@@ -268,7 +268,7 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
 // Map enum values to human-readable labels
 const TimeoutPolicyLabels: { [key in TimeoutPolicy]: string } = {
   [TimeoutPolicy.REJECT_QUERY_RESPONSE]: "Reject Response",
-  [TimeoutPolicy.EXECUTE_QUERY_CALLBACK]: "Execute Action",
+  [TimeoutPolicy.EXECUTE_QUERY_CALLBACK]: "Execute Flow",
   [TimeoutPolicy.UNRECOGNIZED]: "",
   [TimeoutPolicy.RETRY_QUERY_REQUEST]: "Retry Once",
 };

@@ -1,6 +1,6 @@
 import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper } from "junoblocks"
 import { Field } from "./Fields"
-import { ComparisonOperator, Comparison } from "intentojs/dist/codegen/intento/intent/v1beta1/action"
+import { ComparisonOperator, Comparison } from "intentojs/dist/codegen/intento/intent/v1beta1/flow"
 import ConditionDropdown from "./ConditionDropdown"
 
 import Dropdown from "./Dropdown"
@@ -96,10 +96,10 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
 
       />
       <Field
-        label="Action ID (optional)"
-        tooltip="Action to get the latest response value from, optional"
-        value={comparison?.actionId?.toString()}
-        onChange={(e) => handleFieldChange('actionId', BigInt(Number(e.target.value)))}
+        label="Flow ID (optional)"
+        tooltip="Flow to get the latest response value from, optional"
+        value={comparison?.flowId?.toString()}
+        onChange={(e) => handleFieldChange('flowId', BigInt(Number(e.target.value)))}
 
       />
       <Button css={{ marginBottom: '$6' }}

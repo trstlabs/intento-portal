@@ -152,7 +152,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Inline css={{ paddingLeft: '$4' }}>Transfer</Inline>
         </Button>
       </Link> */}
-      {process.env.NEXT_PUBLIC_ACTION_ENABLED == 'true' && (
+      {process.env.NEXT_PUBLIC_FLOW_ENABLED == 'true' && (
         <Link href="/build" passHref>
           <Button
             as="a"
@@ -161,7 +161,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             iconLeft={<GearIcon />}
             selected={getIsLinkActive('/build')}
           >
-            <Inline css={{ paddingLeft: '$4' }}>Action Builder </Inline>
+            <Inline css={{ paddingLeft: '$4' }}>Flow Builder </Inline>
           </Button>
         </Link>
       )}

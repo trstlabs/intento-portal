@@ -11,7 +11,7 @@ import {
   PlusIcon,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConditions } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { ExecutionConditions } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { FieldArray } from './Fields'
 import { ComparisonForm } from './ComparisonForm'
 import { FeedbackLoopForm } from './FeedbackLoopForm'
@@ -50,7 +50,7 @@ export const Conditions = ({
   const handleAddFeedbackLoop = () => {
     let newConditions = conditions
     const newValue = {
-      actionId: BigInt(0),
+      flowId: BigInt(0),
       responseIndex: 0,
       responseKey: "",
       valueType: "string",
@@ -64,7 +64,7 @@ export const Conditions = ({
   const handleAddComparison = () => {
     let newConditions = conditions
     const newValue = {
-      actionId: BigInt(0),
+      flowId: BigInt(0),
       responseIndex: 0,
       responseKey: "",
       valueType: "string",
@@ -199,10 +199,10 @@ export const Conditions = ({
               >
                 <Tooltip
                   label={
-                    "Depend execution on result of other actions"}>
+                    "Depend execution on result of other flows"}>
                   <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Stoplights🚦 </Text>
                 </Tooltip>
-                {/* <Text variant="body"> Depend execution on result of other intent-based actions</Text> */}
+                {/* <Text variant="body"> Depend execution on result of other intent-based flows</Text> */}
                 {/* Add more UI elements to handle other properties of ExecutionConditions */}
                 <FieldArray
                   label="Stop On Success Of "
@@ -211,7 +211,7 @@ export const Conditions = ({
                   disabled={false}
                 />
                 <FieldArray
-                  label="Stop On Error Of "
+                  label="Stop on Failure Of "
                   values={conditions.stopOnFailureOf}
                   onChange={(value) => handleInputChange('stopOnFailureOf', value)}
                   disabled={false}
