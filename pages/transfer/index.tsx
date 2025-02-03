@@ -26,9 +26,9 @@ export default function Transfer() {
     selectedToken: null,
   })
 
-  function handleAssetCardActionClick({ actionType, tokenSymbol }) {
+  function handleAssetCardFlowClick({ flowType, tokenSymbol }) {
     updateState({
-      transactionKind: actionType,
+      transactionKind: flowType,
       selectedToken: tokenSymbol,
       isTransferDialogShowing: true,
     })
@@ -99,7 +99,7 @@ export default function Transfer() {
             title="IBC Transfer"
             subtitle="Easily transfer assets across IBC."
           />
-          <AssetsList onActionClick={handleAssetCardActionClick} />
+          <AssetsList onFlowClick={handleAssetCardFlowClick} />
         </StyledWrapper>
       </AppLayout>
       {selectedToken && (

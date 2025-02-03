@@ -6,7 +6,7 @@ import { __TRANSFERS_ENABLED__ } from 'util/constants'
 import { useGetIBCAssetsBalances } from '../hooks/useGetSupportedAssetsBalances'
 import { AssetCard, AssetCardState } from './AssetCard'
 
-export const AssetsList = ({ onActionClick }) => {
+export const AssetsList = ({ onFlowClick }) => {
   const [loadingBalances, [myTokens, allTokens]] =
   useGetIBCAssetsBalances()
 
@@ -43,7 +43,7 @@ export const AssetsList = ({ onActionClick }) => {
                       state={AssetCardState.active}
                       key={tokenSymbol}
                       tokenSymbol={tokenSymbol}
-                      onActionClick={onActionClick}
+                      onFlowClick={onFlowClick}
                       balance={balance}
                     />
                   ))}
@@ -92,7 +92,7 @@ export const AssetsList = ({ onActionClick }) => {
               <AssetCard
                 key={tokenSymbol}
                 tokenSymbol={tokenSymbol}
-                onActionClick={onActionClick}
+                onFlowClick={onFlowClick}
                 balance={balance}
               />
             ))}

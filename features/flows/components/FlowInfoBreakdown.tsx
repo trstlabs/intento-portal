@@ -20,8 +20,8 @@ import {
 import Link from 'next/link'
 import React from 'react'
 
-import { MsgUpdateActionParams } from '../../../types/trstTypes'
-import { ActionInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { MsgUpdateFlowParams } from '../../../types/trstTypes'
+import { FlowInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -32,32 +32,32 @@ import {
 } from '../../../hooks/useICA'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
-import { useSendFundsOnHost, useUpdateAction } from '../../build/hooks'
+import { useSendFundsOnHost, useUpdateFlow } from '../../build/hooks'
 import { JsonCodeMirrorEditor } from '../../build/components/Editor/CodeMirror'
 import { getDuration, getRelativeTime } from '../../../util/time'
 import { getIntentoSigningClientOptions } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 import { Any } from 'cosmjs-types/google/protobuf/any'
-import { ActionHistory } from './ActionHistory'
-import ActionTransformButton from './ActionTransformButton'
+import { FlowHistory } from './FlowHistory'
+import FlowTransformButton from './FlowTransformButton'
 import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
-import { TimeoutPolicy } from 'intentojs/dist/codegen/intento/interchainquery/v1/genesis'
+import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
 import { Configuration } from '../../build/components/Conditions/Configuration'
 import { GlobalDecoderRegistry } from 'intentojs'
 import { MsgExec } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/tx'
 
 
-type ActionInfoBreakdownProps = {
-  actionInfo: ActionInfo
+type FlowInfoBreakdownProps = {
+  flowInfo: FlowInfo
   ibcInfo: IBCAssetInfo
 }
 
-export const ActionInfoBreakdown = ({
-  actionInfo,
+export const FlowInfoBreakdown = ({
+  flowInfo,
   ibcInfo,
 }: //size = 'large',
-  ActionInfoBreakdownProps) => {
-  const [icaAddress, _] = useGetICA(actionInfo.icaConfig?.connectionId, actionInfo.owner)
+  FlowInfoBreakdownProps) => {
+  const [icaAddress, _] = useGetICA(flowInfo.icaConfig?.connectionId, flowInfo.owner)
 
   const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
@@ -70,12 +70,12 @@ export const ActionInfoBreakdown = ({
   )
 
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
-    actionInfo.feeAddress
+    flowInfo.feeAddress
   )
   const isActive =
-    actionInfo.endTime &&
-    actionInfo.execTime &&
-    actionInfo.endTime.getTime() >= actionInfo.execTime.getTime() && actionInfo.endTime.getTime() > Date.now()
+    flowInfo.endTime &&
+    flowInfo.execTime &&
+    flowInfo.endTime.getTime() >= flowInfo.execTime.getTime() && flowInfo.endTime.getTime() > Date.now()
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
@@ -136,17 +136,17 @@ export const ActionInfoBreakdown = ({
     return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
   }
 
-  //////////////////////////////////////// Action message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [isJsonValid, setIsJsonValid] = useState(true)
   const [editor, setEditor] = useState(false)
   const [editMsg, setEditMsg] = useState('')
   const [editConfig, setEditConfig] = useState(false)
-  let actionParams: MsgUpdateActionParams = {
-    id: Number(actionInfo.id),
-    owner: actionInfo.owner,
+  let flowParams: MsgUpdateFlowParams = {
+    id: Number(flowInfo.id),
+    owner: flowInfo.owner,
   }
 
-  const [updatedActionParams, setUpdatedActionParams] = useState(actionParams)
+  const [updatedFlowParams, setUpdatedFlowParams] = useState(flowParams)
 
   function showEditor(show: boolean, msg: Any) {
     setEditor(show)
@@ -156,22 +156,22 @@ export const ActionInfoBreakdown = ({
     }
     setEditMsg('')
   }
-  const [requestedUpdateAction, setRequestedUpdateAction] = useState(false)
-  const { mutate: handleUpdateAction, isLoading: isExecutingUpdateAction } =
-    useUpdateAction({ actionParams: updatedActionParams })
+  const [requestedUpdateFlow, setRequestedUpdateFlow] = useState(false)
+  const { mutate: handleUpdateFlow, isLoading: isExecutingUpdateFlow } =
+    useUpdateFlow({ flowParams: updatedFlowParams })
   useEffect(() => {
-    const shouldTriggerUpdateAction =
-      !isExecutingUpdateAction && requestedUpdateAction
-    if (shouldTriggerUpdateAction) {
-      handleUpdateAction(undefined, {
-        onSettled: () => setRequestedUpdateAction(false),
+    const shouldTriggerUpdateFlow =
+      !isExecutingUpdateFlow && requestedUpdateFlow
+    if (shouldTriggerUpdateFlow) {
+      handleUpdateFlow(undefined, {
+        onSettled: () => setRequestedUpdateFlow(false),
       })
     }
-  }, [isExecutingUpdateAction, requestedUpdateAction, handleUpdateAction])
+  }, [isExecutingUpdateFlow, requestedUpdateFlow, handleUpdateFlow])
 
 
   //todo add support for multiple messages in exec message array
-  const handleUpdateActionMsgClick = (index: number) => {
+  const handleUpdateFlowMsgClick = (index: number) => {
     connectExternalWallet(null)
     if (!isJsonValid) {
       //alert("Invalid JSON")
@@ -179,14 +179,14 @@ export const ActionInfoBreakdown = ({
     }
     try {
       let value = JSON.parse(editMsg)
-      let params: MsgUpdateActionParams = {
-        id: Number(actionInfo.id),
+      let params: MsgUpdateFlowParams = {
+        id: Number(flowInfo.id),
         msgs: [],
-        owner: actionInfo.owner,
+        owner: flowInfo.owner,
       }
       console.log(value)
-      if (actionInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
-        const msgExecDecoded = registry.decode(actionInfo.msgs[index])
+      if (flowInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
+        const msgExecDecoded = registry.decode(flowInfo.msgs[index])
 
         msgExecDecoded.msgs.forEach((msgExecMsg, i) => {
 
@@ -205,24 +205,24 @@ export const ActionInfoBreakdown = ({
 
 
       } else {
-        console.log(actionInfo.msgs[0])
+        console.log(flowInfo.msgs[0])
         const encodeObject = {
-          typeUrl: actionInfo.msgs[index].typeUrl,
+          typeUrl: flowInfo.msgs[index].typeUrl,
           value,
         }
         const msgEncoded = registry.encodeAsAny(encodeObject)
         params.msgs = [msgEncoded]
       }
 
-      setUpdatedActionParams(params)
+      setUpdatedFlowParams(params)
       console.log(params)
     } catch (e) {
       console.log(e)
     }
-    return setRequestedUpdateAction(true)
+    return setRequestedUpdateFlow(true)
   }
 
-  const handleUpdateActionConfigClick = (config: ExecutionConfiguration) => {
+  const handleUpdateFlowConfigClick = (config: ExecutionConfiguration) => {
 
     if (!isJsonValid) {
       //alert("Invalid JSON")
@@ -230,30 +230,30 @@ export const ActionInfoBreakdown = ({
     }
     try {
 
-      let params: MsgUpdateActionParams = {
-        id: Number(actionInfo.id),
+      let params: MsgUpdateFlowParams = {
+        id: Number(flowInfo.id),
         configuration: config,
-        owner: actionInfo.owner,
+        owner: flowInfo.owner,
       }
 
-      setUpdatedActionParams(params)
+      setUpdatedFlowParams(params)
       console.log(params)
     } catch (e) {
       console.log(e)
     }
-    return setRequestedUpdateAction(true)
+    return setRequestedUpdateFlow(true)
   }
-  const shouldDisableUpdateActionButton = false // !updatedActionParams || !updatedActionParams.id
+  const shouldDisableUpdateFlowButton = false // !updatedFlowParams || !updatedFlowParams.id
 
   ////
 
-  // const [icaUpdateActions, isUpdateActionsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, actionInfo)
+  // const [icaUpdateFlows, isUpdateFlowsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, flowInfo)
   /*  if (size === 'small') {
          return (
              <>
                  <InfoHeader
-                     id={actionInfo.id}
-                     owner={actionInfo.owner}
+                     id={flowInfo.id}
+                     owner={flowInfo.owner}
                      good={isActive}
                  />
                  <Inline
@@ -277,8 +277,8 @@ export const ActionInfoBreakdown = ({
   return (
     <>
       <InfoHeader
-        id={actionInfo.id.toString()}
-        owner={actionInfo.owner}
+        id={flowInfo.id.toString()}
+        owner={flowInfo.owner}
         good={isActive}
       />
       {/* <Row> */}
@@ -308,10 +308,10 @@ export const ActionInfoBreakdown = ({
               {isActive && <>🟢 </>}
             </Text>
             <Text variant="legend">
-              {actionInfo.label != '' ? (
-                <> {actionInfo.label}</>
+              {flowInfo.label != '' ? (
+                <> {flowInfo.label}</>
               ) : (
-                <>Action {actionInfo.id.toString()}</>
+                <>Flow {flowInfo.id.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">
@@ -320,7 +320,7 @@ export const ActionInfoBreakdown = ({
                 <>
                   {' '}
                   {
-                    actionInfo.msgs[0].typeUrl
+                    flowInfo.msgs[0].typeUrl
                       .split('.')
                       .find((fetchedHistory) => fetchedHistory.includes('Msg')).split(',')[0]
 
@@ -339,7 +339,7 @@ export const ActionInfoBreakdown = ({
           align="flex-end"
 
         >
-          <ActionTransformButton actionInfo={actionInfo} />
+          <FlowTransformButton flowInfo={flowInfo} />
         </Column>
         <Row>
           <Inline
@@ -357,9 +357,9 @@ export const ActionInfoBreakdown = ({
                 Owner
               </Text>
 
-              <Text variant="body">{actionInfo.owner} </Text>
+              <Text variant="body">{flowInfo.owner} </Text>
             </Column>
-            {actionInfo.icaConfig.portId && (
+            {flowInfo.icaConfig.portId && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <Column
                 css={{ padding: '$3' }}
@@ -371,14 +371,14 @@ export const ActionInfoBreakdown = ({
                   IBC Port
                 </Text>
 
-                <Text variant="body">{actionInfo.icaConfig.portId} </Text>
+                <Text variant="body">{flowInfo.icaConfig.portId} </Text>
               </Column>
             )}
 
           </Inline>
         </Row>
 
-        {icaAddress && icaBalance && actionInfo.icaConfig && (
+        {icaAddress && icaBalance && flowInfo.icaConfig && (
           <Row>
             <Column
               style={{
@@ -479,12 +479,12 @@ export const ActionInfoBreakdown = ({
             >
 
               <Text variant="legend" color="secondary" align="left">
-                Action Address
+                Flow Address
               </Text>
             </Tooltip>
             <Inline gap={2}>
               <Text css={{ wordBreak: 'break-all' }} variant="body">
-                {actionInfo.feeAddress}{' '}
+                {flowInfo.feeAddress}{' '}
               </Text>
             </Inline>
             {!isFeeBalanceLoading && feeBalance > 0 && (
@@ -494,12 +494,12 @@ export const ActionInfoBreakdown = ({
               </Text>
             )}
 
-            {actionInfo.hostedConfig.hostedAddress && (
+            {flowInfo.hostedConfig.hostedAddress && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <>
                 <Tooltip
                   label={
-                    "Address of the Hosted Account that is used to execute actions on the target chain. A hosted account has it's own fee configuration"
+                    "Address of the Hosted Account that is used to execute flows on the target chain. A hosted account has it's own fee configuration"
                   }
                 >
                   <Text variant="legend" color="secondary" align="left">
@@ -507,9 +507,9 @@ export const ActionInfoBreakdown = ({
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
-                  {actionInfo.hostedConfig.hostedAddress}{' '}<a
+                  {flowInfo.hostedConfig.hostedAddress}{' '}<a
                     target={'_blank'}
-                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1beta1/hosted-account/${actionInfo.hostedConfig.hostedAddress}`}
+                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1beta1/hosted-account/${flowInfo.hostedConfig.hostedAddress}`}
                     rel="noopener noreferrer"
                   >
                     <b>View</b>
@@ -521,7 +521,7 @@ export const ActionInfoBreakdown = ({
             )}
           </Column>
         </Row>
-        {actionInfo.msgs.map((msg: any, index) => (
+        {flowInfo.msgs.map((msg: any, index) => (
           <div key={index}>
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -589,10 +589,10 @@ export const ActionInfoBreakdown = ({
                       css={{ marginTop: '$8', margin: '$2' }}
                       variant="secondary"
                       size="small"
-                      disabled={shouldDisableUpdateActionButton}
-                      onClick={() => handleUpdateActionMsgClick(index)}
+                      disabled={shouldDisableUpdateFlowButton}
+                      onClick={() => handleUpdateFlowMsgClick(index)}
                     >
-                      {isExecutingUpdateAction ? (
+                      {isExecutingUpdateFlow ? (
                         <Spinner instant />
                       ) : (
                         'Update Message'
@@ -605,11 +605,11 @@ export const ActionInfoBreakdown = ({
           </div>
         ))}
 
-        {actionInfo.startTime.getTime() > 0 && (
+        {flowInfo.startTime.getTime() > 0 && (
           <Row>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {actionInfo.startTime && (
+              {flowInfo.startTime && (
                 <>
                   <Tooltip
                     label={
@@ -622,7 +622,7 @@ export const ActionInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(actionInfo.startTime.getTime())}
+                      {getRelativeTime(flowInfo.startTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -638,10 +638,10 @@ export const ActionInfoBreakdown = ({
               </Tooltip>
               <Inline gap={2}>
                 <Text variant="body">
-                  {getRelativeTime(actionInfo.execTime.getTime())}
+                  {getRelativeTime(flowInfo.execTime.getTime())}
                 </Text>
               </Inline>
-              {actionInfo.interval.seconds.toString() != '0' && (
+              {flowInfo.interval.seconds.toString() != '0' && (
                 <>
                   {' '}
                   <Tooltip
@@ -653,12 +653,12 @@ export const ActionInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getDuration(Number(actionInfo.interval.seconds))}
+                      {getDuration(Number(flowInfo.interval.seconds))}
                     </Text>
                   </Inline>
                 </>
               )}
-              {actionInfo.endTime.getTime() && (
+              {flowInfo.endTime.getTime() && (
                 <>
                   <Tooltip
                     label={'End time is the time last time execution can place'}
@@ -669,7 +669,7 @@ export const ActionInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(actionInfo.endTime.getTime())}
+                      {getRelativeTime(flowInfo.endTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -679,7 +679,7 @@ export const ActionInfoBreakdown = ({
         )}
 
 
-        {actionInfo.conditions.comparisons && actionInfo.conditions.comparisons.map((comparison) => (
+        {flowInfo.conditions.comparisons && flowInfo.conditions.comparisons.map((comparison) => (
           <Row>
             <Column gap={8} align="flex-start" justifyContent="flex-start">
 
@@ -695,8 +695,8 @@ export const ActionInfoBreakdown = ({
                 </Tooltip>
 
                 <>
-                  {comparison.actionId.toString() != "0" && (<Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">ID</Text>  {comparison.actionId.toString()}
+                  {comparison.flowId.toString() != "0" && (<Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">ID</Text>  {comparison.flowId.toString()}
                   </Text>)}
                   <Text variant="body">
                     <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {comparison.responseIndex}
@@ -720,7 +720,7 @@ export const ActionInfoBreakdown = ({
             </Column>
           </Row>
         ))}
-        {actionInfo.conditions.feedbackLoops && actionInfo.conditions.feedbackLoops.map((feedbackLoop) => (
+        {flowInfo.conditions.feedbackLoops && flowInfo.conditions.feedbackLoops.map((feedbackLoop) => (
           <><Row>
             <Column gap={4} align="flex-start" justifyContent="flex-start">
               <Tooltip
@@ -734,9 +734,9 @@ export const ActionInfoBreakdown = ({
               </Tooltip>
 
 
-              {feedbackLoop.actionId.toString() != "0" && (
+              {feedbackLoop.flowId.toString() != "0" && (
                 <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.actionId.toString()}
+                  <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
                 </Text>)}
               {feedbackLoop.responseIndex != 0 &&
                 <Text variant="body">
@@ -764,16 +764,16 @@ export const ActionInfoBreakdown = ({
           </>
 
         ))}
-        {actionInfo.configuration && (
+        {flowInfo.configuration && (
           showConfiguration()
 
         )}
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {actionInfo.conditions.skipOnFailureOf.length != 0 && (
+          {flowInfo.conditions.skipOnFailureOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
-                  "Skip execution when dependent actions fail"
+                  "Skip execution when dependent flows fail"
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
@@ -782,17 +782,17 @@ export const ActionInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {actionInfo.conditions.skipOnFailureOf}
+                {flowInfo.conditions.skipOnFailureOf}
               </Text>
             </Row>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {actionInfo.conditions.skipOnSuccessOf.length != 0 && (
+          {flowInfo.conditions.skipOnSuccessOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
-                  "Skip execution when dependent actions succeed"
+                  "Skip execution when dependent flows succeed"
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
@@ -801,36 +801,36 @@ export const ActionInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {actionInfo.conditions.skipOnSuccessOf}
+                {flowInfo.conditions.skipOnSuccessOf}
               </Text>
             </Row>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {actionInfo.conditions.stopOnFailureOf.length != 0 && (
+          {flowInfo.conditions.stopOnFailureOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
-                  "Stop execution when dependent actions fail"
+                  "Stop execution when dependent flows fail"
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
-                  Stop on Error Of
+                  Stop on Failure Of
                 </Text>
               </Tooltip>
 
               <Text variant="body">
-                {actionInfo.conditions.stopOnFailureOf}
+                {flowInfo.conditions.stopOnFailureOf}
               </Text>
             </Row>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {actionInfo.conditions.stopOnSuccessOf.length != 0 && (
+          {flowInfo.conditions.stopOnSuccessOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
-                  "Stop execution when dependent actions succeed"
+                  "Stop execution when dependent flows succeed"
                 }
               >
                 <Text variant="legend" color="secondary" align="left">
@@ -839,7 +839,7 @@ export const ActionInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {actionInfo.conditions.stopOnSuccessOf}
+                {flowInfo.conditions.stopOnSuccessOf}
               </Text>
             </Row>
           )}
@@ -849,7 +849,7 @@ export const ActionInfoBreakdown = ({
 
 
 
-        {/* {actionInfo.updateHistory.length != 0 && (
+        {/* {flowInfo.updateHistory.length != 0 && (
           <>
             {' '}
             <Row>
@@ -861,7 +861,7 @@ export const ActionInfoBreakdown = ({
                     Update History
                   </Text>
                 </Inline>
-                {actionInfo.updateHistory?.map((entry, ei) => (
+                {flowInfo.updateHistory?.map((entry, ei) => (
                   <div key={ei}>
                     <Column
                       gap={2}
@@ -878,7 +878,7 @@ export const ActionInfoBreakdown = ({
             </Row>
           </>
         )} */}
-        <ActionHistory id={actionInfo.id.toString()} />
+        <FlowHistory id={flowInfo.id.toString()} />
 
 
       </>
@@ -891,7 +891,7 @@ export const ActionInfoBreakdown = ({
       <Column gap={4} align="flex-start" justifyContent="flex-start">
         <Inline css={{ justifyContent: 'space-between' }} >
           <Tooltip
-            label={"Configuration for the action"}
+            label={"Configuration for the flow"}
           >
             <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
               Configuration
@@ -906,13 +906,13 @@ export const ActionInfoBreakdown = ({
           </Button>
         </Inline>
         {editConfig ?
-          <Configuration config={actionInfo.configuration}
+          <Configuration config={flowInfo.configuration}
             disabled={false}
-            onChange={handleUpdateActionConfigClick} />
+            onChange={handleUpdateFlowConfigClick} />
           :
           <> <>
             <Tooltip
-              label={'If set to true, message responses i.e. outputs may be used as inputs for new actions'}
+              label={'If set to true, message responses i.e. outputs may be used as inputs for new flows'}
             >
               <Text variant="legend" color="secondary" align="left">
                 Save Responses
@@ -920,19 +920,19 @@ export const ActionInfoBreakdown = ({
             </Tooltip>
 
             <Text variant="header">
-              {actionInfo.configuration.saveResponses ? '✔' : '✖'}
+              {flowInfo.configuration.saveResponses ? '✔' : '✖'}
             </Text>
           </>
             <>
               <Tooltip
-                label={'If set to true, the action settings can not be updated'}
+                label={'If set to true, the flow settings can not be updated'}
               >
                 <Text variant="legend" color="secondary" align="left">
                   Updating Disabled
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {actionInfo.configuration.updatingDisabled ? '✔' : '✖'}
+                {flowInfo.configuration.updatingDisabled ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -940,11 +940,11 @@ export const ActionInfoBreakdown = ({
                 label={'If set to true, stops on any errors that occur'}
               >
                 <Text variant="legend" color="secondary" align="left">
-                  Stop On Error
+                  Stop on Failure
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {actionInfo.configuration.stopOnFailure ? '✔' : '✖'}
+                {flowInfo.configuration.stopOnFailure ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -956,7 +956,7 @@ export const ActionInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {actionInfo.configuration.stopOnSuccess ? '✔' : '✖'}
+                {flowInfo.configuration.stopOnSuccess ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -968,7 +968,7 @@ export const ActionInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {actionInfo.configuration.fallbackToOwnerBalance ? '✔' : '✖'}
+                {flowInfo.configuration.fallbackToOwnerBalance ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -980,7 +980,7 @@ export const ActionInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {actionInfo.conditions.useAndForComparisons ? '✔' : '✖'}
+                {flowInfo.conditions.useAndForComparisons ? '✔' : '✖'}
               </Text>
             </>
           </>
@@ -1057,15 +1057,15 @@ type InfoHeaderProps = {
 const InfoHeader = ({ id, good }: InfoHeaderProps) => (
   <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
     <Inline gap={6}>
-      <Link href="/actions" passHref>
+      <Link href="/flows" passHref>
         <Button as="a" variant="ghost" size="large" iconLeft={<WalletIcon />}>
-          <Inline css={{ paddingLeft: '$4' }}>All Actions</Inline>
+          <Inline css={{ paddingLeft: '$4' }}>All Flows</Inline>
         </Button>
       </Link>
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
     </Inline>
     <Text variant="caption" color="secondary">
-      {good && <>🟢</>} Action {id}
+      {good && <>🟢</>} Flow {id}
     </Text>
   </Inline>
 )

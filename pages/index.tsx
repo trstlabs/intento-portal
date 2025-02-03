@@ -4,8 +4,8 @@ import {
   SortDirections,
   ButtonWithDropdownForSorting,
   SortParameters,
-  useSortActions,
-} from 'features/actions'
+  useSortFlows,
+} from '../features/flows'
 import {
   Column,
   ConnectIcon,
@@ -18,18 +18,18 @@ import {
 } from 'junoblocks'
 import React, { useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
-import { useActionInfos } from 'hooks/useActionInfo'
-import { ActionCard } from '../features/actions/components/ActionCard'
+import { useFlowInfos } from 'hooks/useFlowInfo'
+import { FlowCard } from '../features/flows/components/FlowCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
   const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
-  const [actions, isLoading] = useActionInfos()
+  const [flows, isLoading] = useFlowInfos()
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs = { infos: actions, address }
-  const [myActions, allActions, isSorting] = useSortActions({
+  const infoArgs = { infos: flows, address }
+  const [myFlows, allFlows, isSorting] = useSortFlows({
     infoArgs,
     sortBy: useMemo(
       () => ({
@@ -41,15 +41,15 @@ export default function Home() {
   })
 
   const shouldShowAutoCompound =
-    !myActions?.length ||
-    myActions.find((tx) => tx.label === 'Autocompound') == undefined
-  const shouldShowFetchingState = isLoading && isSorting && !actions?.length
-  const shouldRenderActions = Boolean(actions?.length)
+    !myFlows?.length ||
+    myFlows.find((tx) => tx.label === 'Autocompound') == undefined
+  const shouldShowFetchingState = isLoading && isSorting && !flows?.length
+  const shouldRenderFlows = Boolean(flows?.length)
 
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="View and manage action configurations 🌟"
+      subtitle="View and manage flows 🌟"
     />
   )
 
@@ -84,38 +84,38 @@ export default function Home() {
       )}
       {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
         <Tooltip label="Build messages and workflows, move assets on your behalf">
-          <span>Actions</span>
+          <span>Flows</span>
         </Tooltip>
       </Text> */}
-      {shouldRenderActions && (
+      {shouldRenderFlows && (
         <>
-          {Boolean(myActions?.length) && (
+          {Boolean(myFlows?.length) && (
             <>
               <Text variant="caption" css={{ padding: '$4' }}>
                 {' '}
-                {myActions.length > 1 ? (
-                  <span> Your Actions({myActions.length})</span>
+                {myFlows.length > 1 ? (
+                  <span> Your Flows({myFlows.length})</span>
                 ) : (
-                  <span> Your Action (1)</span>
+                  <span> Your Flow (1)</span>
                 )}
               </Text>
 
-              <StyledDivForActionsGrid>
-                {myActions.map((actionInfo, index) => (
-                  <ActionCard
+              <StyledDivForFlowsGrid>
+                {myFlows.map((flowInfo, index) => (
+                  <FlowCard
                     key={index}
                     //structuredClone does not work on ios
-                    actionInfo={structuredClone(actionInfo)}
+                    flowInfo={structuredClone(flowInfo)}
                   />
                 ))}
-              </StyledDivForActionsGrid>
+              </StyledDivForFlowsGrid>
             </>
           )}
         </>
       )}
-      <StyledDivForActionsGrid>
+      <StyledDivForFlowsGrid>
         <>
-          {Boolean(allActions?.length) ? (
+          {Boolean(allFlows?.length) ? (
             <Inline
               gap={4}
               css={{
@@ -124,8 +124,8 @@ export default function Home() {
               }}
             >
               <Text variant="primary">
-                {allActions.length} {myActions[0] && <>Other</>} Available
-                Actions
+                {allFlows.length} {myFlows[0] && <>Other</>} Available
+                Flows
               </Text>
 
               <ButtonWithDropdownForSorting
@@ -138,21 +138,21 @@ export default function Home() {
           ) : (
             <Text variant="caption" css={{ padding: '$4' }}>
               {' '}
-              No Actions found
+              No Flows found
             </Text>
           )}
         </>
-      </StyledDivForActionsGrid>
+      </StyledDivForFlowsGrid>
 
-      <StyledDivForActionsGrid>
-        {allActions.map((actionInfo, index) => (
-          <ActionCard
+      <StyledDivForFlowsGrid>
+        {allFlows.map((flowInfo, index) => (
+          <FlowCard
             key={index}
             //structuredClone does not work on ios
-            actionInfo={structuredClone(actionInfo)}
+            flowInfo={structuredClone(flowInfo)}
           />
         ))}
-      </StyledDivForActionsGrid>
+      </StyledDivForFlowsGrid>
 
       {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout>
@@ -160,8 +160,8 @@ export default function Home() {
 }
 
 const useSortControllers = () => {
-  const storeKeyForParameter = '@actions/sort/parameter'
-  const storeKeyForDirection = '@actions/sort/direction'
+  const storeKeyForParameter = '@flows/sort/parameter'
+  const storeKeyForDirection = '@flows/sort/direction'
 
   const [sortParameter, setSortParameter] = useState<SortParameters>(
     () =>
@@ -189,7 +189,7 @@ const useSortControllers = () => {
   }
 }
 
-const StyledDivForActionsGrid = styled('div', {
+const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
   columnGap: '$3',

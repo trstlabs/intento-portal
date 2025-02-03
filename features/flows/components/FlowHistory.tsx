@@ -12,32 +12,32 @@ import React from 'react'
 
 import { GlobalDecoderRegistry } from 'intentojs'
 import { convertMicroDenomToDenom } from 'util/conversion'
-import { useActionHistory } from '../../../hooks/useActionInfo'
+import { useFlowHistory } from '../../../hooks/useFlowInfo'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
 
 
-type ActionHistoryProps = {
+type FlowHistoryProps = {
   id: string
 }
 
-export const ActionHistory = ({
+export const FlowHistory = ({
   id,
 }: //size = 'large',
-  ActionHistoryProps) => {
+  FlowHistoryProps) => {
 
-  const [actionHistory, setActionHistory] = useState([]);
+  const [flowHistory, setFlowHistory] = useState([]);
   const [historyLimit] = useState(5); // Define your historyLimit or make it dynamic as needed
   const [fetchNext, setFetchNext] = useState(false);
   const [paginationKey, setPaginationKey] = useState(undefined);
-  const [fetchedHistory, isHistoryLoading] = useActionHistory(id.toString(), historyLimit, paginationKey);
-  const refetchQueries = useRefetchQueries([`actionHistory/${id.toString()}/${paginationKey}`], 15);
+  const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);
+  const refetchQueries = useRefetchQueries([`flowHistory/${id.toString()}/${paginationKey}`], 15);
 
-  // Clear actionHistory when id changes
+  // Clear flowHistory when id changes
   useEffect(() => {
     if (paginationKey == undefined) {
-      setActionHistory([]);
+      setFlowHistory([]);
       // setPaginationKey(undefined);
     }
   }, [fetchedHistory]);
@@ -45,7 +45,7 @@ export const ActionHistory = ({
 
   const uniqueFetchedHistory = useMemo(() => {
     if (fetchedHistory && fetchedHistory.history && fetchedHistory.history.length > 0) {
-      const existingIds = new Set(actionHistory.map(entry => entry.scheduledExecTime));
+      const existingIds = new Set(flowHistory.map(entry => entry.scheduledExecTime));
       //console.log('Existing IDs:', existingIds);
 
       const uniqueEntries = fetchedHistory.history.filter(entry => !existingIds.has(entry.scheduledExecTime));
@@ -54,12 +54,12 @@ export const ActionHistory = ({
       return uniqueEntries;
     }
     return [];
-  }, [fetchedHistory, actionHistory]);
+  }, [fetchedHistory, flowHistory]);
 
   useEffect(() => {
     if (uniqueFetchedHistory.length > 0) {
       console.log('Unique Fetched History:', uniqueFetchedHistory);
-      setActionHistory(prevHistory => {
+      setFlowHistory(prevHistory => {
         const combinedHistory = [...prevHistory, ...uniqueFetchedHistory];
         const uniqueCombinedHistory = combinedHistory.reduce((acc, current) => {
           const x = acc.find(item => item.scheduledExecTime === current.scheduledExecTime); // Ensure this 'id' is unique and reliable
@@ -90,7 +90,7 @@ export const ActionHistory = ({
   return (
 
     <>
-      {actionHistory && actionHistory.length > 0 && (
+      {flowHistory && flowHistory.length > 0 && (
         <>
           {' '}
           <Row>
@@ -103,7 +103,7 @@ export const ActionHistory = ({
                   Execution History
                 </Text>
               </Inline>
-              {actionHistory
+              {flowHistory
                 ?.slice(0).filter((entry, index, self) => self.findIndex(e => e.scheduledExecTime === entry.scheduledExecTime) === index)
                 .map(
                   (

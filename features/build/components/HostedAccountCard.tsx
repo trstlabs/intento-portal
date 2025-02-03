@@ -13,7 +13,7 @@ import { Row } from './BuildComponent'
 import { convertFromMicroDenom } from '../../../util/conversion'
 import { useAuthZGrantsForUser, useGetHostICAAddress } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 
@@ -22,7 +22,7 @@ interface HostedAccountCardProps {
   chainSymbol: string
   chainId: string
   // hostDenom: string
-  actionInput: ActionInput
+  flowInput: FlowInput
 }
 
 export const HostedAccountCard = ({
@@ -30,12 +30,12 @@ export const HostedAccountCard = ({
   chainSymbol,
   chainId,
   //  hostDenom,
-  actionInput,
+  flowInput,
 }: HostedAccountCardProps) => {
   const [showICAInfo, setShowICAInfo] = useState(false)
   const isMobile = useMedia('sm')
 
-  const [hostedAccountAddress, _isIcaLoading] = useGetHostICAAddress(actionInput.connectionId, hostedAccount.hostedAddress)
+  const [hostedAccountAddress, _isIcaLoading] = useGetHostICAAddress(flowInput.connectionId, hostedAccount.hostedAddress)
 
   /*  const [hostedAccountBalance, ishostedAccountBalanceLoading] = useICATokenBalance(
      chainId,
@@ -61,7 +61,7 @@ export const HostedAccountCard = ({
   const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
     chainId,
     hostedAccountAddress,
-    actionInput
+    flowInput
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
@@ -179,7 +179,7 @@ export const HostedAccountCard = ({
                   grant.hasGrant ? (
                     <Text key={index} css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✓ Action Account is granted for type: {
+                      ✓ Flow Account is granted for type: {
                         grant.msgTypeUrl
                       }{' '}
                       {grant.expiration && (
@@ -189,7 +189,7 @@ export const HostedAccountCard = ({
                   ) : (
                     <Text css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✘ Action Account is not granted for type:{' '}
+                      ✘ Flow Account is not granted for type:{' '}
                       {grant.msgTypeUrl}{' '}
                     </Text>
                   )

@@ -1,6 +1,6 @@
 import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper } from "junoblocks"
 import { Field } from "./Fields"
-import { FeedbackLoop } from "intentojs/dist/codegen/intento/intent/v1beta1/action"
+import { FeedbackLoop } from "intentojs/dist/codegen/intento/intent/v1beta1/flow"
 import ConditionDropdown from "./ConditionDropdown"
 import { useState } from "react"
 import { ICQConfigForm } from "./ICQConfigForm"
@@ -25,7 +25,7 @@ export const FeedbackLoopForm = ({ feedbackLoop, onChange, setDisabled }: Feedba
   }
   const emptyFields = () => {
     // const newValue = {
-    //   actionId: BigInt(0),
+    //   flowId: BigInt(0),
     //   responseIndex: 0,
     //   msgsIndex: 0,
     //   responseKey: "",
@@ -59,9 +59,9 @@ export const FeedbackLoopForm = ({ feedbackLoop, onChange, setDisabled }: Feedba
         </Button>
       </div>
       <Field
-        label="Action ID (optional)"
-        value={feedbackLoop?.actionId?.toString()}
-        onChange={(e) => handleFieldChange('actionId', BigInt(e.target.value))}
+        label="Flow ID (optional)"
+        value={feedbackLoop?.flowId?.toString()}
+        onChange={(e) => handleFieldChange('flowId', BigInt(e.target.value))}
 
       />
       <Field

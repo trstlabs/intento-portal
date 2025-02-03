@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
 type ConfigurationProps = {
   config: ExecutionConfiguration
@@ -66,7 +66,7 @@ export const Configuration = ({
 
             <Tooltip
               label={
-                'If set to true, message responses i.e. outputs may be used as inputs for new actions'
+                'If set to true, message responses i.e. outputs may be used as inputs for new flows'
               }
             ><Button
               variant="ghost"
@@ -88,7 +88,7 @@ export const Configuration = ({
 
             <Tooltip
               label={
-                'If set to true, the action settings can not be updated'
+                'If set to true, the flow settings can not be updated'
               }
             ><Button
               variant="ghost"
@@ -108,7 +108,7 @@ export const Configuration = ({
                 Updating Disabled
               </Button></Tooltip>
             <Tooltip
-              label={'If set to true, stops on any errors that occur'}
+              label={'If set to true, stops on any errors that occur or when comparison can not be made due to missing response'}
             ><Button
               variant="ghost"
               size="large"
@@ -170,7 +170,7 @@ export const Configuration = ({
               </Button></Tooltip>
             <Tooltip
               label={
-                'If set to true, as a fallback, the interchain account associated with the action will be reregistered when a channel times out'
+                'If set to true, as a fallback, the interchain account associated with the flow will be reregistered when a channel times out'
               }
             ><Button
               variant="ghost"

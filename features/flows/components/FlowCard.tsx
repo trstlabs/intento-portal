@@ -10,27 +10,27 @@ import {
 import Link from 'next/link'
 
 
-import { ActionInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
 import { useGetConnectionIDFromHostAddress } from '../../../hooks/useICA'
 
 
-export declare type actionInfoWithDetails = {
-  actionInfo: ActionInfo
+export declare type flowInfoWithDetails = {
+  flowInfo: FlowInfo
 }
 
-export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
-  //const actionInfoAmino = ActionInfo.toAmino(actionInfo)
-  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(actionInfo.hostedConfig?.hostedAddress)
-  const ibcInfo = useIBCAssetInfoFromConnection(actionInfo.icaConfig.connectionId || hostedConnectionID)
+export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
+  //const flowInfoAmino = FlowInfo.toAmino(flowInfo)
+  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.hostedConfig?.hostedAddress)
+  const ibcInfo = useIBCAssetInfoFromConnection(flowInfo.icaConfig.connectionId || hostedConnectionID)
 
   const isActive =
-    actionInfo.endTime &&
-    actionInfo.execTime &&
-    actionInfo.endTime.getSeconds() >= actionInfo.execTime.getSeconds()
-    && actionInfo.endTime.getTime() > Date.now()
+    flowInfo.endTime &&
+    flowInfo.execTime &&
+    flowInfo.endTime.getSeconds() >= flowInfo.execTime.getSeconds()
+    && flowInfo.endTime.getTime() > Date.now()
   return (
-    <Link href={`/actions/${actionInfo.id.toString()}`} passHref>
+    <Link href={`/flows/${flowInfo.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>
         <CardContent size="medium">
           <Column align="center">
@@ -43,14 +43,14 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
               /> : <text style={{ fontSize: "28px" }}> 🌐 </text>}
             </StyledDivForTokenLogos>
 
-            {actionInfo.label ? (
+            {flowInfo.label ? (
               <StyledText
                 variant="title"
                 align="center"
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                {/*      {actionInfo.label}{' '} */} {actionInfo.label.length < 35 ? actionInfo.label : actionInfo.label.substring(0, 32) + '...'}
+                {/*      {flowInfo.label}{' '} */} {flowInfo.label.length < 35 ? flowInfo.label : flowInfo.label.substring(0, 32) + '...'}
               </StyledText>
             ) : (
               <StyledText
@@ -59,21 +59,21 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
                 css={{ paddingTop: '$8' }}
               >
                 {' '}
-                Action {actionInfo.id.toString()}{' '}
+                Flow {flowInfo.id.toString()}{' '}
               </StyledText>
             )}
-            {actionInfo.msgs && (
+            {flowInfo.msgs && (
               <Column align="center">
 
                 <StyledText variant="caption">
 
                   <>
-                    {actionInfo.hostedConfig.hostedAddress ? <>Hosted</> :
-                      actionInfo.icaConfig.connectionId ? <>Self-Hosted</> : <>Local</>
+                    {flowInfo.hostedConfig.hostedAddress ? <>Hosted</> :
+                      flowInfo.icaConfig.connectionId ? <>Self-Hosted</> : <>Local</>
                     } {' '}| {' '}
 
                     {
-                      actionInfo.msgs[0]?.typeUrl
+                      flowInfo.msgs[0]?.typeUrl
                         .split('.')
                         .find((data) => data.includes('Msg'))
                         .split(',')[0]
@@ -89,19 +89,19 @@ export const ActionCard = ({ actionInfo }: actionInfoWithDetails) => {
           <Column gap={5} css={{ paddingBottom: '$8' }}>
             <Text variant="legend">
               {isActive ? (
-                <> 🟢 Active Action {ibcInfo && <>on {ibcInfo.name}</>}</>
+                <> 🟢 Active Flow {ibcInfo && <>on {ibcInfo.name}</>}</>
               ) : (
-                <>Execution ended {actionInfo.endTime.toLocaleString()}</>
+                <>Execution ended {flowInfo.endTime.toLocaleString()}</>
               )}
               {/* {isActive ? (
                                 <>
                                     <StyledSpanForHighlight>
-                                        🟢  ExecTime: {actionInfo.execTime}{' '}
+                                        🟢  ExecTime: {flowInfo.execTime}{' '}
                                     </StyledSpanForHighlight>
-                                    EndTime {actionInfo.endTime}
+                                    EndTime {flowInfo.endTime}
                                 </>
                             ) : (
-                                <>🔴 Owner: {actionInfo.owner}</>
+                                <>🔴 Owner: {flowInfo.owner}</>
                             )} */}
             </Text>
           </Column>

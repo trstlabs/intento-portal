@@ -1,5 +1,5 @@
 import { AppLayout, NavigationSidebar } from 'components'
-import { ActionInfoBreakdown } from 'features/actions'
+import { FlowInfoBreakdown } from '../../features/flows'
 import {
   Button,
   ChevronIcon,
@@ -14,18 +14,18 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { APP_NAME } from 'util/constants'
-import { useActionInfo } from '../../hooks/useActionInfo'
+import { useFlowInfo } from '../../hooks/useFlowInfo'
 import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
 
-export default function Action() {
+export default function Flow() {
   const {
     query: { id },
   } = useRouter()
 
   const isMobile = useMedia('sm')
 
-  const [actionInfo, isLoading] = useActionInfo(id)
-  const connectionId = actionInfo && actionInfo.icaConfig ? actionInfo.icaConfig.connectionId : /* TODO use a mapping (actionInfo.hostedConfig ? actionInfo.hostedConfig.hostedAddress : '') */''
+  const [flowInfo, isLoading] = useFlowInfo(id)
+  const connectionId = flowInfo && flowInfo.icaConfig ? flowInfo.icaConfig.connectionId : /* TODO use a mapping (flowInfo.hostedConfig ? flowInfo.hostedConfig.hostedAddress : '') */''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {
@@ -36,7 +36,7 @@ export default function Action() {
         css={{ padding: '$10', height: '100vh' }}
       >
         {' '}
-        <title>Action</title>
+        <title>Flow</title>
         {/*  {isLoading && (
           <Text variant="header">
             {"Oops, we've messed up. Please try again later."}
@@ -62,10 +62,10 @@ export default function Action() {
           />
         }
       >
-        {APP_NAME && actionInfo != undefined && (
+        {APP_NAME && flowInfo != undefined && (
           <Head>
             <title>
-              {APP_NAME} — Action {actionInfo.id}
+              {APP_NAME} — Flow {flowInfo.id}
             </title>
           </Head>
         )}
@@ -77,14 +77,14 @@ export default function Action() {
         )}
 
         {!isLoading &&
-          (actionInfo && actionInfo.feeAddress ? (
+          (flowInfo && flowInfo.feeAddress ? (
             <>
-              <ActionInfoBreakdown actionInfo={actionInfo} ibcInfo={ibcInfo} />
+              <FlowInfoBreakdown flowInfo={flowInfo} ibcInfo={ibcInfo} />
             </>
           ) : (
             <StyledDiv>
               <Text variant="legend">
-                <>Action not found in this space continuum 🌌 </>
+                <>Flow not found in this space continuum 🌌 </>
               </Text>{' '}
             </StyledDiv>
           ))}

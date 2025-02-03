@@ -27,7 +27,7 @@ export default function Build() {
       <StyledContainer>
         <PageHeader
           title="Build"
-          subtitle={`Create actions on any connected chain 🌌. Submit messages for direct execution or as intents with feedback loops and condition-based logic. 💫`}
+          subtitle={`Create flows on any connected chain 🌌. Submit messages for direct execution or as intents with feedback loops and condition-based logic. 💫`}
         />
         <BuildWrapper
           initialExample={getInitialExampleFromSearchParams()}

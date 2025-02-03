@@ -4,9 +4,10 @@ Interface to build transactions and workflows on-chain.
 Using Trustless Triggers and Trustless Contracts through the TrustlessJS library. 
 
 ### Features
-- Dashboard for Triggers
+
+- Dashboard for Flows
 - Autocompound INTO tokens
-- Advanced automation for scheduling transactions with interchain accounts
+- Advanced automation for scheduling flows using (self-)hosted interchain accounts
 - Send tokens on a recurring basis
 
 Based on Junoblocks and Wasmswap interface, an open-source interface for a CosmWasm decentralized exchange.

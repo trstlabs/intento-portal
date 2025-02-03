@@ -10,9 +10,9 @@ export declare type ViewAirdropEligibilityProps = {
   claimRecordLoaded: boolean;
 };
 
-export enum ClaimAction {
-  "Local Action" = 0,
-  "Interchain Account Action" = 1,
+export enum ClaimFlow {
+  "Local Flow" = 0,
+  "Interchain Account Flow" = 1,
   "Governance Vote" = 2,
   "Stake Tokens" = 3,
   UNRECOGNIZED = -1

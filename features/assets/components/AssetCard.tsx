@@ -20,9 +20,9 @@ export enum AssetCardState {
 
 type AssetCardProps = Exclude<HTMLProps<HTMLDivElement>, 'children'> & {
   tokenSymbol?: string
-  onActionClick?: (args: {
+  onFlowClick?: (args: {
     tokenSymbol: string
-    actionType: 'deposit' | 'withdraw'
+    flowType: 'deposit' | 'withdraw'
   }) => void
   balance?: number
   state?: AssetCardState
@@ -30,7 +30,7 @@ type AssetCardProps = Exclude<HTMLProps<HTMLDivElement>, 'children'> & {
 
 export const AssetCard = ({
   tokenSymbol,
-  onActionClick,
+  onFlowClick,
   balance,
   state,
   ...htmlProps
@@ -50,16 +50,16 @@ export const AssetCard = ({
       return setShowingRedirectDepositDialog(true)
     }
 
-    onActionClick({
+    onFlowClick({
       tokenSymbol: symbol,
-      actionType: 'deposit',
+      flowType: 'deposit',
     })
   }
 
   const handleWithdrawClick = () =>
-    onActionClick({
+    onFlowClick({
       tokenSymbol: symbol,
-      actionType: 'withdraw',
+      flowType: 'withdraw',
     })
 
   if (state === AssetCardState.fetching) {
@@ -103,7 +103,7 @@ export const AssetCard = ({
           </StyledElementForToken>
         </StyledElementForCard>
 
-        <StyledElementForCard kind="actions">
+        <StyledElementForCard kind="flows">
           {shouldPerformDepositOutsideApp ? (
             <Button
               disabled={!__TRANSFERS_ENABLED__}
@@ -172,7 +172,7 @@ const StyledElementForCard = styled('div', {
         position: 'relative',
         zIndex: 1,
       },
-      actions: {
+      flows: {
         display: 'grid',
         gridAutoFlow: 'column',
         columnGap: '$space$6',

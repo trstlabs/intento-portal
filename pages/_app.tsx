@@ -76,6 +76,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
         const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
         console.log(rpcEndpoint, apiEndpoint)
         chains.push({
+          chain_type: 'cosmos',
           chain_name: asset.registry_name,
           status: 'live',
           network_type: 'testnet',

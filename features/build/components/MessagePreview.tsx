@@ -10,16 +10,16 @@ import {
   Inline,
   Union,
 } from 'junoblocks'
-import { SubmitActionDialog } from './SubmitActionDialog'
+import { SubmitFlowDialog } from './SubmitFlowDialog'
 
 const MessagePreview = ({
-  ActionInput,
+  FlowInput,
   chainSymbol,
   icaBalance,
   shouldDisableAuthzGrants,
   icaAddress,
-  isSubmitActionDialogShowing,
-  setSubmitActionDialogState,
+  isSubmitFlowDialogShowing,
+  setSubmitFlowDialogState,
   isExecutingSchedule,
   feeFundsHostChain,
   shouldDisableSendHostChainFundsButton,
@@ -28,15 +28,15 @@ const MessagePreview = ({
   showWarning,
   hideWarning,
   setFeeFundsHostChain,
-  handleSubmitActionClick,
+  handleSubmitFlowClick,
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
 }) => {
   return (
     <div>
-      {ActionInput.msgs &&
-        ActionInput.msgs[0] &&
-        ActionInput.msgs[0].length > 3 && (
+      {FlowInput.msgs &&
+        FlowInput.msgs[0] &&
+        FlowInput.msgs[0].length > 3 && (
           <Column>
             <Card
               css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -59,8 +59,8 @@ const MessagePreview = ({
                         {' '}
                         Please exercise caution when handling message values, as
                         incorrect inputs could potentially result in the loss of
-                        funds. It is advisable not to engage in any interactions
-                        if you are uncertain about the actions you are taking.
+                        funds. It is advisable not to engage in any interflows
+                        if you are uncertain about the flows you are taking.
                         Always thoroughly review the contents of your messages
                         before submitting them to mitigate any potential risks.
                       </Text>
@@ -75,8 +75,8 @@ const MessagePreview = ({
                 )}
               </CardContent>
 
-              {ActionInput.msgs &&
-                ActionInput.msgs.map((msgToDisplay, i) => (
+              {FlowInput.msgs &&
+                FlowInput.msgs.map((msgToDisplay, i) => (
                   <div key={msgToDisplay}>
                     {' '}
                     <CardContent
@@ -91,14 +91,14 @@ const MessagePreview = ({
                         Message {i + 1}: <pre>{msgToDisplay}
                         </pre>
                       </Text>{' '}
-                      <SubmitActionDialog
+                      <SubmitFlowDialog
                         chainSymbol={chainSymbol}
                         icaBalance={icaBalance}
                         icaAddress={icaAddress}
-                        actionInput={ActionInput}
-                        isDialogShowing={isSubmitActionDialogShowing}
+                        flowInput={FlowInput}
+                        isDialogShowing={isSubmitFlowDialogShowing}
                         onRequestClose={() =>
-                          setSubmitActionDialogState({
+                          setSubmitFlowDialogState({
                             isShowing: false,
                           })
                         }
@@ -113,8 +113,8 @@ const MessagePreview = ({
                           !shouldDisableAuthzGrants
                         }
                         setFeeFundsHostChain={setFeeFundsHostChain}
-                        handleSubmitAction={(ActionInput) =>
-                          handleSubmitActionClick(ActionInput)
+                        handleSubmitFlow={(FlowInput) =>
+                          handleSubmitFlowClick(FlowInput)
                         }
                         handleCreateAuthzGrantClick={
                           handleCreateAuthzGrantClick

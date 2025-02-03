@@ -2,23 +2,23 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { toUtf8 } from '@cosmjs/encoding'
 
 import { validateTransactionSuccess } from '../../util/validateTx'
-import { ActionInput } from '../../types/trstTypes'
+import { FlowInput } from '../../types/trstTypes'
 
 type ExecuteSubmitTxArgs = {
   owner: string
-  actionInput: ActionInput
+  flowInput: FlowInput
   client: SigningStargateClient
 }
 
 export const executeSubmitTx = async ({
   client,
-  actionInput,
+  flowInput,
   owner,
 }: ExecuteSubmitTxArgs): Promise<any> => {
   let msgs = []
   const masterRegistry = client.registry
 
-  for (let msgJSON of actionInput.msgs) {
+  for (let msgJSON of flowInput.msgs) {
     console.log(msgJSON)
 
     let value = JSON.parse(msgJSON)['value']

@@ -27,8 +27,7 @@ export const TestnetDialog = () => {
       <DialogContent css={{ paddingBottom: '$12' }}>
         <Text css={{ paddingBottom: '$12' }} variant="body">
           This app is currently operating in demo mode. The app serves only the
-          presentation and testing purposes. You will not be able to trigger
-          actions on mainnet chains.
+          presentation and testing purposes. You will not be able to interact with mainnet chains.
         </Text>
 
         <Button css={{ width: '100%' }} size="large" onClick={requestClose}>

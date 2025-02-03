@@ -10,7 +10,7 @@ import {
 import { toast } from 'react-hot-toast'
 import { useMutation } from 'react-query'
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil'
-import { executeSubmitAction } from '../../../services/build'
+import { executeSubmitFlow } from '../../../services/build'
 import {
   TransactionStatus,
   transactionStatusState,
@@ -20,13 +20,13 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
 import { DeliverTxResponse } from '@cosmjs/stargate'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 
-type UseSubmitActionArgs = {
-  actionInput: ActionInput
+type UseSubmitFlowArgs = {
+  flowInput: FlowInput
 }
 
-export const useSubmitAction = ({ actionInput }: UseSubmitActionArgs) => {
+export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
   const { client, address, status } = useRecoilValue(walletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
@@ -34,7 +34,7 @@ export const useSubmitAction = ({ actionInput }: UseSubmitActionArgs) => {
 
   const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
   return useMutation(
-    'submitAction',
+    'submitFlow',
     async () => {
      // console.log(status)
       if (status !== WalletStatusType.connected || client == null) {
@@ -43,10 +43,10 @@ export const useSubmitAction = ({ actionInput }: UseSubmitActionArgs) => {
       // if (client == null) {
       //   throw new Error('Please try reconnecting your wallet.')
       // }
-      console.log(actionInput)
-      const response: DeliverTxResponse = await executeSubmitAction({
+      console.log(flowInput)
+      const response: DeliverTxResponse = await executeSubmitFlow({
         owner: address,
-        actionInput,
+        flowInput,
         client,
       })
       return response
@@ -54,21 +54,21 @@ export const useSubmitAction = ({ actionInput }: UseSubmitActionArgs) => {
     {
       onSuccess(data) {
         console.log(data)
-        let actionID = data.events
-          .find((event) => event.type == 'action')
-          .attributes.find((attr) => attr.key == 'action-id').value
+        let flowID = data.events
+          .find((event) => event.type == 'flow')
+          .attributes.find((attr) => attr.key == 'flow-id').value
 
-        console.log(actionID)
+        console.log(flowID)
         toast.custom((t) => (
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}
             title="Your trigger is submitted!"
-            body={`An on-chain trigger was created succesfully! Your unique ID is ${actionID}`}
+            body={`An on-chain trigger was created succesfully! Your unique ID is ${flowID}`}
             buttons={
               <Button
                 as="a"
                 variant="ghost"
-                href={`/actions/${actionID}`}
+                href={`/flows/${flowID}`}
                 target="__blank"
                 rel="noopener noreferrer"
                 iconRight={<UpRightArrow />}

@@ -33,7 +33,7 @@ export const FieldArray = ({ label, values = [], onChange, disabled }) => {
       </Text>
       <Text>
         {/*  <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">
-          Action IDs
+          Flow IDs
         </Text> */}
         {values.map((value, index) => (
           <StyledInput
@@ -47,7 +47,7 @@ export const FieldArray = ({ label, values = [], onChange, disabled }) => {
         ))}
         {values.length < 10 && !disabled && (
           <button type="button" onClick={addField} style={{ marginBottom: '8px', fontSize: '11px' }}>
-            + Add Action ID
+            + Add Flow ID
           </button>
         )}
       </Text>
