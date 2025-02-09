@@ -302,7 +302,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     <Text variant="legend"> Flow Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.FlowConstantFee),
+                        Number(triggerParams.burnFeePerMsg),
                         6
                       )}{' '}
                       INTO{' '}

@@ -226,7 +226,7 @@ export const getExpectedFlowFee = (
 
   const flowFee =
     recurrences * flexFeeForPeriod +
-    recurrences * Number(triggerParams.flowConstantFee) * lenMsgs
+    recurrences * Number(triggerParams.burnFeePerMsg) * lenMsgs
   const flowFeeDenom = convertMicroDenomToDenom(flowFee, 6)
 
   return Number(flowFeeDenom.toFixed(4))
