@@ -212,73 +212,86 @@ export const useICATokenBalance = (
   return [data, isLoading] as const
 }
 
-export const useAuthZGrantsForUser = (
-  chainId: string,
-  grantee: string,
-  FlowInput?: FlowInput
-) => {
-  const ibcState = useRecoilValue(ibcWalletState)
-  const chain = useChainInfoByChainID(chainId)
-
-  // console.log('granter ', ibcState.address, 'grantee ', grantee)
-  const { data, isLoading } = useQuery(
-    [`userAuthZGrants/${grantee}/${chainId}`],
-    async () => {
-      // console.log(ibcState.status)
-
-      let grants: GrantResponse[] = []
-      // console.log('granter ', ibcState.address, 'grantee ', grantee)
-      const granteeGrants = await getAuthZGrantsForGrantee({
-        grantee,
-        granter: ibcState.address,
-        rpc: chain.rpc,
-      })
-      if (granteeGrants != false) {
-        console.log(grants, grantee, ibcState)
-
-        for (const msg of FlowInput.msgs) {
-          let msgTypeUrl = JSON.parse(msg)['typeUrl']
-          // console.log(msgTypeUrl)
-          const grantMatch = granteeGrants?.find(
-            (grant) => grant.msgTypeUrl == msgTypeUrl
-          )
-          if (grantMatch == undefined) {
-            grants.push({
-              msgTypeUrl,
-              expiration: undefined,
-              hasGrant: false,
-            })
+export const useAuthZMsgGrantInfoForUser = (
+    chainId: string,
+    grantee: string,
+    flowInput?: FlowInput
+  ) => {
+    const ibcState = useRecoilValue(ibcWalletState)
+    const chain = useChainInfoByChainID(chainId)
+  
+    const { data, isLoading } = useQuery(
+      [`userAuthZGrants/${grantee}/${chainId}`],
+      async () => {
+        let grants: GrantResponse[] = []
+        const granteeGrants = await getAuthZGrantsForGrantee({
+          grantee,
+          granter: ibcState.address,
+          rpc: chain.rpc,
+        })
+        if (!granteeGrants) return undefined
+        console.log(granteeGrants)
+        for (const msg of flowInput.msgs) {
+          let parsedMsg = JSON.parse(msg)
+          let msgTypeUrl = parsedMsg.typeUrl
+          if (msgTypeUrl === "/cosmos.authz.v1beta1.MsgExec") {
+            // Extract messages from MsgExec
+            const execMsgs = parsedMsg.value.msgs || []
+            for (const execMsg of execMsgs) {
+              console.log(execMsg)
+              let execMsgTypeUrl =execMsg.typeUrl
+              console.log(execMsgTypeUrl)
+              const grantMatch = granteeGrants.find(
+                (grant) => grant.msgTypeUrl === execMsgTypeUrl
+              )
+              
+              grants.push(
+                grantMatch || {
+                  msgTypeUrl: execMsgTypeUrl,
+                  expiration: undefined,
+                  hasGrant: false,
+                }
+              )
+            }
           } else {
-            grants.push(grantMatch)
+            const grantMatch = granteeGrants.find(
+              (grant) => grant.msgTypeUrl === msgTypeUrl
+            )
+            
+            grants.push(
+              grantMatch || {
+                msgTypeUrl,
+                expiration: undefined,
+                hasGrant: false,
+              }
+            )
           }
-          // typeUrls.push(grant.msgTypeUrl)
         }
-        // console.log('grants', grants)
+        console.log("grants", grants)
         return grants
+      },
+      {
+        enabled: Boolean(
+          grantee &&
+            chain &&
+            chain.rpc &&
+            grantee !== '' &&
+            chainId &&
+            ibcState.status === WalletStatusType.connected &&
+            grantee.includes(ibcState.address.slice(0, 5)) &&
+            flowInput.msgs[0] &&
+            flowInput.msgs[0].includes('typeUrl') &&
+            flowInput.connectionId
+        ),
+        refetchOnMount: 'always',
+        refetchIntervalInBackground: true,
+        refetchInterval: DEFAULT_REFETCH_INTERVAL,
       }
-      return undefined
-    },
-    {
-      enabled: Boolean(
-        grantee &&
-          chain &&
-          chain.rpc &&
-          grantee != '' &&
-          chainId &&
-          ibcState.status === WalletStatusType.connected &&
-          grantee.includes(ibcState.address.slice(0, 5)) &&
-          FlowInput.msgs[0] &&
-          FlowInput.msgs[0].includes('typeUrl') &&
-          FlowInput.connectionId
-      ),
-      refetchOnMount: 'always',
-      refetchIntervalInBackground: true,
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-    }
-  )
-
-  return [data, isLoading] as const
-}
+    )
+  
+    return [data, isLoading] as const
+  }
+  
 
 export const useFeeGrantAllowanceForUser = (granter: string) => {
   const { status, client, address } = useRecoilValue(walletState)

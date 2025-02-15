@@ -14,7 +14,7 @@ import {
 import React, { useEffect, useMemo, useState } from 'react'
 import { Row, StyledInput } from './BuildComponent'
 
-import { useAuthZGrantsForUser } from '../../../hooks/useICA'
+import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
 import { FlowInput } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -66,7 +66,7 @@ export const IcaCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
     useState(false)
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
+  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
     chainId,
     icaAddress,
     flowInput
@@ -184,7 +184,7 @@ export const IcaCard = ({
                   grant.hasGrant ? (
                     <Text key={index} css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✓ Flow Account is granted for type: {
+                      ✓ Interchain Account is granted for type: {
                         grant.msgTypeUrl
                       }{' '}
                       {grant.expiration && (
@@ -194,7 +194,7 @@ export const IcaCard = ({
                   ) : (
                     <Text css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✘ Flow Account is not granted for type:{' '}
+                      ✘ Interchain Account is not granted for type:{' '}
                       {grant.msgTypeUrl}{' '}
                     </Text>
                   )
