@@ -19,6 +19,9 @@ export const useConnectIBCWallet = (
   const [{ status /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
     useRecoilState(ibcWalletState)
 
+  if ((tokenSymbol == '' || chainId == '')) {
+    return
+  }
   let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
   if (fromRegistry) {
     assetInfo = useChainInfoByChainID(chainId)

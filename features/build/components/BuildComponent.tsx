@@ -192,6 +192,8 @@ export const BuildComponent = ({
   )
 
 
+  const shouldDisableAuthzGrantButton = hostedAccount != "" || flowInput.msgs.includes("authz.v1beta1.MsgExec")
+
 
   const handleRegisterAccountClick = () => {
     return setRequestedRegisterICA(true)
@@ -497,6 +499,7 @@ export const BuildComponent = ({
             isShowing: false,
           })
         }
+        shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
         isLoading={isExecutingSchedule}
         feeFundsHostChain={feeFundsHostChain}
         shouldDisableSendHostChainFundsButton={
@@ -509,7 +512,7 @@ export const BuildComponent = ({
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
-       <Column>
+      <Column>
         <Inline css={{ margin: '$6', marginTop: '$16' }}>
           <StepIcon step={3} />
           <Text
