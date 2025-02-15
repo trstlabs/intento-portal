@@ -3,6 +3,7 @@ import { SigningStargateClient } from '@cosmjs/stargate'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { intento } from 'intentojs'
 import { MsgUpdateFlowParams } from '../../types/trstTypes'
+import { transformAndEncodeMsgs } from './executeSubmitFlow'
 
 type executeUpdateFlowArgs = {
   flowParams: MsgUpdateFlowParams
@@ -14,12 +15,17 @@ export const executeUpdateFlow = async ({
   flowParams,
 }: executeUpdateFlowArgs): Promise<any> => {
   console.log(flowParams)
+  let msgs = []
+  if (flowParams.msgs) {
+    transformAndEncodeMsgs(flowParams.msgs, client, msgs)
+  }
+  console.log(msgs)
   const msgUpdateFlow =
     intento.intent.v1beta1.MessageComposer.withTypeUrl.updateFlow({
       id: BigInt(flowParams.id),
       owner: flowParams.owner,
       connectionId: flowParams.connectionId ? flowParams.connectionId : '',
-      msgs: flowParams.msgs ? flowParams.msgs : [],
+      msgs: msgs,
       endTime: flowParams.endTime ? BigInt(flowParams.endTime) : BigInt(0),
       label: flowParams.label ? flowParams.label : '',
       interval: flowParams.interval ? flowParams.interval : '',

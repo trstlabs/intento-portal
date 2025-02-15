@@ -10,7 +10,7 @@ export interface MsgUpdateFlowParams {
   owner: string
   id: number
   connectionId?: string
-  msgs?: Any[]
+  msgs?: string[]
   endTime?: number
   label?: string
   interval?: string

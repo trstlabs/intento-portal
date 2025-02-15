@@ -27,7 +27,7 @@ import { FlowInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import {
-  /* useAuthZGrantsForUser,  */ useGetICA,
+  /* useAuthZMsgGrantInfoForUser,  */ useGetICA,
   /* useIsActiveICAForUser,  */ useICATokenBalance,
 } from '../../../hooks/useICA'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
@@ -37,14 +37,14 @@ import { JsonCodeMirrorEditor } from '../../build/components/Editor/CodeMirror'
 import { getDuration, getRelativeTime } from '../../../util/time'
 import { getIntentoSigningClientOptions } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
-import { Any } from 'cosmjs-types/google/protobuf/any'
+
 import { FlowHistory } from './FlowHistory'
-import FlowTransformButton from './FlowTransformButton'
+import FlowTransformButton, { transformFlowMsgs } from './FlowTransformButton'
 import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
 import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
 import { Configuration } from '../../build/components/Conditions/Configuration'
-import { GlobalDecoderRegistry } from 'intentojs'
-import { MsgExec } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/tx'
+import JsonFormEditor from '../../build/components/Editor/DynamicForm'
+import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 
 
 type FlowInfoBreakdownProps = {
@@ -57,6 +57,7 @@ export const FlowInfoBreakdown = ({
   ibcInfo,
 }: //size = 'large',
   FlowInfoBreakdownProps) => {
+
   const [icaAddress, _] = useGetICA(flowInfo.icaConfig?.connectionId, flowInfo.owner)
 
   const symbol = ibcInfo ? ibcInfo.symbol : ''
@@ -113,34 +114,12 @@ export const FlowInfoBreakdown = ({
     defaultTypes,
   })
 
-  function getMsgValueForMsgExec(exMsg) {
-    let msgs = []
-    console.log(exMsg)
-    console.log(exMsg.valueDecoded.msgs[0])
-    const msgExecDecoded = registry.decode(exMsg)
-    const decode = MsgExec.decode(exMsg.value)
-    const json = MsgExec.toAminoMsg(decode)
-    // const msgExecDecodedd = registry.decode(exMsg.valueDecoded.msgs[0])
-    console.log(decode)
-    console.log(json)
-    for (let message of exMsg.valueDecoded.msgs) {
-      console.log(exMsg)
-      // let messageValue = message//registry.decode({ typeUrl: message.typeUrl, value: message.value })
-      let type = GlobalDecoderRegistry.wrapAny(message).typeUrl
-      if (type.includes("Query")) {
-        type = "Could not retrieve at the moment"
-      }
-      // let type = registry.lookupType(message).typeUrl
-      msgs.push({ typeUrl: type, value: message })
-    }
-    return JSON.stringify({ grantee: msgExecDecoded.grantee, msgs }, null, 2)
-  }
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [isJsonValid, setIsJsonValid] = useState(true)
-  const [editor, setEditor] = useState(false)
-  const [editMsg, setEditMsg] = useState('')
+  const [editorIndex, setEditorIndex] = useState(-1)
   const [editConfig, setEditConfig] = useState(false)
+  const [editMsgs, setEditMsgs] = useState([''])
   let flowParams: MsgUpdateFlowParams = {
     id: Number(flowInfo.id),
     owner: flowInfo.owner,
@@ -148,13 +127,18 @@ export const FlowInfoBreakdown = ({
 
   const [updatedFlowParams, setUpdatedFlowParams] = useState(flowParams)
 
-  function showEditor(show: boolean, msg: Any) {
-    setEditor(show)
-    if (!show) {
-      setEditMsg(JSON.stringify(registry.decode(msg), null, '\t'))
+  async function showEditor(show: boolean, index: number) {
+    setEditorIndex(index)
+
+    if (show) {
+      const msgs = await transformFlowMsgs(flowInfo);
+
+      setEditorIndex(index)
+      setEditMsgs(msgs)
       return
     }
-    setEditMsg('')
+    setEditorIndex(-1)
+    setEditMsgs([])
   }
   const [requestedUpdateFlow, setRequestedUpdateFlow] = useState(false)
   const { mutate: handleUpdateFlow, isLoading: isExecutingUpdateFlow } =
@@ -171,54 +155,12 @@ export const FlowInfoBreakdown = ({
 
 
   //todo add support for multiple messages in exec message array
-  const handleUpdateFlowMsgClick = (index: number) => {
-    connectExternalWallet(null)
+  const handleUpdateFlowMsgClick = () => {
     if (!isJsonValid) {
       //alert("Invalid JSON")
       return
     }
-    try {
-      let value = JSON.parse(editMsg)
-      let params: MsgUpdateFlowParams = {
-        id: Number(flowInfo.id),
-        msgs: [],
-        owner: flowInfo.owner,
-      }
-      console.log(value)
-      if (flowInfo.msgs[index].typeUrl == '/cosmos.authz.v1beta1.MsgExec') {
-        const msgExecDecoded = registry.decode(flowInfo.msgs[index])
 
-        msgExecDecoded.msgs.forEach((msgExecMsg, i) => {
-
-          console.log(msgExecDecoded)
-          const encodeObject = {
-            typeUrl: msgExecMsg.typeUrl,
-            value: value,
-          }
-          console.log(encodeObject)
-          const msgExecMsgEncoded = registry.encodeAsAny(encodeObject)
-          console.log(msgExecMsgEncoded)
-          msgExecDecoded.msgs[i] = msgExecMsgEncoded
-
-        })
-        params.msgs = msgExecDecoded
-
-
-      } else {
-        console.log(flowInfo.msgs[0])
-        const encodeObject = {
-          typeUrl: flowInfo.msgs[index].typeUrl,
-          value,
-        }
-        const msgEncoded = registry.encodeAsAny(encodeObject)
-        params.msgs = [msgEncoded]
-      }
-
-      setUpdatedFlowParams(params)
-      console.log(params)
-    } catch (e) {
-      console.log(e)
-    }
     return setRequestedUpdateFlow(true)
   }
 
@@ -226,6 +168,10 @@ export const FlowInfoBreakdown = ({
 
     if (!isJsonValid) {
       //alert("Invalid JSON")
+      return
+    }
+    if (editMsgs.length == 0) {
+      alert("Nothing to update")
       return
     }
     try {
@@ -245,34 +191,53 @@ export const FlowInfoBreakdown = ({
   }
   const shouldDisableUpdateFlowButton = false // !updatedFlowParams || !updatedFlowParams.id
 
-  ////
+  //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  const handleChangeMsg = (index: number) => (msg: string) => {
+    console.log("index", index)
+    if (!isJsonValid) {
+      return
+    }
+    try {
 
-  // const [icaUpdateFlows, isUpdateFlowsLoading] = useAuthZGrantsForUser(icaAddress, ibcInfo.symbol, flowInfo)
-  /*  if (size === 'small') {
-         return (
-             <>
-                 <InfoHeader
-                     id={flowInfo.id}
-                     owner={flowInfo.owner}
-                     good={isActive}
-                 />
-                 <Inline
-                     css={{
-                         backgroundColor: '$colors$dark10',
-                         borderRadius: '$4',
-                         marginBottom: '$14',
-                     }}
-                 >
-                     <Column
-                         justifyContent="space-between"
-                         css={{ padding: '$10 $16', width: '100%' }}
-                     >
-     
-                     </Column>
-                 </Inline>
-             </>
-         )
-     } */
+      let newMsgs = editMsgs
+
+      newMsgs[index] = msg
+
+      setEditMsgs(newMsgs)
+
+      let params: MsgUpdateFlowParams = {
+        id: Number(flowInfo.id),
+        msgs: newMsgs,
+        owner: flowInfo.owner,
+      }
+      console.log(params)
+      setUpdatedFlowParams(params)
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  function handleRemoveMsg(index: number) {
+
+
+    const newMsgs = editMsgs.filter(
+      (msg) => msg !== editMsgs[index]
+    )
+
+    if (index == 0 && newMsgs.length == 0) {
+      newMsgs[index] = null
+    }
+
+
+    let params: MsgUpdateFlowParams = {
+      id: Number(flowInfo.id),
+      msgs: newMsgs,
+      owner: flowInfo.owner,
+    }
+
+    setUpdatedFlowParams(params)
+  }
+
 
   return (
     <>
@@ -542,20 +507,19 @@ export const FlowInfoBreakdown = ({
                       <Button
                         variant="ghost"
                         size="small"
-                        onClick={() => showEditor(!editor, msg)}
+                        onClick={() => showEditor(editorIndex != index, index)}
                       >
-                        {!editor ? 'Edit' : 'Discard'}
+                        {editorIndex != index ? 'Edit' : 'Discard'}
                       </Button>
                     ) : (
                       <Button
                         variant="ghost"
                         size="small"
                         onClick={() => {
-                          setEditor(!editor)
-                          setEditMsg(getMsgValueForMsgExec(msg))
+                          showEditor(editorIndex != index, index)
                         }}
                       >
-                        {!editor ? 'Edit' : 'Discard'}
+                        {editorIndex != index ? 'Edit' : 'Discard'}
                       </Button>
                     )}
                   </Inline>
@@ -578,25 +542,25 @@ export const FlowInfoBreakdown = ({
                   </Inline>
                 </>
 
-                {editor &&
+                {editorIndex == index && editMsgs && editMsgs[index] &&
                   <>
-                    <JsonCodeMirrorEditor
-                      jsonValue={editMsg}
-                      onChange={setEditMsg}
-                      onValidate={setIsJsonValid}
+                    <JsonFormWrapper
+                      index={index}
+                      chainSymbol={"INTO"}
+                      msg={editMsgs[index]}
+                      handleRemoveMsg={handleRemoveMsg}
+                      handleChangeMsg={handleChangeMsg}
+                      setIsJsonValid={setIsJsonValid}
                     />
                     <Button
                       css={{ marginTop: '$8', margin: '$2' }}
                       variant="secondary"
                       size="small"
                       disabled={shouldDisableUpdateFlowButton}
-                      onClick={() => handleUpdateFlowMsgClick(index)}
+                      onClick={handleUpdateFlowMsgClick}
                     >
-                      {isExecutingUpdateFlow ? (
-                        <Spinner instant />
-                      ) : (
-                        'Update Message'
-                      )}
+                      {isExecutingUpdateFlow && <Spinner instant />}{' '}
+                      {'Update Message'}
                     </Button>
                   </>
                 }

@@ -24,14 +24,14 @@ export const executeSubmitFlow = async ({
   }
   console.log(startAtInt)
   let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
-  console.log('startAt s', startAtInt / 1000)
-  console.log('duration s', flowInput.duration / 1000)
-  console.log('interval s', flowInput.interval / 1000)
+  console.log('startAt (s)', startAtInt / 1000)
+  console.log('duration (s)', flowInput.duration / 1000)
+  console.log('interval (s)', flowInput.interval / 1000)
   let duration = flowInput.duration + 'ms'
   let interval = flowInput.interval + 'ms'
   let msgs = []
 
-  transformAndEncodeMsgs(flowInput, client, msgs)
+  transformAndEncodeMsgs(flowInput.msgs, client, msgs)
   // console.log(msgs)
 
   if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ != '') {
@@ -91,17 +91,18 @@ export const executeSubmitFlow = async ({
     })
   )
 }
-function transformAndEncodeMsgs(
-  flowInput: FlowInput,
+export function transformAndEncodeMsgs(
+  flowInputMsgs: string[],
   client: SigningStargateClient,
   msgs: any[]
 ) {
-  for (let msgJSON of flowInput.msgs) {
+  for (let msgJSON of flowInputMsgs) {
     let value = JSON.parse(msgJSON)['value']
     let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
 
     //todo: test and adjust accordingly
     if (typeUrl.startsWith('/cosmwasm')) {
+      alert("cosmwasm msgs are available for testing use only at the moment")
       let msgString: string = JSON.stringify(value['msg'])
       console.log(msgString)
       let msg2: Uint8Array = toUtf8(msgString)

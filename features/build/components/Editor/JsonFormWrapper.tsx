@@ -31,7 +31,7 @@ export const JsonFormWrapper = ({
   index: number
   chainSymbol: string
   msg: string
-  setExample: (index: number, msg: any) => void
+  setExample?: (index: number, msg: any) => void
   handleRemoveMsg: (index: number) => void
   handleChangeMsg: (index: number) => (msg: string) => void
   setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>
@@ -81,7 +81,7 @@ export const JsonFormWrapper = ({
           disabled
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-            <Inline css={{ justifyContent: 'space-between' }} >
+            {setExample && <Inline css={{ justifyContent: 'space-between' }} >
               <MessageSelector
                 msgTypeName={msgTypeName}
                 setSchema={setSchema}
@@ -97,74 +97,75 @@ export const JsonFormWrapper = ({
                 </a>
               </Text>
             </Inline>
-
-
-
+            }
             <Column>
-              <Inline css={{ display: 'inline', paddingTop: '$4' }} >
-                {generalExamples.map((example, ei) => (
-                  <span key={ei}>
-                    {' '}
-                    <Chip
-                      href="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
-                      label={example.typeUrl
-                        .split('.')
-                        .find((data) => data.includes('Msg'))
-                        .slice(3)
-                        .replace(/([A-Z])/g, ' $1')
-                        .trim()}
-                      onClick={() => {
-                        setMsgFromExample(example)
-                      }}
-                    />
-                  </span>
-                ))}
-                {wasmEnabledList.find((symbol) => symbol == chainSymbol) && (
-                  <>
-                    {wasmExamples.map((example, ei) => (
-                      <span key={ei}>
-                        {' '}
-                        <Chip
-                          href="https://cosmwasm.com/_next/image/?url=%2Fcosmwasm-logo.png&w=3840&q=75"
-                          label={example.typeUrl
-                            .split('.')
-                            .find((data) => data.includes('Msg'))
-                            .slice(3)
-                            .replace(/([A-Z])/g, ' $1')
-                            .trim()}
-                          onClick={() => {
-                            setMsgFromExample(example)
-                          }}
-                        />
-                      </span>
-                    ))}
-                  </>
-                )}
-                {chainSymbol == 'OSMO' && (
-                  <>
-                    {osmoExamples.map((example, ei) => (
-                      <span key={ei}>
-                        {' '}
-                        <Chip
-                          href="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg"
-                          label={example.typeUrl
-                            .split('.')
-                            .find((data) => data.includes('Msg'))
-                            .slice(3)
-                            .replace(/([A-Z])/g, ' $1')
-                            .trim()}
-                          onClick={() => {
-                            setMsgFromExample(example)
-                          }}
-                        />
-                      </span>
-                    ))}
-                  </>
-                )}
-              </Inline>
-
-              <div style={{ margin: '$4', padding: '$4' }}>
+              {setExample && <>
+                <Inline css={{ display: 'inline', paddingTop: '$4' }} >
+                  {generalExamples.map((example, ei) => (
+                    <span key={ei}>
+                      {' '}
+                      <Chip
+                        href="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                        label={example.typeUrl
+                          .split('.')
+                          .find((data) => data.includes('Msg'))
+                          .slice(3)
+                          .replace(/([A-Z])/g, ' $1')
+                          .trim()}
+                        onClick={() => {
+                          setMsgFromExample(example)
+                        }}
+                      />
+                    </span>
+                  ))}
+                  {wasmEnabledList.find((symbol) => symbol == chainSymbol) && (
+                    <>
+                      {wasmExamples.map((example, ei) => (
+                        <span key={ei}>
+                          {' '}
+                          <Chip
+                            href="https://cosmwasm.com/_next/image/?url=%2Fcosmwasm-logo.png&w=3840&q=75"
+                            label={example.typeUrl
+                              .split('.')
+                              .find((data) => data.includes('Msg'))
+                              .slice(3)
+                              .replace(/([A-Z])/g, ' $1')
+                              .trim()}
+                            onClick={() => {
+                              setMsgFromExample(example)
+                            }}
+                          />
+                        </span>
+                      ))}
+                    </>
+                  )}
+                  {chainSymbol == 'OSMO' && (
+                    <>
+                      {osmoExamples.map((example, ei) => (
+                        <span key={ei}>
+                          {' '}
+                          <Chip
+                            href="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg"
+                            label={example.typeUrl
+                              .split('.')
+                              .find((data) => data.includes('Msg'))
+                              .slice(3)
+                              .replace(/([A-Z])/g, ' $1')
+                              .trim()}
+                            onClick={() => {
+                              setMsgFromExample(example)
+                            }}
+                          />
+                        </span>
+                      ))}
+                    </>
+                  )}
+                </Inline>
                 <Divider offsetY="$6" />
+              </>
+              }
+              <div style={{ margin: '$4', padding: '$4' }}>
+
                 <Inline css={{ justifyContent: 'space-between' }}>
                   <Button
                     variant="ghost"
@@ -196,6 +197,7 @@ export const JsonFormWrapper = ({
                       </Button>
                     </div>
                   )}</Inline>
+
               </div>
               {showJsonForm && msgTypeName != 'Unknown' ? (
                 <JsonFormEditor
