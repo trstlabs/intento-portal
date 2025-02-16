@@ -1,4 +1,3 @@
-import { Any } from 'cosmjs-types/google/protobuf/any'
 import { Coin } from '@cosmjs/stargate'
 import {
   ExecutionConditions,

@@ -33,17 +33,13 @@ import {
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
 import { useSendFundsOnHost, useUpdateFlow } from '../../build/hooks'
-import { JsonCodeMirrorEditor } from '../../build/components/Editor/CodeMirror'
 import { getDuration, getRelativeTime } from '../../../util/time'
-import { getIntentoSigningClientOptions } from 'intentojs'
-import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
 import { FlowHistory } from './FlowHistory'
 import FlowTransformButton, { transformFlowMsgs } from './FlowTransformButton'
 import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
 import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
 import { Configuration } from '../../build/components/Conditions/Configuration'
-import JsonFormEditor from '../../build/components/Editor/DynamicForm'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 
 
@@ -110,9 +106,7 @@ export const FlowInfoBreakdown = ({
     return setRequestedSendFunds(true)
   }
 
-  const { registry } = getIntentoSigningClientOptions({
-    defaultTypes,
-  })
+
 
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -237,7 +231,6 @@ export const FlowInfoBreakdown = ({
 
     setUpdatedFlowParams(params)
   }
-
 
   return (
     <>
@@ -813,35 +806,37 @@ export const FlowInfoBreakdown = ({
 
 
 
-        {/* {flowInfo.updateHistory.length != 0 && (
-          <>
-            {' '}
-            <Row>
+        {
+          flowInfo.updateHistory.length != 0 && (
+            <>
               {' '}
-              <Column gap={8} align="flex-start" justifyContent="flex-start">
+              <Row>
                 {' '}
-                <Inline>
-                  <Text variant="legend" color="secondary" align="left">
-                    Update History
-                  </Text>
-                </Inline>
-                {flowInfo.updateHistory?.map((entry, ei) => (
-                  <div key={ei}>
-                    <Column
-                      gap={2}
-                      align="flex-start"
-                      justifyContent="flex-start"
-                    >
-                      <Text variant="body">
-                        At {getRelativeTime(entry.getTime())}{' '}
-                      </Text>
-                    </Column>
-                  </div>
-                ))}
-              </Column>
-            </Row>
-          </>
-        )} */}
+                <Column gap={8} align="flex-start" justifyContent="flex-start">
+                  {' '}
+                  <Inline>
+                    <Text variant="legend" color="secondary" align="left">
+                      Update History
+                    </Text>
+                  </Inline>
+                  {flowInfo.updateHistory?.map((entry: any, ei) => (
+                    <div key={ei}>
+                      <Column
+                        gap={2}
+                        align="flex-start"
+                        justifyContent="flex-start"
+                      >
+                        <Text variant="body">
+                          At {entry.seconds}
+                        </Text>
+                      </Column>
+                    </div>
+                  ))}
+                </Column>
+              </Row>
+            </>
+          )
+        }
         <FlowHistory id={flowInfo.id.toString()} />
 
 
