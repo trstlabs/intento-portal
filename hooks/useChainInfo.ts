@@ -73,6 +73,7 @@ export const useGetExpectedFlowFee = (
       setTriggerModuleData(intentModuleParams)
       const fee = getExpectedFlowFee(
         intentModuleParams,
+        200000,
         durationSeconds,
         flowInput.msgs.length,
         intervalSeconds

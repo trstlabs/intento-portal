@@ -181,7 +181,7 @@ export const getAPY = async (
 }
 
 export const getAPYForAutoCompound = async (
-  triggerParams: Params,
+  intentParams: Params,
   paramsState: ParamsState,
   cosmosClient: any,
   client: StargateClient,
@@ -193,7 +193,8 @@ export const getAPYForAutoCompound = async (
   try {
     const apy = await getAPY(cosmosClient, client, paramsState, intervalSeconds)
     const expectedFees = getExpectedFlowFee(
-      triggerParams,
+      intentParams,
+      200000,
       durationSeconds,
       nrMessages,
       intervalSeconds
@@ -205,32 +206,29 @@ export const getAPYForAutoCompound = async (
 }
 
 export const getExpectedFlowFee = (
-  triggerParams: Params,
-  durationSeconds: number,
+  intentParams: Params,
+  gasUsed: number,
   lenMsgs: number,
+  durationSeconds: number,
   intervalSeconds?: number
 ) => {
   const recurrences =
     intervalSeconds && intervalSeconds < durationSeconds
       ? Math.floor(durationSeconds / intervalSeconds)
       : 1
-  const periodSeconds =
-    intervalSeconds && intervalSeconds < durationSeconds
-      ? intervalSeconds
-      : durationSeconds
 
-  const periodMinutes = Math.trunc(periodSeconds / 60)
 
   const flexFeeForPeriod =
-    (Number(triggerParams.flowFlexFeeMul) / 100) * periodMinutes
+    (Number(intentParams.flowFlexFeeMul) / 100) * gasUsed
 
   const flowFee =
     recurrences * flexFeeForPeriod +
-    recurrences * Number(triggerParams.burnFeePerMsg) * lenMsgs
+    recurrences * Number(intentParams.burnFeePerMsg) * lenMsgs
   const flowFeeDenom = convertMicroDenomToDenom(flowFee, 6)
 
   return Number(flowFeeDenom.toFixed(4))
 }
+
 
 function blockInfoAndCalculateApr(
   stakingProvision: number,

@@ -33,7 +33,6 @@ type InfoCardProps = {
 
 export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const [params, _] = useSetModuleParams()
-  // const triggerParams = useRecoilValue(intentModuleParamsAtom)
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
   let data = new FlowInput()
   data.duration = 14 * 86400000
@@ -292,7 +291,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 {getRelativeTime(params.mintModuleParams.startTime.seconds)}
               </Text> */}
             </Card>
-            {/* {triggerParams && (
+            {/* {intentParams && (
               <Column>
                 <Text variant="title" css={{ padding: '$8' }}>
                   <span> Fee Info</span>
@@ -302,7 +301,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     <Text variant="legend"> Flow Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.burnFeePerMsg),
+                        Number(intentParams.burnFeePerMsg),
                         6
                       )}{' '}
                       INTO{' '}
@@ -310,7 +309,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     <Text variant="legend"> Flow Flex Fee per hour</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.FlowFlexFeeMul) * 60,
+                        Number(intentParams.FlowFlexFeeMul) * 60,
                         6
                       ) + ' '}
                       INTO{' '}
