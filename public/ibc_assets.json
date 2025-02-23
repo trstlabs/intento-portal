@@ -26,7 +26,7 @@
     "connection_id": "connection-1",
     "counterparty_connection_id": "connection-0",
     "prefix": "cosmos",
-    "rpc": "http://gaia-rpc-t.trustlesshub.com"
+    "rpc": "https://gaia-rpc-t.trustlesshub.com"
   },
   {
     "id": "Osmosis",
@@ -43,6 +43,6 @@
     "connection_id": "connection-3",
     "counterparty_connection_id": "connection-1",
     "prefix": "osmo",
-    "rpc": "http://osmo-rpc-t.trustlesshub.com"
+    "rpc": "https://osmo-rpc-t.trustlesshub.com"
   }
 ]

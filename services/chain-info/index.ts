@@ -11,7 +11,7 @@ import { Params as StakingModuleParams } from 'intentojs/dist/codegen/cosmos/sta
 import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 
 import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/codegen/intento/alloc/v1beta1/query'
-import { QueryParamsResponse as QueryActionParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1beta1/query'
 
 export interface BaseQueryInput {
@@ -181,7 +181,7 @@ export const getAPY = async (
 }
 
 export const getAPYForAutoCompound = async (
-  triggerParams: Params,
+  intentParams: Params,
   paramsState: ParamsState,
   cosmosClient: any,
   client: StargateClient,
@@ -192,8 +192,9 @@ export const getAPYForAutoCompound = async (
 ) => {
   try {
     const apy = await getAPY(cosmosClient, client, paramsState, intervalSeconds)
-    const expectedFees = getExpectedActionFee(
-      triggerParams,
+    const expectedFees = getExpectedFlowFee(
+      intentParams,
+      200000,
       durationSeconds,
       nrMessages,
       intervalSeconds
@@ -204,33 +205,30 @@ export const getAPYForAutoCompound = async (
   }
 }
 
-export const getExpectedActionFee = (
-  triggerParams: Params,
-  durationSeconds: number,
+export const getExpectedFlowFee = (
+  intentParams: Params,
+  gasUsed: number,
   lenMsgs: number,
+  durationSeconds: number,
   intervalSeconds?: number
 ) => {
   const recurrences =
     intervalSeconds && intervalSeconds < durationSeconds
       ? Math.floor(durationSeconds / intervalSeconds)
       : 1
-  const periodSeconds =
-    intervalSeconds && intervalSeconds < durationSeconds
-      ? intervalSeconds
-      : durationSeconds
 
-  const periodMinutes = Math.trunc(periodSeconds / 60)
 
   const flexFeeForPeriod =
-    (Number(triggerParams.ActionFlexFeeMul) / 100) * periodMinutes
+    (Number(intentParams.flowFlexFeeMul) / 100) * gasUsed
 
-  const actionFee =
+  const flowFee =
     recurrences * flexFeeForPeriod +
-    recurrences * Number(triggerParams.ActionConstantFee) * lenMsgs
-  const actionFeeDenom = convertMicroDenomToDenom(actionFee, 6)
+    recurrences * Number(intentParams.burnFeePerMsg) * lenMsgs
+  const flowFeeDenom = convertMicroDenomToDenom(flowFee, 6)
 
-  return Number(actionFeeDenom.toFixed(4))
+  return Number(flowFeeDenom.toFixed(4))
 }
+
 
 function blockInfoAndCalculateApr(
   stakingProvision: number,
@@ -364,8 +362,8 @@ async function getAnnualProvisions(client: any) {
   }
 }
 
-export async function getActionParams(client: any) {
-  const resp: QueryActionParamsResponse =
+export async function getFlowParams(client: any) {
+  const resp: QueryFlowParamsResponse =
     await client.intento.intent.v1beta1.params({})
   return resp.params
 }
@@ -374,10 +372,14 @@ async function getStakeProvisionPercent(client: any) {
   try {
     const resp: QueryAllocParamsResponse =
       await client.intento.alloc.v1beta1.params({})
-
-    const stakeProvision = resp.params.distributionProportions.staking
+    console.log(resp.params.distributionProportions)
+    const stakeProvision =
+      1 -
+      Number(resp.params.distributionProportions.communityPool) -
+      Number(resp.params.distributionProportions.developerRewards) -
+      Number(resp.params.distributionProportions.relayerIncentives)
     console.log('stakeProvision', Number(stakeProvision))
-    //   const communityTax = parseFloat(distribution.params.community_tax)
+
     return Number(stakeProvision)
   } catch (e) {
     console.error('err(getStakeProvisionPercent):', e)

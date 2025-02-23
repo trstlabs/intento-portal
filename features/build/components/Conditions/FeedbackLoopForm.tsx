@@ -1,23 +1,31 @@
-import { Card, Text, ToggleSwitch, Tooltip, Button, UnionIcon } from "junoblocks"
+import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper } from "junoblocks"
 import { Field } from "./Fields"
-import { UseResponseValue } from "intentojs/dist/codegen/intento/intent/v1beta1/action"
+import { FeedbackLoop } from "intentojs/dist/codegen/intento/intent/v1beta1/flow"
 import ConditionDropdown from "./ConditionDropdown"
+import { useState } from "react"
+import { ICQConfigForm } from "./ICQConfigForm"
 
 
-type UseResponseValueFormProps = {
-  useResponseValue?: UseResponseValue
-  onChange: (value: UseResponseValue) => void
+type FeedbackLoopFormProps = {
+  feedbackLoop?: FeedbackLoop
+  onChange: (value: FeedbackLoop) => void
   setDisabled: () => void
 }
 
-export const UseResponseValueForm = ({ useResponseValue, onChange, setDisabled }: UseResponseValueFormProps) => {
-  const handleFieldChange = (field: keyof UseResponseValue, value: any) => {
-    const newValue = { ...useResponseValue, [field]: value }
+export const FeedbackLoopForm = ({ feedbackLoop, onChange, setDisabled }: FeedbackLoopFormProps) => {
+  const [showICQConfig, setShowICQConfig] = useState(false)
+  const handleIcqChange = (value: any) => {
+    let newConditions = feedbackLoop
+    feedbackLoop.icqConfig = value
+    onChange(newConditions)
+  }
+  const handleFieldChange = (field: keyof FeedbackLoop, value: any) => {
+    const newValue = { ...feedbackLoop, [field]: value }
     onChange(newValue)
   }
   const emptyFields = () => {
     // const newValue = {
-    //   actionId: BigInt(0),
+    //   flowId: BigInt(0),
     //   responseIndex: 0,
     //   msgsIndex: 0,
     //   responseKey: "",
@@ -38,7 +46,7 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, setDisabled }
       <Tooltip
         label={
           "Use a response value as a value for a message"}>
-        <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Feedback loop 🔁
+        <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Feedback Loop 🔁
         </Text>
       </Tooltip>
       <div style={{ display: 'flex', justifyContent: 'end' }}>
@@ -51,15 +59,15 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, setDisabled }
         </Button>
       </div>
       <Field
-        label="Action ID (optional)"
-        value={useResponseValue?.actionId?.toString()}
-        onChange={(e) => handleFieldChange('actionId', BigInt(e.target.value))}
+        label="Flow ID (optional)"
+        value={feedbackLoop?.flowId?.toString()}
+        onChange={(e) => handleFieldChange('flowId', BigInt(e.target.value))}
 
       />
       <Field
         label="Response Index"
         tooltip="Index of the response object to parse from, optional for Interchain Query"
-        value={useResponseValue?.responseIndex}
+        value={feedbackLoop?.responseIndex}
         onChange={(e) => handleFieldChange('responseIndex', Number(e.target.value))}
 
         type="number"
@@ -68,14 +76,14 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, setDisabled }
         label="Response Key"
         tooltip="Key of the response message (e.g. Amount[0].Amount, FromAddress) "
         type="string"
-        value={useResponseValue?.responseKey}
+        value={feedbackLoop?.responseKey}
         onChange={(e) => handleFieldChange('responseKey', e.target.value)}
 
       />
       <Field
         label="Message Index"
         tooltip="Index of the message to parse into"
-        value={useResponseValue?.msgsIndex}
+        value={feedbackLoop?.msgsIndex}
         onChange={(e) => handleFieldChange('msgsIndex', Number(e.target.value))}
 
         type="number"
@@ -84,38 +92,37 @@ export const UseResponseValueForm = ({ useResponseValue, onChange, setDisabled }
         label="Message Key"
         tooltip="Key of the message to replace (e.g. Amount[0].Amount, FromAddress) "
         type="string"
-        value={useResponseValue?.msgKey}
+        value={feedbackLoop?.msgKey}
         onChange={(e) => handleFieldChange('msgKey', e.target.value)}
 
       />
       <ConditionDropdown
         label="Value Type"
-        value={useResponseValue?.valueType}
+        value={feedbackLoop?.valueType}
         onChange={(e) => handleFieldChange('valueType', e.target.value)}
 
         options={valueTypeOptions}
       />
-      <Tooltip
-        label={
-          'If set to true, the query result will be used as response value. The value type should be defined correctly'
-        }
-      ><Button
+      <Button css={{ marginBottom: '$6' }}
+        onClick={() => setShowICQConfig(!showICQConfig)}
         variant="ghost"
-
-        css={{ columnGap: '$4', margin: '$2' }}
-        onClick={() => handleFieldChange('fromIcq', !useResponseValue.fromIcq)}
-        iconLeft={
-          <ToggleSwitch
-            id="reregisterIcaAfterTimeout"
-            name="reregisterIcaAfterTimeout"
-            onChange={() => handleFieldChange('fromIcq', !useResponseValue.fromIcq)}
-            checked={useResponseValue?.fromIcq || false}
-            optionLabels={['no icq', 'icq']}
-          />
-        }
-      >
-          From Interchain Query
-        </Button></Tooltip>
+        iconRight={
+          <IconWrapper
+            size="medium"
+            rotation="-90deg"
+            color="tertiary"
+            icon={showICQConfig ? <ChevronIcon rotation="-90deg" /> : <Chevron />}
+          />}>
+        Interchain Query
+      </Button>
+      {
+        showICQConfig &&
+        <ICQConfigForm
+          icqConfig={feedbackLoop?.icqConfig}
+          onChange={(value) => handleIcqChange(value)}
+          setDisabled={() => setShowICQConfig(!showICQConfig)}
+        />
+      }
     </Card>
   )
 }

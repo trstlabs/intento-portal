@@ -23,7 +23,7 @@ import { StargateClient } from '@cosmjs/stargate'
 import { convertMicroDenomToDenom } from 'junoblocks'
 
 import { useIntentoRpcClient } from './useRPCClient'
-import { ActionInput } from '../types/trstTypes'
+import { FlowInput } from '../types/trstTypes'
 import { useChainInfoByChainID } from './useChainList'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
@@ -107,9 +107,7 @@ export const useGetHostICAAddressFromHostAddress = (address: string) => {
       return icaAddress
     },
     {
-      enabled: Boolean(
-        rpcClient && !!address && address.length > 40
-      ),
+      enabled: Boolean(rpcClient && !!address && address.length > 40),
       refetchOnMount: 'always',
       // refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
@@ -130,9 +128,7 @@ export const useGetConnectionIDFromHostAddress = (address: string) => {
       return resp.hostedAccount.icaConfig.connectionId
     },
     {
-      enabled: Boolean(
-        rpcClient && !!address && address.length > 40
-      ),
+      enabled: Boolean(rpcClient && !!address && address.length > 40),
       refetchOnMount: 'always',
       // refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
@@ -201,7 +197,12 @@ export const useICATokenBalance = (
     },
     {
       enabled: Boolean(
-        ibcWalletAddress && denom && ibcWalletAddress != '' && isICAChain
+        ibcWalletAddress &&
+          chainId &&
+          chainId != '' &&
+          ibcWalletAddress != '' &&
+          ibcWalletAddress.length != 0 &&
+          isICAChain
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
@@ -212,64 +213,76 @@ export const useICATokenBalance = (
   return [data, isLoading] as const
 }
 
-export const useAuthZGrantsForUser = (
+export const useAuthZMsgGrantInfoForUser = (
   chainId: string,
   grantee: string,
-  ActionInput?: ActionInput
+  flowInput?: FlowInput
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(chainId)
 
-  // console.log('granter ', ibcState.address, 'grantee ', grantee)
   const { data, isLoading } = useQuery(
     [`userAuthZGrants/${grantee}/${chainId}`],
     async () => {
-      // console.log(ibcState.status)
-
       let grants: GrantResponse[] = []
-      // console.log('granter ', ibcState.address, 'grantee ', grantee)
       const granteeGrants = await getAuthZGrantsForGrantee({
         grantee,
         granter: ibcState.address,
         rpc: chain.rpc,
       })
-      if (granteeGrants != false) {
-        console.log(grants, grantee, ibcState)
+      if (!granteeGrants) return undefined
+      // console.log(granteeGrants)
+      for (const msg of flowInput.msgs) {
+        let parsedMsg = JSON.parse(msg)
+        let msgTypeUrl = parsedMsg.typeUrl
+        if (msgTypeUrl === '/cosmos.authz.v1beta1.MsgExec') {
+          // Extract messages from MsgExec
+          const execMsgs = parsedMsg.value.msgs || []
+          for (const execMsg of execMsgs) {
+            // console.log(execMsg)
+            let execMsgTypeUrl = execMsg.typeUrl
+            // console.log(execMsgTypeUrl)
+            const grantMatch = granteeGrants.find(
+              (grant) => grant.msgTypeUrl === execMsgTypeUrl
+            )
 
-        for (const msg of ActionInput.msgs) {
-          let msgTypeUrl = JSON.parse(msg)['typeUrl']
-          // console.log(msgTypeUrl)
-          const grantMatch = granteeGrants?.find(
-            (grant) => grant.msgTypeUrl == msgTypeUrl
+            grants.push(
+              grantMatch || {
+                msgTypeUrl: execMsgTypeUrl,
+                expiration: undefined,
+                hasGrant: false,
+              }
+            )
+          }
+        } else {
+          const grantMatch = granteeGrants.find(
+            (grant) => grant.msgTypeUrl === msgTypeUrl
           )
-          if (grantMatch == undefined) {
-            grants.push({
+
+          grants.push(
+            grantMatch || {
               msgTypeUrl,
               expiration: undefined,
               hasGrant: false,
-            })
-          } else {
-            grants.push(grantMatch)
-          }
-          // typeUrls.push(grant.msgTypeUrl)
+            }
+          )
         }
-        // console.log('grants', grants)
-        return grants
       }
-      return undefined
+      console.log('grants', grants)
+      return grants
     },
     {
       enabled: Boolean(
         grantee &&
           chain &&
           chain.rpc &&
-          grantee != '' &&
+          grantee !== '' &&
           chainId &&
           ibcState.status === WalletStatusType.connected &&
           grantee.includes(ibcState.address.slice(0, 5)) &&
-          ActionInput.msgs[0] &&
-          ActionInput.msgs[0].includes('typeUrl') &&
-          ActionInput.connectionId
+          flowInput.msgs[0] &&
+          flowInput.msgs[0].includes('typeUrl') &&
+          flowInput.connectionId
       ),
       refetchOnMount: 'always',
       refetchIntervalInBackground: true,

@@ -12,8 +12,8 @@ import {
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 
-import { SubmitActionDialog } from '../../build/components/SubmitActionDialog'
-import { useSubmitAction } from '../../build/hooks'
+import { SubmitFlowDialog } from '../../build/components/SubmitFlowDialog'
+import { useSubmitFlow } from '../../build/hooks'
 import {
   useGetAPR,
   useGetAPYForWithFees,
@@ -25,7 +25,7 @@ import { useTokenBalance } from '../../../hooks/useTokenBalance'
 
 import IssuanceChart from './Chart'
 import { getDuration } from '../../../util/time'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 
 type InfoCardProps = {
   shouldShowAutoCompound: Boolean
@@ -33,14 +33,13 @@ type InfoCardProps = {
 
 export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   const [params, _] = useSetModuleParams()
-  // const triggerParams = useRecoilValue(intentModuleParamsAtom)
-  const [requestedSubmitAction, setRequestedSubmitAction] = useState(false)
-  let data = new ActionInput()
+  const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
+  let data = new FlowInput()
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
   // data.typeUrls = [""]
-  const [actionInput, setActionInput] = useState(data)
+  const [flowInput, setFlowInput] = useState(data)
   const [APR, isAPRLoading] = useGetAPR()
   const week = 60 * 60 * 24 * 7
 
@@ -54,20 +53,20 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
   )
   const { balance, isLoading } = useTokenBalance('INTO')
 
-  const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
-    useSubmitAction({ actionInput })
+  const { mutate: handleSubmitFlow, isLoading: isExecutingSchedule } =
+    useSubmitFlow({ flowInput })
 
   useEffect(() => {
-    const shouldTriggerSubmitAction =
-      !isExecutingSchedule && requestedSubmitAction
-    if (shouldTriggerSubmitAction) {
-      handleSubmitAction(undefined, {
-        onSettled: () => setRequestedSubmitAction(false),
+    const shouldTriggerSubmitFlow =
+      !isExecutingSchedule && requestedSubmitFlow
+    if (shouldTriggerSubmitFlow) {
+      handleSubmitFlow(undefined, {
+        onSettled: () => setRequestedSubmitFlow(false),
       })
     }
-  }, [isExecutingSchedule, requestedSubmitAction, handleSubmitAction])
+  }, [isExecutingSchedule, requestedSubmitFlow, handleSubmitFlow])
 
-  const handleSubmitActionClick = (newActionInput: ActionInput) => {
+  const handleSubmitFlowClick = (newFlowInput: FlowInput) => {
     const msgs = []
     for (const validator of stakeBalance.validators) {
       let claimMsg = claimRewardSDKMessage
@@ -75,18 +74,18 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
       claimMsg.value.validatorAddress = validator
       msgs.push(JSON.stringify(claimMsg))
     }
-    const action = {
-      ...newActionInput,
+    const flow = {
+      ...newFlowInput,
       msgs,
     }
-    // console.log(action)
-    setActionInput(action)
-    return setRequestedSubmitAction(true)
+    // console.log(flow)
+    setFlowInput(flow)
+    return setRequestedSubmitFlow(true)
   }
 
   const [
-    { isShowing: isSubmitActionDialogShowing },
-    setSubmitActionDialogState,
+    { isShowing: isSubmitFlowDialogShowing },
+    setSubmitFlowDialogState,
   ] = useState({ isShowing: false })
 
   return (
@@ -219,7 +218,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   size="large"
                   disabled={isStakeBalanceLoading}
                   as="a"
-                  href={'https://wallet.keplr.app/?tab=staking'}
+                  href={'https://explorer.intento.zone/intento-test/staking'}
                   target="__blank"
                 >
                   {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
@@ -233,7 +232,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                     (stakeBalance && stakeBalance.stakingBalanceAmount == 0)
                   }
                   onClick={() =>
-                    setSubmitActionDialogState({
+                    setSubmitFlowDialogState({
                       isShowing: true,
                     })
                   }
@@ -292,25 +291,25 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                 {getRelativeTime(params.mintModuleParams.startTime.seconds)}
               </Text> */}
             </Card>
-            {/* {triggerParams && (
+            {/* {intentParams && (
               <Column>
                 <Text variant="title" css={{ padding: '$8' }}>
                   <span> Fee Info</span>
                 </Text>
                 <Card css={{ padding: '$12' }}>
                   <>
-                    <Text variant="legend"> Action Constant Fee</Text>
+                    <Text variant="legend"> Flow Constant Fee</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.ActionConstantFee),
+                        Number(intentParams.burnFeePerMsg),
                         6
                       )}{' '}
                       INTO{' '}
                     </Text>
-                    <Text variant="legend"> Action Flex Fee per hour</Text>
+                    <Text variant="legend"> Flow Flex Fee per hour</Text>
                     <Text css={{ padding: '$8' }} variant="title">
                       {convertMicroDenomToDenom(
-                        Number(triggerParams.ActionFlexFeeMul) * 60,
+                        Number(intentParams.FlowFlexFeeMul) * 60,
                         6
                       ) + ' '}
                       INTO{' '}
@@ -321,19 +320,19 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             )} */}
           </Column>
         )}
-        <SubmitActionDialog
+        <SubmitFlowDialog
           isLoading={isExecutingSchedule}
-          actionInput={actionInput}
+          flowInput={flowInput}
           customLabel="Autocompound"
-          isDialogShowing={isSubmitActionDialogShowing}
+          isDialogShowing={isSubmitFlowDialogShowing}
           chainSymbol={"INTO"}
           onRequestClose={() =>
-            setSubmitActionDialogState({
+            setSubmitFlowDialogState({
               isShowing: false,
             })
           }
-          handleSubmitAction={(actionInput) =>
-            handleSubmitActionClick(actionInput)
+          handleSubmitFlow={(flowInput) =>
+            handleSubmitFlowClick(flowInput)
           }
         />
       </StyledDivForInfoGrid>

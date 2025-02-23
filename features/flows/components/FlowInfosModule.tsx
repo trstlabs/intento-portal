@@ -1,41 +1,41 @@
 
 import { styled, /* useMedia */ } from 'junoblocks'
-import { useEffect,  } from 'react'
+import { useEffect, } from 'react'
 import { useRecoilValue } from 'recoil'
 import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { useActionInfos } from '../../../hooks/useActionInfo'
-import { ActionInfos } from './ActionInfos'
+import { useFlowInfos } from '../../../hooks/useFlowInfo'
+import { FlowInfos } from './FlowInfos'
 
-export const ActionInfosModule = () => {
+export const FlowInfosModule = () => {
 
     const transactionStatus = useRecoilValue(transactionStatusState)
 
     /* fetch token list and set initial state */
-    const [actionList, isActionListLoading] = useActionInfos()
+    const [flowList, isFlowListLoading] = useFlowInfos(Number(100), undefined)
     useEffect(() => {
 
-    }, [actionList])
+    }, [flowList])
 
-    
+
     const isUiDisabled =
-        transactionStatus === TransactionStatus.EXECUTING || isActionListLoading
-   // const uiSize = useMedia('sm') ? 'small' : 'large'
+        transactionStatus === TransactionStatus.EXECUTING || isFlowListLoading
+    // const uiSize = useMedia('sm') ? 'small' : 'large'
 
 
     return (
         <>
             <StyledDivForWrapper>
-                <ActionInfos
-                    
-                   onChange={() => {
+                <FlowInfos
+
+                    onChange={() => {
                     }}
                     disabled={isUiDisabled}
-                    //size={uiSize}
+                //size={uiSize}
                 />
-              
+
             </StyledDivForWrapper>
 
         </>

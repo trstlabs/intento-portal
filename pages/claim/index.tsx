@@ -7,24 +7,23 @@ import {
     styled,
     useMedia,
     Text,
-    Inline,
+    
 } from 'junoblocks'
 import Head from 'next/head'
 import Link from 'next/link'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { APP_NAME } from 'util/constants'
 
-import { useClaimRecord, useClaimRecordForAddress, useTotalClaimable } from '../../hooks/useClaimRecord'
+import { useClaimRecord, useTotalClaimable } from '../../hooks/useClaimRecord'
 import ClaimAirdrop from '../../features/claim/components/claim'
 import ViewAirdropEligibility from '../../features/claim/components/eligibility'
 
 export default function Claim() {
     const isMobile = useMedia('sm')
 
-    const [address, setAddress] = useState("")
     const [claimRecord, isLoading] = useClaimRecord()
-    /*  const [claimRecord, isLoading] = useClaimRecordForAddress(address) */
+
     const [total, isTotalLoading] = useTotalClaimable()
     if (isLoading) {
         return (
@@ -124,12 +123,4 @@ const StyledDiv = styled('div', {
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 143,
-})
-
-
-const StyledInput = styled('input', {
-    width: '100%',
-    color: 'inherit',
-    padding: '$2',
-    margin: '$2',
 })

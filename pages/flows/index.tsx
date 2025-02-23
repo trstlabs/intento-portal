@@ -4,7 +4,8 @@ import {
   SortDirections,
   ButtonWithDropdownForSorting,
   SortParameters,
-} from '../features/flows'
+
+} from '../../features/flows'
 import {
   Column,
   ConnectIcon,
@@ -18,11 +19,12 @@ import {
 import React, { useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
-import { FlowCard } from '../features/flows/components/FlowCard'
-import { InfoCard } from '../features/dashboard/components/InfoCard'
+import { FlowCard } from '../../features/flows/components/FlowCard'
+import { InfoCard } from '../../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
-export default function Home() {
+export default function Flows() {
+
   const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
   const [allFlows, isLoading] = useFlowInfos(Number(100), undefined)
   const [myFlows, isMyFlowsLoading] = useFlowInfosByOwner(Number(100), undefined)

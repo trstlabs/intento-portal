@@ -13,7 +13,7 @@ import {
 } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
 import {
-  useSubmitAction,
+  useSubmitFlow,
   useRegisterAccount,
   useSendFundsOnHost,
   useSubmitTx,
@@ -31,10 +31,10 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
-import { ActionInput } from '../../../types/trstTypes'
-import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+import { FlowInput } from '../../../types/trstTypes'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { GearIcon, TransferIcon } from '../../../icons'
-import { SubmitActionDialog } from './SubmitActionDialog'
+import { SubmitFlowDialog } from './SubmitFlowDialog'
 import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
@@ -43,15 +43,15 @@ import { HostedAccountCard } from './HostedAccountCard'
 
 
 
-type ActionsInputProps = {
-  actionInput: ActionInput
-  onActionChange: (actionInput: ActionInput) => void
+type FlowsInputProps = {
+  flowInput: FlowInput
+  onFlowChange: (flowInput: FlowInput) => void
 } & HTMLProps<HTMLInputElement>
 
 export const BuildComponent = ({
-  actionInput,
-  onActionChange,
-}: ActionsInputProps) => {
+  flowInput,
+  onFlowChange,
+}: FlowsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
   const [prefix, setPrefix] = useState('into')
@@ -64,35 +64,35 @@ export const BuildComponent = ({
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
   const [_isJsonValid, setIsJsonValid] = useState(true)
-  const [requestedSubmitAction, setRequestedSubmitAction] = useState(false)
+  const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
 
-  const [icaAddress, isIcaLoading] = useGetICA(actionInput.connectionId, '')
+  const [icaAddress, isIcaLoading] = useGetICA(flowInput.connectionId, '')
 
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
     chainId,
     icaAddress,
     chainIsConnected
   )
-  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(actionInput.connectionId)
+  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(flowInput.connectionId)
 
 
   const refetchICAData = useRefetchQueries([
-    //`userAuthZGrants/${icaAddress}/${actionInput}`,
+    //`userAuthZGrants/${icaAddress}/${flowInput}`,
     `icaTokenBalance/${chainId}/${icaAddress}`,
   ])
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance/${denom}/${icaAddress}`,
-    `interchainAccount/${actionInput.connectionId}`,
+    `interchainAccount/${flowInput.connectionId}`,
   ])
 
-  const { mutate: handleSubmitAction, isLoading: isExecutingSchedule } =
-    useSubmitAction({ actionInput })
+  const { mutate: handleSubmitFlow, isLoading: isExecutingSchedule } =
+    useSubmitFlow({ flowInput })
   const { mutate: handleRegisterICA, isLoading: isExecutingRegisterICA } =
     useRegisterAccount({
-      connectionId: actionInput.connectionId,
-      hostConnectionId: actionInput.hostConnectionId,
+      connectionId: flowInput.connectionId,
+      hostConnectionId: flowInput.hostConnectionId,
     })
 
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
@@ -116,11 +116,11 @@ export const BuildComponent = ({
   useEffect(
     () =>
       handleTriggerEffect(
-        !isExecutingSchedule && requestedSubmitAction,
-        handleSubmitAction,
-        setRequestedSubmitAction
+        !isExecutingSchedule && requestedSubmitFlow,
+        handleSubmitFlow,
+        setRequestedSubmitFlow
       ),
-    [isExecutingSchedule, requestedSubmitAction, handleSubmitAction]
+    [isExecutingSchedule, requestedSubmitFlow, handleSubmitFlow]
   )
 
   const handleSendFundsOnHostClick = () => {
@@ -129,7 +129,7 @@ export const BuildComponent = ({
   }
 
   const { mutate: handleSubmitTx, isLoading: isExecutingSubmitTx } =
-    useSubmitTx({ actionInput })
+    useSubmitTx({ flowInput })
 
   useEffect(
     () =>
@@ -186,35 +186,37 @@ export const BuildComponent = ({
   const shouldDisableSendHostChainFundsButton = useMemo(
     () =>
       !icaAddress ||
-      (actionInput.msgs && actionInput.msgs.length === 0) ||
+      (flowInput.msgs && flowInput.msgs.length === 0) ||
       Number(feeFundsHostChain) === 0,
-    [icaAddress, actionInput.msgs, feeFundsHostChain]
+    [icaAddress, flowInput.msgs, feeFundsHostChain]
   )
 
+
+  const shouldDisableAuthzGrantButton = hostedAccount != "" || flowInput.msgs.includes("authz.v1beta1.MsgExec")
 
 
   const handleRegisterAccountClick = () => {
     return setRequestedRegisterICA(true)
   }
 
-  const handleSubmitActionClick = (actionInput: ActionInput) => {
-    onActionChange(actionInput)
-    return setRequestedSubmitAction(true)
+  const handleSubmitFlowClick = (flowInput: FlowInput) => {
+    onFlowChange(flowInput)
+    return setRequestedSubmitFlow(true)
   }
 
-  //////////////////////////////////////// Action message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+  //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
     // if (!isJsonValid) {
     //   return
     // }
     try {
-      let msgs = actionInput.msgs
+      let msgs = flowInput.msgs
       msgs[index] = msg
-      let updatedActionInput = {
-        ...actionInput,
+      let updatedFlowInput = {
+        ...flowInput,
         msgs,
       }
-      onActionChange(updatedActionInput)
+      onFlowChange(updatedFlowInput)
       if (
         JSON.parse(msg)
         ['typeUrl'].split('.')
@@ -236,24 +238,24 @@ export const BuildComponent = ({
     name: string,
     chainSymbol: string
   ) {
-   // alert(denom + newDenom)
-    let updatedActionInput = actionInput
-    updatedActionInput.connectionId = connectionId
-    updatedActionInput.hostConnectionId = hostConnectionId
-    actionInput.msgs.map((editMsg, editIndex) => {
+    // alert(denom + newDenom)
+    let updatedFlowInput = flowInput
+    updatedFlowInput.connectionId = connectionId
+    updatedFlowInput.hostConnectionId = hostConnectionId
+    flowInput.msgs.map((editMsg, editIndex) => {
       if (editMsg.includes(prefix + '1...')) {
-        updatedActionInput.msgs[editIndex] = editMsg.replaceAll(
+        updatedFlowInput.msgs[editIndex] = editMsg.replaceAll(
           prefix + '1...',
           newPrefix + '1...'
         )
 
       }
-      updatedActionInput.msgs[editIndex] = updatedActionInput.msgs[
+      updatedFlowInput.msgs[editIndex] = updatedFlowInput.msgs[
         editIndex
       ].replaceAll(denom, newDenom)
     })
 
-    onActionChange(updatedActionInput)
+    onFlowChange(updatedFlowInput)
     setDenom(newDenom)
     setChainName(name)
     setChainSymbol(chainSymbol)
@@ -270,9 +272,9 @@ export const BuildComponent = ({
     await sleep(200)
     connectExternalWallet(null)
     refetchICA()
-    // console.log("Connection: ", connectionId, actionInput.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    // console.log("Connection: ", connectionId, flowInput.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     await sleep(5000)
-    //console.log("Connection: ", connectionId, actionInput.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
+    //console.log("Connection: ", connectionId, flowInput.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     refetchICAData()
 
   }
@@ -281,63 +283,63 @@ export const BuildComponent = ({
     try {
       const msg = JSON.stringify(msgObject, null, '\t')
       let newMsg = msg.replaceAll('uinto', denom)
-       newMsg = newMsg.replaceAll('into', prefix)
-      
-      let updatedActionInput = actionInput
-      updatedActionInput.msgs[index] = newMsg
-      //updatedActionInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+      newMsg = newMsg.replaceAll('into', prefix)
 
-      onActionChange(updatedActionInput)
+      let updatedFlowInput = flowInput
+      updatedFlowInput.msgs[index] = newMsg
+      //updatedFlowInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
+
+      onFlowChange(updatedFlowInput)
     } catch (e) {
       alert(e)
     }
   }
 
   function setConfig(updatedConfig: ExecutionConfiguration) {
-    let updatedActionInput = actionInput
-    updatedActionInput.configuration = updatedConfig
-    onActionChange(updatedActionInput)
+    let updatedFlowInput = flowInput
+    updatedFlowInput.configuration = updatedConfig
+    onFlowChange(updatedFlowInput)
   }
 
 
   function setConditions(updatedConfig: ExecutionConditions) {
-    let updatedActionInput = actionInput
-    updatedActionInput.conditions = updatedConfig
-    onActionChange(updatedActionInput)
+    let updatedFlowInput = flowInput
+    updatedFlowInput.conditions = updatedConfig
+    onFlowChange(updatedFlowInput)
   }
 
   function handleAddMsg() {
-    let newMsgs = [...actionInput.msgs]
+    let newMsgs = [...flowInput.msgs]
     let emptyMsg = ''
     newMsgs.push(emptyMsg)
-    let updatedActionInput = actionInput
-    updatedActionInput.msgs = newMsgs
-    onActionChange(updatedActionInput)
+    let updatedFlowInput = flowInput
+    updatedFlowInput.msgs = newMsgs
+    onFlowChange(updatedFlowInput)
   }
   function handleRemoveMsg(index: number) {
-    let updatedActionInput = actionInput
+    let updatedFlowInput = flowInput
 
-    const newMsgs = updatedActionInput.msgs.filter(
-      (msg) => msg !== updatedActionInput.msgs[index]
+    const newMsgs = updatedFlowInput.msgs.filter(
+      (msg) => msg !== updatedFlowInput.msgs[index]
     )
 
     if (index == 0 && newMsgs.length == 0) {
       newMsgs[index] = ''
     }
-    updatedActionInput.msgs = newMsgs
-    onActionChange(updatedActionInput)
+    updatedFlowInput.msgs = newMsgs
+    onFlowChange(updatedFlowInput)
   }
 
   const [
-    { isShowing: isSubmitActionDialogShowing },
-    setSubmitActionDialogState,
+    { isShowing: isSubmitFlowDialogShowing },
+    setSubmitFlowDialogState,
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmitButton =
 
-    (actionInput.msgs[0] &&
-      actionInput.msgs[0].length == 0 &&
-      JSON.parse(actionInput.msgs[0])['typeUrl'].length < 5)
+    (flowInput.msgs[0] &&
+      flowInput.msgs[0].length == 0 &&
+      JSON.parse(flowInput.msgs[0])['typeUrl'].length < 5)
 
   const shouldDisableBuildButton =
     shouldDisableSubmitButton ||
@@ -387,7 +389,7 @@ export const BuildComponent = ({
                 /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
                 chainIsConnected &&
                 !isIcaLoading &&
-                actionInput.connectionId != '' && (
+                flowInput.connectionId != '' && (
                   <>
                     <Button
                       css={{
@@ -419,7 +421,7 @@ export const BuildComponent = ({
                     hostedAccount={hostedAccount}
                     chainSymbol={chainSymbol}
                     chainId={chainId}
-                    actionInput={actionInput}
+                    flowInput={flowInput}
                   />}
                     {/* <Text variant="caption">
                       No Self-hosted Interchain Account for selected chain: {chainName}.
@@ -436,7 +438,7 @@ export const BuildComponent = ({
                       }
                       hostDenom={denom}
                       chainId={chainId}
-                      actionInput={actionInput}
+                      flowInput={flowInput}
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
                       setFeeFundsHostChain={(fees) =>
                         setFeeFundsHostChain(fees)
@@ -460,7 +462,7 @@ export const BuildComponent = ({
           Define what to execute
         </Text>{' '}
       </Inline>
-      {actionInput.msgs.map((msg, index) => (
+      {flowInput.msgs.map((msg, index) => (
         <div key={index}>
           <JsonFormWrapper
             index={index}
@@ -486,17 +488,18 @@ export const BuildComponent = ({
           </Column>
         }
       </Card>
-      <SubmitActionDialog
+      <SubmitFlowDialog
         chainSymbol={chainSymbol}
         icaBalance={icaBalance}
         icaAddress={icaAddress}
-        actionInput={actionInput}
-        isDialogShowing={isSubmitActionDialogShowing}
+        flowInput={flowInput}
+        isDialogShowing={isSubmitFlowDialogShowing}
         onRequestClose={() =>
-          setSubmitActionDialogState({
+          setSubmitFlowDialogState({
             isShowing: false,
           })
         }
+        shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
         isLoading={isExecutingSchedule}
         feeFundsHostChain={feeFundsHostChain}
         shouldDisableSendHostChainFundsButton={
@@ -504,20 +507,46 @@ export const BuildComponent = ({
         }
         isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
         setFeeFundsHostChain={setFeeFundsHostChain}
-        handleSubmitAction={(actionInput) =>
-          handleSubmitActionClick(actionInput)
+        handleSubmitFlow={(flowInput) =>
+          handleSubmitFlowClick(flowInput)
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
-      <Configuration
-        config={actionInput.configuration}
-        disabled={!icaAddress && !chainHasIAModule}
-        onChange={setConfig}
-      />
-      <Conditions conditions={actionInput.conditions}
-        disabled={!actionInput.conditions}
-        onChange={setConditions}
-      />
+      <Column>
+        <Inline css={{ margin: '$6', marginTop: '$16' }}>
+          <StepIcon step={3} />
+          <Text
+            align="center"
+            variant="body"
+            color="tertiary"
+            css={{ padding: '0 $15 0 $6' }}
+          >
+            Specify conditions
+          </Text>
+        </Inline>
+        <Conditions conditions={flowInput.conditions}
+          disabled={!flowInput.conditions}
+          onChange={setConditions}
+        />
+      </Column>
+      <Column>
+        <Inline css={{ margin: '$6', marginTop: '$16' }}>
+          <StepIcon step={4} />
+          <Text
+            align="center"
+            variant="body"
+            color="tertiary"
+            css={{ padding: '0 $15 0 $6' }}
+          >
+            Configure execution
+          </Text>{' '}
+        </Inline>
+        <Configuration
+          config={flowInput.configuration}
+          disabled={!icaAddress && !chainHasIAModule}
+          onChange={setConfig}
+        />
+      </Column>
       <Inline
         css={{
           margin: '$4 $6 $8',
@@ -541,13 +570,13 @@ export const BuildComponent = ({
           size="large"
           disabled={shouldDisableBuildButton}
           onClick={() =>
-            setSubmitActionDialogState({
+            setSubmitFlowDialogState({
               isShowing: true,
             })
           }
           iconLeft={<GearIcon />}
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Build Action'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Build Flow'}
         </Button>
       </Inline>
     </StyledDivForContainer>

@@ -2,15 +2,12 @@ import {
   Button,
   Card,
   CardContent,
-  Column,
   ToggleSwitch,
   Text,
   Tooltip,
-  Inline,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
-import { StepIcon } from '../../../../icons/StepIcon'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
 type ConfigurationProps = {
   config: ExecutionConfiguration
@@ -55,18 +52,7 @@ export const Configuration = ({
   }
 
   return (
-    <Column>
-      <Inline css={{ margin: '$6', marginTop: '$16' }}>
-        <StepIcon step={3} />
-        <Text
-          align="center"
-          variant="body"
-          color="tertiary"
-          css={{ padding: '0 $15 0 $6' }}
-        >
-          Configure execution
-        </Text>{' '}
-      </Inline>
+    <>
       {isConfigItemsShowing && (
         <Card
           css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -75,12 +61,12 @@ export const Configuration = ({
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
             <Text css={{ paddingBottom: '$4' }} align="center">
-               Configuration
+              Configuration
             </Text>
 
             <Tooltip
               label={
-                'If set to true, message responses i.e. outputs may be used as inputs for new actions'
+                'If set to true, message responses i.e. outputs may be used as inputs for new flows'
               }
             ><Button
               variant="ghost"
@@ -97,12 +83,12 @@ export const Configuration = ({
                 />
               }
             >
-                Save Message Responses
+                Save Responses
               </Button></Tooltip>
 
             <Tooltip
               label={
-                'If set to true, the action settings can not be updated'
+                'If set to true, the flow settings can not be updated'
               }
             ><Button
               variant="ghost"
@@ -122,7 +108,7 @@ export const Configuration = ({
                 Updating Disabled
               </Button></Tooltip>
             <Tooltip
-              label={'If set to true, stops on any errors that occur'}
+              label={'If set to true, stops on any errors that occur or when comparison can not be made due to missing response'}
             ><Button
               variant="ghost"
               size="large"
@@ -184,7 +170,7 @@ export const Configuration = ({
               </Button></Tooltip>
             <Tooltip
               label={
-                'If set to true, as a fallback, the interchain account associated with the action will be reregistered when a channel times out'
+                'If set to true, as a fallback, the interchain account associated with the flow will be reregistered when a channel times out'
               }
             ><Button
               variant="ghost"
@@ -202,7 +188,9 @@ export const Configuration = ({
               }
             >
                 Allow Recovery
-              </Button></Tooltip>
+              </Button>
+            </Tooltip>
+
 
             {/*       {isConfigItemsShowing && (
         <ConfigurationDialog
@@ -214,6 +202,6 @@ export const Configuration = ({
           </CardContent>
         </Card>
       )}
-    </Column>
+    </>
   )
 }

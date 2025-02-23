@@ -18,9 +18,9 @@ import {
   getStakeBalanceForAcc,
   getAPR,
   getAPY,
-  getExpectedActionFee,
+  getExpectedFlowFee,
   getAPYForAutoCompound,
-  getActionParams,
+  getFlowParams,
   getModuleParams,
 } from '../services/chain-info'
 import { useRecoilState, useRecoilValue } from 'recoil'
@@ -31,7 +31,7 @@ import {
   intentModuleParamsAtom,
 } from '../state/atoms/moduleParamsAtoms'
 import { useEffect } from 'react'
-import { ActionInput } from '../types/trstTypes'
+import { FlowInput } from '../types/trstTypes'
 
 const chainInfoQueryKey = '@chain-info'
 
@@ -56,9 +56,9 @@ export const useIBCChainInfo = (chainId: string) => {
   return [data, isLoading] as const
 }
 
-export const useGetExpectedActionFee = (
+export const useGetExpectedFlowFee = (
   durationSeconds: number,
-  actionInput: ActionInput,
+  flowInput: FlowInput,
   isDialogShowing: boolean,
   intervalSeconds?: number
 ) => {
@@ -67,28 +67,29 @@ export const useGetExpectedActionFee = (
   )
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    `expectedActionFee/${durationSeconds}/${intervalSeconds}`,
+    'expectedFlowFee',
     async () => {
-      const intentModuleParams = await getActionParams(client)
+      const intentModuleParams = await getFlowParams(client)
       setTriggerModuleData(intentModuleParams)
-      const fee = getExpectedActionFee(
+      const fee = getExpectedFlowFee(
         intentModuleParams,
+        200000,
         durationSeconds,
-        actionInput.msgs.length,
+        flowInput.msgs.length,
         intervalSeconds
       )
 
       return fee
     },
     {
-      enabled: Boolean(durationSeconds && actionInput.msgs && isDialogShowing),
+      enabled: Boolean(durationSeconds && flowInput.msgs && isDialogShowing),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
   useEffect(() => {
-    if (intentModuleParams && intentModuleParams.ActionFlexFeeMul) {
+    if (intentModuleParams && intentModuleParams.flowFlexFeeMul) {
     }
   }, [intentModuleParams])
 
@@ -210,7 +211,7 @@ export const useGetAPYForWithFees = (
   const { data, isLoading } = useQuery(
     'useGetAPYForWithFees',
     async () => {
-      const intentModuleParams = await getActionParams(trstClient)
+      const intentModuleParams = await getFlowParams(trstClient)
       setTriggerModuleData(intentModuleParams)
 
       return getAPYForAutoCompound(
@@ -228,14 +229,14 @@ export const useGetAPYForWithFees = (
       enabled: Boolean(
         !!client && !!cosmosClient && !!trstClient && !!paramsState
       ),
-      refetchOnMount: 'always',
+      //refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      //refetchIntervalInBackground: true,
     }
   )
 
   useEffect(() => {
-    if (intentModuleParams && intentModuleParams.ActionFlexFeeMul) {
+    if (intentModuleParams && intentModuleParams.flowFlexFeeMul) {
     }
   }, [intentModuleParams])
 

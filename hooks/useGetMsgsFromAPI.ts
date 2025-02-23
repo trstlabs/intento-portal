@@ -2,12 +2,12 @@ import axios from 'axios'
 import { camelCase, isObject } from 'lodash'
 
 ///temporary solution as typeUrls get lost in retrieving from intentojs/telescope as the objects are unwrapped there with the GlobalRegistry. We cannnot transpile without that setting becasue then we loose the full registry  needed to unwrap/wrap ourselves and  osmosis.gamm.v1beta1.load(registry) is unavailable without the useGlobalDecoderRegistry setting
-export const fetchActionMsgs = async (id) => {
+export const fetchFlowMsgs = async (id) => {
   const { data } = await axios.get(
-    'https://openapi.trustlesshub.com/intento/intent/v1beta1/action/' + id
+    process.env.NEXT_PUBLIC_INTO_API+'/intento/intent/v1beta1/flow/' + id
   )
-  console.log(data.action_info)
-  return toCamelCaseWithValues(data.action_info.msgs)
+  console.log(data.flow_info)
+  return toCamelCaseWithValues(data.flow_info.msgs)
 }
 
 const toCamelCaseWithValues = (obj: any): any => {

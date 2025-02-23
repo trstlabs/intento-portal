@@ -2,21 +2,20 @@ import {
 
   Card,
   CardContent,
-  Column,
   Button,
   Text,
   Inline,
   Tooltip,
   ChevronIcon, Chevron,
   IconWrapper,
+  PlusIcon,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConditions, } from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
-import { StepIcon } from '../../../../icons/StepIcon'
+import { ExecutionConditions } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { FieldArray } from './Fields'
-import { ResponseComparisonForm } from './ResponseComparisonForm'
-import { UseResponseValueForm } from './UseResponseValueForm'
-import { ICQConfigForm } from './ICQConfigForm'
+import { ComparisonForm } from './ComparisonForm'
+import { FeedbackLoopForm } from './FeedbackLoopForm'
+
 
 type ConditionsProps = {
   conditions: ExecutionConditions
@@ -31,28 +30,63 @@ export const Conditions = ({
 }: ConditionsProps) => {
 
   const [showStoplights, setShowStoplights] = useState(false)
-  const [showFeedbackLoop, setShowFeedbackLoop] = useState(false)
-  const [showICQConfig, setShowICQConfig] = useState(false)
-  const [showComparison, setShowComparison] = useState(false)
+  const [showFeedbackLoops, setShowFeedbackLoops] = useState(false)
+  const [showComparisons, setShowComparisons] = useState(false)
 
   const handleInputChange = (field: keyof ExecutionConditions, value: any) => {
     const newConditions = { ...conditions, [field]: value }
     onChange(newConditions)
   }
 
+  const handleChangeComparison = (index, value: any) => {
+    let newConditions = conditions
+    newConditions.comparisons[index] = value
+    if (value == undefined) {
+      newConditions.comparisons.splice(index, 1)
+    }
+    onChange(newConditions)
+  }
+
+  const handleAddFeedbackLoop = () => {
+    let newConditions = conditions
+    const newValue = {
+      flowId: BigInt(0),
+      responseIndex: 0,
+      responseKey: "",
+      valueType: "string",
+      msgsIndex: 0,
+      msgKey: "",
+    }
+
+    newConditions.feedbackLoops = [...conditions.feedbackLoops, newValue] // Add a new empty object
+    onChange(newConditions)
+  }
+  const handleAddComparison = () => {
+    let newConditions = conditions
+    const newValue = {
+      flowId: BigInt(0),
+      responseIndex: 0,
+      responseKey: "",
+      valueType: "string",
+      fromIcq: false,
+      operator: -1,
+      operand: "",
+    }
+
+    newConditions.comparisons = [...conditions.comparisons, newValue] // Add a new empty object
+    onChange(newConditions)
+  }
+  const handleChangeFeedbackLoop = (index, value: any) => {
+    let newConditions = conditions
+    newConditions.feedbackLoops[index] = value
+    if (value == undefined) {
+      newConditions.feedbackLoops.splice(index, 1)
+    }
+  }
+
+
   return (
-    <Column>
-      <Inline css={{ margin: '$6', marginTop: '$16' }}>
-        <StepIcon step={4} />
-        <Text
-          align="center"
-          variant="body"
-          color="tertiary"
-          css={{ padding: '0 $15 0 $6' }}
-        >
-          Set execution conditions
-        </Text>
-      </Inline>
+    <>
       {!disabled && (
         <Card
           css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
@@ -62,67 +96,89 @@ export const Conditions = ({
             <Text css={{ paddingBottom: '$4' }} align="center">
               Conditions
             </Text>
-            <Button css={{ marginBottom: '$6' }}
-              onClick={() => setShowFeedbackLoop(!showFeedbackLoop)}
-              variant="ghost"
-              iconRight={
-                <IconWrapper
-                  size="medium"
-                  rotation="-90deg"
-                  color="tertiary"
-                  icon={showFeedbackLoop ? <ChevronIcon rotation="-90deg" /> : <Chevron />}
-                />}>
-              Feedback loop
-            </Button>
+            <Inline justifyContent="space-between" >
+              <Button css={{ marginBottom: '$6' }}
+                onClick={() => {
+                  if (conditions.feedbackLoops[0] == undefined) {
+                    handleAddFeedbackLoop();
+                  }
+                  setShowFeedbackLoops(!showFeedbackLoops)
+                }}
+                variant="ghost"
+                iconRight={
+                  <IconWrapper
+                    size="medium"
+                    rotation="-90deg"
+                    color="tertiary"
+                    icon={showFeedbackLoops ? <ChevronIcon rotation="90deg" /> : <Chevron />}
+                  />}>
+                Feedback Loop
+              </Button>
+              {showFeedbackLoops && <Button css={{ marginBottom: '$6' }}
+                onClick={() => handleAddFeedbackLoop()}
+                variant="ghost"
+                iconRight={
+                  <IconWrapper
+                    size="medium"
+                    rotation="-90deg"
+                    color="tertiary"
+                    icon={<PlusIcon />}
+                  />}>
+              </Button>}
+            </Inline>
 
-            {showFeedbackLoop &&
-              <UseResponseValueForm
-                useResponseValue={conditions.useResponseValue}
-                onChange={(value) => handleInputChange('useResponseValue', value)}
-                setDisabled={() => setShowFeedbackLoop(!showFeedbackLoop)}
-              />
+            {showFeedbackLoops &&
+              conditions.feedbackLoops.map(((feedbackLoop, index) => (
+                <FeedbackLoopForm
+                  feedbackLoop={feedbackLoop}
+                  onChange={(value) => handleChangeFeedbackLoop(index, value)}
+                  setDisabled={() => setShowComparisons(!showComparisons)}
+                />
+              )))
             }
 
-            <Button css={{ marginBottom: '$6' }}
-              onClick={() => setShowComparison(!showComparison)}
-              variant="ghost"
-              iconRight={
-                <IconWrapper
-                  size="medium"
-                  rotation="-90deg"
-                  color="tertiary"
-                  icon={showComparison ? <ChevronIcon rotation="-90deg" /> : <Chevron />}
-                />}>
-              Comparison</Button>
-            {showComparison &&
-              <ResponseComparisonForm
-                responseComparison={conditions.responseComparison}
-                onChange={(value) => handleInputChange('responseComparison', value)}
-                setDisabled={() => setShowComparison(!showComparison)}
-              />
-            }
-            <Button css={{ marginBottom: '$6' }}
-              onClick={() => setShowICQConfig(!showICQConfig)}
-              variant="ghost"
-              
-              iconRight={
-                <IconWrapper
-                  size="medium"
-                  rotation="-90deg"
-                  color="tertiary"
-                  icon={showICQConfig ? <ChevronIcon rotation="-90deg" /> : <Chevron />}
-                />}>
-              Interchain Query
-            
-            </Button>
+            <Inline justifyContent="space-between" >
+              <Button css={{ marginBottom: '$6' }}
+                onClick={() => {
+                  if (conditions.comparisons[0] == undefined) {
+                    handleAddComparison();
+                  }
+                  setShowComparisons(!showComparisons)
+                }
+                }
+                variant="ghost"
+                iconRight={
+                  <IconWrapper
+                    size="medium"
+                    rotation="-90deg"
+                    color="tertiary"
+                    icon={showComparisons ? <ChevronIcon rotation="90deg" /> : <Chevron />}
+                  />}>
+                Comparison</Button>
+              {showComparisons && <Button css={{ marginBottom: '$6' }}
+                onClick={() => handleAddComparison()}
+                variant="ghost"
+                iconRight={
+                  <IconWrapper
+                    size="medium"
+                    rotation="-90deg"
+                    color="tertiary"
+                    icon={<PlusIcon />}
+                  />}>
+              </Button>}
+            </Inline>
 
-            {showICQConfig &&
-              <ICQConfigForm
-                icqConfig={conditions.icqConfig}
-                onChange={(value) => handleInputChange('icqConfig', value)}
-                setDisabled={() => setShowICQConfig(!showICQConfig)}
-              />
+            {showComparisons && (
+              conditions.comparisons.map(((comparison, index) =>
+                <ComparisonForm
+                  comparison={comparison}
+                  onChange={(value) => handleChangeComparison(index, value)}
+                  setDisabled={() => setShowComparisons(!showComparisons)}
+                />
+
+              )))
             }
+
             <Button css={{ marginBottom: '$6' }}
               onClick={() => setShowStoplights(!showStoplights)}
               variant="ghost"
@@ -131,7 +187,7 @@ export const Conditions = ({
                   size="large"
                   rotation="-90deg"
                   color="tertiary"
-                  icon={showStoplights ? <ChevronIcon rotation="-90deg" /> : <Chevron />}
+                  icon={showStoplights ? <ChevronIcon rotation="90deg" /> : <Chevron />}
                 />}>
               Stoplights
             </Button>
@@ -143,10 +199,10 @@ export const Conditions = ({
               >
                 <Tooltip
                   label={
-                    "Depend execution on result of other actions"}>
+                    "Depend execution on result of other flows"}>
                   <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Stoplights🚦 </Text>
                 </Tooltip>
-                {/* <Text variant="body"> Depend execution on result of other intent-based actions</Text> */}
+                {/* <Text variant="body"> Depend execution on result of other intent-based flows</Text> */}
                 {/* Add more UI elements to handle other properties of ExecutionConditions */}
                 <FieldArray
                   label="Stop On Success Of "
@@ -155,13 +211,13 @@ export const Conditions = ({
                   disabled={false}
                 />
                 <FieldArray
-                  label="Stop On Failure Of "
+                  label="Stop on Failure Of "
                   values={conditions.stopOnFailureOf}
                   onChange={(value) => handleInputChange('stopOnFailureOf', value)}
                   disabled={false}
                 />
                 <FieldArray
-                  label="Skip On Failure Of "
+                  label="Skip On Error Of "
                   values={conditions.skipOnFailureOf}
                   onChange={(value) => handleInputChange('skipOnFailureOf', value)}
                   disabled={false}
@@ -174,11 +230,11 @@ export const Conditions = ({
                 /></Card>
             </>
             }
-          </CardContent>
+          </CardContent >
 
         </Card>
       )
       }
-    </Column >
+    </ >
   )
 }

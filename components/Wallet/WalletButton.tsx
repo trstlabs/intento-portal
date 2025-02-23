@@ -86,8 +86,8 @@ export const WalletButton = ({
           {tokenSymbol}
         </Text>}
       </div>
-      <StyledDivForActions>
-        <StyledDivForInlineActions>
+      <StyledDivForFlows>
+        <StyledDivForInlineFlows>
           <CopyTextTooltip
             label="Copy wallet address"
             successLabel="Wallet address copied!"
@@ -114,13 +114,13 @@ export const WalletButton = ({
               icon={<IconWrapper icon={<Logout />} />}
             />
           </Tooltip>
-        </StyledDivForInlineActions>
-      </StyledDivForActions>
+        </StyledDivForInlineFlows>
+      </StyledDivForFlows>
     </StyledWalletButton >
   )
 }
 
-const StyledDivForActions = styled('div', {
+const StyledDivForFlows = styled('div', {
   position: 'absolute',
   right: 0,
   top: 0,
@@ -137,7 +137,7 @@ const StyledDivForActions = styled('div', {
   transition: 'opacity .1s ease-out',
 })
 
-const StyledDivForInlineActions = styled('div', {
+const StyledDivForInlineFlows = styled('div', {
   display: 'flex',
   columnGap: '$space$2',
 })
@@ -154,13 +154,13 @@ const StyledWalletButton = styled('div', {
   border: '1px solid $borderColors$default',
   '&:hover': {
     border: '1px solid $borderColors$selected',
-    [`${StyledDivForActions}`]: {
+    [`${StyledDivForFlows}`]: {
       opacity: 1,
     },
   },
   [media.sm]: {
     border: '1px solid $borderColors$selected',
-    [`${StyledDivForActions}`]: {
+    [`${StyledDivForFlows}`]: {
       opacity: 1,
     },
   },

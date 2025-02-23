@@ -1,16 +1,15 @@
-import { Any } from 'cosmjs-types/google/protobuf/any'
 import { Coin } from '@cosmjs/stargate'
 import {
   ExecutionConditions,
   ExecutionConfiguration,
   HostedConfig,
-} from 'intentojs/dist/codegen/intento/intent/v1beta1/action'
+} from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
-export interface MsgUpdateActionParams {
+export interface MsgUpdateFlowParams {
   owner: string
   id: number
   connectionId?: string
-  msgs?: Any[]
+  msgs?: string[]
   endTime?: number
   label?: string
   interval?: string
@@ -20,7 +19,7 @@ export interface MsgUpdateActionParams {
   configuration?: ExecutionConfiguration
 }
 
-export class ActionInput {
+export class FlowInput {
   label?: string
   msgs: string[]
   duration: number

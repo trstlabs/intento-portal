@@ -67,9 +67,9 @@ export default function Send() {
                       ))}
                   </Inline>
                   <StyledText css={{ padding: '$8' }} variant="caption">
-                    Build payment actions from your wallet on another
+                    Build payment flows from your wallet on another
                     chain.
-                    <br /> You control the action on Intento using an
+                    <br /> You control the flow on Intento using an
                     Interchain Account.
                   </StyledText>
                 </Column>

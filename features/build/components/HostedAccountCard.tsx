@@ -11,9 +11,9 @@ import {
 import React, { useEffect, useMemo, useState } from 'react'
 import { Row } from './BuildComponent'
 import { convertFromMicroDenom } from '../../../util/conversion'
-import { useAuthZGrantsForUser, useGetHostICAAddress } from '../../../hooks/useICA'
+import { useAuthZMsgGrantInfoForUser, useGetHostICAAddress } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 
@@ -21,27 +21,20 @@ interface HostedAccountCardProps {
   hostedAccount: HostedAccount
   chainSymbol: string
   chainId: string
-  // hostDenom: string
-  actionInput: ActionInput
+  flowInput: FlowInput
 }
 
 export const HostedAccountCard = ({
   hostedAccount,
   chainSymbol,
   chainId,
-  //  hostDenom,
-  actionInput,
+  flowInput
 }: HostedAccountCardProps) => {
   const [showICAInfo, setShowICAInfo] = useState(false)
   const isMobile = useMedia('sm')
 
-  const [hostedAccountAddress, _isIcaLoading] = useGetHostICAAddress(actionInput.connectionId, hostedAccount.hostedAddress)
+  const [hostedAccountAddress, _isIcaLoading] = useGetHostICAAddress(flowInput.connectionId, hostedAccount.hostedAddress)
 
-  /*  const [hostedAccountBalance, ishostedAccountBalanceLoading] = useICATokenBalance(
-     chainId,
-     hostedAccountAddress,
-     true
-   ) */
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
@@ -58,16 +51,16 @@ export const HostedAccountCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
     useState(false)
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
+  const [icaAuthzMsgInfo, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
     chainId,
     hostedAccountAddress,
-    actionInput
+    flowInput
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
       grantee: hostedAccountAddress,
-      grantInfos: icaAuthzGrants
-        ? icaAuthzGrants.filter((grant) => grant.hasGrant == false)
+      grantInfos: icaAuthzMsgInfo
+        ? icaAuthzMsgInfo.filter((icaAuthzMsgInfo) => icaAuthzMsgInfo.hasGrant == false)
         : [],
       coin: undefined,
     })
@@ -98,10 +91,9 @@ export const HostedAccountCard = ({
     }
   }
 
-
   const shouldDisableAuthzGrantButton = useMemo(
-    () => icaAuthzGrants?.every((grant) => grant.hasGrant),
-    [icaAuthzGrants]
+    () => icaAuthzMsgInfo?.every((grant) => grant.hasGrant),
+    [icaAuthzMsgInfo]
   )
 
   return (
@@ -170,16 +162,16 @@ export const HostedAccountCard = ({
             ) : (
               <Spinner instant />
             ))} */}
-          {icaAuthzGrants != undefined && <><Text variant="legend"> Grants</Text>
-            {isAuthzGrantsLoading && !icaAuthzGrants ? (
+          {icaAuthzMsgInfo != undefined && <><Text variant="legend"> Grants</Text>
+            {isAuthzGrantsLoading && !icaAuthzMsgInfo ? (
               <Spinner />
             ) : (
               <>
-                {icaAuthzGrants && icaAuthzGrants[0] && icaAuthzGrants.map((grant, index) =>
+                {icaAuthzMsgInfo && icaAuthzMsgInfo[0] && icaAuthzMsgInfo.map((grant, index) =>
                   grant.hasGrant ? (
                     <Text key={index} css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✓ Action Account is granted for type: {
+                      ✓ Interchain Account is granted for type: {
                         grant.msgTypeUrl
                       }{' '}
                       {grant.expiration && (
@@ -189,7 +181,7 @@ export const HostedAccountCard = ({
                   ) : (
                     <Text css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✘ Action Account is not granted for type:{' '}
+                      ✘ Interchain Account is not granted for type:{' '}
                       {grant.msgTypeUrl}{' '}
                     </Text>
                   )
@@ -206,7 +198,7 @@ export const HostedAccountCard = ({
               >
                 <CardContent>
                   <Tooltip
-                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
                     aria-label="Fee Funds"
                   >
                     <Text variant="legend"> Top up</Text>
@@ -241,7 +233,7 @@ export const HostedAccountCard = ({
                 </CardContent>
               </Card> */}
               <Row>
-                {icaAuthzGrants && (
+                {icaAuthzMsgInfo && (
                   <>
                     <Tooltip
                       label="An AuthZ grant allows the Interchain Account to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"

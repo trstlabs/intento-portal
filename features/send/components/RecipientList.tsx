@@ -22,11 +22,11 @@ import { useTokenSend } from '../hooks'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { ChannelSelector } from './ChannelSelector'
 import { useRecoilValue } from 'recoil'
-import { SubmitActionDialog } from '../../build/components/SubmitActionDialog'
+import { SubmitFlowDialog } from '../../build/components/SubmitFlowDialog'
 import { ChannelInfo } from './ChannelSelectList'
-import { useSubmitAction } from '../../build/hooks'
+import { useSubmitFlow } from '../../build/hooks'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 
 
 export class RecipientInfo {
@@ -56,17 +56,17 @@ export const RecipientList = ({
   const [requestedSchedule, setRequestedSchedule] = useState(false)
   const ibcAsset = useIBCAssetInfo(tokenSymbol)
   // set default fields
-  let data = new ActionInput()
+  let data = new FlowInput()
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
-  const [actionInput, setactionInput] = useState(data)
+  const [flowInput, setflowInput] = useState(data)
   const { address, status } = useRecoilValue(walletState)
 
   const { mutate: handleSend, isLoading: isExecutingTransaction } =
     useTokenSend({ ibcAsset, recipientInfos: recipients })
   const { mutate: handleSchedule, isLoading: isExecutingSchedule } =
-    useSubmitAction({ actionInput })
+    useSubmitFlow({ flowInput })
 
   useEffect(() => {
     if (inputRef.current) {
@@ -98,7 +98,7 @@ export const RecipientList = ({
     }
   }
 
-  const handleScheduleClick = (txData: ActionInput) => {
+  const handleScheduleClick = (txData: FlowInput) => {
     if (status === WalletStatusType.connected) {
       let msgs = []
       for (let recipient of recipients) {
@@ -131,7 +131,7 @@ export const RecipientList = ({
         msgs.push(JSON.stringify(sendMsg, null, 2))
       }
       txData.msgs = msgs
-      setactionInput(txData)
+      setflowInput(txData)
 
       return setRequestedSchedule(true)
     }
@@ -217,11 +217,11 @@ export const RecipientList = ({
   }
 
   const [
-    { isShowing: isScheduleDialogShowing /* , actionType  */ },
+    { isShowing: isScheduleDialogShowing /* , flowType  */ },
     setScheduleDialogState,
   ] = useState({
     isShowing:
-      false /* , actionType: 'recurrence' as 'recurrence' | "occurrence" } */,
+      false /* , flowType: 'recurrence' as 'recurrence' | "occurrence" } */,
   })
 
   const shouldDisableSubmissionButton =
@@ -369,19 +369,19 @@ export const RecipientList = ({
           {isExecutingSchedule ? <Spinner instant /> : 'Schedule Recurrence'}
         </Button>
       </Inline>
-      <SubmitActionDialog
+      <SubmitFlowDialog
         isLoading={isExecutingSchedule}
         // label="Recurring Send"
-        actionInput={actionInput}
+        flowInput={flowInput}
         isDialogShowing={isScheduleDialogShowing}
-        /* initialActionType={actionType} */
+        /* initialFlowType={flowType} */
         chainSymbol={'INTO'}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,
           })
         }
-        handleSubmitAction={(txData) => handleScheduleClick(txData)}
+        handleSubmitFlow={(txData) => handleScheduleClick(txData)}
       />
     </div>
   )

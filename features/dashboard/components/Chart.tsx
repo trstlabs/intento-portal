@@ -10,35 +10,42 @@ type IssuanceChartProps = {
 
 const IssuanceChart = (issuanceChartProps: IssuanceChartProps) => {
   const issuance = [
-    ((Number(issuanceChartProps.params.annualProvision) / 1000000000000000000000000) *
+    ((Number(issuanceChartProps.params.annualProvision)) *
       Number(
         issuanceChartProps.params.allocModuleParams.distributionProportions
           .communityPool
       )) /
-      1000000000000000000,
-      ((Number(issuanceChartProps.params.annualProvision) / 1000000000000000000000000) *
+    1000000000000000000,
+    ((Number(issuanceChartProps.params.annualProvision)) *
       Number(
         issuanceChartProps.params.allocModuleParams.distributionProportions
           .relayerIncentives
       )) /
-      1000000000000000000,
-      ((Number(issuanceChartProps.params.annualProvision) / 1000000000000000000000000) *
+    1000000000000000000,
+    ((Number(issuanceChartProps.params.annualProvision)) * (1 -
       Number(
-        issuanceChartProps.params.allocModuleParams.distributionProportions
-          .staking
+        issuanceChartProps.params.allocModuleParams.distributionProportions.communityPool
+      ) - Number(
+        issuanceChartProps.params.allocModuleParams.distributionProportions.developerRewards
+      ) - Number(
+        issuanceChartProps.params.allocModuleParams.distributionProportions.relayerIncentives
+      ))) /
+    1000000000000000000,
+    ((Number(issuanceChartProps.params.annualProvision)) *
+      Number(issuanceChartProps.params.allocModuleParams.distributionProportions.developerRewards
       )) /
-      1000000000000000000,
-   
+    1000000000000000000,
+
   ]
 
   const data = {
-    labels: ['Community Pool', 'Relayer Rewards', 'Staking Rewards'],
+    labels: ['Community Pool', 'Relayer Rewards', 'Staking Rewards', 'Contributor Rewards'],
     datasets: [
       {
         label: 'Token Issuance',
         data: issuance,
-        backgroundColor: ['green', 'blue', 'purple'],
-        borderColor: ['green', 'blue', 'purple'],
+        backgroundColor: ['green', 'blue', 'purple', 'pink'],
+        borderColor: ['green', 'blue', 'purple', 'pink'],
         borderWidth: 1,
       },
     ],
@@ -48,7 +55,7 @@ const IssuanceChart = (issuanceChartProps: IssuanceChartProps) => {
     plugins: {
       tooltip: {
         titleFont: { size: 11, family: "Inter" },
-            bodyFont: { size: 9, family: "Inter" },
+        bodyFont: { size: 9, family: "Inter" },
         callbacks: {
           label: function (context) {
             const dataset = data.datasets[context.datasetIndex]
@@ -57,9 +64,8 @@ const IssuanceChart = (issuanceChartProps: IssuanceChartProps) => {
             )
             const currentValue = dataset.data[context.dataIndex]
             const percentage = ((currentValue / total) * 100).toFixed()
-            return `${
-              data.labels[context.dataIndex]
-            }: ${currentValue} (${percentage}%)`
+            return `${data.labels[context.dataIndex]
+              }: ${currentValue.toFixed(0)} (${percentage}%)`
           },
         },
       },
@@ -68,7 +74,7 @@ const IssuanceChart = (issuanceChartProps: IssuanceChartProps) => {
 
   return (
     <div>
-   
+
       <Doughnut
         style={{
           fontSize: "8px",

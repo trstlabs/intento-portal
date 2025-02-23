@@ -14,9 +14,9 @@ import {
 import React, { useEffect, useMemo, useState } from 'react'
 import { Row, StyledInput } from './BuildComponent'
 
-import { useAuthZGrantsForUser } from '../../../hooks/useICA'
+import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 interface IcaCardProps {
@@ -29,7 +29,7 @@ interface IcaCardProps {
   isExecutingSendFundsOnHost: boolean
   chainId: string
   hostDenom: string
-  actionInput: ActionInput
+  flowInput: FlowInput
   setFeeFundsHostChain: (fees: string) => void
   handleSendFundsOnHostClick: () => void
 }
@@ -44,7 +44,7 @@ export const IcaCard = ({
   isExecutingSendFundsOnHost,
   chainId,
   hostDenom,
-  actionInput,
+  flowInput,
   setFeeFundsHostChain,
   handleSendFundsOnHostClick,
 }: IcaCardProps) => {
@@ -66,10 +66,10 @@ export const IcaCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
     useState(false)
-  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZGrantsForUser(
+  const [icaAuthzGrants, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
     chainId,
     icaAddress,
-    actionInput
+    flowInput
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
@@ -184,7 +184,7 @@ export const IcaCard = ({
                   grant.hasGrant ? (
                     <Text key={index} css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✓ Action Account is granted for type: {
+                      ✓ Interchain Account is granted for type: {
                         grant.msgTypeUrl
                       }{' '}
                       {grant.expiration && (
@@ -194,7 +194,7 @@ export const IcaCard = ({
                   ) : (
                     <Text css={{ padding: '$4' }} variant="caption">
                       {' '}
-                      ✘ Action Account is not granted for type:{' '}
+                      ✘ Interchain Account is not granted for type:{' '}
                       {grant.msgTypeUrl}{' '}
                     </Text>
                   )
@@ -211,7 +211,7 @@ export const IcaCard = ({
               >
                 <CardContent>
                   <Tooltip
-                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                    label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
                     aria-label="Fee Funds"
                   >
                     <Text variant="legend"> Top up</Text>

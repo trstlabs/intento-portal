@@ -1,10 +1,10 @@
 import { useQuery } from 'react-query'
 
-import { DEFAULT_LONG_REFETCH_INTERVAL } from '../util/constants'
+
 import { useIntentoRpcClient } from './useRPCClient'
 import { useRecoilValue } from 'recoil'
 import { walletState } from '../state/atoms/walletAtoms'
-import { ClaimRecord } from 'intentojs/dist/codegen/intento/claim/v1beta1/claim'
+
 
 export const useClaimRecord = () => {
   const client = useIntentoRpcClient()
@@ -81,7 +81,7 @@ export const useTotalClaimable = () => {
       }
       const total = (
         await client.intento.claim.v1beta1.totalClaimable({ address })
-      ).coins[0].amount
+      ).total.amount
 
       return total
     },

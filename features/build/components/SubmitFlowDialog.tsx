@@ -19,14 +19,14 @@ import {
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
-import { useGetExpectedActionFee } from '../../../hooks/useChainInfo'
+import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { ActionInput } from '../../../types/trstTypes'
+import { FlowInput } from '../../../types/trstTypes'
 import { Chip, ChipSelected } from '../../../components/Layout/Chip'
 
-type SubmitActionDialogProps = {
+type SubmitFlowDialogProps = {
   isDialogShowing: boolean
-  actionInput: ActionInput
+  flowInput: FlowInput
   chainSymbol?: string
   icaAddress?: string
   icaBalance?: number
@@ -38,19 +38,19 @@ type SubmitActionDialogProps = {
   shouldDisableAuthzGrantButton?: boolean
   shouldDisableSendHostChainFundsButton?: boolean
   onRequestClose: () => void
-  handleSubmitAction: (data: ActionInput) => void
+  handleSubmitFlow: (data: FlowInput) => void
   handleCreateAuthzGrantClick?: (withFunds: boolean) => void
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
 }
 //todo clean up all authz and host fund logic
-export const SubmitActionDialog = ({
+export const SubmitFlowDialog = ({
   isDialogShowing,
   icaAddress,
   icaBalance,
   customLabel,
   chainSymbol,
-  actionInput,
+  flowInput,
   feeFundsHostChain,
   isExecutingAuthzGrant,
   isExecutingSendFundsOnHost,
@@ -59,10 +59,10 @@ export const SubmitActionDialog = ({
   shouldDisableSendHostChainFundsButton,
   onRequestClose,
   setFeeFundsHostChain,
-  handleSubmitAction,
+  handleSubmitFlow,
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
-}: SubmitActionDialogProps) => {
+}: SubmitFlowDialogProps) => {
 
   const [startTime, setStartTime] = useState(3600000)
   const [duration, setDuration] = useState(14 * 86400000)
@@ -126,7 +126,7 @@ export const SubmitActionDialog = ({
     }
     setInterval(value)
     setDisplayInterval(label)
-    refetchExpectedActionFee()
+    refetchExpectedFlowFee()
   }
   function handleRemoveInterval() {
     setInterval(0)
@@ -136,7 +136,7 @@ export const SubmitActionDialog = ({
     if (value >= interval || interval == 0) {
       setDuration(value)
       setDisplayDuration(label)
-      refetchExpectedActionFee()
+      refetchExpectedFlowFee()
       return
     }
     // if (interval > 0) {
@@ -155,7 +155,7 @@ export const SubmitActionDialog = ({
   function handleRemoveDuration() {
     setDuration(0)
     setDisplayDuration('None Selected')
-    refetchExpectedActionFee()
+    refetchExpectedFlowFee()
   }
   function handleStartTime(label: string, value: number) {
     if (value == undefined) {
@@ -163,13 +163,13 @@ export const SubmitActionDialog = ({
     }
     setStartTime(value)
     setDisplayStartTime(label)
-    refetchExpectedActionFee()
+    refetchExpectedFlowFee()
     //handleDisplayRecurrence(recurrence)
   }
   function handleRemoveStartTime() {
     setStartTime(0)
     setDisplayStartTime(displayInterval)
-    refetchExpectedActionFee()
+    refetchExpectedFlowFee()
   }
 
   const editLabel = 'days(s), hour(s), minute(s) or weeks(s)'
@@ -204,13 +204,13 @@ export const SubmitActionDialog = ({
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
-  const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedActionFee(
+  const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedFlowFee(
     duration / 1000,
-    actionInput,
+    flowInput,
     isDialogShowing,
     interval / 1000
   )
-  const refetchExpectedActionFee = useRefetchQueries([`expectedActionFee/${duration}/${actionInput}/${isDialogShowing}/${interval}`])
+  const refetchExpectedFlowFee = useRefetchQueries('expectedFlowFee')
   const canSchedule = duration > 0 && interval > 0
 
   const handleData = (icaAddressForAuthZ: string) => {
@@ -230,8 +230,8 @@ export const SubmitActionDialog = ({
       ))
     }
     console.log({ startTime, duration, interval })
-    handleSubmitAction({
-      ...actionInput, // Spread first
+    handleSubmitFlow({
+      ...flowInput, // Spread first
       startTime,
       duration,
       interval,
@@ -243,7 +243,7 @@ export const SubmitActionDialog = ({
   return (
     <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
       <DialogHeader paddingBottom={canSchedule ? '$4' : '6'}>
-        <Text variant="header">Build Action</Text>
+        <Text variant="header">Build Flow</Text>
       </DialogHeader>
 
       <DialogContent>
@@ -512,7 +512,7 @@ export const SubmitActionDialog = ({
                       {chainSymbol}
                     </Text>
                     <Tooltip
-                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution failure."
+                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
                       aria-label="host chain execution fee funds"
                     >
                       <Text variant="legend" color="disabled">
@@ -560,8 +560,8 @@ export const SubmitActionDialog = ({
                 </>
               )}
               <Tooltip
-                label="Funds to set aside for execution fee of the action. Remaining funds are refunded after execution. If deduct fees from wallet balance is checked, your local balance will be used"
-                aria-label="Fund Action - INTO (Optional)"
+                label="Funds to set aside for execution fee of the flow. Remaining funds are refunded after execution. If deduct fees from wallet balance is checked, your local balance will be used"
+                aria-label="Fund Flow - INTO (Optional)"
               >
                 <Text align="center" css={{ margin: '$4' }} variant="caption">
                   Fee Funds - INTO
@@ -591,7 +591,7 @@ export const SubmitActionDialog = ({
               {!checkedFeeAcc && (
                 <Inline justifyContent={'space-between'}>
                   <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                    Attatch INTO fee to action
+                    Attatch INTO fee to flow
                   </Text>{' '}
                   <Text variant="legend">
                     <StyledInput
@@ -640,7 +640,7 @@ export const SubmitActionDialog = ({
                   <Inline justifyContent={'space-between'} align="center">
                     <Tooltip
                       label="Name your trigger so you can find it back later by name"
-                      aria-label="Fund Action - INTO (Optional)"
+                      aria-label="Fund Flow - INTO (Optional)"
                     >
                       <Text color="disabled" wrap={false} variant="legend">
                         Label (optional)
@@ -660,6 +660,12 @@ export const SubmitActionDialog = ({
           </Column>
         </StyledDivForInputs>
       </DialogContent>
+
+      {shouldDisableAuthzGrantButton && <Inline justifyContent={'space-between'} align="center">
+        <Text color="disabled" variant="caption" css={{ padding: '$6' }}>
+          Tip: to make the ICA execute on your behalf, create any missing grants and submit it wrapped as a MsgExec
+        </Text></Inline>
+      }
       <DialogDivider offsetTop="$4" offsetBottom="$2" />
       <DialogButtons
         cancellationButton={
@@ -677,7 +683,7 @@ export const SubmitActionDialog = ({
           </Button>
         }
       >
-        {actionInput.connectionId && actionInput.msgs[0] && !actionInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
+        {flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
           <Button
             disabled={shouldDisableAuthzGrantButton}
             variant="secondary"
@@ -691,7 +697,7 @@ export const SubmitActionDialog = ({
           </Button>
         )}
       </DialogButtons>
-    </Dialog>
+    </Dialog >
   )
 }
 

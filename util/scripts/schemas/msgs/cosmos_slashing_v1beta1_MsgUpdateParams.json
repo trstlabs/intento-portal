@@ -33,12 +33,12 @@
           "type": "string",
           "format": "regex"
         },
-        "slashFractionDoubleSign": {
+        "slashFrflowDoubleSign": {
           "type": "string",
           "format": "binary",
           "binaryEncoding": "base64"
         },
-        "slashFractionDowntime": {
+        "slashFrflowDowntime": {
           "type": "string",
           "format": "binary",
           "binaryEncoding": "base64"

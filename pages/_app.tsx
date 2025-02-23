@@ -74,7 +74,9 @@ function TrstApp({ Component, pageProps }: AppProps) {
 
       for (let asset of ibcAssetList) {
         const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
+        console.log(rpcEndpoint, apiEndpoint)
         chains.push({
+          chain_type: 'cosmos',
           chain_name: asset.registry_name,
           status: 'live',
           network_type: 'testnet',
@@ -112,9 +114,9 @@ function TrstApp({ Component, pageProps }: AppProps) {
           },
         })
 
-        // console.log(chains[chains.length - 1])
+        console.log(chains[chains.length - 1])
       }
-      // console.log(chains.find((i) => i.chain_name == 'cosmoshub'))
+      console.log(chains.find((i) => i.chain_name == 'cosmostest'))
       // Mark the data as pushed
       setDataPushed(true)
     }
@@ -161,12 +163,18 @@ function TrstApp({ Component, pageProps }: AppProps) {
                     },
                     cosmostest: {
                       isLazy: true,
+                      rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
+                      rest: [process.env.NEXT_PUBLIC_ATOM_API],
                     },
                     osmosistest: {
                       isLazy: true,
+                      rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
+                      rest: [process.env.NEXT_PUBLIC_OSMO_API],
                     },
                     host: {
                       isLazy: true,
+                      rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
+                      rest: [process.env.NEXT_PUBLIC_COSM_API],
                     },
                   },
                 }}
@@ -219,8 +227,10 @@ function getEnvVarForSymbol(symbol: string): {
         rpcEndpoint: process.env.NEXT_PUBLIC_COSM_RPC,
         apiEndpoint: process.env.NEXT_PUBLIC_COSM_API,
       }
+
     // Add more cases as needed for other symbols
     default:
+      console.log("UNDefined")
       return { rpcEndpoint: undefined, apiEndpoint: undefined }
   }
 }
