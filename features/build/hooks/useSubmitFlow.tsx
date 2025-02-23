@@ -44,6 +44,9 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
       //   throw new Error('Please try reconnecting your wallet.')
       // }
       console.log(flowInput)
+      if (flowInput.configuration.fallbackToOwnerBalance == false && flowInput.feeFunds[0].amount == "0"){
+        throw new Error('No funds attached and no fallback to owner balance, can not submit flow.')
+      }
       const response: DeliverTxResponse = await executeSubmitFlow({
         owner: address,
         flowInput,
