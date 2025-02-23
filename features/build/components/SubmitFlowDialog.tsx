@@ -210,7 +210,7 @@ export const SubmitFlowDialog = ({
     isDialogShowing,
     interval / 1000
   )
-  const refetchExpectedFlowFee = useRefetchQueries([`expectedFlowFee/${duration}/${flowInput}/${isDialogShowing}/${interval}`])
+  const refetchExpectedFlowFee = useRefetchQueries('expectedFlowFee')
   const canSchedule = duration > 0 && interval > 0
 
   const handleData = (icaAddressForAuthZ: string) => {
@@ -660,6 +660,12 @@ export const SubmitFlowDialog = ({
           </Column>
         </StyledDivForInputs>
       </DialogContent>
+
+      {shouldDisableAuthzGrantButton && <Inline justifyContent={'space-between'} align="center">
+        <Text color="disabled" variant="caption" css={{ padding: '$6' }}>
+          Tip: to make the ICA execute on your behalf, create any missing grants and submit it wrapped as a MsgExec
+        </Text></Inline>
+      }
       <DialogDivider offsetTop="$4" offsetBottom="$2" />
       <DialogButtons
         cancellationButton={
@@ -691,7 +697,7 @@ export const SubmitFlowDialog = ({
           </Button>
         )}
       </DialogButtons>
-    </Dialog>
+    </Dialog >
   )
 }
 
