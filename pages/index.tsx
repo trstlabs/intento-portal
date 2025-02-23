@@ -33,7 +33,7 @@ export default function Home() {
   const shouldShowAutoCompound =
     !myFlows?.length ||
     myFlows.find((tx) => tx.label === 'Autocompound') == undefined
-  const shouldShowFetchingState = isLoading && !allFlows?.length || isMyFlowsLoading && !myFlows?.length
+  const shouldShowFetchingState = isLoading && !allFlows?.length && isMyFlowsLoading && !myFlows?.length
   const shouldRenderFlows = Boolean(allFlows?.length)
 
   const pageHeaderContents = (
@@ -60,18 +60,7 @@ export default function Home() {
       {process.env.NEXT_PUBLIC_DASHBOARD_INFO_ENABLED == "true" && <Column css={{ paddingTop: '12' }}>
         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>}
-      {!isLoading && address && (
-        <Column
-          justifyContent="center"
-          align="center"
-          css={{ paddingTop: '$24' }}
-        >
-          <Inline gap={2}>
-            <ConnectIcon color="secondary" />
-            <Text variant="primary">{'Finding your flows...'}</Text>
-          </Inline>
-        </Column>
-      )}
+
       {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
         <Tooltip label="Build messages and workflows, move assets on your behalf">
           <span>Flows</span>
@@ -133,7 +122,18 @@ export default function Home() {
           )}
         </>
       </StyledDivForFlowsGrid>
-
+      {(isMyFlowsLoading) && address && (
+        <Column
+          justifyContent="center"
+          align="center"
+          css={{ paddingTop: '$24' }}
+        >
+          <Inline gap={2}>
+            <ConnectIcon color="secondary" />
+            <Text variant="primary">{'Finding Your Flows...'}</Text>
+          </Inline>
+        </Column>
+      )}
       <StyledDivForFlowsGrid>
         {allFlows?.map((flowInfo, index) => (
           <FlowCard
