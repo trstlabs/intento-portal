@@ -67,7 +67,7 @@ export const useGetExpectedFlowFee = (
   )
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    `expectedFlowFee/${durationSeconds}/${intervalSeconds}`,
+    'expectedFlowFee',
     async () => {
       const intentModuleParams = await getFlowParams(client)
       setTriggerModuleData(intentModuleParams)
@@ -229,9 +229,9 @@ export const useGetAPYForWithFees = (
       enabled: Boolean(
         !!client && !!cosmosClient && !!trstClient && !!paramsState
       ),
-      refetchOnMount: 'always',
+      //refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      //refetchIntervalInBackground: true,
     }
   )
 

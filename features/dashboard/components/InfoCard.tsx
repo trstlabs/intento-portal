@@ -218,7 +218,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                   size="large"
                   disabled={isStakeBalanceLoading}
                   as="a"
-                  href={'https://wallet.keplr.app/?tab=staking'}
+                  href={'https://explorer.intento.zone/intento-test/staking'}
                   target="__blank"
                 >
                   {isExecutingSchedule ? <Spinner instant /> : ' Stake'}

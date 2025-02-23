@@ -145,7 +145,9 @@ export const useGetBalanceForAcc = (address: string) => {
     ['address', address],
     async () => {
       const resp = await getBalanceForAcc({ address, client })
-      return convertMicroDenomToDenom(resp[0].amount, 6)
+      if (resp && resp[0]) {
+        return convertMicroDenomToDenom(resp[0].amount, 6)
+      }
     },
     {
       enabled: Boolean(client),

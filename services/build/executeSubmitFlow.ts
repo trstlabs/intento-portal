@@ -1,11 +1,13 @@
 import { convertDenomToMicroDenom } from 'junoblocks'
-
-import { Coin } from '@cosmjs/stargate'
+//import { ethers } from "ethers";
+//import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { toUtf8 } from '@cosmjs/encoding'
+import { toBase64, toUtf8 } from '@cosmjs/encoding'
 import { intento, GlobalDecoderRegistry } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { FlowInput } from '../../types/trstTypes'
+import { Coin } from 'intentojs/dist/codegen/cosmos/base/v1beta1/coin'
+// import { Coin } from 'intentojs/dist/codegen/cosmos/base/v1beta1/coin'
 
 type ExecuteSubmitFlowArgs = {
   owner: string
@@ -22,7 +24,7 @@ export const executeSubmitFlow = async ({
   if (flowInput.startTime && flowInput.startTime > 0) {
     startAtInt = Math.floor(Date.now() / 1000) + flowInput.startTime / 1000
   }
-  console.log(startAtInt)
+
   let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
   console.log('startAt (s)', startAtInt / 1000)
   console.log('duration (s)', flowInput.duration / 1000)
@@ -32,7 +34,7 @@ export const executeSubmitFlow = async ({
   let msgs = []
 
   transformAndEncodeMsgs(flowInput.msgs, client, msgs)
-  // console.log(msgs)
+  console.log(msgs)
 
   if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ != '') {
     const encodeObject2 = {
@@ -57,6 +59,7 @@ export const executeSubmitFlow = async ({
   if (flowInput.connectionId && flowInput.hostConnectionId) {
     flowInput.hostedConfig = undefined
   }
+  console.log('msgSubmitFlow', msgs)
   const msgSubmitFlow =
     intento.intent.v1beta1.MessageComposer.withTypeUrl.submitFlow({
       owner,
@@ -83,7 +86,7 @@ export const executeSubmitFlow = async ({
       conditions: flowInput.conditions,
       hostedConfig: flowInput.hostedConfig,
     })
-  //console.log(msgSubmitFlow)
+  console.log('msgSubmitFlow', msgSubmitFlow)
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitFlow], {
       amount: [],
@@ -91,46 +94,78 @@ export const executeSubmitFlow = async ({
     })
   )
 }
+
 export function transformAndEncodeMsgs(
   flowInputMsgs: string[],
   client: SigningStargateClient,
   msgs: any[]
 ) {
   for (let msgJSON of flowInputMsgs) {
-    let value = JSON.parse(msgJSON)['value']
-    let typeUrl: string = JSON.parse(msgJSON)['typeUrl'].toString()
+    let parsedMsg = JSON.parse(msgJSON)
+    let value = parsedMsg['value']
+    let typeUrl: string = parsedMsg['typeUrl'].toString()
 
-    //todo: test and adjust accordingly
+    // Handle CosmWasm messages
     if (typeUrl.startsWith('/cosmwasm')) {
-      alert("cosmwasm msgs are available for testing use only at the moment")
+      alert('CosmWasm msgs are available for testing use only at the moment')
+
+      // Convert the msg to a JSON string and then to Base64
       let msgString: string = JSON.stringify(value['msg'])
-      console.log(msgString)
-      let msg2: Uint8Array = toUtf8(msgString)
-      console.log(msg2)
-      value['msg'] = msg2
+      let msgBase64: string = toBase64(toUtf8(msgString))
+
+      console.log('CosmWasm JSON String:', msgString)
+      console.log('Base64 Encoded:', msgBase64)
+
+      value['msg'] = msgBase64
     }
-    if (typeUrl.includes('authz.v1beta1.MsgExec')) {
-      // for (let authzMsg; authzMsgI of value.msgs) {
-      value.msgs.forEach((authzMsg, authzMsgI) => {
-        const encodeObject = {
-          typeUrl: authzMsg.typeUrl,
-          value: authzMsg.value,
-        }
-        let msgAny = client.registry.encodeAsAny(encodeObject)
-        value.msgs[authzMsgI] = msgAny
-      })
-    }
-    console.log(value)
+
+    //to implement
+    // if (typeUrl.startsWith('/ethermint.evm.v1.MsgEthereumTx')) {
+    //   alert("Evmos EVM transactions are being processed");
+
+    //   // Decode transaction data
+    //   let txData = value['data'];
+
+    //   if (txData && typeof txData !== 'string') {
+    //     // Convert to ABI-encoded format
+    //     let iface = new ethers.utils.Interface(["function transfer(address to, uint256 amount)"]);
+    //     let encodedData = iface.encodeFunctionData("transfer", [txData.to, txData.amount]);
+
+    //     console.log("Original Data:", txData);
+    //     console.log("ABI Encoded Data:", encodedData);
+
+    //     value['data'] = encodedData;
+    //   }
+    // }
+
+   // Handle MsgExec
+   if (typeUrl.includes('authz.v1beta1.MsgExec')) {
+    value.msgs.forEach((authzMsg: any, authzMsgI: number) => {
+      let authzValue = authzMsg.value;
+
+     
+
+      const encodeObject = {
+        typeUrl: authzMsg.typeUrl,
+        value: authzValue,
+      };
+
+      // Encode and replace message in array
+      value.msgs[authzMsgI] = client.registry.encodeAsAny(encodeObject);
+
+    });
+  }
 
     const encodeObject = {
       typeUrl,
       value,
     }
-    console.log(encodeObject)
 
     let msgAny = client.registry.encodeAsAny(encodeObject)
     msgAny = GlobalDecoderRegistry.wrapAny(msgAny)
 
     msgs.push(msgAny)
+
+   
   }
 }
