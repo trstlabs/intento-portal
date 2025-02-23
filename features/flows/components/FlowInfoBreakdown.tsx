@@ -36,7 +36,7 @@ import { useSendFundsOnHost, useUpdateFlow } from '../../build/hooks'
 import { getDuration, getRelativeTime } from '../../../util/time'
 
 import { FlowHistory } from './FlowHistory'
-import FlowTransformButton, { transformFlowMsgs } from './FlowTransformButton'
+import { FlowTransformButton, transformFlowMsgs } from './FlowTransformButton'
 import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
 import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
 import { Configuration } from '../../build/components/Conditions/Configuration'
@@ -819,19 +819,24 @@ export const FlowInfoBreakdown = ({
                       Update History
                     </Text>
                   </Inline>
-                  {flowInfo.updateHistory?.map((entry: any, ei) => (
-                    <div key={ei}>
-                      <Column
-                        gap={2}
-                        align="flex-start"
-                        justifyContent="flex-start"
-                      >
-                        <Text variant="body">
-                          At {entry.seconds}
-                        </Text>
-                      </Column>
-                    </div>
-                  ))}
+                  {flowInfo.updateHistory?.length ? (
+                    flowInfo.updateHistory.map((entry: any, ei) => {
+                      const date = new Date(Number(entry.seconds) * 1000);  // Convert seconds to milliseconds
+                      return (
+                        <div key={ei}>
+                          <Column gap={2} align="flex-start" justifyContent="flex-start">
+                            <Text variant="body">
+                              At {date.toLocaleString()}
+                            </Text>
+                          </Column>
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <Text>No update history available</Text>
+                  )}
+
+
                 </Column>
               </Row>
             </>
