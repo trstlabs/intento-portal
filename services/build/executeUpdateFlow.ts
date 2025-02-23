@@ -32,14 +32,7 @@ export const executeUpdateFlow = async ({
       startAt: flowParams.startAt ? BigInt(flowParams.startAt) : BigInt(0),
       configuration: flowParams.configuration
         ? flowParams.configuration
-        : {
-            saveResponses: false,
-            updatingDisabled: false,
-            stopOnSuccess: false,
-            stopOnFailure: false,
-            fallbackToOwnerBalance: false,
-            reregisterIcaAfterTimeout: false,
-          },
+        : undefined,
       feeFunds: flowParams.feeFunds ? flowParams.feeFunds : [],
     })
   return validateTransactionSuccess(
