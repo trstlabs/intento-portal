@@ -1,10 +1,10 @@
 import { AppLayout, PageHeader } from 'components'
-import { useRecoilValue } from 'recoil'
+
 import {
-  ButtonWithDropdownForSorting,
   SortDirections,
+  ButtonWithDropdownForSorting,
   SortParameters,
-  useSortFlows,
+
 } from '../../features/flows'
 import {
   Column,
@@ -14,45 +14,40 @@ import {
   Spinner,
   styled,
   Text,
+  /*   Tooltip, */
 } from 'junoblocks'
-import React, { useMemo, useState } from 'react'
-import { walletState } from 'state/atoms/walletAtoms'
+import React, { useState } from 'react'
 import { useUpdateEffect } from 'react-use'
-import { useFlowInfos } from 'hooks/useFlowInfo'
+import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
 import { FlowCard } from '../../features/flows/components/FlowCard'
-import { InfoArgs } from '../../features/flows/hooks/useSortFlows'
+import { InfoCard } from '../../features/dashboard/components/InfoCard'
+import { useChain } from '@cosmos-kit/react'
 
 export default function Flows() {
-  const { address } = useRecoilValue(walletState)
-  const [flows, isLoading] = useFlowInfos()
+
+  const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
+  const [allFlows, isLoading] = useFlowInfos(Number(100), undefined)
+  const [myFlows, isMyFlowsLoading] = useFlowInfosByOwner(Number(100), undefined)
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs: InfoArgs = { infos: flows, address }
-  const [myFlows, allFlows, isSorting] = useSortFlows({
-    infoArgs,
-    sortBy: useMemo(
-      () => ({
-        parameter: sortParameter,
-        direction: sortDirection,
-      }),
-      [sortParameter, sortDirection]
-    ),
-  })
 
-  const shouldShowFetchingState = isLoading && isSorting && !flows?.length
-  const shouldRenderFlows = Boolean(flows?.length)
+
+  const shouldShowAutoCompound =
+    !myFlows?.length ||
+    myFlows.find((tx) => tx.label === 'Autocompound') == undefined
+  const shouldShowFetchingState = isLoading && !allFlows?.length || isMyFlowsLoading && !myFlows?.length
+  const shouldRenderFlows = Boolean(allFlows?.length)
 
   const pageHeaderContents = (
     <PageHeader
-      title="Flows"
-      subtitle="View, manage and update flows"
+      title="Dashboard"
+      subtitle="View and manage flows 🌟"
     />
   )
 
   return (
     <AppLayout>
       {pageHeaderContents}
-
       {shouldShowFetchingState && (
         <>
           <Column
@@ -64,7 +59,10 @@ export default function Flows() {
           </Column>
         </>
       )}
-      {!isLoading && isSorting && (
+      {process.env.NEXT_PUBLIC_DASHBOARD_INFO_ENABLED == "true" && <Column css={{ paddingTop: '12' }}>
+        <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
+      </Column>}
+      {!isLoading && address && (
         <Column
           justifyContent="center"
           align="center"
@@ -76,18 +74,31 @@ export default function Flows() {
           </Inline>
         </Column>
       )}
+      {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
+        <Tooltip label="Build messages and workflows, move assets on your behalf">
+          <span>Flows</span>
+        </Tooltip>
+      </Text> */}
       {shouldRenderFlows && (
         <>
           {Boolean(myFlows?.length) && (
             <>
-              <Text variant="primary" css={{ padding: '$11 0 $11 0' }}>
-                Your Personal Flows
+              <Text variant="caption" css={{ padding: '$4' }}>
+                {' '}
+                {myFlows.length > 1 ? (
+                  <span> Your Flows({myFlows.length})</span>
+                ) : (
+                  <span> Your Flow (1)</span>
+                )}
               </Text>
+
               <StyledDivForFlowsGrid>
                 {myFlows.map((flowInfo, index) => (
-                  <div key={index}>
-                    <FlowCard flowInfo={flowInfo} />
-                  </div>
+                  <FlowCard
+                    key={index}
+                    //structuredClone does not work on ios
+                    flowInfo={structuredClone(flowInfo)}
+                  />
                 ))}
               </StyledDivForFlowsGrid>
             </>
@@ -96,7 +107,7 @@ export default function Flows() {
       )}
       <StyledDivForFlowsGrid>
         <>
-          {Boolean(allFlows?.length) && (
+          {Boolean(allFlows?.length) ? (
             <Inline
               gap={4}
               css={{
@@ -105,9 +116,10 @@ export default function Flows() {
               }}
             >
               <Text variant="primary">
-                {allFlows.length} {myFlows[0] && <>Other</>} Available
+                {allFlows.length} {myFlows && myFlows[0] && <>Other</>} Available
                 Flows
               </Text>
+
               <ButtonWithDropdownForSorting
                 sortParameter={sortParameter}
                 sortDirection={sortDirection}
@@ -115,17 +127,26 @@ export default function Flows() {
                 onSortDirectionChange={setSortDirection}
               />
             </Inline>
+          ) : (
+            <Text variant="caption" css={{ padding: '$4' }}>
+              {' '}
+              No Flows found
+            </Text>
           )}
         </>
       </StyledDivForFlowsGrid>
 
       <StyledDivForFlowsGrid>
-        {allFlows.map((flowInfo, index) => (
-          <div key={index}>
-            <FlowCard flowInfo={flowInfo} />
-          </div>
+        {allFlows?.map((flowInfo, index) => (
+          <FlowCard
+            key={index}
+            //structuredClone does not work on ios
+            flowInfo={structuredClone(flowInfo)}
+          />
         ))}
       </StyledDivForFlowsGrid>
+
+      {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout>
   )
 }

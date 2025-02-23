@@ -1,6 +1,6 @@
 
 import { styled, /* useMedia */ } from 'junoblocks'
-import { useEffect,  } from 'react'
+import { useEffect, } from 'react'
 import { useRecoilValue } from 'recoil'
 import {
     TransactionStatus,
@@ -14,28 +14,28 @@ export const FlowInfosModule = () => {
     const transactionStatus = useRecoilValue(transactionStatusState)
 
     /* fetch token list and set initial state */
-    const [flowList, isFlowListLoading] = useFlowInfos()
+    const [flowList, isFlowListLoading] = useFlowInfos(Number(100), undefined)
     useEffect(() => {
 
     }, [flowList])
 
-    
+
     const isUiDisabled =
         transactionStatus === TransactionStatus.EXECUTING || isFlowListLoading
-   // const uiSize = useMedia('sm') ? 'small' : 'large'
+    // const uiSize = useMedia('sm') ? 'small' : 'large'
 
 
     return (
         <>
             <StyledDivForWrapper>
                 <FlowInfos
-                    
-                   onChange={() => {
+
+                    onChange={() => {
                     }}
                     disabled={isUiDisabled}
-                    //size={uiSize}
+                //size={uiSize}
                 />
-              
+
             </StyledDivForWrapper>
 
         </>

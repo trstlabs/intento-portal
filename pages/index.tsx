@@ -4,7 +4,6 @@ import {
   SortDirections,
   ButtonWithDropdownForSorting,
   SortParameters,
-  useSortFlows,
 } from '../features/flows'
 import {
   Column,
@@ -16,35 +15,26 @@ import {
   Text,
   /*   Tooltip, */
 } from 'junoblocks'
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { useUpdateEffect } from 'react-use'
-import { useFlowInfos } from 'hooks/useFlowInfo'
+import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
 import { FlowCard } from '../features/flows/components/FlowCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
   const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
-  const [flows, isLoading] = useFlowInfos()
+  const [allFlows, isLoading] = useFlowInfos(Number(100), undefined)
+  const [myFlows, isMyFlowsLoading] = useFlowInfosByOwner(Number(100), undefined)
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
-  const infoArgs = { infos: flows, address }
-  const [myFlows, allFlows, isSorting] = useSortFlows({
-    infoArgs,
-    sortBy: useMemo(
-      () => ({
-        parameter: sortParameter,
-        direction: sortDirection,
-      }),
-      [sortParameter, sortDirection]
-    ),
-  })
+
 
   const shouldShowAutoCompound =
     !myFlows?.length ||
     myFlows.find((tx) => tx.label === 'Autocompound') == undefined
-  const shouldShowFetchingState = isLoading && isSorting && !flows?.length
-  const shouldRenderFlows = Boolean(flows?.length)
+  const shouldShowFetchingState = isLoading && !allFlows?.length || isMyFlowsLoading && !myFlows?.length
+  const shouldRenderFlows = Boolean(allFlows?.length)
 
   const pageHeaderContents = (
     <PageHeader
@@ -70,7 +60,7 @@ export default function Home() {
       {process.env.NEXT_PUBLIC_DASHBOARD_INFO_ENABLED == "true" && <Column css={{ paddingTop: '12' }}>
         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>}
-      {!isLoading && isSorting && address && (
+      {!isLoading && address && (
         <Column
           justifyContent="center"
           align="center"
@@ -78,7 +68,7 @@ export default function Home() {
         >
           <Inline gap={2}>
             <ConnectIcon color="secondary" />
-            <Text variant="primary">{'Finding your triggers...'}</Text>
+            <Text variant="primary">{'Finding your flows...'}</Text>
           </Inline>
         </Column>
       )}
@@ -124,7 +114,7 @@ export default function Home() {
               }}
             >
               <Text variant="primary">
-                {allFlows.length} {myFlows[0] && <>Other</>} Available
+                {allFlows.length} {myFlows && myFlows[0] && <>Other</>} Available
                 Flows
               </Text>
 
@@ -145,7 +135,7 @@ export default function Home() {
       </StyledDivForFlowsGrid>
 
       <StyledDivForFlowsGrid>
-        {allFlows.map((flowInfo, index) => (
+        {allFlows?.map((flowInfo, index) => (
           <FlowCard
             key={index}
             //structuredClone does not work on ios

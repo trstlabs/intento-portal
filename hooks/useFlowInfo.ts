@@ -8,16 +8,77 @@ import { useIntentoRpcClient } from './useRPCClient'
 import { QueryFlowsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { GlobalDecoderRegistry } from 'intentojs'
 import { PageRequest } from 'intentojs/dist/codegen/cosmos/base/query/v1beta1/pagination'
+import { useRecoilValue } from 'recoil'
+import { walletState } from '../state/atoms/walletAtoms'
 
-export const useFlowInfos = () => {
+export const useFlowInfos = (limit: number, key: Uint8Array) => {
   const client = useIntentoRpcClient()
 
   const { data, isLoading } = useQuery(
     'useFlowInfos',
     async () => {
+      const pageRequest = PageRequest.fromPartial({
+        limit: BigInt(limit),
+        key,
+        reverse: true,
+        countTotal: true,
+      })
       const resp: QueryFlowsResponse =
         await client.intento.intent.v1beta1.flows({
-          pagination: undefined,
+          pagination: pageRequest,
+        })
+
+      // Transform each msg in flowInfos
+      const transformedFlowInfos = resp.flowInfos.map((flowInfo) => {
+        return {
+          ...flowInfo,
+          msgs: flowInfo.msgs.map((msg) => {
+            //GlobalDecoderRegistry.unwrapAny(msg.value)
+            const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
+            wrappedMsg.typeUrl =
+              wrappedMsg.typeUrl ==
+              '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+                ? '/cosmos.authz.v1beta1.MsgExec'
+                : wrappedMsg.typeUrl
+            return {
+              value: msg.value,
+              valueDecoded: msg,
+              typeUrl: msg.typeUrl || wrappedMsg.typeUrl,
+            }
+          }),
+        }
+      })
+
+      return transformedFlowInfos
+    },
+    {
+      enabled: Boolean(client && client.intento),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [data, isLoading] as const
+}
+
+export const useFlowInfosByOwner = (limit: number, key: Uint8Array) => {
+  const client = useIntentoRpcClient()
+  const { address } = useRecoilValue(walletState)
+  const { data, isLoading } = useQuery(
+    'useFlowInfosByOwner',
+    async () => {
+      const pageRequest = PageRequest.fromPartial({
+        limit: BigInt(limit),
+        key,
+        reverse: true,
+        countTotal: true,
+      })
+
+      const resp: QueryFlowsResponse =
+        await client.intento.intent.v1beta1.flowsForOwner({
+          owner: address,
+          pagination: pageRequest,
         })
 
       // Transform each msg in flowInfos
