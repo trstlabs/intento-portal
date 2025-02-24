@@ -14,6 +14,7 @@ import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/
 import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1beta1/query'
 
+
 export interface BaseQueryInput {
   client: any
 }
@@ -139,71 +140,6 @@ export const getModuleParams = async (cosmosClient: any, trstClient: any) => {
   }
 }
 
-/* 
-export const getAPRForAcc = async (client: any) => {
-    try {
-        const annualProvision = (await getAnnualProvisions(client))
-
-        const mintParams = (await getMintParams(client)).params
-        const bondedTokens = await (await getStakingParams(client)).bondedTokens
-
-        const communityTax = (await getDistributionParams(client)).communityTax
-        const blockParams = (await getBlockParams(client))
-
-        const apr = blockInfoAndCalculateApr(annualProvision, bondedTokens, communityTax, mintParams.blocksPerYear, blockParams.actualBlocksPerYear)
-
-
-
-    } catch (e) { console.error('err(getAPR):', e) }
-}
- */
-export const getAPY = async (
-  cosmosClient: any,
-  client: StargateClient,
-  paramsState: ParamsState,
-  intervalSeconds: number
-) => {
-  try {
-    const apr = await getAPR(cosmosClient, client, paramsState)
-    if (!apr) {
-      return 0
-    }
-
-    const periodsPerYear = (60 * 60 * 24 * 365) / intervalSeconds
-
-    return (
-      ((1 + apr.estimatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) *
-      100
-    )
-  } catch (e) {
-    console.error('err(getAPY):', e)
-  }
-}
-
-export const getAPYForAutoCompound = async (
-  intentParams: Params,
-  paramsState: ParamsState,
-  cosmosClient: any,
-  client: StargateClient,
-  durationSeconds: number,
-  intervalSeconds: number,
-  stakingBalanceAmount: number,
-  nrMessages: number
-) => {
-  try {
-    const apy = await getAPY(cosmosClient, client, paramsState, intervalSeconds)
-    const expectedFees = getExpectedFlowFee(
-      intentParams,
-      200000,
-      durationSeconds,
-      nrMessages,
-      intervalSeconds
-    )
-    return (apy * stakingBalanceAmount) / stakingBalanceAmount - expectedFees
-  } catch (e) {
-    console.error('err(getAPYForAutoCompound):', e)
-  }
-}
 
 export const getExpectedFlowFee = (
   intentParams: Params,

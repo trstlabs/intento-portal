@@ -17,9 +17,7 @@ import {
 import {
   getStakeBalanceForAcc,
   getAPR,
-  getAPY,
   getExpectedFlowFee,
-  getAPYForAutoCompound,
   getFlowParams,
   getModuleParams,
 } from '../services/chain-info'
@@ -160,9 +158,9 @@ export const useGetAPR = () => {
     },
     {
       enabled: Boolean(client && paramsState),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: false,
+      staleTime: 60000, // Cache data for 60 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
     }
   )
 
@@ -194,7 +192,7 @@ export const useSetModuleParams = () => {
   return [data, isLoading] as const
 }
 
-export const useGetAPYForWithFees = (
+export const useGetAPYWithFees = (
   duration: number,
   interval: number,
   stakingBalance: number,
@@ -204,67 +202,69 @@ export const useGetAPYForWithFees = (
     intentModuleParamsAtom
   )
   const paramsState = useRecoilValue(paramsStateAtom)
-  const cosmosClient = useCosmosRpcClient()
+
   const trstClient = useIntentoRpcClient()
   const { client } = useRecoilValue(walletState)
 
+  // Use useAPR instead of getAPR
+  const [APR, isLoadingAPR ]= useGetAPR()
+
   const { data, isLoading } = useQuery(
-    'useGetAPYForWithFees',
+    'useGetAPYWithFees',
     async () => {
       const intentModuleParams = await getFlowParams(trstClient)
       setTriggerModuleData(intentModuleParams)
 
-      return getAPYForAutoCompound(
+      // Use apr value from useAPR instead of calling getAPYForAutoCompound directly
+      const expectedFees = getExpectedFlowFee(
         intentModuleParams,
-        paramsState,
-        cosmosClient,
-        client,
+        200000,
         duration,
-        interval,
-        stakingBalance,
-        nrMessages
+        nrMessages,
+        interval
       )
+      return (APR.calculatedApr * stakingBalance) / stakingBalance - expectedFees
     },
     {
-      enabled: Boolean(
-        !!client && !!cosmosClient && !!trstClient && !!paramsState
-      ),
-      //refetchOnMount: 'always',
-      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      //refetchIntervalInBackground: true,
+      enabled: Boolean(client && APR && paramsState), // Ensure apr is available before executing
+      refetchOnMount: false,
+      staleTime: 60000, // Cache data for 60 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
     }
   )
-
   useEffect(() => {
     if (intentModuleParams && intentModuleParams.flowFlexFeeMul) {
     }
   }, [intentModuleParams])
 
-  return [data, isLoading] as const
+  return [data, isLoading || isLoadingAPR] as const
 }
 
 export const useGetAPY = (intervalSeconds: number) => {
-  const cosmosClient = useCosmosRpcClient()
+ 
   const { client } = useRecoilValue(walletState)
   const paramsState = useRecoilValue(paramsStateAtom)
+
+  // Use useAPR instead of getAPY
+  const [APR, isLoadingAPR]  = useGetAPR()
+
   const { data, isLoading } = useQuery(
     'useGetAPY',
     async () => {
-      const resp = await getAPY(
-        cosmosClient,
-        client,
-        paramsState,
-        intervalSeconds
+      const periodsPerYear = (60 * 60 * 24 * 365) / intervalSeconds
+
+      return (
+        ((1 + APR.estimatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) *
+        100
       )
-      return resp
     },
     {
-      enabled: Boolean(client && intervalSeconds > 0 && paramsState),
+      enabled: Boolean(client && intervalSeconds > 0 && APR && paramsState),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
 
-  return [data, isLoading] as const
+  return [data, isLoading || isLoadingAPR] as const
 }

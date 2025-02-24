@@ -78,9 +78,11 @@ export const useTokenBalance = (tokenSymbol: string) => {
       enabled: Boolean(
         tokenSymbol && status === WalletStatusType.connected && client && ibcAssetInfo
       ),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: 'always', // Refetch when the component mounts
+      refetchInterval: 30000,    // Refetch every 30 seconds
+      staleTime: 5000,           // Cache expires after 5 seconds
+      cacheTime: 300000,         // Cache data for 5 minutes
+      refetchOnWindowFocus: true,
     }
   )
   return { balance, isLoading }
@@ -125,9 +127,11 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
         ibcAssetsList
       ),
 
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: 'always', // Refetch when the component mounts
+      refetchInterval: 30000,    // Refetch every 30 seconds
+      staleTime: 5000,           // Cache expires after 5 seconds
+      cacheTime: 300000,         // Cache data for 5 minutes
+      refetchOnWindowFocus: true,
 
       onError(error) {
         console.error('Cannot fetch token balance bc:', error)

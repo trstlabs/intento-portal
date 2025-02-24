@@ -8,7 +8,6 @@ import {
 } from '../state/atoms/walletAtoms'
 import {
   DEFAULT_LONG_REFETCH_INTERVAL,
-  DEFAULT_REFETCH_INTERVAL,
 } from '../util/constants'
 import {
   getICA,
@@ -54,9 +53,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
           !!accAddr &&
           accAddr.length > 40
       ),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: false,
+      staleTime: 30000,
+      cacheTime: 300000,
     }
   )
 
@@ -85,9 +84,9 @@ export const useGetHostedICA = (connectionId: string) => {
     },
     {
       enabled: Boolean(connectionId && rpcClient),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: false,
+      staleTime: 30000,
+      cacheTime: 300000,
     }
   )
 
@@ -108,9 +107,9 @@ export const useGetHostICAAddressFromHostAddress = (address: string) => {
     },
     {
       enabled: Boolean(rpcClient && !!address && address.length > 40),
-      refetchOnMount: 'always',
-      // refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
+      refetchOnMount: false,
+      staleTime: 30000,
+      cacheTime: 300000,
     }
   )
 
@@ -129,9 +128,9 @@ export const useGetConnectionIDFromHostAddress = (address: string) => {
     },
     {
       enabled: Boolean(rpcClient && !!address && address.length > 40),
-      refetchOnMount: 'always',
-      // refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
+      refetchOnMount: false,
+      staleTime: 30000,
+      cacheTime: 300000,
     }
   )
 
@@ -169,9 +168,9 @@ export const useGetHostICAAddress = (
           !!accAddr &&
           accAddr.length > 40
       ),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: false,
+      staleTime: 30000,
+      cacheTime: 300000,
     }
   )
 
@@ -204,9 +203,11 @@ export const useICATokenBalance = (
           ibcWalletAddress.length != 0 &&
           isICAChain
       ),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: 'always', // Refetch when the component mounts
+      refetchInterval: 30000,    // Refetch every 30 seconds
+      staleTime: 15000,           // Cache expires after 15 seconds
+      cacheTime: 300000,         // Cache data for 5 minutes
+      refetchOnWindowFocus: true,
     }
   )
 
@@ -284,9 +285,10 @@ export const useAuthZMsgGrantInfoForUser = (
           flowInput.msgs[0].includes('typeUrl') &&
           flowInput.connectionId
       ),
-      refetchOnMount: 'always',
-      refetchIntervalInBackground: true,
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
+      refetchOnMount: 'always', // Refetch when the component mounts
+      refetchInterval: 30000,    // Refetch every 30 seconds
+      staleTime: 15000,           // Cache expires after 15 seconds
+      cacheTime: 300000,         // Cache data for 5 minutes
     }
   )
 

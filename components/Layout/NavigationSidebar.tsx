@@ -59,8 +59,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     openView, assets,
   } = useChain('intentozone')
   const refetchQueries = useRefetchQueries([
-    `tokenBalance/INTO/${address}`,
-    'ibcTokenBalance',
+    `tokenBalance/INTO/${address}`
   ])
 
   const { mutate: afterConnectWallet } = useAfterConnectWallet()

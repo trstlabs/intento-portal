@@ -16,7 +16,7 @@ import { SubmitFlowDialog } from '../../build/components/SubmitFlowDialog'
 import { useSubmitFlow } from '../../build/hooks'
 import {
   useGetAPR,
-  useGetAPYForWithFees,
+  useGetAPYWithFees,
   useGetAPY,
   useGetStakeBalanceForAcc,
   useSetModuleParams,
@@ -45,7 +45,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
 
   const [weeklyAPY, ___] = useGetAPY(week)
   const [stakeBalance, isStakeBalanceLoading] = useGetStakeBalanceForAcc()
-  const [APYWFees, isAPYWFeesLoading] = useGetAPYForWithFees(
+  const [APYWFees, isAPYWFeesLoading] = useGetAPYWithFees(
     week * 52,
     week,
     stakeBalance ? stakeBalance.stakingBalanceAmount : 0,
