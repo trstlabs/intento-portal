@@ -30,6 +30,8 @@ export const useClaimRecord = () => {
       enabled: !!address && !!client?.intento,
       refetchOnMount: false,
       refetchInterval: false,
+      staleTime: 60000, // Cache data for 60 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
     }
   )
 
@@ -64,6 +66,8 @@ export const useClaimRecordForAddress = (address: string) => {
       enabled: !!addrToClaim && !!client?.intento,
       refetchOnMount: false,
       refetchInterval: false,
+      staleTime: 60000, // Cache data for 60 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
     }
   )
 
@@ -89,6 +93,8 @@ export const useTotalClaimable = () => {
       enabled: !!address && !!client?.intento,
       refetchOnMount: false,
       refetchInterval: false,
+      staleTime: 120000, // Cache data for 120 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
     }
   )
 
