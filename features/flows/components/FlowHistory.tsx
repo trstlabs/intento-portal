@@ -28,7 +28,7 @@ export const FlowHistory = ({
   FlowHistoryProps) => {
 
   const [flowHistory, setFlowHistory] = useState([]);
-  const [historyLimit] = useState(5); // Define your historyLimit or make it dynamic as needed
+  const [historyLimit] = useState(5);
   const [fetchNext, setFetchNext] = useState(false);
   const [paginationKey, setPaginationKey] = useState(undefined);
   const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);

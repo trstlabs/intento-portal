@@ -25,27 +25,25 @@ type UseSortFlowsArgs = {
 export const useSortFlows = ({ infoArgs, filter, sortBy }: UseSortFlowsArgs) => {
   return useMemo((): readonly [
     Array<FlowInfo>,
-    Array<FlowInfo>,
     boolean
   ] => {
-    const myFlows = [] as Array<FlowInfo>
-    const otherFlows = [] as Array<FlowInfo>
+
+    const sortedFlows = [] as Array<FlowInfo>
 
     if (!infoArgs.infos?.length) {
-      return [myFlows, otherFlows, false]
+      return [sortedFlows, false]
     }
     infoArgs.infos.forEach((flow) => {
 
       const isFrom = (infoArgs.address == flow.owner)
 
-      const flowsBucket = isFrom ? myFlows : otherFlows
+      const flowsBucket = isFrom ? [] : sortedFlows
       flowsBucket.push(flow)
     })
 
     /* sort and filter flows */
     return [
-      sortFlows(filterFlowsByAcc(myFlows, filter), sortBy),
-      sortFlows(filterFlowsByAcc(otherFlows, filter), sortBy),
+      sortFlows(filterFlowsByAcc(sortedFlows, filter), sortBy),
       false,
     ] as const
   }, [infoArgs.infos, filter, sortBy])

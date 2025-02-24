@@ -2,8 +2,9 @@ import { AppLayout, PageHeader } from 'components'
 
 import {
   SortDirections,
-  ButtonWithDropdownForSorting,
+
   SortParameters,
+  useSortFlows,
 } from '../features/flows'
 import {
   Column,
@@ -15,7 +16,7 @@ import {
   Text,
   /*   Tooltip, */
 } from 'junoblocks'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
 import { FlowCard } from '../features/flows/components/FlowCard'
@@ -24,17 +25,29 @@ import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
   const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
-  const [allFlows, isLoading] = useFlowInfos(Number(100), undefined)
-  const [myFlows, isMyFlowsLoading] = useFlowInfosByOwner(Number(100), undefined)
-  const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
+  const flowsPerPage = 20;
+  const [allFlows, isLoading] = useFlowInfos(Number(flowsPerPage), undefined)
+  const [flows, isMyFlowsLoading] = useFlowInfosByOwner(Number(flowsPerPage), undefined)
+  const { sortDirection, sortParameter } =
     useSortControllers()
 
+  const infoArgs = { infos: flows?.flowInfos || [], address }
+  const [myFlows, isSorting] = useSortFlows({
+    infoArgs,
+    sortBy: useMemo(
+      () => ({
+        parameter: sortParameter,
+        direction: sortDirection,
+      }),
+      [sortParameter, sortDirection]
+    ),
+  })
 
   const shouldShowAutoCompound =
     !myFlows?.length ||
     myFlows.find((tx) => tx.label === 'Autocompound') == undefined
-  const shouldShowFetchingState = isLoading && !allFlows?.length && isMyFlowsLoading && !myFlows?.length
-  const shouldRenderFlows = Boolean(allFlows?.length)
+  const shouldShowFetchingState = isLoading && !allFlows?.flowInfos.length && isMyFlowsLoading && !myFlows?.length
+  const shouldRenderFlows = Boolean(allFlows?.flowInfos.length)
 
   const pageHeaderContents = (
     <PageHeader
@@ -61,11 +74,6 @@ export default function Home() {
         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>}
 
-      {/*       <Text variant="title" css={{ paddingLeft: '$2', padding: '$8' }}>
-        <Tooltip label="Build messages and workflows, move assets on your behalf">
-          <span>Flows</span>
-        </Tooltip>
-      </Text> */}
       {shouldRenderFlows && (
         <>
           {Boolean(myFlows?.length) && (
@@ -94,7 +102,7 @@ export default function Home() {
       )}
       <StyledDivForFlowsGrid>
         <>
-          {Boolean(allFlows?.length) ? (
+          {Boolean(allFlows?.flowInfos.length) ? (
             <Inline
               gap={4}
               css={{
@@ -103,16 +111,9 @@ export default function Home() {
               }}
             >
               <Text variant="primary">
-                {allFlows.length} {myFlows && myFlows[0] && <>Other</>} Available
+                {allFlows.flowInfos.length} Recent
                 Flows
               </Text>
-
-              <ButtonWithDropdownForSorting
-                sortParameter={sortParameter}
-                sortDirection={sortDirection}
-                onSortParameterChange={setSortParameter}
-                onSortDirectionChange={setSortDirection}
-              />
             </Inline>
           ) : (
             <Text variant="caption" css={{ padding: '$4' }}>
@@ -122,7 +123,7 @@ export default function Home() {
           )}
         </>
       </StyledDivForFlowsGrid>
-      {(isMyFlowsLoading) && address && (
+      {isMyFlowsLoading || isSorting && (
         <Column
           justifyContent="center"
           align="center"
@@ -130,12 +131,12 @@ export default function Home() {
         >
           <Inline gap={2}>
             <ConnectIcon color="secondary" />
-            <Text variant="primary">{'Finding Your Flows...'}</Text>
+            <Text variant="primary">{'Finding Flows...'}</Text>
           </Inline>
         </Column>
       )}
       <StyledDivForFlowsGrid>
-        {allFlows?.map((flowInfo, index) => (
+        {allFlows?.flowInfos.map((flowInfo, index) => (
           <FlowCard
             key={index}
             //structuredClone does not work on ios

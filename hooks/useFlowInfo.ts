@@ -11,11 +11,11 @@ import { PageRequest } from 'intentojs/dist/codegen/cosmos/base/query/v1beta1/pa
 import { useRecoilValue } from 'recoil'
 import { walletState } from '../state/atoms/walletAtoms'
 
-export const useFlowInfos = (limit: number, key: Uint8Array) => {
+export const useFlowInfos = (limit: number, key: any) => {
   const client = useIntentoRpcClient()
 
   const { data, isLoading } = useQuery(
-    'useFlowInfos',
+   `useFlowInfos/${key}`,
     async () => {
       const pageRequest = PageRequest.fromPartial({
         limit: BigInt(limit),
@@ -23,13 +23,12 @@ export const useFlowInfos = (limit: number, key: Uint8Array) => {
         reverse: true,
         countTotal: true,
       })
-      const resp: QueryFlowsResponse =
-        await client.intento.intent.v1beta1.flows({
-          pagination: pageRequest,
-        })
+      let resp: QueryFlowsResponse = await client.intento.intent.v1beta1.flows({
+        pagination: pageRequest,
+      })
 
       // Transform each msg in flowInfos
-      const transformedFlowInfos = resp.flowInfos.map((flowInfo) => {
+      const flowInfos = resp.flowInfos.map((flowInfo) => {
         return {
           ...flowInfo,
           msgs: flowInfo.msgs.map((msg) => {
@@ -49,20 +48,22 @@ export const useFlowInfos = (limit: number, key: Uint8Array) => {
         }
       })
 
-      return transformedFlowInfos
+      return { flowInfos: flowInfos, pagination: resp.pagination }
     },
     {
       enabled: Boolean(client && client.intento),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      refetchOnMount: false,
+      staleTime: 60000, // Cache data for 60 seconds
+      cacheTime: 300000, // Cache data for 5 minutes
+      //refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      //refetchIntervalInBackground: true,
     }
   )
 
   return [data, isLoading] as const
 }
 
-export const useFlowInfosByOwner = (limit: number, key: Uint8Array) => {
+export const useFlowInfosByOwner = (limit: number, key: any) => {
   const client = useIntentoRpcClient()
   const { address } = useRecoilValue(walletState)
   const { data, isLoading } = useQuery(
@@ -75,14 +76,14 @@ export const useFlowInfosByOwner = (limit: number, key: Uint8Array) => {
         countTotal: true,
       })
 
-      const resp: QueryFlowsResponse =
+      let resp: QueryFlowsResponse =
         await client.intento.intent.v1beta1.flowsForOwner({
           owner: address,
           pagination: pageRequest,
         })
 
       // Transform each msg in flowInfos
-      const transformedFlowInfos = resp.flowInfos.map((flowInfo) => {
+      const flowInfos = resp.flowInfos.map((flowInfo) => {
         return {
           ...flowInfo,
           msgs: flowInfo.msgs.map((msg) => {
@@ -102,13 +103,13 @@ export const useFlowInfosByOwner = (limit: number, key: Uint8Array) => {
         }
       })
 
-      return transformedFlowInfos
+      return { flowInfos: flowInfos, pagination: resp.pagination }
     },
     {
       enabled: Boolean(client && client.intento),
       refetchOnMount: 'always',
-      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      staleTime: 10000,
+      cacheTime: 60000,
     }
   )
 
@@ -146,7 +147,6 @@ export const useFlowInfo = (id) => {
       enabled: !!id && !!client?.intento,
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
     }
   )
 
