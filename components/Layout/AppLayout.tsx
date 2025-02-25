@@ -149,6 +149,5 @@ const StyledContainerForMobile = styled('div', {
   '& [data-content]': {
     margin: '0 auto',
     width: '100%',
-    padding: '0 $12',
   },
 })

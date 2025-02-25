@@ -234,7 +234,7 @@ function Row({ children }) {
         margin: '$6',
         justifyContent: 'space-between',
         alignItems: 'center',
-        overflow: 'hidden',
+        overflow: 'scroll',
         boxShadow: '$light',
         borderRadius: '18px',
         border: '1px solid $borderColors$default',
