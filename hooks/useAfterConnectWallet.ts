@@ -3,7 +3,6 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
-
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2]
 ) => {
@@ -11,10 +10,6 @@ export const useAfterConnectWallet = (
     useChain('intentozone')
 
   const [{ status }, setWalletState] = useRecoilState(walletState)
-  // const refetchQueries = useRefetchQueries([
-  //   `tokenBalance/INTO/${address}`,
-  //   'ibcTokenBalance',
-  // ])
   const mutation = useMutation(async () => {
     setWalletState((value) => ({
       ...value,

@@ -1,74 +1,73 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
 import { useIBCAssetInfo } from './useIBCAssetInfo'
-
 import { useChain } from '@cosmos-kit/react'
 import { useChainInfoByChainID } from './useChainList'
 import toast from 'react-hot-toast'
 
-/* shares very similar logic with `useConnectWallet` and is a subject to refactor */
 export const useConnectIBCWallet = (
-  tokenSymbol: string,
-  chainId: string,
-  mutationOptions?: Parameters<typeof useMutation>[2],
-  fromRegistry?: boolean
+  tokenSymbol,
+  chainId,
+  mutationOptions,
+  fromRegistry = false
 ) => {
-  const [{ status /* tokenSymbol: storedTokenSymbol */ }, setWalletState] =
-    useRecoilState(ibcWalletState)
+  const [{ status }, setWalletState] = useRecoilState(ibcWalletState)
+  const hasConnected = useRef(false) // Prevent multiple connects
 
-  if ((tokenSymbol == '' || chainId == '')) {
+  if (!tokenSymbol || !chainId) {
     return
   }
-  let assetInfo = useIBCAssetInfo(tokenSymbol /* || storedTokenSymbol */)
+
+  let assetInfo = useIBCAssetInfo(tokenSymbol)
   if (fromRegistry) {
     assetInfo = useChainInfoByChainID(chainId)
   }
 
-  const chainRegistryName = assetInfo ? assetInfo.registry_name : 'cosmostest'
-  //  console.log(chainRegistryName)
+  const chainRegistryName = assetInfo?.registry_name || 'cosmostest'
   const { getSigningStargateClient, connect, address, assets } =
     useChain(chainRegistryName)
+
   const mutation = useMutation(async () => {
     if (!tokenSymbol) {
-      throw new Error(
-        'You must provide `tokenSymbol` before connecting to the wallet.'
-      )
+      throw new Error('You must provide `tokenSymbol` before connecting to the wallet.')
     }
 
     if (!assetInfo) {
-      throw new Error(
-        'Asset info for the provided `tokenSymbol` was not found. Check your internet connection.'
-      )
+      throw new Error('Asset info for the provided `tokenSymbol` was not found.')
     }
-    /* set the fetching state */
+
     setWalletState((value) => ({
       ...value,
       tokenSymbol,
-      state: WalletStatusType.connecting,
+      status: WalletStatusType.connecting,
     }))
 
     try {
-      if (address) {
-        const ibcChainClient = await getSigningStargateClient()
+      await connect() // Ensure connection is established first
 
-        /* successfully update the wallet state */
-        setWalletState({
-          tokenSymbol,
-          address,
-          client: ibcChainClient,
-          status: WalletStatusType.connected,
-          assets,
-        })
-      } else {
-        // Handle the case where the client could not be obtained
-        throw new Error('Failed to obtain the client')
+      if (!address) {
+        throw new Error('Wallet address not available after connection.')
       }
-    } catch (e) {
-      toast.error(e)
-      /* set the error state */
+
+      const ibcChainClient = await getSigningStargateClient()
+
+      if (!ibcChainClient) {
+        throw new Error('Failed to obtain the signing client.')
+      }
+
+      setWalletState({
+        tokenSymbol,
+        address,
+        client: ibcChainClient,
+        status: WalletStatusType.connected,
+        assets,
+      })
+    } catch (error) {
+      toast.error('Failed to connect IBC wallet')
+
       setWalletState({
         tokenSymbol: null,
         address: '',
@@ -77,20 +76,37 @@ export const useConnectIBCWallet = (
         assets: undefined,
       })
 
-      throw e
+      throw error
     }
   }, mutationOptions)
 
-  useEffect(
-    function restoreWalletConnectionIfHadBeenConnectedBefore() {
-      /* restore wallet connection if the state has been set with the */
-      if (status === WalletStatusType.restored && assetInfo) {
-        connect()
-        mutation.mutate(null)
+  useEffect(() => {
+    if (!assetInfo || status !== WalletStatusType.restored || hasConnected.current) {
+      return
+    }
+
+    let isMounted = true
+    hasConnected.current = true // Prevent multiple runs
+
+    const restoreConnection = async () => {
+      try {
+        await connect()
+        if (isMounted && address) {
+          mutation.mutate(null)
+        } else {
+          console.error('Address not available after reconnecting.')
+        }
+      } catch (error) {
+        console.error('Error restoring connection:', error)
       }
-    }, // eslint-disable-next-line
-    [status, assetInfo]
-  )
+    }
+
+    restoreConnection()
+
+    return () => {
+      isMounted = false // Cleanup
+    }
+  }, [status, assetInfo, connect, address])
 
   return mutation
 }
