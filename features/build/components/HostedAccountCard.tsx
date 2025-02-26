@@ -169,7 +169,7 @@ export const HostedAccountCard = ({
               <>
                 {icaAuthzMsgInfo && icaAuthzMsgInfo[0] && icaAuthzMsgInfo.map((grant, index) =>
                   grant.hasGrant ? (
-                    <Text key={index} css={{ padding: '$4' }} variant="caption">
+                    <Text key={"hkey" + index} css={{ padding: '$4' }} variant="caption">
                       {' '}
                       ✓ Interchain Account is granted for type: {
                         grant.msgTypeUrl

@@ -93,9 +93,6 @@ export const Conditions = ({
           variant="secondary"
           disabled>
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-            <Text css={{ paddingBottom: '$4' }} align="center">
-              Conditions
-            </Text>
             <Inline justifyContent="space-between" >
               <Button css={{ marginBottom: '$6' }}
                 onClick={() => {
@@ -112,7 +109,7 @@ export const Conditions = ({
                     color="tertiary"
                     icon={showFeedbackLoops ? <ChevronIcon rotation="90deg" /> : <Chevron />}
                   />}>
-                Feedback Loop
+                Feedback Loops
               </Button>
               {showFeedbackLoops && <Button css={{ marginBottom: '$6' }}
                 onClick={() => handleAddFeedbackLoop()}
@@ -154,7 +151,7 @@ export const Conditions = ({
                     color="tertiary"
                     icon={showComparisons ? <ChevronIcon rotation="90deg" /> : <Chevron />}
                   />}>
-                Comparison</Button>
+                Comparisons</Button>
               {showComparisons && <Button css={{ marginBottom: '$6' }}
                 onClick={() => handleAddComparison()}
                 variant="ghost"

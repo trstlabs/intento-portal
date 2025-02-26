@@ -64,7 +64,7 @@ type FieldProps = {
   type?: string
 }
 export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text' }: FieldProps) => {
-  const [error, setError] = useState<string | null>(null)
+  const [errorInput, setError] = useState<string>("")
 
   // Function to validate and convert input value
   const parseValue = (inputValue: string): string | number | bigint | null => {
@@ -100,7 +100,7 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
         // Check if newValue is not a valid number or BigInt
         throw new Error('Invalid input: not a number')
       }
-      setError(null) // Clear error if valid
+      setError("") // Clear errorInput if valid
       onChange({ target: { value: inputValue.toString() } } as React.ChangeEvent<HTMLInputElement>)
     } catch (err) {
       setError('Invalid input: Please enter a valid input value')
@@ -146,7 +146,7 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
             transition: 'width 0.2s ease', // Optional: smooth transition for width changes
           }}
         />
-        {error && <Text variant="caption" css={{ marginTop: '2px', color: 'red' }}>{error}</Text>}
+        {errorInput && <Text variant="caption" css={{ marginTop: '2px', color: 'red' }}>{errorInput || 'Unknown error occurred'}</Text>}
       </Text>
     </div>
   );

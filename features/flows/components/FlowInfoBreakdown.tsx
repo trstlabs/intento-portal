@@ -27,8 +27,8 @@ import { FlowInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import {
-  /* useAuthZMsgGrantInfoForUser,  */ useGetICA,
-  /* useIsActiveICAForUser,  */ useICATokenBalance,
+  useGetICA,
+  useICATokenBalance,
 } from '../../../hooks/useICA'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
@@ -41,6 +41,7 @@ import { ComparisonOperatorLabels } from '../../build/components/Conditions/Comp
 import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
 import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
+import JsonViewer from '../../build/components/Editor/JsonViewer'
 
 
 type FlowInfoBreakdownProps = {
@@ -98,7 +99,7 @@ export const FlowInfoBreakdown = ({
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
 
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol, chainId)
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol, chainId, false)
   const handleSendFundsOnHostClick = () => {
     if (chainId != '') {
       connectExternalWallet(null)
@@ -518,7 +519,8 @@ export const FlowInfoBreakdown = ({
                   </Inline>
                   <Inline gap={2}>
                     <Text css={{ wordBreak: 'break-word' }} variant="body">
-                      <pre
+                      <JsonViewer jsonValue={msg.valueDecoded} />
+                      {/* <pre
                         style={{
                           display: 'inline-block',
                           whiteSpace: 'pre-wrap',
@@ -530,13 +532,14 @@ export const FlowInfoBreakdown = ({
 
                         {StringifyBigints(msg.valueDecoded)}
 
-                      </pre>
+                      </pre> */}
                     </Text>
                   </Inline>
                 </>
 
                 {editorIndex == index && editMsgs && editMsgs[index] &&
                   <>
+
                     <JsonFormWrapper
                       index={index}
                       chainSymbol={"INTO"}
@@ -990,12 +993,12 @@ export const FlowInfoBreakdown = ({
 }
 
 function Row({ children }) {
-  const baseCss = { padding: '$10 $16' }
+  const baseCss = { padding: '$10 $10' }
   return (
     <Inline
       css={{
         ...baseCss,
-        margin: '$6',
+        margin: '$4',
         justifyContent: 'space-between',
         alignItems: 'center',
         overflow: 'hidden',
@@ -1042,11 +1045,11 @@ const StyledInput = styled('input', {
 })
 
 
-const StringifyBigints = (msg: any) => {
-  const jsonString = JSON.stringify(msg, (_, value) =>
-    typeof value === 'bigint' ? value.toString() : value, 2);
+// const StringifyBigints = (msg: any) => {
+//   const jsonString = JSON.stringify(msg, (_, value) =>
+//     typeof value === 'bigint' ? value.toString() : value, 2);
 
-  return (
-    <div>{jsonString}</div>
-  );
-};
+//   return (
+//     <div>{jsonString}</div>
+//   );
+// };

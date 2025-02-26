@@ -71,17 +71,33 @@ const ClaimAirdrop = ({ claimRecord, total, claimRecordLoaded }: ClaimAirdropPro
                 {showClaimMessage && (
                   <Card variant="secondary" disabled style={{ padding: "16px" }}>
                     <CardContent>
-                     
-                      <Text style={{ padding: "8px" }} >
-                        <p>Congrats! You are eligible for Flow Airdrop rewards! 🎉</p>
-                        <p>You have already received some liquid INTO as a start.</p>
-                        <p>It's a challenge. To complete the airdrop, you will have to use our product and create Intento flows, like streaming tokens, and auto-compounding your staking rewards.</p>
-                        <p>For each flow you complete, you receive a liquid amount and some more tokens over time. You may claim tokens as long as you stake more than 67% of them.</p>
-                        <p>
-                          Complete the airdrop to obtain the full amount of {convertMicroDenomToDenom(total, 6)} INTO
-                          (rounded).
+
+                      <Text style={{ padding: "16px", fontFamily: "Arial, sans-serif" }}>
+                        <p style={{ fontSize: "18px", fontWeight: "bold", color: "#4CAF50" }}>🎉 Congrats! You're eligible for Airdrop Rewards!</p>
+                        <p style={{ fontSize: "16px", marginBottom: "14px" }}>
+                          You've already received some liquid INTO to get started.
+                        </p>
+                        <p style={{ fontSize: "16px", marginBottom: "14px" }}>
+                          Here's the challenge: To complete the airdrop, you'll need to use our product and create Intento flows, such as streaming tokens and auto-compounding your staking rewards.
+                        </p>
+                        <p style={{ fontSize: "16px", marginBottom: "14px" }}>
+                          For each action you complete, you'll receive a liquid amount of INTO, along with additional tokens over time. You can claim these tokens as long as you stake more than 67% of them.
+                        </p>
+
+                        <p style={{ fontSize: "16px", fontWeight: "bold", marginBottom: "14px" }}>
+                          Complete the airdrop to unlock the full amount of <span style={{ color: "#FF9800" }}>{convertMicroDenomToDenom(total, 6).toFixed(2)} INTO</span>.
+                        </p>
+
+                        <p style={{ fontSize: "16px", marginBottom: "12px" }}>
+                          Any tokens that remain unclaimed will be clawed back and redistributed to the community pool, so don't miss your chance to claim your full reward!
+                        </p>
+
+                        <p style={{ fontSize: "16px", marginBottom: "14px" }}>
+                          Important: The claimable amount of the airdrop will decline over two months, decreasing until it reaches zero. So be sure to complete the actions before the decline starts to avoid losing out on rewards.
                         </p>
                       </Text>
+
+
                     </CardContent>
                   </Card>
                 )}
@@ -110,7 +126,7 @@ const ClaimAirdrop = ({ claimRecord, total, claimRecordLoaded }: ClaimAirdropPro
                           </Text>
                         </Button>
                         <Text variant="caption" style={{ margin: "8px" }}>
-                          Eligible for: {convertMicroDenomToDenom(total / 4 / 5, 6)} INTO
+                          Eligible for: {convertMicroDenomToDenom(total / 4 / 5, 6).toFixed(2)} INTO
                         </Text>
                         {expandedFlows[index] && (
                           <div style={{ marginLeft: "16px" }}>

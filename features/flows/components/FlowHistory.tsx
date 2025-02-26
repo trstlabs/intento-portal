@@ -226,12 +226,12 @@ export const FlowHistory = ({
 }
 
 function Row({ children }) {
-  const baseCss = { padding: '$10 $16' }
+  const baseCss = { padding: '$10 $10' }
   return (
     <Inline
       css={{
         ...baseCss,
-        margin: '$6',
+        margin: '$4',
         justifyContent: 'space-between',
         alignItems: 'center',
         overflow: 'scroll',

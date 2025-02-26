@@ -3,7 +3,6 @@ import {
   Card,
   CardContent,
   ToggleSwitch,
-  Text,
   Tooltip,
 } from 'junoblocks'
 import React, { useState } from 'react'
@@ -60,10 +59,6 @@ export const Configuration = ({
           disabled
         >
           <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-            <Text css={{ paddingBottom: '$4' }} align="center">
-              Configuration
-            </Text>
-
             <Tooltip
               label={
                 'If set to true, message responses i.e. outputs may be used as inputs for new flows'

@@ -32,8 +32,6 @@ export const FlowTransformButton = ({ flowInfo }) => {
     };
 
     const transformFlowInfo = async (info: FlowInfo) => {
-
-
         const msgs = await transformFlowMsgs(info)
         console.log(msgs)
         // Transform FlowInfo to FlowInput
@@ -91,13 +89,13 @@ export async function transformFlowMsgs(info) {
 
     } else {
         info.msgs.forEach((msgAny: any, index) => {
-            console.log("Original MsgAny:", JSON.stringify(msgAny.valueDecoded, null, 2));
+            //console.log("Original MsgAny:", JSON.stringify(msgAny.valueDecoded, null, 2));
 
             let msgObj = { typeUrl: msgAny.typeUrl, value: msgAny.valueDecoded };
 
-            msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
+            // msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
 
-            console.log("After normalization:", JSON.stringify(msgObj, null, 2));
+            // console.log("After normalization:", JSON.stringify(msgObj, null, 2));
 
             const msg = JSON.stringify(msgObj, (_, value) =>
                 typeof value === "bigint" ? value.toString() : value,
