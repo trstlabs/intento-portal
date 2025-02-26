@@ -77,15 +77,26 @@ export const BuildComponent = ({
   )
   const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(flowInput.connectionId)
 
-
-  const refetchICAData = useRefetchQueries([
-    //`userAuthZGrants/${icaAddress}/${flowInput}`,
-    `icaTokenBalance/${chainId}/${icaAddress}`,
-  ])
+  // const refetchICAData = useRefetchQueries([
+  //   //`userAuthZGrants/${icaAddress}/${flowInput}`,
+  //   `icaTokenBalance/${chainId}/${icaAddress}`,
+  // ])
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance/${denom}/${icaAddress}`,
-    `interchainAccount/${flowInput.connectionId}`,
+    //`interchainAccount/${flowInput.connectionId}`,
   ])
+
+  useEffect(() => {
+    if (icaAddress && denom) {
+      refetchICA();
+    }
+  }, [denom, icaAddress]);
+
+  // useEffect(() => {
+  //   if (icaAddress && chainId) {
+  //     refetchICAData();
+  //   }
+  // }, [chainId, icaAddress]);
 
   const { mutate: handleSubmitFlow, isLoading: isExecutingSchedule } =
     useSubmitFlow({ flowInput })
@@ -209,6 +220,7 @@ export const BuildComponent = ({
     // if (!isJsonValid) {
     //   return
     // }
+
     try {
       let msgs = flowInput.msgs
       msgs[index] = msg
@@ -217,13 +229,14 @@ export const BuildComponent = ({
         msgs,
       }
       onFlowChange(updatedFlowInput)
-      if (
-        JSON.parse(msg)
-        ['typeUrl'].split('.')
-          .find((data) => data.includes('Msg'))
-      ) {
-        refetchICAData()
-      }
+      // if (
+      //   JSON.parse(msg)
+      //   ['typeUrl'].split('.')
+      //     .find((data) => data.includes('Msg'))
+      // ) {
+
+      //   refetchICAData()
+      // }
     } catch (e) {
       console.log(e)
     }
@@ -271,11 +284,11 @@ export const BuildComponent = ({
     }
     await sleep(200)
     connectExternalWallet(null)
-    refetchICA()
+
     // console.log("Connection: ", connectionId, flowInput.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
     await sleep(5000)
-    //console.log("Connection: ", connectionId, flowInput.connectionId, "ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
-    refetchICAData()
+
+
 
   }
 
@@ -576,7 +589,7 @@ export const BuildComponent = ({
           }
           iconLeft={<GearIcon />}
         >
-          {isExecutingSchedule ? <Spinner instant /> : 'Build Flow'}
+          {isExecutingSchedule ? <Spinner instant /> : 'Schedule'}
         </Button>
       </Inline>
     </StyledDivForContainer>

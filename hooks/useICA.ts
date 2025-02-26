@@ -34,7 +34,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
-    `interchainAccount/${connectionId}`,
+    `interchainAccount/${connectionId}/${address}`,
     async () => {
       if (connectionId == '') {
         return ''
@@ -223,7 +223,7 @@ export const useAuthZMsgGrantInfoForUser = (
   const chain = useChainInfoByChainID(chainId)
 
   const { data, isLoading } = useQuery(
-    [`userAuthZGrants/${grantee}/${chainId}`],
+    [`userAuthZGrants/${grantee}/${chainId}/${flowInput}`],
     async () => {
       let grants: GrantResponse[] = []
       const granteeGrants = await getAuthZGrantsForGrantee({

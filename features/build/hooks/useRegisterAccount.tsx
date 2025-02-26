@@ -37,7 +37,6 @@ export const useRegisterAccount = ({
 
   const refetchQueries = useRefetchQueries([
     'tokenBalance',
-    `interchainAccount/${connectionId}`,
   ])
 
   return useMutation(

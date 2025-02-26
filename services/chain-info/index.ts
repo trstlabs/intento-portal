@@ -145,13 +145,9 @@ export const getExpectedFlowFee = (
   intentParams: Params,
   gasUsed: number,
   lenMsgs: number,
-  durationSeconds: number,
-  intervalSeconds?: number
+  recurrences: number,
 ) => {
-  const recurrences =
-    intervalSeconds && intervalSeconds < durationSeconds
-      ? Math.floor(durationSeconds / intervalSeconds)
-      : 1
+
 
 
   const flexFeeForPeriod =

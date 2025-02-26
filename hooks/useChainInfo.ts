@@ -60,23 +60,38 @@ export const useGetExpectedFlowFee = (
   isDialogShowing: boolean,
   intervalSeconds?: number
 ) => {
-  const [intentModuleParams, setTriggerModuleData] = useRecoilState(
+  let [intentModuleParams, setTriggerModuleData] = useRecoilState(
     intentModuleParamsAtom
   )
+
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    'expectedFlowFee',
+    `expectedFlowFee/${durationSeconds}/${intervalSeconds}`,
     async () => {
-      const intentModuleParams = await getFlowParams(client)
-      setTriggerModuleData(intentModuleParams)
+      console.log('useGetExpectedFlowFee')
+      console.log(
+        'durationSeconds',
+        durationSeconds,
+        'intervalSeconds',
+        intervalSeconds
+      )
+      if (intentModuleParams == undefined) {
+        intentModuleParams = await getFlowParams(client)
+        setTriggerModuleData(intentModuleParams)
+      }
+      const recurrences =
+        intervalSeconds && intervalSeconds < durationSeconds
+          ? Math.floor(durationSeconds / intervalSeconds)
+          : 1
+          console.log(
+            'recurrences',recurrences)
       const fee = getExpectedFlowFee(
         intentModuleParams,
         200000,
-        durationSeconds,
         flowInput.msgs.length,
-        intervalSeconds
+        recurrences
       )
-
+      console.log(fee)
       return fee
     },
     {
@@ -93,6 +108,7 @@ export const useGetExpectedFlowFee = (
 
   return [data, isLoading] as const
 }
+
 
 export const useGetAllValidators = () => {
   const client = useCosmosRpcClient()
@@ -207,23 +223,27 @@ export const useGetAPYWithFees = (
   const { client } = useRecoilValue(walletState)
 
   // Use useAPR instead of getAPR
-  const [APR, isLoadingAPR ]= useGetAPR()
+  const [APR, isLoadingAPR] = useGetAPR()
 
   const { data, isLoading } = useQuery(
     'useGetAPYWithFees',
     async () => {
       const intentModuleParams = await getFlowParams(trstClient)
       setTriggerModuleData(intentModuleParams)
-
+      const recurrences =
+      interval && interval < duration
+        ? Math.floor(duration / interval)
+        : 1
       // Use apr value from useAPR instead of calling getAPYForAutoCompound directly
       const expectedFees = getExpectedFlowFee(
         intentModuleParams,
         200000,
-        duration,
         nrMessages,
-        interval
+        recurrences
       )
-      return (APR.calculatedApr * stakingBalance) / stakingBalance - expectedFees
+      return (
+        (APR.calculatedApr * stakingBalance) / stakingBalance - expectedFees
+      )
     },
     {
       enabled: Boolean(client && APR && paramsState), // Ensure apr is available before executing
@@ -241,12 +261,11 @@ export const useGetAPYWithFees = (
 }
 
 export const useGetAPY = (intervalSeconds: number) => {
- 
   const { client } = useRecoilValue(walletState)
   const paramsState = useRecoilValue(paramsStateAtom)
 
   // Use useAPR instead of getAPY
-  const [APR, isLoadingAPR]  = useGetAPR()
+  const [APR, isLoadingAPR] = useGetAPR()
 
   const { data, isLoading } = useQuery(
     'useGetAPY',

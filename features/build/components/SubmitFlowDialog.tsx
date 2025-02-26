@@ -20,7 +20,6 @@ import {
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
-import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { FlowInput } from '../../../types/trstTypes'
 import { Chip, ChipSelected } from '../../../components/Layout/Chip'
 
@@ -126,7 +125,6 @@ export const SubmitFlowDialog = ({
     }
     setInterval(value)
     setDisplayInterval(label)
-    refetchExpectedFlowFee()
   }
   function handleRemoveInterval() {
     setInterval(0)
@@ -136,7 +134,6 @@ export const SubmitFlowDialog = ({
     if (value >= interval || interval == 0) {
       setDuration(value)
       setDisplayDuration(label)
-      refetchExpectedFlowFee()
       return
     }
     // if (interval > 0) {
@@ -155,7 +152,6 @@ export const SubmitFlowDialog = ({
   function handleRemoveDuration() {
     setDuration(0)
     setDisplayDuration('None Selected')
-    refetchExpectedFlowFee()
   }
   function handleStartTime(label: string, value: number) {
     if (value == undefined) {
@@ -163,13 +159,10 @@ export const SubmitFlowDialog = ({
     }
     setStartTime(value)
     setDisplayStartTime(label)
-    refetchExpectedFlowFee()
-    //handleDisplayRecurrence(recurrence)
   }
   function handleRemoveStartTime() {
     setStartTime(0)
     setDisplayStartTime(displayInterval)
-    refetchExpectedFlowFee()
   }
 
   const editLabel = 'days(s), hour(s), minute(s) or weeks(s)'
@@ -196,7 +189,6 @@ export const SubmitFlowDialog = ({
     ))
   }
 
-  //
 
   //true = deduct fees from local acc
   const [checkedFeeAcc, setCheckedFeeAcc] = useState(true)
@@ -209,8 +201,8 @@ export const SubmitFlowDialog = ({
     flowInput,
     isDialogShowing,
     interval / 1000
-  )
-  const refetchExpectedFlowFee = useRefetchQueries('expectedFlowFee')
+  );
+
   const canSchedule = duration > 0 && interval > 0
 
   const handleData = (icaAddressForAuthZ: string) => {
