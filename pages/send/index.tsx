@@ -33,8 +33,8 @@ export default function Send() {
     <AppLayout>
       <StyledContainer>
         <PageHeader
-          title="Coin Sender"
-          subtitle={`Configure token transfers, schedule ahead and make recurring transfers.`}
+          title="Coin Streamer"
+          subtitle={`Stream tokens, schedule ahead and make recurring transfers from Intento.`}
         />
         <TokenSendModule initialToken={getInitialTokenFromSearchParams()} />
 

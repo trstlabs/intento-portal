@@ -4,6 +4,7 @@ import { useQueryClient, QueryKey } from 'react-query';
 const sleep = (delayMs: number) => new Promise((resolve) => setTimeout(resolve, delayMs));
 
 export const useRefetchQueries = (queryKey?: QueryKey, delayMs?: number) => {
+  
   const queryClient = useQueryClient();
 
   // Ensure queriesToRefetchRef is storing the initial queryKey correctly
@@ -18,9 +19,11 @@ export const useRefetchQueries = (queryKey?: QueryKey, delayMs?: number) => {
 
     // Assuming you want to refetch based on a string or pattern
     if (typeof queriesToRefetch === 'string') {
+      console.log("Refetch Qs", queryKey)
       // Directly refetch if it's a string
       await queryClient.refetchQueries(queriesToRefetch);
     } else if (Array.isArray(queriesToRefetch)) {
+      console.log("RefetchqueriesToRefetch Q", queryKey)
       // Handle array of query keys, assuming they are strings for simplicity
       await Promise.all(
         queriesToRefetch.map(key => {

@@ -173,7 +173,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           iconLeft={<DoubleArrowIcon rotation="-90deg" />}
           selected={getIsLinkActive('/send')}
         >
-          <Inline css={{ paddingLeft: '$4' }}>Coin Sender</Inline>
+          <Inline css={{ paddingLeft: '$4' }}>Coin Streamer</Inline>
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />

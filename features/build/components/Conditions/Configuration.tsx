@@ -163,7 +163,7 @@ export const Configuration = ({
             >
                 Wallet Fallback
               </Button></Tooltip>
-            <Tooltip
+            {/* <Tooltip
               label={
                 'If set to true, as a fallback, the interchain account associated with the flow will be reregistered when a channel times out'
               }
@@ -184,7 +184,7 @@ export const Configuration = ({
             >
                 Allow Recovery
               </Button>
-            </Tooltip>
+            </Tooltip> */}
 
 
             {/*       {isConfigItemsShowing && (

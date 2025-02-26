@@ -70,11 +70,11 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
         />
 
       </StyledDivForWrapper>
-      <div > <RecipientList recipients={tokenRecipientList} tokenSymbol={tokenSymbol}
+      <RecipientList recipients={tokenRecipientList} tokenSymbol={tokenSymbol}
         // onTokenSymbolChange={(symbol) => setToken(symbol)}
         onRecipientsChange={((newRecipients) => setTokenRecipientList(newRecipients))}
         onRemoveRecipient={(recipient) => setTokenRecipientList(tokenRecipientList.filter(item => item !== recipient))}
-      /></div>
+      />
     </StyledDivForWrapper>
     </>
   )

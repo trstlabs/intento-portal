@@ -37,7 +37,10 @@ export const executeDirectSend = async ({
         await client.signAndBroadcast(
           senderAddress,
           [transferMsg],
-          'auto',
+          {
+            amount: [],
+            gas: '120000',
+          },
           recipientInfos[0].memo
         )
       )
@@ -59,14 +62,16 @@ export const executeDirectSend = async ({
     if (recipient.channelID) {
       const transferMsg =
         ibc.applications.transfer.v1.MessageComposer.withTypeUrl.transfer({
-        sourcePort: 'transfer',
-        sourceChannel: recipient.channelID,
-        sender: senderAddress,
-        timeoutTimestamp: BigInt(Math.floor(new Date().getTime() + 60*1000)),
-        timeoutHeight: undefined,
-        receiver: recipient.recipient,
-        token: { denom, amount: recipient.amount.toString() },
-      })
+          sourcePort: 'transfer',
+          sourceChannel: recipient.channelID,
+          sender: senderAddress,
+          timeoutTimestamp: BigInt(
+            Math.floor(new Date().getTime() + 60 * 1000)
+          ),
+          timeoutHeight: undefined,
+          receiver: recipient.recipient,
+          token: { denom, amount: recipient.amount.toString() },
+        })
       msgs.push(transferMsg)
       //return await client.tx.ibc.transfer(
     } else {
@@ -78,10 +83,10 @@ export const executeDirectSend = async ({
       msgs.push(sendMsg)
     }
   })
-  return validateTransactionSuccess(await client.signAndBroadcast(senderAddress, msgs, 'auto'))
+  return validateTransactionSuccess(
+    await client.signAndBroadcast(senderAddress, msgs, 'auto')
+  )
 }
-
-
 
 export class RecipientInfo {
   recipient: string

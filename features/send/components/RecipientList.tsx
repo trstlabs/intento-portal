@@ -27,6 +27,8 @@ import { ChannelInfo } from './ChannelSelectList'
 import { useSubmitFlow } from '../../build/hooks'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { FlowInput } from '../../../types/trstTypes'
+import { Configuration } from '../../build/components/Conditions/Configuration'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
 
 export class RecipientInfo {
@@ -60,6 +62,25 @@ export const RecipientList = ({
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
+  const initConfig = {
+    saveResponses: false,
+    updatingDisabled: false,
+    stopOnFailure: true,
+    stopOnSuccess: false,
+    fallbackToOwnerBalance: true,
+    reregisterIcaAfterTimeout: true,
+  }
+  data.configuration = initConfig
+  const initConditions = {
+    stopOnSuccessOf: [],
+    stopOnFailureOf: [],
+    skipOnFailureOf: [],
+    skipOnSuccessOf: [],
+    feedbackLoops: [],
+    comparisons: [],
+    useAndForComparisons: false,
+  }
+  data.conditions = initConditions
   const [flowInput, setflowInput] = useState(data)
   const { address, status } = useRecoilValue(walletState)
 
@@ -135,6 +156,15 @@ export const RecipientList = ({
 
       return setRequestedSchedule(true)
     }
+  }
+
+
+  const handleConfigClick = (config: ExecutionConfiguration) => {
+   
+    let newData = data
+    newData.configuration = config
+    setflowInput(newData)
+    console.log(newData)
   }
 
   const handleChange =
@@ -331,6 +361,7 @@ export const RecipientList = ({
                 </Column>
               </CardContent>
             </Card>
+
             <Column>
               <Button
                 css={{ display: 'end', margin: '$2' }}
@@ -343,7 +374,7 @@ export const RecipientList = ({
           </div>
         ))}
       </Card>
-
+      <Configuration config={flowInput.configuration} onChange={handleConfigClick} />
       <Inline
         css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}
       >
