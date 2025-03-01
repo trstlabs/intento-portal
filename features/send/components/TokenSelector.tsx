@@ -2,7 +2,6 @@ import { useTokenBalance } from 'hooks/useTokenBalance'
 import {
   Button,
   IconWrapper,
-  Inline,
   styled,
   Union,
   useOnClickOutside,
@@ -51,50 +50,66 @@ export const TokenSelector = ({
 
   if (size === 'small') {
     return (
-      <div>
-        {isTokenListShowing && (
-          <Inline justifyContent="space-between" css={{ padding: '$5 $6' }}>
-            <QueryInput
-              searchQuery={tokenSearchQuery}
-              onQueryChange={setTokenSearchQuery}
-              onFocus={() => {
-                setInputForSearchFocused(true)
-              }}
-              onBlur={() => {
-                setInputForSearchFocused(false)
-              }}
-            />
-            <Button
-              icon={<IconWrapper icon={<Union />} />}
-              variant="ghost"
-              onClick={() => setTokenListShowing(false)}
-              iconColor="tertiary"
-            />
-          </Inline>
-        )}
-        {!isTokenListShowing && (
-          <Inline css={{ padding: '$6 $4', display: 'grid' }}>
-            <TokenSelectorToggle
-              availableAmount={availableAmount}
-              tokenSymbol={tokenSymbol}
-              isSelecting={isTokenListShowing}
-              onToggle={
-                !disabled
-                  ? () => setTokenListShowing((isShowing) => !isShowing)
-                  : undefined
-              }
-            />
-          </Inline>
-        )}
+      <div
+      >
+        <StyledDivForWrapper>
+          <StyledDivForSelector>
+            {isTokenListShowing && (
+              <QueryInput
+                searchQuery={tokenSearchQuery}
+                onQueryChange={setTokenSearchQuery}
+                onFocus={() => {
+                  setInputForSearchFocused(true)
+                }}
+                onBlur={() => {
+                  setInputForSearchFocused(false)
+                }}
+              />
+            )}
+            {!isTokenListShowing && (
+              <TokenSelectorToggle
+                availableAmount={availableAmount}
+                tokenSymbol={tokenSymbol}
+                isSelecting={isTokenListShowing}
+                onToggle={
+                  !disabled
+                    ? () => setTokenListShowing((isShowing) => !isShowing)
+                    : undefined
+                }
+              />
+            )}
 
+          </StyledDivForSelector>
+          <StyledDivForAmountWrapper>
+            {isTokenListShowing && (
+              <Button
+                icon={<IconWrapper icon={<Union />} />}
+                variant="ghost"
+                onClick={() => setTokenListShowing(false)}
+                iconColor="tertiary"
+              />
+            )}
+          </StyledDivForAmountWrapper>
+          <StyledDivForOverlay
+
+            onClick={() => {
+              if (!readOnly) {
+                if (isTokenListShowing) {
+                  setTokenListShowing(false)
+                } else {
+                  inputRef.current?.focus()
+                }
+              }
+            }}
+          />
+        </StyledDivForWrapper>
         {isTokenListShowing && (
           <TokenOptionsList
             activeTokenSymbol={tokenSymbol}
             onSelect={handleSelectToken}
-            css={{ padding: '$4 $6 $12' }}
             queryFilter={tokenSearchQuery}
+            css={{ padding: '$4 $6 $12' }}
             emptyStateLabel={`No result for “${tokenSearchQuery}”`}
-            visibleNumberOfTokensInViewport={4.5}
           />
         )}
       </div>
@@ -103,9 +118,9 @@ export const TokenSelector = ({
 
   return (
     <StyledDivForContainer
-    selected={isInputForSearchFocused}
-    ref={wrapperRef}
-  >
+      selected={isInputForSearchFocused}
+      ref={wrapperRef}
+    >
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {isTokenListShowing && (
@@ -166,7 +181,7 @@ export const TokenSelector = ({
           emptyStateLabel={`No result for “${tokenSearchQuery}”`}
         />
       )}
-       </StyledDivForContainer>
+    </StyledDivForContainer>
   )
 }
 

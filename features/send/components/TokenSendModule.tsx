@@ -40,7 +40,7 @@ export const TokenSendModule = ({ initialToken }: TokenSendModuleProps) => {
 
   const initialTokenValue = useRef(initialToken).current
   useEffect(
-    function setInitialTokenPairIfProvided() {
+    function setInitialTokenIfProvided() {
       if (initialTokenValue) {
         const tokenSymbol = initialTokenValue
         setToken(

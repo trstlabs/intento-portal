@@ -54,7 +54,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
           accAddr.length > 40
       ),
       refetchOnMount: false,
-      staleTime: 30000,
+      staleTime: 60000,
       cacheTime: 300000,
     }
   )
@@ -187,6 +187,7 @@ export const useICATokenBalance = (
   const { data, isLoading } = useQuery(
     `icaTokenBalance/${chainId}/${ibcWalletAddress}`,
     async () => {
+      console.log(ibcWalletAddress)
       const chainClient = await StargateClient.connect(chain.rpc)
       const coin = await chainClient.getBalance(ibcWalletAddress, denom)
 
@@ -204,9 +205,9 @@ export const useICATokenBalance = (
           isICAChain
       ),
       refetchOnMount: 'always', // Refetch when the component mounts
-      refetchInterval: 30000,    // Refetch every 30 seconds
-      staleTime: 15000,           // Cache expires after 15 seconds
-      cacheTime: 300000,         // Cache data for 5 minutes
+      refetchInterval: 60000,  
+      staleTime: 30000,       
+      cacheTime: 1000000,        
       refetchOnWindowFocus: true,
     }
   )

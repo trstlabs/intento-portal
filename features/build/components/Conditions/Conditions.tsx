@@ -11,7 +11,7 @@ import {
   PlusIcon,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConditions } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { Comparison, ExecutionConditions, FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { FieldArray } from './Fields'
 import { ComparisonForm } from './ComparisonForm'
 import { FeedbackLoopForm } from './FeedbackLoopForm'
@@ -49,7 +49,7 @@ export const Conditions = ({
 
   const handleAddFeedbackLoop = () => {
     let newConditions = conditions
-    const newValue = {
+    const newValue: FeedbackLoop = {
       flowId: BigInt(0),
       responseIndex: 0,
       responseKey: "",
@@ -61,14 +61,14 @@ export const Conditions = ({
     newConditions.feedbackLoops = [...conditions.feedbackLoops, newValue] // Add a new empty object
     onChange(newConditions)
   }
+
   const handleAddComparison = () => {
     let newConditions = conditions
-    const newValue = {
+    const newValue: Comparison = {
       flowId: BigInt(0),
       responseIndex: 0,
       responseKey: "",
       valueType: "string",
-      fromIcq: false,
       operator: -1,
       operand: "",
     }

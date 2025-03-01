@@ -28,7 +28,7 @@ import { useSubmitFlow } from '../../build/hooks'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { Configuration } from '../../build/components/Conditions/Configuration'
-import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
 
 export class RecipientInfo {
@@ -62,7 +62,7 @@ export const RecipientList = ({
   data.duration = 14 * 86400000
   data.interval = 86400000
   data.msgs = ['']
-  const initConfig = {
+  const initConfig: ExecutionConfiguration = {
     saveResponses: false,
     updatingDisabled: false,
     stopOnFailure: true,
@@ -71,7 +71,7 @@ export const RecipientList = ({
     reregisterIcaAfterTimeout: true,
   }
   data.configuration = initConfig
-  const initConditions = {
+  const initConditions: ExecutionConditions = {
     stopOnSuccessOf: [],
     stopOnFailureOf: [],
     skipOnFailureOf: [],
@@ -119,7 +119,7 @@ export const RecipientList = ({
     }
   }
 
-  const handleScheduleClick = (txData: FlowInput) => {
+  const handleScheduleClick = (flowInput: FlowInput) => {
     if (status === WalletStatusType.connected) {
       let msgs = []
       for (let recipient of recipients) {
@@ -151,8 +151,8 @@ export const RecipientList = ({
 
         msgs.push(JSON.stringify(sendMsg, null, 2))
       }
-      txData.msgs = msgs
-      setflowInput(txData)
+      flowInput.msgs = msgs
+      setflowInput(flowInput)
 
       return setRequestedSchedule(true)
     }
@@ -412,7 +412,7 @@ export const RecipientList = ({
             isShowing: false,
           })
         }
-        handleSubmitFlow={(txData) => handleScheduleClick(txData)}
+        handleSubmitFlow={(flowInput) => handleScheduleClick(flowInput)}
       />
     </div>
   )
