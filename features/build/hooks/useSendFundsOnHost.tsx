@@ -15,6 +15,8 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
 import { Coin } from '@cosmjs/stargate'
 
+import { validateTransactionSuccess } from '../../../util/validateTx'
+
 
 type UseSendFundsParams = {
     toAddress: string
@@ -29,8 +31,6 @@ export const useSendFundsOnHost = ({
     const { address, client, status } =
         useRecoilValue(ibcWalletState)
 
-    /*   const { address, client, status } =
-        useRecoilValue(walletState)*/
     const setTransactionState = useSetRecoilState(transactionStatusState)
 
     const refetchQueries = useRefetchQueries([`ibcTokenBalance/${coin.denom}/${address}`])
@@ -45,13 +45,13 @@ export const useSendFundsOnHost = ({
                 coin = undefined
             }
 
-            return await executeSendFunds({
+            return validateTransactionSuccess(await executeSendFunds({
                 client,
                 toAddress,
                 fromAddress: address,
                 coin,
 
-            })
+            }))
 
         },
         {

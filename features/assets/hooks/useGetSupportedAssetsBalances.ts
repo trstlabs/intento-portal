@@ -6,8 +6,8 @@ export const useGetIBCAssetsBalances = () => {
   let [ibcAssetList] = useIBCAssetList()
 
   const assetList = useMemo(
-    () => ibcAssetList.filter(token => token.connection_id).map(({ symbol }) => symbol),
-    [ibcAssetList.filter(token => token.connection_id)]
+    () => ibcAssetList?.filter(token => token.connection_id).map(({ symbol }) => symbol),
+    [ibcAssetList?.filter(token => token.connection_id)]
   )
 
   const [tokenBalances, loadingBalances] = useMultipleTokenBalance(assetList)
