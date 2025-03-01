@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect} from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
@@ -15,7 +15,7 @@ export const useConnectIBCWallet = (
   fromRegistry = false
 ) => {
   const [{ status }, setWalletState] = useRecoilState(ibcWalletState)
-  const hasConnected = useRef(false) // Prevent multiple connects
+  // const hasConnected = useRef(false) // Prevent multiple connects
 
   if (!tokenSymbol || !chainId) {
     return
@@ -32,11 +32,15 @@ export const useConnectIBCWallet = (
 
   const mutation = useMutation(async () => {
     if (!tokenSymbol) {
-      throw new Error('You must provide `tokenSymbol` before connecting to the wallet.')
+      throw new Error(
+        'You must provide `tokenSymbol` before connecting to the wallet.'
+      )
     }
 
     if (!assetInfo) {
-      throw new Error('Asset info for the provided `tokenSymbol` was not found.')
+      throw new Error(
+        'Asset info for the provided `tokenSymbol` was not found.'
+      )
     }
 
     setWalletState((value) => ({
@@ -46,25 +50,27 @@ export const useConnectIBCWallet = (
     }))
 
     try {
-      await connect() // Ensure connection is established first
+ 
+        await connect() // Ensure connection is established first
 
-      if (!address) {
-        throw new Error('Wallet address not available after connection.')
-      }
+        if (!address) {
+          throw new Error('Wallet address not available after connection.')
+        }
 
-      const ibcChainClient = await getSigningStargateClient()
+        const ibcChainClient = await getSigningStargateClient()
 
-      if (!ibcChainClient) {
-        throw new Error('Failed to obtain the signing client.')
-      }
+        if (!ibcChainClient) {
+          throw new Error('Failed to obtain the signing client.')
+        }
 
-      setWalletState({
-        tokenSymbol,
-        address,
-        client: ibcChainClient,
-        status: WalletStatusType.connected,
-        assets,
-      })
+        setWalletState({
+          tokenSymbol,
+          address,
+          client: ibcChainClient,
+          status: WalletStatusType.connected,
+          assets,
+        })
+  
     } catch (error) {
       toast.error('Failed to connect IBC wallet')
 
@@ -81,12 +87,12 @@ export const useConnectIBCWallet = (
   }, mutationOptions)
 
   useEffect(() => {
-    if (!assetInfo || status !== WalletStatusType.restored || hasConnected.current) {
+    if (!assetInfo || status !== WalletStatusType.restored) {
       return
     }
 
     let isMounted = true
-    hasConnected.current = true // Prevent multiple runs
+   // hasConnected.current = true // Prevent multiple runs
 
     const restoreConnection = async () => {
       try {
@@ -95,6 +101,7 @@ export const useConnectIBCWallet = (
           mutation.mutate(null)
         } else {
           console.error('Address not available after reconnecting.')
+          isMounted = false // Cleanup
         }
       } catch (error) {
         console.error('Error restoring connection:', error)

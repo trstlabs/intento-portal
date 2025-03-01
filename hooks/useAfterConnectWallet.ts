@@ -4,7 +4,7 @@ import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
 export const useAfterConnectWallet = (
-  mutationOptions?: Parameters<typeof useMutation>[2]
+  mutationOptions?: Parameters<typeof useMutation>[2],
 ) => {
   let { connect, getSigningStargateClient, address, username } =
     useChain('intentozone')

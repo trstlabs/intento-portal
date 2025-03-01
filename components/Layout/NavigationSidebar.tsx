@@ -35,7 +35,7 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
-import { useRefetchQueries } from '../../hooks/useRefetchQueries'
+
 
 type NavigationSidebarProps = {
   shouldRenderBackButton?: boolean
@@ -58,18 +58,17 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     address,
     openView, assets,
   } = useChain('intentozone')
-  const refetchQueries = useRefetchQueries([
-    `tokenBalance/INTO/${address}`
-  ])
 
+
+  // Watch for address changes and trigger the mutation
   const { mutate: afterConnectWallet } = useAfterConnectWallet()
   // Watch for address changes and trigger the mutation
   useEffect(() => {
     if (address) {
       afterConnectWallet(null);
-      refetchQueries();
+
     }
-  }, [address, afterConnectWallet, refetchQueries]);
+  }, [address, afterConnectWallet]);
   const walletStatusesConnected = isWalletConnected && (status === WalletStatusType.connected || status === WalletStatusType.restored)
   const isClientConnected = client != null && client != undefined
 
@@ -90,7 +89,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     await connect()
     let attempts = 0
 
-    while (status !== WalletStatusType.connecting && attempts < 5) {
+    while (status !== WalletStatusType.connecting && attempts < 3) {
       console.log(
         walletStatusesConnected,
         isClientConnected,
@@ -100,14 +99,15 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       )
 
       if (isClientConnected) {
-        attempts = attempts + 30
+        attempts = attempts + 3
       }
 
       afterConnectWallet(null)
 
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       attempts++
+
     }
   }
 
