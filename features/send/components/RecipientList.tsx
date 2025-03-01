@@ -67,8 +67,8 @@ export const RecipientList = ({
     updatingDisabled: false,
     stopOnFailure: true,
     stopOnSuccess: false,
+    stopOnTimeout: false,
     fallbackToOwnerBalance: true,
-    reregisterIcaAfterTimeout: true,
   }
   data.configuration = initConfig
   const initConditions: ExecutionConditions = {

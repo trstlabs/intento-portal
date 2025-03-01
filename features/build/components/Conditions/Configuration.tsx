@@ -44,6 +44,12 @@ export const Configuration = ({
     newConfig.stopOnSuccess = !config.stopOnSuccess
     onChange(newConfig)
   }
+
+  function stopOnTimeout() {
+    let newConfig = config
+    newConfig.stopOnTimeout = !config.stopOnTimeout
+    onChange(newConfig)
+  }
   function fallback() {
     let newConfig = config
     newConfig.fallbackToOwnerBalance = !config.fallbackToOwnerBalance
@@ -123,7 +129,7 @@ export const Configuration = ({
               </Button></Tooltip>
             <Tooltip
               label={
-                'If set to true, stops when execution of the messages was succesful'
+                'If set to true, stops when execution of the messages was succesfull'
               }
             ><Button
               variant="ghost"
@@ -141,6 +147,27 @@ export const Configuration = ({
               }
             >
                 Stop on Success
+              </Button></Tooltip>
+            <Tooltip
+              label={
+                'If set to true, stops when execution of the messages when message times out'
+              }
+            ><Button
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => stopOnTimeout()}
+              iconLeft={
+                <ToggleSwitch
+                  id="timeout"
+                  name="timeout"
+                  onChange={() => stopOnTimeout()}
+                  checked={config.stopOnTimeout}
+                  optionLabels={['timeout', 'dont timeout']}
+                />
+              }
+            >
+                Stop on Timeout
               </Button></Tooltip>
             <Tooltip
               label={
@@ -163,29 +190,6 @@ export const Configuration = ({
             >
                 Wallet Fallback
               </Button></Tooltip>
-            {/* <Tooltip
-              label={
-                'If set to true, as a fallback, the interchain account associated with the flow will be reregistered when a channel times out'
-              }
-            ><Button
-              variant="ghost"
-              size="large"
-              css={{ columnGap: '$4', margin: '$2' }}
-              onClick={() => fallback()}
-              iconLeft={
-                <ToggleSwitch
-                  id="reregisterIcaAfterTimeout"
-                  name="reregisterIcaAfterTimeout"
-                  onChange={() => fallback()}
-                  checked={config.reregisterIcaAfterTimeout}
-                  optionLabels={['no fallback', 'fallback']}
-                />
-              }
-            >
-                Allow Recovery
-              </Button>
-            </Tooltip> */}
-
 
             {/*       {isConfigItemsShowing && (
         <ConfigurationDialog
@@ -195,7 +199,7 @@ export const Configuration = ({
         />
       )} */}
           </CardContent>
-        </Card>
+        </Card >
       )}
     </>
   )

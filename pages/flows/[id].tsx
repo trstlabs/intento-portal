@@ -25,7 +25,7 @@ export default function Flow() {
   const isMobile = useMedia('sm')
 
   const [flowInfo, isLoading] = useFlowInfo(id)
-  const connectionId = flowInfo && flowInfo.icaConfig ? flowInfo.icaConfig.connectionId : /* TODO use a mapping (flowInfo.hostedConfig ? flowInfo.hostedConfig.hostedAddress : '') */''
+  const connectionId = flowInfo && flowInfo.icaConfig ? flowInfo.icaConfig.connectionId : /* TODO use a mapping (flowInfo.hostedIcaConfig ? flowInfo.hostedIcaConfig.hostedAddress : '') */''
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {

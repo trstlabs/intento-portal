@@ -42,8 +42,7 @@ export const FlowTransformButton = ({ flowInfo }) => {
             conditions: info.conditions,
             configuration: info.configuration,
             connectionId: info.icaConfig.connectionId,
-            hostConnectionId: info.icaConfig.hostConnectionId,
-            hostedConfig: info.hostedConfig,
+            hostedIcaConfig: info.hostedIcaConfig,
             label: info.label
 
         };

@@ -51,7 +51,7 @@ export const executeSubmitFlow = async ({
     feeFunds = [flowInput.feeFunds]
   }
   if (flowInput.connectionId && flowInput.hostConnectionId) {
-    flowInput.hostedConfig = undefined
+    flowInput.hostedIcaConfig = undefined
   }
   console.log('msgSubmitFlow', msgs)
   const msgSubmitFlow =
@@ -63,9 +63,6 @@ export const executeSubmitFlow = async ({
       interval,
       startAt,
       connectionId: flowInput.connectionId ? flowInput.connectionId : '',
-      hostConnectionId: flowInput.hostConnectionId
-        ? flowInput.hostConnectionId
-        : '',
       configuration: flowInput.configuration
         ? flowInput.configuration
         : {
@@ -73,12 +70,12 @@ export const executeSubmitFlow = async ({
             updatingDisabled: false,
             stopOnSuccess: false,
             stopOnFailure: false,
+            stopOnTimeout: false,
             fallbackToOwnerBalance: true,
-            reregisterIcaAfterTimeout: false,
           },
       feeFunds,
       conditions: flowInput.conditions,
-      hostedConfig: flowInput.hostedConfig,
+      hostedIcaConfig: flowInput.hostedIcaConfig,
     })
   console.log('msgSubmitFlow', msgSubmitFlow)
   return validateTransactionSuccess(

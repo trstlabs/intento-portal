@@ -76,8 +76,8 @@ export const WalletButton = ({
           {formatTokenBalance(balance, { includeCommaSeparation: true })}{' '}
           {baseToken?.symbol}
         </Text>
-        {!loadingBalances && ibcBalances?.map((balance) =>
-          <Text
+        {!loadingBalances && ibcBalances?.map((balance, i) =>
+          <Text key={"bal"+i}
             variant="legend"
             css={{
               '-webkit-background-clip': 'text',

@@ -21,7 +21,7 @@ export declare type flowInfoWithDetails = {
 
 export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
   //const flowInfoAmino = FlowInfo.toAmino(flowInfo)
-  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.hostedConfig?.hostedAddress)
+  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.hostedIcaConfig?.hostedAddress)
   const ibcInfo = useIBCAssetInfoFromConnection(flowInfo.icaConfig.connectionId || hostedConnectionID)
 
   const isActive =
@@ -68,7 +68,7 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
                 <StyledText variant="caption">
 
                   <>
-                    {flowInfo.hostedConfig.hostedAddress ? <>Hosted</> :
+                    {flowInfo.hostedIcaConfig.hostedAddress ? <>Hosted</> :
                       flowInfo.icaConfig.connectionId ? <>Self-Hosted</> : <>Local</>
                     } {' '}| {' '}
 

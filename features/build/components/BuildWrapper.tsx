@@ -25,8 +25,8 @@ export const BuildWrapper = ({
     updatingDisabled: false,
     stopOnFailure: false,
     stopOnSuccess: false,
+    stopOnTimeout: false,
     fallbackToOwnerBalance: true,
-    reregisterIcaAfterTimeout: true,
   }
   initialFlowInput.configuration = initConfig
   const initConditions = {

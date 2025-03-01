@@ -453,7 +453,7 @@ export const FlowInfoBreakdown = ({
               </Text>
             )}
 
-            {flowInfo.hostedConfig.hostedAddress && (
+            {flowInfo.hostedIcaConfig.hostedAddress && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <>
                 <Tooltip
@@ -466,9 +466,9 @@ export const FlowInfoBreakdown = ({
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
-                  {flowInfo.hostedConfig.hostedAddress}{' '}<a
+                  {flowInfo.hostedIcaConfig.hostedAddress}{' '}<a
                     target={'_blank'}
-                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1beta1/hosted-account/${flowInfo.hostedConfig.hostedAddress}`}
+                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1beta1/hosted-account/${flowInfo.hostedIcaConfig.hostedAddress}`}
                     rel="noopener noreferrer"
                   >
                     <b>View</b>
