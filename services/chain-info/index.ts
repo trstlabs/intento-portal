@@ -14,7 +14,6 @@ import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/
 import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
 import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1beta1/query'
 
-
 export interface BaseQueryInput {
   client: any
 }
@@ -140,27 +139,27 @@ export const getModuleParams = async (cosmosClient: any, trstClient: any) => {
   }
 }
 
-
 export const getExpectedFlowFee = (
   intentParams: Params,
   gasUsed: number,
   lenMsgs: number,
   recurrences: number,
+  denom: string
 ) => {
-
-
-
-  const flexFeeForPeriod =
-    (Number(intentParams.flowFlexFeeMul) / 100) * gasUsed
+  const flexFeeForPeriod = (Number(intentParams.flowFlexFeeMul) / 100) * gasUsed
 
   const flowFee =
     recurrences * flexFeeForPeriod +
     recurrences * Number(intentParams.burnFeePerMsg) * lenMsgs
-  const flowFeeDenom = convertMicroDenomToDenom(flowFee, 6)
+  const denomCoin = intentParams.gasFeeCoins.find((coin) => coin.denom == denom)
+  if (denomCoin == undefined) {
+    return 0
+  }
+  const flowFeeForDenom = flowFee * Number(denomCoin.amount)
+  const flowFeeNormalized = convertMicroDenomToDenom(flowFeeForDenom, 6)
 
-  return Number(flowFeeDenom.toFixed(4))
+  return Number(flowFeeNormalized.toFixed(4))
 }
-
 
 function blockInfoAndCalculateApr(
   stakingProvision: number,

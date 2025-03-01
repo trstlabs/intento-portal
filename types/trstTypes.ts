@@ -25,7 +25,7 @@ export class FlowInput {
   duration: number
   interval?: number
   startTime?: number
-  feeFunds?: number
+  feeFunds?: Coin
   configuration?: ExecutionConfiguration
   conditions?: ExecutionConditions
   hostedConfig?: HostedConfig

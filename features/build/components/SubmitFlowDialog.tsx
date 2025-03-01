@@ -16,12 +16,15 @@ import {
   Tooltip,
   Union,
   Chevron,
+  convertDenomToMicroDenom,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { Chip, ChipSelected } from '../../../components/Layout/Chip'
+import { TokenSelector } from '../../send/components/TokenSelector'
+import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 
 type SubmitFlowDialogProps = {
   isDialogShowing: boolean
@@ -69,7 +72,10 @@ export const SubmitFlowDialog = ({
   const [interval, setInterval] = useState(3600000)
   const [feeFunds, setFeeAmount] = useState(0)
   const [txLabel, setLabel] = useState(customLabel)
+  const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
 
+  const { denom_local } =
+    useIBCAssetInfo(feeFundsSymbol) || {}
 
   const [displayInterval, setDisplayInterval] = useState('1 hour')
   const [editInterval, setEditInterval] = useState(false)
@@ -193,6 +199,7 @@ export const SubmitFlowDialog = ({
   //true = deduct fees from local acc
   const [checkedFeeAcc, setCheckedFeeAcc] = useState(true)
   const handleChangeFeeAcc = () => {
+    setFeeFundsSymbol("INTO")
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
@@ -200,7 +207,8 @@ export const SubmitFlowDialog = ({
     duration / 1000,
     flowInput,
     isDialogShowing,
-    interval / 1000
+    denom_local,
+    interval / 1000,
   );
 
   const canSchedule = duration > 0 && interval > 0
@@ -228,7 +236,9 @@ export const SubmitFlowDialog = ({
       duration,
       interval,
       icaAddressForAuthZ,
-      feeFunds,
+      feeFunds: {
+        amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
+      },
       label: txLabel,
     });
   }
@@ -487,14 +497,24 @@ export const SubmitFlowDialog = ({
 
               {chainSymbol != 'INTO' && (
                 <>
-                  <Text align="center" variant="caption">
-                    Host Chain Fee Funds - {chainSymbol}
+                  <Text align="center" css={{ margin: '$4' }} variant="legend">
+                    ICA Balance
                   </Text>
                   <Inline justifyContent={'space-between'} align="center">
-                    <Text variant="legend">
+                    <Tooltip
+                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
+                      aria-label="host chain execution fee funds"
+                    >
+
+                      <Text variant="caption" color="disabled">
+                       {icaBalance} {chainSymbol}
+                      </Text>
+
+                    </Tooltip>
+                    <Text variant="caption" color="tertiary">
                       <StyledInput
                         step=".01"
-                        placeholder="0.00"
+                        placeholder="11.11"
                         type="number"
                         value={feeFundsHostChain}
                         onChange={({ target: { value } }) =>
@@ -503,15 +523,7 @@ export const SubmitFlowDialog = ({
                       />
                       {chainSymbol}
                     </Text>
-                    <Tooltip
-                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
-                      aria-label="host chain execution fee funds"
-                    >
-                      <Text variant="legend" color="disabled">
-                        {' '}
-                        Balance: {icaBalance} {chainSymbol}
-                      </Text>
-                    </Tooltip>
+
                   </Inline>
                   {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
                   {!isExecutingAuthzGrant && (
@@ -552,26 +564,16 @@ export const SubmitFlowDialog = ({
                 </>
               )}
               <Tooltip
-                label="Funds to set aside for execution fee of the flow. Remaining funds are refunded after execution. If deduct fees from wallet balance is checked, your local balance will be used"
-                aria-label="Fund Flow - INTO (Optional)"
+                label="Funds to set aside for execution. Remaining funds are returned after commision fee."
+                aria-label="Fund Flow - Intento (Optional)"
               >
-                <Text align="center" css={{ margin: '$4' }} variant="caption">
-                  Fee Funds - INTO
+                <Text align="center" css={{ margin: '$4' }} variant="legend">
+                  Fee Funds
                 </Text>
               </Tooltip>
-              {!isSuggestedFundsLoading && (
-                <Text
-                  align="center"
-                  color="disabled"
-                  wrap={false}
-                  variant="caption"
-                >
-                  Estimated at {suggestedFunds} INTO
-                </Text>
-              )}
               <Inline justifyContent={'space-between'}>
                 <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                  Deduct fees from wallet balance
+                  Deduct fees from wallet balance (any token)
                 </Text>{' '}
                 <StyledInput
                   type="checkbox"
@@ -579,27 +581,51 @@ export const SubmitFlowDialog = ({
                   onChange={handleChangeFeeAcc}
                 />
               </Inline>
-
               {!checkedFeeAcc && (
-                <Inline justifyContent={'space-between'}>
-                  <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                    Attatch INTO fee to flow
-                  </Text>{' '}
-                  <Text variant="legend">
-                    <StyledInput
-                      step=".01"
-                      placeholder="0.00"
-                      type="number"
-                      value={feeFunds}
-                      onChange={({ target: { value } }) =>
-                        setFeeAmount(Number(value))
-                      }
-                    />
-                    INTO
-                  </Text>
-                </Inline>
+                <>  <TokenSelector
+                  tokenSymbol={feeFundsSymbol}
+                  onChange={(updateToken) => {
+                    setFeeFundsSymbol(updateToken.tokenSymbol)
+                  }}
+                  disabled={false}
+                  size={'large'}
+                />
+                  <Inline justifyContent={'space-between'}>
+                    <Text wrap={false} css={{ padding: '$4' }} variant="caption">
+                      Attatch to flow
+                    </Text>{' '}
+                    <Text variant="caption" color="tertiary">
+                      <StyledInput
+                        step=".01"
+                        placeholder="0.00"
+                        type="number"
+                        value={feeFunds}
+                        onChange={({ target: { value } }) =>
+                          setFeeAmount(Number(value))
+                        }
+                      />
+                      {feeFundsSymbol}
+                    </Text>
+                  </Inline>
+                </>
               )}
-
+              {!isSuggestedFundsLoading && (
+                suggestedFunds ? <Text
+                  align="center"
+                  color="disabled"
+                  wrap={false}
+                  variant="caption"
+                >
+                  Expected fees ~ {suggestedFunds} {feeFundsSymbol}
+                </Text> : <Text
+                  align="center"
+                  color="disabled"
+                  wrap={false}
+                  variant="caption"
+                >
+                  Coin Currently Not Supported
+                </Text>
+              )}
               <DialogDivider offsetY="$10" />
               {duration && (
                 <>
@@ -653,10 +679,11 @@ export const SubmitFlowDialog = ({
         </StyledDivForInputs>
       </DialogContent>
 
-      {shouldDisableAuthzGrantButton && <Inline justifyContent={'space-between'} align="center">
-        <Text color="disabled" variant="caption" css={{ padding: '$6' }}>
-          Tip: to make the ICA execute on your behalf, create any missing grants and submit it wrapped as a MsgExec
-        </Text></Inline>
+      {
+        shouldDisableAuthzGrantButton && <Inline justifyContent={'space-between'} align="center">
+          <Text color="disabled" variant="caption" css={{ padding: '$6' }}>
+            Tip: to make the ICA execute on your behalf, create any missing grants and submit it wrapped as a MsgExec
+          </Text></Inline>
       }
       <DialogDivider offsetTop="$4" offsetBottom="$2" />
       <DialogButtons

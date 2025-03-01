@@ -1,4 +1,3 @@
-import { convertDenomToMicroDenom } from 'junoblocks'
 //import { ethers } from "ethers";
 //import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
@@ -48,13 +47,8 @@ export const executeSubmitFlow = async ({
   }
 
   let feeFunds: Coin[] = []
-  if (flowInput.feeFunds > 0) {
-    feeFunds = [
-      {
-        denom: 'uinto',
-        amount: convertDenomToMicroDenom(flowInput.feeFunds, 6).toString(),
-      },
-    ]
+  if (Number(flowInput.feeFunds?.amount) > 0) {
+    feeFunds = [flowInput.feeFunds]
   }
   if (flowInput.connectionId && flowInput.hostConnectionId) {
     flowInput.hostedConfig = undefined
@@ -138,23 +132,20 @@ export function transformAndEncodeMsgs(
     //   }
     // }
 
-   // Handle MsgExec
-   if (typeUrl.includes('authz.v1beta1.MsgExec')) {
-    value.msgs.forEach((authzMsg: any, authzMsgI: number) => {
-      let authzValue = authzMsg.value;
+    // Handle MsgExec
+    if (typeUrl.includes('authz.v1beta1.MsgExec')) {
+      value.msgs.forEach((authzMsg: any, authzMsgI: number) => {
+        let authzValue = authzMsg.value
 
-     
+        const encodeObject = {
+          typeUrl: authzMsg.typeUrl,
+          value: authzValue,
+        }
 
-      const encodeObject = {
-        typeUrl: authzMsg.typeUrl,
-        value: authzValue,
-      };
-
-      // Encode and replace message in array
-      value.msgs[authzMsgI] = client.registry.encodeAsAny(encodeObject);
-
-    });
-  }
+        // Encode and replace message in array
+        value.msgs[authzMsgI] = client.registry.encodeAsAny(encodeObject)
+      })
+    }
 
     const encodeObject = {
       typeUrl,
@@ -165,7 +156,5 @@ export function transformAndEncodeMsgs(
     msgAny = GlobalDecoderRegistry.wrapAny(msgAny)
 
     msgs.push(msgAny)
-
-   
   }
 }

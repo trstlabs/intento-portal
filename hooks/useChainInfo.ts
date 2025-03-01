@@ -58,6 +58,7 @@ export const useGetExpectedFlowFee = (
   durationSeconds: number,
   flowInput: FlowInput,
   isDialogShowing: boolean,
+  denom: string,
   intervalSeconds?: number
 ) => {
   let [intentModuleParams, setTriggerModuleData] = useRecoilState(
@@ -65,16 +66,12 @@ export const useGetExpectedFlowFee = (
   )
 
   const client = useIntentoRpcClient()
+
+
   const { data, isLoading } = useQuery(
-    `expectedFlowFee/${durationSeconds}/${intervalSeconds}`,
+    `expectedFlowFee/${durationSeconds}/${intervalSeconds}/${denom}`,
     async () => {
-      console.log('useGetExpectedFlowFee')
-      console.log(
-        'durationSeconds',
-        durationSeconds,
-        'intervalSeconds',
-        intervalSeconds
-      )
+
       if (intentModuleParams == undefined) {
         intentModuleParams = await getFlowParams(client)
         setTriggerModuleData(intentModuleParams)
@@ -83,32 +80,26 @@ export const useGetExpectedFlowFee = (
         intervalSeconds && intervalSeconds < durationSeconds
           ? Math.floor(durationSeconds / intervalSeconds)
           : 1
-          console.log(
-            'recurrences',recurrences)
       const fee = getExpectedFlowFee(
         intentModuleParams,
         200000,
         flowInput.msgs.length,
-        recurrences
+        recurrences,
+        denom
       )
       console.log(fee)
       return fee
     },
     {
-      enabled: Boolean(durationSeconds && flowInput.msgs && isDialogShowing),
+      enabled: Boolean(durationSeconds && flowInput.msgs && isDialogShowing && denom),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: true,
     }
   )
-  useEffect(() => {
-    if (intentModuleParams && intentModuleParams.flowFlexFeeMul) {
-    }
-  }, [intentModuleParams])
-
+  
   return [data, isLoading] as const
 }
-
 
 export const useGetAllValidators = () => {
   const client = useCosmosRpcClient()
@@ -231,15 +222,14 @@ export const useGetAPYWithFees = (
       const intentModuleParams = await getFlowParams(trstClient)
       setTriggerModuleData(intentModuleParams)
       const recurrences =
-      interval && interval < duration
-        ? Math.floor(duration / interval)
-        : 1
+        interval && interval < duration ? Math.floor(duration / interval) : 1
       // Use apr value from useAPR instead of calling getAPYForAutoCompound directly
       const expectedFees = getExpectedFlowFee(
         intentModuleParams,
         200000,
         nrMessages,
-        recurrences
+        recurrences,
+        'uinto'
       )
       return (
         (APR.calculatedApr * stakingBalance) / stakingBalance - expectedFees
