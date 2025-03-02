@@ -30,8 +30,7 @@ ws.on('open', () => {
         jsonrpc: '2.0',
         method: 'subscribe',
         id: flowID,
-        query: "tm.event='NewBlock'",
-        //query: `tm.event='NewBlock' AND flow.flow-id='${flowID}'`, // Subscribe only to events for the specific flow
+        query: `tm.event='NewBlock' AND flow.flow-id='${flowID}'`, // Subscribe only to events for the specific flow
       })
     )
   })
