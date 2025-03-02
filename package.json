@@ -28,6 +28,7 @@
     "@tsparticles/react": "^3.0.0",
     "@tsparticles/slim": "^3.5.0",
     "@uiw/react-codemirror": "^4.19.6",
+    "ably": "^2.6.3",
     "ajv": "^8.17.1",
     "ajv-draft-04": "^1.0.0",
     "body-scroll-lock": "^4.0.0-beta.0",
@@ -54,14 +55,12 @@
     "react-use": "^17.4.0",
     "recoil": "^0.7.4",
     "sass": "^1.45.0",
-    "ws": "^8.18.1",
     "yup": "^1.4.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^14.2.1",
-    "@types/nodemailer": "^6.4.17",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/ws": "^8.5.14",
