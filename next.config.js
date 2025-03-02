@@ -1,24 +1,24 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-});
+})
 
-const withBundleJunoblocks = require('next-bundle-junoblocks');
+const withBundleJunoblocks = require('next-bundle-junoblocks')
 
 const config = {
   reactStrictMode: true,
   images: {
-    loader: 'cloudinary',
-    path: 'https://res.cloudinary.com/dk8s7xjsl/image/upload/',
+      domains: ['intento.zone'], // Add the external domain here
   },
+  reactStrictMode: true,
   webpack(config, { webpack }) {
     config.plugins.push(
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
       })
-    );
+    )
 
     if (!config.resolve.fallback) {
-      config.resolve.fallback = {};
+      config.resolve.fallback = {}
     }
 
     Object.assign(config.resolve.fallback, {
@@ -28,14 +28,14 @@ const config = {
       path: false,
       stream: false,
       string_decoder: false,
-    });
+    })
 
-    return config;
+    return config
   },
-};
+}
 
 module.exports = withBundleAnalyzer(
   process.env.BUNDLE_INTOBLOCKS === 'true'
     ? withBundleJunoblocks(config)
     : config
-);
+)

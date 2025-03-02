@@ -40,7 +40,7 @@ export default function Flows() {
     if (paginationKey === undefined) {
       setPaginationKey(allFlows?.pagination?.nextKey)
     }
-  }, [allFlows])
+  }, [paginationKey, allFlows])
 
   const fetchNextPage = () => {
 

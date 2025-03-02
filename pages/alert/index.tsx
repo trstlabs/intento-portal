@@ -5,7 +5,7 @@ import {
   Text,
 
 } from 'junoblocks';
-
+import Image from 'next/image'
 const FlowAlert = () => {
   const [email, setEmail] = useState("");
   const flowID = new URLSearchParams(window.location.search).get("flowID");
@@ -71,7 +71,7 @@ const FlowAlert = () => {
           Subscribe
         </Button>
         <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <img src={"https://intento.zone/assets/images/intento_tiny.png"} alt="Loading" width="200px" />
+          <Image src="https://intento.zone/assets/images/intento_tiny.png" alt="Loading" width="230" height="40" />
         </div>
       </form>
     </Column >
