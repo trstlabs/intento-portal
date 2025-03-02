@@ -18,81 +18,98 @@ const transporter = nodemailer.createTransport({
   },
 })
 
-const testWs = new WebSocket('wss://echo.websocket.org');
+// WebSocket connection management
+let ws: WebSocket | null = null
 
-testWs.on('open', () => {
-  console.log('Connected to test WebSocket');
-  testWs.send('Hello, WebSocket!');
-});
-
-testWs.on('message', (data) => {
-  console.log('Test received message:', data.toString());
-});
-
-const ws = new WebSocket(process.env.INTENTO_RPC_WS)
-
-ws.on('open', () => {
-  console.log('Connected to WebSocket')
-
-  // Send a subscription query for each flow ID that has an active subscription
-  Object.keys(activeSubscriptions).forEach((flowID) => {
-    ws.send(
-      JSON.stringify({
-        jsonrpc: '2.0',
-        method: 'subscribe',
-        id: flowID,
-        query: `tm.event='NewBlock' AND flow.flow-id='${flowID}'`, // Subscribe only to events for the specific flow
-      })
-    )
-  })
-})
-
-ws.on('message', async (data) => {
-  console.log('Received data from WebSocket:', data.toString()) // Log raw message
-
-  const parsedData = JSON.parse(data.toString())
-  console.log('Parsed data:', parsedData) // Log parsed data for inspection
-
-  if (parsedData?.result?.events) {
-    const events = parsedData.result.events
-    const flowID = events['flow-id']?.[0] // Extract flow ID from the event data
-
-    if (flowID && activeSubscriptions[flowID]) {
-      const email = activeSubscriptions[flowID]
-
-      // Construct the link to view the flow
-      const flowLink = `${process.env.BASE_URL}/flows/${flowID}`
-
-      try {
-        await transporter.sendMail({
-          from: 'no-reply@intento.zone',
-          to: email,
-          subject: 'Flow Alert Notification',
-          text: `An event was detected for flow ID: ${flowID}\n\nView the flow details here: ${flowLink}\n\nTo unsubscribe, click here: ${
-            process.env.BASE_URL
-          }/unsubscribe?email=${encodeURIComponent(email)}&flowID=${flowID}`,
-        })
-        console.log(`Email sent to ${email} for flow ID ${flowID}`)
-      } catch (error) {
-        console.error('Error sending email:', error)
-      }
-
-      // Log the full event data for debugging
-      console.log('Full event data:', JSON.stringify(events, null, 2))
-    }
+// Function to establish or reconnect WebSocket
+function connectWebSocket() {
+  if (ws) {
+    // If WebSocket is already connected, return
+    if (ws.readyState === WebSocket.OPEN) return;
+    ws = null;  // Close and recreate WebSocket if not in open state
   }
-})
+
+  ws = new WebSocket(process.env.INTENTO_RPC_WS)
+  
+  ws.on('open', () => {
+    console.log('Connected to WebSocket')
+
+    // Subscribe to all active subscriptions when WebSocket is ready
+    Object.keys(activeSubscriptions).forEach((flowID) => {
+      ws.send(
+        JSON.stringify({
+          jsonrpc: '2.0',
+          method: 'subscribe',
+          id: flowID,
+          query: `tm.event='NewBlock' AND flow.flow-id='${flowID}'`,
+        })
+      )
+    })
+  })
+
+  ws.on('message', async (data) => {
+    console.log('Received data from WebSocket:', data.toString())
+
+    const parsedData = JSON.parse(data.toString())
+    if (parsedData?.result?.events) {
+      const events = parsedData.result.events
+      const flowID = events['flow-id']?.[0]
+
+      if (flowID && activeSubscriptions[flowID]) {
+        const email = activeSubscriptions[flowID]
+
+        // Construct the link to view the flow
+        const flowLink = `${process.env.BASE_URL}/flows/${flowID}`
+
+        try {
+          await transporter.sendMail({
+            from: 'no-reply@intento.zone',
+            to: email,
+            subject: 'Flow Alert Notification',
+            text: `An event was detected for flow ID: ${flowID}\n\nView the flow details here: ${flowLink}\n\nTo unsubscribe, click here: ${
+              process.env.BASE_URL
+            }/unsubscribe?email=${encodeURIComponent(email)}&flowID=${flowID}`,
+          })
+          console.log(`Email sent to ${email} for flow ID ${flowID}`)
+        } catch (error) {
+          console.error('Error sending email:', error)
+        }
+
+        console.log('Full event data:', JSON.stringify(events, null, 2))
+      }
+    }
+  })
+
+  ws.on('close', (code, reason) => {
+    console.log(`WebSocket connection closed. Code: ${code}, Reason: ${reason}`)
+    // Attempt to reconnect after connection closure
+    setTimeout(connectWebSocket, 5000)
+  })
+
+  ws.on('error', (err) => {
+    console.error('WebSocket error:', err)
+    // Attempt to reconnect in case of error
+    setTimeout(connectWebSocket, 5000)
+  })
+}
+
+// Initial WebSocket connection setup
+connectWebSocket()
 
 export const handler: Handler = async (event) => {
   try {
     const { email, flowID, unsubscribe } = JSON.parse(event.body || '{}')
-    if (!email || !flowID) return { statusCode: 400, body: 'Invalid request' }
+
+    if (!email || !flowID) {
+      return { statusCode: 400, body: 'Invalid request' }
+    }
 
     if (unsubscribe) {
+      // Unsubscribe the user from a flow
       delete activeSubscriptions[flowID]
       console.log(`Unsubscribed ${email} from flow ID ${flowID}`)
 
-      // Unsubscribe using our helper function
+      // Send an unsubscribe message via WebSocket (ensure connection is open)
       sendWhenOpen(
         JSON.stringify({
           jsonrpc: '2.0',
@@ -105,10 +122,11 @@ export const handler: Handler = async (event) => {
       return { statusCode: 200, body: 'Unsubscribed successfully' }
     }
 
+    // Add new subscription to the active subscriptions
     activeSubscriptions[flowID] = email
     console.log(`Subscribed ${email} to flow ID ${flowID}`)
 
-    // Subscribe using our helper function
+    // Send a subscribe message via WebSocket (ensure connection is open)
     sendWhenOpen(
       JSON.stringify({
         jsonrpc: '2.0',
@@ -125,22 +143,14 @@ export const handler: Handler = async (event) => {
   }
 }
 
-// Helper function to send a message when the connection is ready
+// Helper function to send a message when the WebSocket connection is open
 function sendWhenOpen(message: string) {
-  if (ws.readyState === WebSocket.OPEN) {
+  if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(message)
   } else {
     // Wait for the connection to open, then send the message.
-    ws.once('open', () => {
-      ws.send(message)
+    ws?.once('open', () => {
+      ws?.send(message)
     })
   }
 }
-
-ws.on('close', () => {
-  console.log('WebSocket connection closed')
-})
-
-ws.on('error', (err) => {
-  console.error('WebSocket error:', err)
-})
