@@ -18,6 +18,17 @@ const transporter = nodemailer.createTransport({
   },
 })
 
+const testWs = new WebSocket('wss://echo.websocket.org');
+
+testWs.on('open', () => {
+  console.log('Connected to test WebSocket');
+  testWs.send('Hello, WebSocket!');
+});
+
+testWs.on('message', (data) => {
+  console.log('Test received message:', data.toString());
+});
+
 const ws = new WebSocket(process.env.INTENTO_RPC_WS)
 
 ws.on('open', () => {
