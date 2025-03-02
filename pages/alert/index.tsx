@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import {
   Button,
-
   Column,
-
   Text,
 
 } from 'junoblocks';
@@ -35,26 +33,30 @@ const FlowAlert = () => {
 
 
   return (
-    <Column align="center" justifyContent="center" style={{ minHeight: '100vh', padding: '16px'}}>
-      <Text variant="header" align="center" style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>
-        Subscribe to Flow Alerts for flow ID: {flowID}
+    <Column align="center" justifyContent="center" style={{ minHeight: '100vh', padding: '16px' }}>
+
+      <Text variant="header" align="center" style={{ fontSize: '24px', padding: '16px', fontWeight: 'bold', marginBottom: '16px' }}>
+        Subscribe to Flow Alerts for Flow {flowID}
       </Text>
+
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%', maxWidth: '480px' }}>
-        <input
-          type="email"
-          placeholder="Your Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          style={{
-            padding: '12px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            outline: 'none',
-            transition: 'border-color 0.3s ease-in-out',
-          }}
-          required
-        />
+        <Text variant="secondary">
+          <input
+            type="email"
+            placeholder="Your Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={{
+              padding: '12px',
+              border: '1px solid #ccc',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              outline: 'none',
+              transition: 'border-color 0.3s ease-in-out',
+            }}
+            required
+          />
+        </Text>
         <Button
           type="submit"
           variant="primary"
@@ -68,10 +70,13 @@ const FlowAlert = () => {
         >
           Subscribe
         </Button>
+        <div style={{ textAlign: "center", marginTop: "20px" }}>
+          <img src={"https://intento.zone/assets/images/intento_tiny.png"} alt="Loading" width="200px" />
+        </div>
       </form>
-    </Column>
+    </Column >
   );
-  
+
 };
 
 export default FlowAlert;
