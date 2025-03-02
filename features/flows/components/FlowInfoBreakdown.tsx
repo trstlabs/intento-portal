@@ -42,6 +42,7 @@ import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/
 import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
+import { Alert } from '../../../icons/Alert'
 
 
 type FlowInfoBreakdownProps = {
@@ -240,8 +241,6 @@ export const FlowInfoBreakdown = ({
         owner={flowInfo.owner}
         good={isActive}
       />
-      {/* <Row> */}
-
       <Card
         variant="secondary"
         disabled
@@ -292,14 +291,16 @@ export const FlowInfoBreakdown = ({
       </Card>
       {/* </Row> */}
       <>
-        <Column
+        <Inline
           css={{ padding: '$6' }}
-          gap={8}
-          align="flex-end"
 
-        >
+          justifyContent="flex-end">
+          <Button as="a"
+            variant="secondary"
+            target="__blank"
+            rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flowInfo.id}`} >Alerts</Button>;
           <FlowTransformButton flowInfo={flowInfo} />
-        </Column>
+        </Inline>
         <Row>
           <Inline
             style={{
