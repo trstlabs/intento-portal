@@ -1,6 +1,6 @@
 // /netlify/functions/flow-alert.ts
 import { Handler } from '@netlify/functions'
-import Ably from 'ably/promises'
+import * as Ably from 'ably'
 
 // Initialize Ably client and channel
 const ably = new Ably.Rest(process.env.ABLY_API_KEY)
