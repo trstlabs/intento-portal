@@ -17,15 +17,15 @@ export const handler: Handler = async (event) => {
     }
 
     if (unsubscribe) {
-      await channel.publish('unsubscribe', { flowID, email })
-      console.log(`Unsubscribed ${email} from flow ID ${flowID}`)
+      const res = await channel.publish('unsubscribe', { flowID, email })
+      console.log(`Unsubscribed ${email} from flow ID ${flowID},result: ${res}`)
       return { statusCode: 200, body: 'Unsubscribed successfully' }
     }
 
     // Publish subscription event to Ably
-    await channel.publish('subscribe', { flowID, email })
-    console.log(`Subscribed ${email} to flow ID ${flowID}`)
-    
+    const res = await channel.publish('subscribe', { flowID, email })
+    console.log(`Subscribed ${email} to flow ID ${flowID}, result: ${res}`)
+
     return { statusCode: 200, body: 'Subscribed successfully' }
   } catch (error) {
     console.error('Error processing request:', error)
