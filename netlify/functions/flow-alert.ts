@@ -24,7 +24,7 @@ ws.on('open', () => {
   console.log('Connected to WebSocket')
 
   // Send a subscription query for each flow ID that has an active subscription
-  Object.keys(activeSubscriptions).forEach(flowID => {
+  Object.keys(activeSubscriptions).forEach((flowID) => {
     ws.send(
       JSON.stringify({
         jsonrpc: '2.0',
@@ -57,7 +57,9 @@ ws.on('message', async (data) => {
           from: 'no-reply@intento.zone',
           to: email,
           subject: 'Flow Alert Notification',
-          text: `An event was detected for flow ID: ${flowID}\n\nView the flow details here: ${flowLink}\n\nTo unsubscribe, click here: ${process.env.BASE_URL}/unsubscribe?email=${encodeURIComponent(email)}&flowID=${flowID}`,
+          text: `An event was detected for flow ID: ${flowID}\n\nView the flow details here: ${flowLink}\n\nTo unsubscribe, click here: ${
+            process.env.BASE_URL
+          }/unsubscribe?email=${encodeURIComponent(email)}&flowID=${flowID}`,
         })
         console.log(`Email sent to ${email} for flow ID ${flowID}`)
       } catch (error) {
@@ -75,35 +77,33 @@ export const handler: Handler = async (event) => {
     const { email, flowID, unsubscribe } = JSON.parse(event.body || '{}')
     if (!email || !flowID) return { statusCode: 400, body: 'Invalid request' }
 
-    // Unsubscribe logic
     if (unsubscribe) {
       delete activeSubscriptions[flowID]
       console.log(`Unsubscribed ${email} from flow ID ${flowID}`)
-      
-      // Re-send the updated subscription list to unsubscribe the flow event
-      ws.send(
+
+      // Unsubscribe using our helper function
+      sendWhenOpen(
         JSON.stringify({
           jsonrpc: '2.0',
           method: 'unsubscribe',
           id: flowID,
-          query: `tm.event='flow' AND flow-id='${flowID}'`, // Unsubscribe from this specific flow
+          query: `tm.event='flow' AND flow-id='${flowID}'`,
         })
       )
 
       return { statusCode: 200, body: 'Unsubscribed successfully' }
     }
 
-    // Subscribe logic
     activeSubscriptions[flowID] = email
     console.log(`Subscribed ${email} to flow ID ${flowID}`)
 
-    // Send the updated subscription list to subscribe to the flow event
-    ws.send(
+    // Subscribe using our helper function
+    sendWhenOpen(
       JSON.stringify({
         jsonrpc: '2.0',
         method: 'subscribe',
         id: flowID,
-        query: `tm.event='flow' AND flow-id='${flowID}'`, // Subscribe to this specific flow
+        query: `tm.event='flow' AND flow-id='${flowID}'`,
       })
     )
 
@@ -111,5 +111,17 @@ export const handler: Handler = async (event) => {
   } catch (error) {
     console.error('Error processing request:', error)
     return { statusCode: 500, body: 'Internal server error' }
+  }
+}
+
+// Helper function to send a message when the connection is ready
+function sendWhenOpen(message: string) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(message)
+  } else {
+    // Wait for the connection to open, then send the message.
+    ws.once('open', () => {
+      ws.send(message)
+    })
   }
 }
