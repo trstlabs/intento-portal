@@ -1,9 +1,8 @@
-// /netlify/functions/flow-alert.ts
 import { Handler } from '@netlify/functions'
 import * as Ably from 'ably'
 
 // Initialize Ably Realtime client and channel
-const ably = new Ably.Realtime(process.env.ABLY_API_KEY)  // Using Realtime client here
+const ably = new Ably.Realtime(process.env.ABLY_API_KEY)
 const channel = ably.channels.get('flow-events')
 
 // Handler for subscriptions and unsubscriptions
@@ -16,16 +15,20 @@ export const handler: Handler = async (event) => {
       return { statusCode: 400, body: 'Invalid request' }
     }
 
+    console.log(`Processing request for ${email} with flowID: ${flowID} unsubscribe: ${unsubscribe}`)
+
     if (unsubscribe) {
-      // Remove user from presence and unsubscribe
-      await channel.presence.leave({ clientId: email }) // Updated to pass object with clientId
-      console.log(`Unsubscribed ${email} from flow ID ${flowID}`)
+      // Unsubscribe logic: Removing the user from presence
+      console.log(`Unsubscribing ${email} from flowID: ${flowID}`)
+      await channel.presence.leave({ clientId: email }) // Ensure clientId is passed
+      console.log(`Successfully unsubscribed ${email} from flowID: ${flowID}`)
       return { statusCode: 200, body: 'Unsubscribed successfully' }
     }
 
-    // Add user to presence with flowID as metadata
-    await channel.presence.enter({ clientId: email, data: { flowID } })  // Updated to pass object with flowID in the data field
-    console.log(`Subscribed ${email} to flow ID ${flowID}`)
+    // Subscribe logic: Adding the user to presence with the flowID as metadata
+    console.log(`Subscribing ${email} to flowID: ${flowID}`)
+    await channel.presence.enter({ clientId: email, data: { flowID } }) // Pass clientId and flowID
+    console.log(`Successfully subscribed ${email} to flowID: ${flowID}`)
 
     return { statusCode: 200, body: 'Subscribed successfully' }
   } catch (error) {
@@ -37,16 +40,16 @@ export const handler: Handler = async (event) => {
 // Listen for presence updates to handle subscriptions
 channel.presence.subscribe('enter', (member) => {
   const { email, flowID } = member.data
+  console.log(`Presence update - User ${email} entered with flowID: ${flowID}`)
   if (flowID) {
-    console.log(`User ${email} entered with flow ID: ${flowID}`)
-    // Add logic to subscribe to flowID here if needed
+    // Handle subscribing to flowID if needed
   }
 })
 
 channel.presence.subscribe('leave', (member) => {
   const { email, flowID } = member.data
+  console.log(`Presence update - User ${email} left with flowID: ${flowID}`)
   if (flowID) {
-    console.log(`User ${email} left with flow ID: ${flowID}`)
-    // Add logic to unsubscribe from flowID here if needed
+    // Handle unsubscribing from flowID if needed
   }
 })
