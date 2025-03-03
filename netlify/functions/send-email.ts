@@ -1,6 +1,4 @@
-// /netlify/functions/send-email.ts
 import { Handler } from '@netlify/functions'
-import { Realtime } from 'ably'
 import nodemailer from 'nodemailer'
 
 const transporter = nodemailer.createTransport({
@@ -10,23 +8,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.GMAIL_APP_PASSWORD,
   },
 })
-
-const ably = new Realtime(process.env.ABLY_API_KEY)
-
-const channel = ably.channels.get('flow-events')
-
-// Fetch emails associated with a specific flowID using presence history
-async function getEmailsForFlowID(flowID) {
-  const members = await channel.presence.get();
-  const emails = [...new Set(
-    members
-      .filter((member) => member.data?.flowID === flowID)
-      .map((member) => member.clientId)
-  )];
-  console.log(`Emails for flow ID ${flowID}:`, emails);
-  return emails;
-}
-
 
 // Send email to each email address associated with the flowID
 export const handler: Handler = async (event, _context) => {
@@ -44,6 +25,7 @@ export const handler: Handler = async (event, _context) => {
 
     const parsedData = JSON.parse(rawData)
     const flowID = parsedData?.flowID
+    const emails = parsedData?.emails // Retrieve emails directly from message data
 
     if (!flowID) {
       console.error('Flow ID not found in message data.')
@@ -53,9 +35,7 @@ export const handler: Handler = async (event, _context) => {
       }
     }
 
-    const emails = await getEmailsForFlowID(flowID)
-
-    if (emails.length === 0) {
+    if (!emails || emails.length === 0) {
       console.warn(`No emails found for flow ID ${flowID}`)
       return {
         statusCode: 404,
@@ -65,6 +45,7 @@ export const handler: Handler = async (event, _context) => {
       }
     }
 
+    // Send email to each email address
     emails.forEach((email) => {
       const unsubscribeUrl = `${process.env.BASE_URL}/unsubscribe?flowID=${flowID}&email=${encodeURIComponent(email)}`;
       const flowUrl = `${process.env.BASE_URL}/flows/${flowID}`;
@@ -89,8 +70,6 @@ export const handler: Handler = async (event, _context) => {
       });
       
     });
-    
-   
 
     return {
       statusCode: 200,
