@@ -12,22 +12,21 @@ const transporter = nodemailer.createTransport({
 })
 
 const ably = new Realtime(process.env.ABLY_API_KEY)
+
 const channel = ably.channels.get('flow-events')
 
 // Fetch emails associated with a specific flowID using presence history
-async function getEmailsForFlowID(flowID: string) {
-  try {
-    const presenceHistory = await channel.presence.history({ limit: 100 })
-    const emails = presenceHistory.items
-      .filter((item) => item.data?.flowID === flowID)
-      .map((item) => item.clientId)
-    console.log(`Emails for flow ID ${flowID}:`, emails)
-    return emails
-  } catch (err) {
-    console.error('Error fetching presence history:', err)
-    return []
-  }
+async function getEmailsForFlowID(flowID) {
+  const members = await channel.presence.get();
+  const emails = [...new Set(
+    members
+      .filter((member) => member.data?.flowID === flowID)
+      .map((member) => member.clientId)
+  )];
+  console.log(`Emails for flow ID ${flowID}:`, emails);
+  return emails;
 }
+
 
 // Send email to each email address associated with the flowID
 export const handler: Handler = async (event, _context) => {
@@ -66,17 +65,32 @@ export const handler: Handler = async (event, _context) => {
       }
     }
 
-    const emailPromises = emails.map((email) =>
-      transporter.sendMail({
-        from: 'no-reply@intento.zone',
+    emails.forEach((email) => {
+      const unsubscribeUrl = `${process.env.BASE_URL}/unsubscribe?flowID=${flowID}&email=${encodeURIComponent(email)}`;
+      const flowUrl = `${process.env.BASE_URL}/flows/${flowID}`;
+    
+      const mailOptions = {
+        from: process.env.GMAIL_USER,
         to: email,
-        subject: `Notification for Flow ID ${flowID}`,
-        text: `A new event has occurred for flow ID ${flowID}.`,
-      })
-    )
-
-    await Promise.all(emailPromises)
-    console.log(`Emails sent successfully for flow ID ${flowID}`)
+        subject: `Update on Flow ID ${flowID}`,
+        html: `
+          <p>New update on Flow ID ${flowID}.</p>
+          <p><a href="${flowUrl}">View Flow</a></p>
+          <p><a href="${unsubscribeUrl}">Unsubscribe</a></p>
+        `,
+      };
+    
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.error(`Failed to send email to ${email}:`, error);
+        } else {
+          console.log(`Email sent to ${email}: ${info.response}`);
+        }
+      });
+      
+    });
+    
+   
 
     return {
       statusCode: 200,
