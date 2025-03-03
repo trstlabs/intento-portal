@@ -3,9 +3,9 @@ import {
   Button,
   Column,
   Text,
-
 } from 'junoblocks';
 import Image from 'next/image'
+
 const FlowAlert = () => {
   const [email, setEmail] = useState("");
   const flowID = new URLSearchParams(window.location.search).get("flowID");
@@ -31,10 +31,8 @@ const FlowAlert = () => {
     }
   };
 
-
   return (
     <Column align="center" justifyContent="center" style={{ minHeight: '100vh', padding: '16px' }}>
-
       <Text variant="header" align="center" style={{ fontSize: '24px', padding: '16px', fontWeight: 'bold', marginBottom: '16px' }}>
         Subscribe to Flow Alerts for Flow {flowID}
       </Text>
@@ -73,10 +71,13 @@ const FlowAlert = () => {
         <div style={{ textAlign: "center", marginTop: "20px" }}>
           <Image src="https://intento.zone/assets/images/intento_tiny.png" alt="Loading" width="230" height="40" />
         </div>
-      </form>
-    </Column >
-  );
 
+        <Text variant="caption" align="center" style={{ marginTop: '16px' }}>
+          You may get updated when a flow executes. It depends on the service being available and is subject to change.
+        </Text>
+      </form>
+    </Column>
+  );
 };
 
 export default FlowAlert;

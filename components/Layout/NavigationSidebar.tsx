@@ -61,7 +61,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
 
   // Watch for address changes and trigger the mutation
-  const { mutate: afterConnectWallet } = useAfterConnectWallet()
+  const { mutate: afterConnectWallet = () => {} } = useAfterConnectWallet() || {};
   // Watch for address changes and trigger the mutation
   useEffect(() => {
     if (address) {

@@ -99,8 +99,7 @@ export const FlowInfoBreakdown = ({
     }
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
-
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(symbol, chainId, false)
+  const { mutate: connectExternalWallet = () => {} } = useConnectIBCWallet(symbol, chainId, false) || {};
   const handleSendFundsOnHostClick = () => {
     if (chainId != '') {
       connectExternalWallet(null)
@@ -292,10 +291,10 @@ export const FlowInfoBreakdown = ({
       {/* </Row> */}
       <>
         <Inline
-          css={{ padding: '$6' }}
+          css={{ margin: '$6' }}
 
           justifyContent="flex-end">
-          <Button as="a"
+          <Button as="a"   css={{ marginRight: '$4' }}
             variant="secondary"
             target="__blank"
             rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flowInfo.id}`} >Alerts</Button>
