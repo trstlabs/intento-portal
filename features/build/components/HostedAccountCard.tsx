@@ -37,7 +37,8 @@ export const HostedAccountCard = ({
 
 
   // ICA funds
-  const { mutate: connectExternalWallet } = useConnectIBCWallet(
+  const { mutate: connectExternalWallet = () => { }
+  } = useConnectIBCWallet(
     chainSymbol,
     chainId,
     {
@@ -46,7 +47,7 @@ export const HostedAccountCard = ({
       },
     },
     false
-  )
+  ) || {};
 
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
@@ -63,7 +64,7 @@ export const HostedAccountCard = ({
         ? icaAuthzMsgInfo.filter((icaAuthzMsgInfo) => icaAuthzMsgInfo.hasGrant == false)
         : [],
       coin: undefined,
-    })
+    }) || {};
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
     if (shouldTrigger) {
       handler(undefined, { onSettled: () => resetStateSetter(false) })

@@ -99,7 +99,7 @@ export const FlowInfoBreakdown = ({
     }
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
-  const { mutate: connectExternalWallet = () => {} } = useConnectIBCWallet(symbol, chainId, false) || {};
+  const { mutate: connectExternalWallet = () => { } } = useConnectIBCWallet(symbol, chainId, false) || {};
   const handleSendFundsOnHostClick = () => {
     if (chainId != '') {
       connectExternalWallet(null)
@@ -137,7 +137,7 @@ export const FlowInfoBreakdown = ({
   }
   const [requestedUpdateFlow, setRequestedUpdateFlow] = useState(false)
   const { mutate: handleUpdateFlow, isLoading: isExecutingUpdateFlow } =
-    useUpdateFlow({ flowParams: updatedFlowParams })
+    useUpdateFlow({ flowParams: updatedFlowParams }) || {};
   useEffect(() => {
     const shouldTriggerUpdateFlow =
       !isExecutingUpdateFlow && requestedUpdateFlow
@@ -294,7 +294,7 @@ export const FlowInfoBreakdown = ({
           css={{ margin: '$6' }}
 
           justifyContent="flex-end">
-          <Button as="a"   css={{ marginRight: '$4' }}
+          <Button as="a" css={{ marginRight: '$4' }}
             variant="secondary"
             target="__blank"
             rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flowInfo.id}`} >Alerts</Button>
