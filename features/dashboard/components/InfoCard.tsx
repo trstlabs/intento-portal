@@ -248,7 +248,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
             </>
           )}
         </Column>
-        {params && (
+        {process.env.NEXT_PUBLIC_SHOW_DISTRIBUTION && params && (
           <Column>
             <Text
               variant="title"
@@ -348,7 +348,7 @@ const claimRewardSDKMessage = {
   typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
   value: {
     delegatorAddress: 'into1....',
-    validatorAddress: 'trustvaloper1...',
+    validatorAddress: 'intovaloper1...',
   },
 }
 

@@ -66,7 +66,7 @@ export const generalExamples = [
         denom: 'uinto'
       },
       delegatorAddress: 'into1....',
-      validatorAddress: 'trustvaloper1...',
+      validatorAddress: 'intovaloper1...',
     },
   },
   {
@@ -148,7 +148,7 @@ export const generalExamples = [
     typeUrl: '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
     value: {
       delegatorAddress: 'into1....',
-      validatorAddress: 'trustvaloper1...',
+      validatorAddress: 'intovaloper1...',
     },
   },
 
