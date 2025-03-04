@@ -1,6 +1,7 @@
 import { AppLayout, PageHeader } from 'components'
 
 import {
+  ButtonWithDropdownForSorting,
   SortDirections,
 
   SortParameters,
@@ -28,7 +29,7 @@ export default function Home() {
   const flowsPerPage = 20;
   const [allFlows, isLoading] = useFlowInfos(Number(flowsPerPage), undefined)
   const [flows, isMyFlowsLoading] = useFlowInfosByOwner(Number(flowsPerPage), undefined)
-  const { sortDirection, sortParameter } =
+  const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
     useSortControllers()
 
   const infoArgs = { infos: flows?.flowInfos || [], address }
@@ -47,12 +48,12 @@ export default function Home() {
     !myFlows?.length ||
     myFlows.find((tx) => tx.label === 'Autocompound') == undefined
   const shouldShowFetchingState = isLoading && !allFlows?.flowInfos.length && isMyFlowsLoading && !myFlows?.length
-  const shouldRenderFlows = Boolean(allFlows?.flowInfos.length)
+  const shouldRenderMyFlows = Boolean(myFlows?.length)
 
   const pageHeaderContents = (
     <PageHeader
       title="Dashboard"
-      subtitle="View and manage flows 🌟"
+      subtitle="🌟 Explore, view, manage and monitor interchain flows on the Intento blockchain 🌟"
     />
   )
 
@@ -74,10 +75,10 @@ export default function Home() {
         <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
       </Column>}
 
-      {shouldRenderFlows && (
+      {shouldRenderMyFlows && (
         <>
           {Boolean(myFlows?.length) && (
-            <>
+            <><Inline>
               <Text variant="caption" css={{ padding: '$4' }}>
                 {' '}
                 {myFlows.length > 1 ? (
@@ -86,8 +87,15 @@ export default function Home() {
                   <span> Your Flow (1)</span>
                 )}
               </Text>
-
+              <ButtonWithDropdownForSorting
+                sortParameter={sortParameter}
+                sortDirection={sortDirection}
+                onSortParameterChange={setSortParameter}
+                onSortDirectionChange={setSortDirection}
+              />
+            </Inline>
               <StyledDivForFlowsGrid>
+
                 {myFlows.map((flowInfo, index) => (
                   <FlowCard
                     key={index}
@@ -99,7 +107,8 @@ export default function Home() {
             </>
           )}
         </>
-      )}
+      )
+      }
       <StyledDivForFlowsGrid>
         <>
           {Boolean(allFlows?.flowInfos.length) ? (
@@ -111,7 +120,7 @@ export default function Home() {
               }}
             >
               <Text variant="primary">
-                {allFlows.flowInfos.length} Recent
+                Recent
                 Flows
               </Text>
             </Inline>
@@ -123,18 +132,20 @@ export default function Home() {
           )}
         </>
       </StyledDivForFlowsGrid>
-      {isMyFlowsLoading || isSorting && (
-        <Column
-          justifyContent="center"
-          align="center"
-          css={{ paddingTop: '$24' }}
-        >
-          <Inline gap={2}>
-            <ConnectIcon color="secondary" />
-            <Text variant="primary">{'Finding Flows...'}</Text>
-          </Inline>
-        </Column>
-      )}
+      {
+        isMyFlowsLoading || isSorting && (
+          <Column
+            justifyContent="center"
+            align="center"
+            css={{ paddingTop: '$24' }}
+          >
+            <Inline gap={2}>
+              <ConnectIcon color="secondary" />
+              <Text variant="primary">{'Finding Flows...'}</Text>
+            </Inline>
+          </Column>
+        )
+      }
       <StyledDivForFlowsGrid>
         {allFlows?.flowInfos.map((flowInfo, index) => (
           <FlowCard
@@ -146,7 +157,7 @@ export default function Home() {
       </StyledDivForFlowsGrid>
 
       {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
-    </AppLayout>
+    </AppLayout >
   )
 }
 

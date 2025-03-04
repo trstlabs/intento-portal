@@ -15,7 +15,7 @@ export const useFlowInfos = (limit: number, key: any) => {
   const client = useIntentoRpcClient()
 
   const { data, isLoading } = useQuery(
-   `useFlowInfos/${key}`,
+    `useFlowInfos/${key}`,
     async () => {
       const pageRequest = PageRequest.fromPartial({
         limit: BigInt(limit),
@@ -82,6 +82,7 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
           pagination: pageRequest,
         })
 
+      console.log(resp)
       // Transform each msg in flowInfos
       const flowInfos = resp.flowInfos.map((flowInfo) => {
         return {

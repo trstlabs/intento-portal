@@ -1,9 +1,5 @@
 import { AppLayout, PageHeader } from 'components'
-import {
-  SortDirections,
-  ButtonWithDropdownForSorting,
-  SortParameters,
-} from '../../features/flows'
+
 import {
   Button,
   Column,
@@ -15,25 +11,20 @@ import {
   Text,
 } from 'junoblocks'
 import React, { useState, useEffect } from 'react'
-import { useUpdateEffect } from 'react-use'
+
 import { useFlowInfos } from 'hooks/useFlowInfo'
 import { FlowCard } from '../../features/flows/components/FlowCard'
-// import { useChain } from '@cosmos-kit/react'
 import { useRefetchQueries } from '../../hooks/useRefetchQueries'
 
 export default function Flows() {
-  // const { address } = useChain('intentozone')
+
   const [paginationKey, setPaginationKey] = useState(undefined);
   const [backKey, setBackKey] = useState(undefined);
   const flowsPerPage = 20;
   const [allFlows, isLoading] = useFlowInfos(flowsPerPage, paginationKey)
   const refetchQueries = useRefetchQueries([`flowHistory/${paginationKey}`], flowsPerPage);
-  // const [myFlows, isMyFlowsLoading] = useFlowInfosByOwner(20, paginationKey)
-  const { sortDirection, sortParameter, setSortDirection, setSortParameter } = useSortControllers()
-
 
   const shouldShowFetchingState = isLoading && !allFlows?.flowInfos.length /* || isMyFlowsLoading && !myFlows?.flowInfos.length */
-  /*   const shouldRenderFlows = Boolean(allFlows?.flowInfos.length) */
 
   // Clear pagination state when flows are fetched
   useEffect(() => {
@@ -100,12 +91,7 @@ export default function Flows() {
               {/*   <Text variant="primary">
                 {allFlows.flowInfos?.length} {myFlows && myFlows[0] && <>Other</>} Available Flows
               </Text> */}
-              <ButtonWithDropdownForSorting
-                sortParameter={sortParameter}
-                sortDirection={sortDirection}
-                onSortParameterChange={setSortParameter}
-                onSortDirectionChange={setSortDirection}
-              />
+             
             </Inline>
           ) : (
             <Text variant="caption" css={{ padding: '$4' }}>
@@ -137,36 +123,6 @@ export default function Flows() {
     </AppLayout >
   )
 }
-
-const useSortControllers = () => {
-  const storeKeyForParameter = '@flows/sort/parameter'
-  const storeKeyForDirection = '@flows/sort/direction'
-
-  const [sortParameter, setSortParameter] = useState<SortParameters>(
-    () =>
-      (localStorage.getItem(storeKeyForParameter) as SortParameters) || 'end_time'
-  )
-  const [sortDirection, setSortDirection] = useState<SortDirections>(
-    () =>
-      (localStorage.getItem(storeKeyForDirection) as SortDirections) || 'desc'
-  )
-
-  useUpdateEffect(() => {
-    localStorage.setItem(storeKeyForParameter, sortParameter)
-  }, [sortParameter])
-
-  useUpdateEffect(() => {
-    localStorage.setItem(storeKeyForDirection, sortDirection)
-  }, [sortDirection])
-
-  return {
-    sortDirection,
-    sortParameter,
-    setSortDirection,
-    setSortParameter,
-  }
-}
-
 const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
