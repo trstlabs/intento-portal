@@ -24,24 +24,46 @@ export type IBCAssetInfo = {
 }
 
 export const useIBCAssetList = () => {
-  const { data, isLoading } = useQuery<IBCAssetInfo[]>(
-    '@ibc-asset-list',
+  const { data, isLoading, isError, error } = useQuery<IBCAssetInfo[]>(
+    ['@ibc-asset-list'],
     async () => {
+      if (!process.env.NEXT_PUBLIC_IBC_ASSETS_URL) {
+        throw new Error('IBC_ASSETS_URL is not defined')
+      }
+
       const response = await fetch(process.env.NEXT_PUBLIC_IBC_ASSETS_URL)
-      return await response.json()
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch IBC Asset List: ${response.statusText}`
+        )
+      }
+
+      const data = await response.json()
+
+      if (!Array.isArray(data)) {
+        throw new Error('IBC Asset List is not in the expected array format')
+      }
+
+      return data
     },
     {
-      onError(e) {
-        console.error('Error loading ibc asset list:', e)
+      onError: (e) => {
+        console.error('Error loading IBC Asset List:', e)
       },
       refetchOnMount: true,
       refetchIntervalInBackground: false,
-      // refetchIntervalInBackground: true,
-      // refetchInterval: 1000 * 60,
+      retry: 3, // Automatically retry failed queries up to 3 times
+      staleTime: 1000 * 60 * 5, // 5 minutes
     }
   )
 
-  return [data, isLoading] as const
+  if (isError) {
+    console.warn('Failed to load IBC Asset List:', error)
+  }
+
+  // Safely return data or an empty array to avoid undefined errors
+  return [data ?? [], isLoading] as const
 }
 
 //connect to all chains at once, requires chains to come from registry (can only be used in production/public testnet)
