@@ -137,7 +137,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
               </Card>
 
 
-              {balance || weeklyAPY &&
+              {(balance > 0 || weeklyAPY) &&
                 <>
                   <Tooltip label="Autocompound is a feature that automatically restakes earned rewards back to the validator, compounding earnings over time.">
                     <Text variant="title" css={{ padding: '$8' }}>
@@ -169,7 +169,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
                         </Text>
                       </>
                     )}
-                    
+
                     {!isLoading && balance > 0 && (
                       <Text variant="legend">
                         {' '}

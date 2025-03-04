@@ -66,10 +66,10 @@ export const SubmitFlowDialog = ({
   handleSendFundsOnHostClick,
 }: SubmitFlowDialogProps) => {
 
-  const [startTime, setStartTime] = useState(3600000)
-  const [duration, setDuration] = useState(14 * 86400000)
+  const [startTime, setStartTime] = useState(0)
+  const [duration, setDuration] = useState(30 * 86400000)
 
-  const [interval, setInterval] = useState(3600000)
+  const [interval, setInterval] = useState(86400000)
   const [feeFunds, setFeeAmount] = useState(0)
   const [txLabel, setLabel] = useState(customLabel)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
@@ -77,15 +77,15 @@ export const SubmitFlowDialog = ({
   const { denom_local } =
     useIBCAssetInfo(feeFundsSymbol) || {}
 
-  const [displayInterval, setDisplayInterval] = useState('1 hour')
+  const [displayInterval, setDisplayInterval] = useState('1 day')
   const [editInterval, setEditInterval] = useState(false)
   const [editIntervalValue, setEditIntervalValue] = useState('1 hour')
-  const [displayDuration, setDisplayDuration] = useState('2 weeks')
+  const [displayDuration, setDisplayDuration] = useState('30 days')
   const [editDuration, setEditDuration] = useState(false)
   const [editDurationValue, setEditDurationValue] = useState('2 hours')
-  const [displayStartTime, setDisplayStartTime] = useState('1 hour')
+  const [displayStartTime, setDisplayStartTime] = useState('Right Away')
   const [editStartTime, setEditStartTime] = useState(false)
-  const [editStartTimeValue, setEditStartTimeValue] = useState('0')
+  const [editStartTimeValue, setEditStartTimeValue] = useState('1 hour')
 
   const timeLabels = [
     'None',
@@ -99,6 +99,7 @@ export const SubmitFlowDialog = ({
     '30 days',
     '60 days',
     '90 days',
+    '1 year',
   ]
   const timeSecondValues = [
     0,
@@ -112,6 +113,7 @@ export const SubmitFlowDialog = ({
     3600000 * 24 * 30,
     3600000 * 24 * 60,
     3600000 * 24 * 90,
+    3600000 * 24 * 365,
   ]
 
   function handleInterval(label, value: number) {

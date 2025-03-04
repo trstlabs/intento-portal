@@ -82,7 +82,6 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
           pagination: pageRequest,
         })
 
-      console.log(resp)
       // Transform each msg in flowInfos
       const flowInfos = resp.flowInfos.map((flowInfo) => {
         return {

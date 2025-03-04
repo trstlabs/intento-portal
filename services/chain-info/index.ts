@@ -146,7 +146,7 @@ export const getExpectedFlowFee = (
   recurrences: number,
   denom: string
 ) => {
-  const flexFeeForPeriod = (Number(intentParams.flowFlexFeeMul) / 100) * gasUsed
+  const flexFeeForPeriod = (Number(intentParams.flowFlexFeeMul) / 1000) * gasUsed
 
   const flowFee =
     recurrences * flexFeeForPeriod +
