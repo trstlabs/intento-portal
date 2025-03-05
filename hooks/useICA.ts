@@ -6,9 +6,7 @@ import {
   walletState,
   WalletStatusType,
 } from '../state/atoms/walletAtoms'
-import {
-  DEFAULT_LONG_REFETCH_INTERVAL,
-} from '../util/constants'
+import { DEFAULT_LONG_REFETCH_INTERVAL } from '../util/constants'
 import {
   getICA,
   getAuthZGrantsForGrantee,
@@ -67,14 +65,12 @@ export const useGetHostedICA = (connectionId: string) => {
   const { data: ica, isLoading } = useQuery(
     `hostedAccount/${connectionId}`,
     async () => {
-      if (connectionId == '') {
-        return ''
-      }
       const hostedAccs = await getHostedAccounts({ rpcClient })
       // console.log(hostedAccs)
       const hostedAcc = hostedAccs?.find(
         (account) => account.icaConfig.connectionId == connectionId
       )
+
       // const resp: string = await getICA({
       //   owner: hostedAcc.address,
       //   connectionId,
@@ -93,34 +89,35 @@ export const useGetHostedICA = (connectionId: string) => {
   return [ica, isLoading] as const
 }
 
-export const useGetHostICAAddressFromHostAddress = (address: string) => {
-  const rpcClient = useIntentoRpcClient()
+// export const useGetHostICAAddressFromHostAddress = (address: string) => {
+//   const rpcClient = useIntentoRpcClient()
 
-  const { data: ica, isLoading } = useQuery(
-    `geHostICAAddressFromHostAddress/${address}`,
-    async () => {
-      const resp = await getHostedAccount({ rpcClient, address })
-      let [icaAddress, _] = useGetHostICAAddress(
-        resp.hostedAccount.icaConfig.connectionId
-      )
-      return icaAddress
-    },
-    {
-      enabled: Boolean(rpcClient && !!address && address.length > 40),
-      refetchOnMount: false,
-      staleTime: 30000,
-      cacheTime: 300000,
-    }
-  )
+//   const { data: ica, isLoading } = useQuery(
+//     `hostICAAddressFromHostAddress/${address}`,
+//     async () => {
+//       const resp = await getHostedAccount({ rpcClient, address })
+//       let [icaAddress, _] = useGetHostICAAddress(
+//         address,
+//         resp.hostedAccount.icaConfig.connectionId
+//       )
+//       return icaAddress
+//     },
+//     {
+//       enabled: Boolean(rpcClient && !!address && address.length > 40),
+//       refetchOnMount: false,
+//       staleTime: 30000,
+//       cacheTime: 300000,
+//     }
+//   )
 
-  return [ica, isLoading] as const
-}
+//   return [ica, isLoading] as const
+// }
 
 export const useGetConnectionIDFromHostAddress = (address: string) => {
   const rpcClient = useIntentoRpcClient()
 
   const { data: connectionID, isLoading } = useQuery(
-    `geHostICAAddressFromHostAddress/${address}`,
+    `connectionIDFromHostAddress/${address}`,
     async () => {
       const resp = await getHostedAccount({ rpcClient, address })
 
@@ -137,28 +134,17 @@ export const useGetConnectionIDFromHostAddress = (address: string) => {
   return [connectionID, isLoading] as const
 }
 
-export const useGetHostICAAddress = (
-  connectionId: string,
-  accAddr?: string
-) => {
-  const { address } = useRecoilValue(walletState)
-
-  if (accAddr === '') {
-    accAddr = address
-  }
-
+export const useGetHostICAAddress = (accAddr: string, connectionId: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
-    `hostInterchainAccount/${connectionId}/${address}`,
+    `hostInterchainAccount/${connectionId}/${accAddr}`,
     async () => {
-      if (connectionId == '') {
-        return ''
-      }
       const resp: string = await getICA({
         owner: accAddr,
         connectionId,
         rpcClient,
       })
+
       return resp
     },
     {
@@ -205,9 +191,9 @@ export const useICATokenBalance = (
           isICAChain
       ),
       refetchOnMount: 'always', // Refetch when the component mounts
-      refetchInterval: 60000,  
-      staleTime: 30000,       
-      cacheTime: 1000000,        
+      refetchInterval: 60000,
+      staleTime: 30000,
+      cacheTime: 1000000,
       refetchOnWindowFocus: true,
     }
   )
@@ -224,7 +210,7 @@ export const useAuthZMsgGrantInfoForUser = (
   const chain = useChainInfoByChainID(chainId)
 
   const { data, isLoading } = useQuery(
-    [`userAuthZGrants/${grantee}/${chainId}/${flowInput}`],
+    `userAuthZGrants/${grantee}`,
     async () => {
       let grants: GrantResponse[] = []
       const granteeGrants = await getAuthZGrantsForGrantee({
@@ -232,6 +218,7 @@ export const useAuthZMsgGrantInfoForUser = (
         granter: ibcState.address,
         rpc: chain.rpc,
       })
+
       if (!granteeGrants) return undefined
       // console.log(granteeGrants)
       for (const msg of flowInput.msgs) {
@@ -270,26 +257,26 @@ export const useAuthZMsgGrantInfoForUser = (
           )
         }
       }
-      console.log('grants', grants)
+      console.log('grants', grants, 'grantee', grantee)
       return grants
     },
     {
       enabled: Boolean(
         grantee &&
           chain &&
-          chain.rpc &&
-          grantee !== '' &&
-          chainId &&
-          ibcState.status === WalletStatusType.connected &&
-          grantee.includes(ibcState.address.slice(0, 5)) &&
-          flowInput.msgs[0] &&
-          flowInput.msgs[0].includes('typeUrl') &&
+          // chain.rpc &&
+          // grantee !== '' &&
+          // chainId &&
+          // ibcState.status === WalletStatusType.connected &&
+          //          grantee.includes(ibcState.address.slice(0, 5)) &&
+          // flowInput.msgs[0] &&
+          // flowInput.msgs[0].includes('typeUrl') &&
           flowInput.connectionId
       ),
       refetchOnMount: 'always', // Refetch when the component mounts
       refetchInterval: 30000,    // Refetch every 30 seconds
-      staleTime: 15000,           // Cache expires after 15 seconds
-      cacheTime: 300000,         // Cache data for 5 minutes
+      // staleTime: 15000,           // Cache expires after 15 seconds
+      // cacheTime: 300000,         // Cache data for 5 minutes
     }
   )
 

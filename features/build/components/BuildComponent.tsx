@@ -21,7 +21,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
-  useGetHostedICA,
+  useGetHostedICA, useGetHostICAAddress,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -76,27 +76,21 @@ export const BuildComponent = ({
     chainIsConnected
   )
   const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(flowInput.connectionId)
+  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId)
 
-  // const refetchICAData = useRefetchQueries([
-  //   //`userAuthZGrants/${icaAddress}/${flowInput}`,
-  //   `icaTokenBalance/${chainId}/${icaAddress}`,
-  // ])
+  const refetchHostedICA = useRefetchQueries([
+    `hostInterchainAccount/${hostedAccount?.hostedAddress || ""}/${flowInput.connectionId}`,
+  ])
+  const refetchAuthZForHostedICA = useRefetchQueries(
+    `userAuthZGrants / ${hostedICA}`
+  )
   const refetchICA = useRefetchQueries([
-    `ibcTokenBalance/${denom}/${icaAddress}`,
-    //`interchainAccount/${flowInput.connectionId}`,
+    `ibcTokenBalance / ${denom} / ${icaAddress}`,
+    `userAuthZGrants / ${icaAddress}`,
+    //`interchainAccount / ${ flowInput.connectionId }`,
   ])
 
-  useEffect(() => {
-    if (icaAddress && denom) {
-      refetchICA();
-    }
-  }, [denom, icaAddress]);
 
-  // useEffect(() => {
-  //   if (icaAddress && chainId) {
-  //     refetchICAData();
-  //   }
-  // }, [chainId, icaAddress]);
 
   const { mutate: handleSubmitFlow, isLoading: isExecutingSchedule } =
     useSubmitFlow({ flowInput })
@@ -203,7 +197,7 @@ export const BuildComponent = ({
   )
 
 
-  const shouldDisableAuthzGrantButton = hostedAccount != "" || flowInput.msgs.includes("authz.v1beta1.MsgExec")
+  const shouldDisableAuthzGrantButton = !hostedICA || flowInput.msgs.includes("authz.v1beta1.MsgExec")
 
 
   const handleRegisterAccountClick = () => {
@@ -217,9 +211,7 @@ export const BuildComponent = ({
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
-    // if (!isJsonValid) {
-    //   return
-    // }
+
 
     try {
       let msgs = flowInput.msgs
@@ -284,13 +276,27 @@ export const BuildComponent = ({
     }
     await sleep(200)
     connectExternalWallet(null)
-
-    // console.log("Connection: ", connectionId, flowInput.connectionId,"ICA:", icaAddress, "Grants: ", icaAuthzGrants, "Balance: ", icaBalance)
-    await sleep(5000)
-
-
-
   }
+
+  useEffect(() => {
+    if (icaAddress && icaAddress != "" && denom) {
+      refetchICA();
+    }
+  }, [denom, icaAddress]);
+
+  useEffect(() => {
+    if ((hostedAccount) && chainId) {
+      refetchHostedICA();
+    }
+
+  }, [chainId, hostedAccount]);
+
+  useEffect(() => {
+    if (hostedICA) {
+      refetchAuthZForHostedICA()
+    }
+
+  }, [hostedICA]);
 
   function setExample(index: number, msgObject: any) {
     try {
@@ -357,7 +363,7 @@ export const BuildComponent = ({
   const shouldDisableBuildButton =
     shouldDisableSubmitButton ||
     isExecutingRegisterICA ||
-    (!icaAddress && !chainHasIAModule)
+    (!icaAddress && !hostedAccount && !chainHasIAModule)
 
   return (
     <StyledDivForContainer>
@@ -432,6 +438,7 @@ export const BuildComponent = ({
                 <>
                   {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
                     hostedAccount={hostedAccount}
+                    hostedICAAddress={hostedICA}
                     chainSymbol={chainSymbol}
                     chainId={chainId}
                     flowInput={flowInput}

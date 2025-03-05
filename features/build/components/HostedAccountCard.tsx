@@ -11,7 +11,7 @@ import {
 import React, { useEffect, useMemo, useState } from 'react'
 import { Row } from './BuildComponent'
 import { convertFromMicroDenom } from '../../../util/conversion'
-import { useAuthZMsgGrantInfoForUser, useGetHostICAAddress } from '../../../hooks/useICA'
+import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
 import { FlowInput } from '../../../types/trstTypes'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -19,6 +19,7 @@ import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hos
 
 interface HostedAccountCardProps {
   hostedAccount: HostedAccount
+  hostedICAAddress: string
   chainSymbol: string
   chainId: string
   flowInput: FlowInput
@@ -26,6 +27,7 @@ interface HostedAccountCardProps {
 
 export const HostedAccountCard = ({
   hostedAccount,
+  hostedICAAddress,
   chainSymbol,
   chainId,
   flowInput
@@ -33,7 +35,7 @@ export const HostedAccountCard = ({
   const [showICAInfo, setShowICAInfo] = useState(false)
   const isMobile = useMedia('sm')
 
-  const [hostedAccountAddress, _isIcaLoading] = useGetHostICAAddress(flowInput.connectionId, hostedAccount.hostedAddress)
+
 
 
   // ICA funds
@@ -52,16 +54,16 @@ export const HostedAccountCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
     useState(false)
-  const [icaAuthzMsgInfo, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
+  const [authzGrants, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
     chainId,
-    hostedAccountAddress,
+    hostedICAAddress,
     flowInput
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
-      grantee: hostedAccountAddress,
-      grantInfos: icaAuthzMsgInfo
-        ? icaAuthzMsgInfo.filter((icaAuthzMsgInfo) => icaAuthzMsgInfo.hasGrant == false)
+      grantee: hostedICAAddress,
+      grantInfos: authzGrants
+        ? authzGrants.filter((authzGrants) => authzGrants.hasGrant == false)
         : [],
       coin: undefined,
     }) || {};
@@ -93,8 +95,8 @@ export const HostedAccountCard = ({
   }
 
   const shouldDisableAuthzGrantButton = useMemo(
-    () => icaAuthzMsgInfo?.every((grant) => grant.hasGrant),
-    [icaAuthzMsgInfo]
+    () => authzGrants?.every((grant) => grant.hasGrant),
+    [authzGrants]
   )
 
   return (
@@ -143,11 +145,11 @@ export const HostedAccountCard = ({
           <Text variant="legend"> Address </Text>
           {isMobile ? (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
-              {hostedAccountAddress.substring(0, 33) + '..'}
+              {hostedICAAddress.substring(0, 33) + '..'}
             </Text>
           ) : (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
-              {hostedAccountAddress}
+              {hostedICAAddress}
             </Text>
           )}
           {/*   {hostedAccountBalance &&
@@ -163,12 +165,12 @@ export const HostedAccountCard = ({
             ) : (
               <Spinner instant />
             ))} */}
-          {icaAuthzMsgInfo != undefined && <><Text variant="legend"> Grants</Text>
-            {isAuthzGrantsLoading && !icaAuthzMsgInfo ? (
+          {authzGrants != undefined && <><Text variant="legend"> Grants</Text>
+            {isAuthzGrantsLoading && !authzGrants ? (
               <Spinner />
             ) : (
               <>
-                {icaAuthzMsgInfo && icaAuthzMsgInfo[0] && icaAuthzMsgInfo.map((grant, index) =>
+                {authzGrants && authzGrants[0] && authzGrants.map((grant, index) =>
                   grant.hasGrant ? (
                     <Text key={"hkey" + index} css={{ padding: '$4' }} variant="caption">
                       {' '}
@@ -234,7 +236,7 @@ export const HostedAccountCard = ({
                 </CardContent>
               </Card> */}
               <Row>
-                {icaAuthzMsgInfo && (
+                {authzGrants && (
                   <>
                     <Tooltip
                       label="An AuthZ grant allows the Interchain Account to execute a message on behalf of your account. By sending this message you grant the Interchain Account to execute messages for 1 year based on the specified TypeUrls"

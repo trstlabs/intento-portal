@@ -78,9 +78,6 @@ export const getAuthZGrantsForGrantee = async ({
   rpc,
 }: GrantQueryInput) => {
   try {
-    if (grantee == '') {
-      return false
-    }
     const cosmosClient = await cosmos.ClientFactory.createRPCQueryClient({
       rpcEndpoint: rpc,
     })
