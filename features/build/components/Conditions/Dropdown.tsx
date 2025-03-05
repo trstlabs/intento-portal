@@ -23,8 +23,8 @@ const Dropdown = <T extends string | number>({
         <div>
 
             {tooltip ? <Tooltip placement="left" label={tooltip}>
-                <Text variant="caption" color="secondary" align="left">{label}</Text>
-            </Tooltip> : <Text variant="caption" color="secondary" align="left">{label}</Text>
+                <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">{label}</Text>
+            </Tooltip> : <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">{label}</Text>
             }
             <Text>
                 <select
@@ -33,14 +33,13 @@ const Dropdown = <T extends string | number>({
                     disabled={disabled}
                     style={{
                         width: '50%',
-                        padding: '8px',
-                        margin: '8px',
+                        padding: '4px',
+                        margin: '4px',
                         borderColor: 'var(--input-border-color)',  // Use themed color
                         backgroundColor: 'var(--input-background-color)', // Use themed color
                         color: 'var(--input-text-color)', // Use themed color
-                        borderRadius: '4px',
-                        borderWidth: '1px',
-                        borderStyle: 'solid',
+                        border: 'none',
+                        borderBottom: '1px solid #ccc', // Subtle light gray line
                     }}
                 >
                     {Object.entries(options).map(([key, label]) => (

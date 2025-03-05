@@ -38,13 +38,13 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
     <Card
       variant="secondary"
       disabled
-      css={{ padding: '$6', margin: '$2' }}
+      css={{ padding: '$2', margin: '$2' , marginTop: '$6' }}
     >
 
       <Tooltip
         label={
           "Compare responses to determine if execution should take place"}>
-        <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Comparison 🆚</Text>
+        <Text variant="header" color="secondary" align="center" css={{ margin: '$6' }}> Comparison</Text>
       </Tooltip>
       <div style={{ display: 'flex', justifyContent: 'end' }}>
         <Button
@@ -102,7 +102,7 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
         onChange={(e) => handleFieldChange('flowId', BigInt(Number(e.target.value)))}
 
       />
-      <Button css={{ marginBottom: '$6' }}
+      <Button css={{ margin: '$6' }}
         onClick={() => setShowICQConfig(!showICQConfig)}
         variant="ghost"
         iconRight={

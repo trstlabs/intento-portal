@@ -98,28 +98,29 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
       }
       if (inputValue === null) {
         // Check if newValue is not a valid number or BigInt
-        throw new Error('Invalid input: not a number')
+        // throw new Error('Invalid input: not a number')
+        inputValue = 0
       }
       setError("") // Clear errorInput if valid
       onChange({ target: { value: inputValue.toString() } } as React.ChangeEvent<HTMLInputElement>)
     } catch (err) {
-      setError('Invalid input: Please enter a valid input value')
+      console.log(err)
     }
   }
-  const [inputWidth, setInputWidth] = useState('auto'); // Set initial width to auto
+  const [inputWidth, setInputWidth] = useState('auto');
   const inputRef = useRef(null);
+  const spanRef = useRef(null);
 
   useEffect(() => {
-    if (inputRef.current) {
-      // Get the scrollWidth of the input to set its width dynamically
-      const currentWidth = inputRef.current.scrollWidth;
-      setInputWidth(`${currentWidth}px`); // Set the width based on content
+    if (spanRef.current) {
+      setInputWidth(`${spanRef.current.offsetWidth + 10}px`); // Add padding for caret
     }
-  }, [value]); // Update width whenever the value changes
+  }, [value]);
+
 
   return (
     <div>
-      {tooltip ? (
+       {tooltip ? (
         <Tooltip placement="left" label={tooltip}>
           <Text css={{ padding: '$2', margin: '$2' }} variant="caption" color="secondary" align="left">
             {label}
@@ -131,21 +132,41 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
         </Text>
       )}
       <Text variant="body">
-        <StyledInput
-          ref={inputRef} // Attach ref to StyledInput
-          type={type}
-          value={value}
-          onChange={handleChange}
-          disabled={disabled}
-          style={{
-            width: inputWidth, // Set dynamic width
-            minWidth: '15%', // Minimum width
-            maxWidth: '100%', // Maximum width
-            border: '1px ridge #ccc',
-            borderRadius: '8px',
-            transition: 'width 0.2s ease', // Optional: smooth transition for width changes
-          }}
-        />
+        <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+          <StyledInput 
+            ref={inputRef} // Attach ref to StyledInput
+            type={type}
+            value={value}
+            onChange={handleChange}
+            disabled={disabled}
+            style={{
+              width: inputWidth,
+              minWidth: '50px',
+              border: 'none',
+              borderBottom: '1px solid #ccc', // Subtle light gray line
+              padding: '2px 4px',
+              outline: 'none',
+              fontSize: '16px', // Larger font size for readability
+              fontWeight: 400, // Light font weight for modern look
+              backgroundColor: 'transparent', // Transparent background for minimal look
+              transition: 'border-color 0.3s ease, transform 0.2s ease', // Smooth transitions
+            }}
+            onFocus={(e) => (e.target.style.borderBottomColor = '#007aff')} // Apple blue on focus
+            onBlur={(e) => (e.target.style.borderBottomColor = '#D1D1D6')} // Light gray when not focused
+          />
+          <span 
+            ref={spanRef}
+            style={{
+              position: 'absolute',
+              visibility: 'hidden',
+              whiteSpace: 'pre',
+              padding: '0 5px',
+              font: 'inherit', // Ensure the span matches the font size and weight of the input
+            }}
+          >
+            {value || ' '}
+          </span>
+        </div>
         {errorInput && <Text variant="caption" css={{ marginTop: '2px', color: 'red' }}>{errorInput || 'Unknown error occurred'}</Text>}
       </Text>
     </div>

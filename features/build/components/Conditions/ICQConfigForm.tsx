@@ -181,9 +181,9 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
 
   return (
     <>
-      <Divider offsetTop="$10" offsetBottom="$5"  />
+      <Divider offsetTop="$10" offsetBottom="$5" />
       <Tooltip label={"Perform an interchain query for conditions"}>
-        <Text variant="header" color="secondary" align="center" css={{ marginBottom: "$5", marginTop: "$12" }}>
+        <Text variant="header" color="secondary" align="center" css={{ marginBottom: "$2", marginTop: "$12" }}>
           Interchain Query 🔍
         </Text>
       </Tooltip>
@@ -201,66 +201,67 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
           handleFieldsChange({ chainId: update.chainId, connectionId: update.connectionId });
         }}
       />
+      <div style={{ margin: "12px" }}>
+        <div style={{ margin: "$6" }}>
+          <Text variant="caption" color="secondary">Examples</Text>
+          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+            {Object.keys(examples).map((example) => (
+              <Chip key={example} label={example} onClick={() => handleExampleSelect(example)} />
+            ))}
+          </div>
 
-      <div style={{ marginTop: "16px" }}>
-        <Text variant="caption" color="secondary">Examples</Text>
-        <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-          {Object.keys(examples).map((example) => (
-            <Chip key={example} label={example} onClick={() => handleExampleSelect(example)} />
+          {/* Dynamically render fields based on the selected query example */}
+          {selectedExample && examples[selectedExample].fields.map((field, index) => (
+            <Field
+              key={index}
+              label={field.label}
+              tooltip={`Provide the ${field.label.toLowerCase()} for the ${selectedExample}`}
+              type="string"
+              value={formData[field.key] || ""}
+              onChange={(e) => handleFieldChange(field.key, e.target.value)}
+              disabled={false}
+            />
           ))}
+          <Button
+            variant="primary"
+            onClick={generateQuery}
+            disabled={!selectedExample}
+            css={{ marginTop: "16px" }}
+          >
+            Generate Key
+          </Button>
         </div>
 
-        {/* Dynamically render fields based on the selected query example */}
-        {selectedExample && examples[selectedExample].fields.map((field, index) => (
-          <Field
-            key={index}
-            label={field.label}
-            tooltip={`Provide the ${field.label.toLowerCase()} for the ${selectedExample}`}
-            type="string"
-            value={formData[field.key] || ""}
-            onChange={(e) => handleFieldChange(field.key, e.target.value)}
-            disabled={false}
-          />
-        ))}
-        <Button
-          variant="primary"
-          onClick={generateQuery}
-          disabled={!selectedExample}
-          css={{ marginTop: "16px" }}
-        >
-          Generate Key
-        </Button>
+        <Field
+          label="Query Type"
+          tooltip="path to the store, e.g. store/bank/key or store/staking/key"
+          type="string"
+          value={formData.queryType || ""}
+          onChange={(e) => handleFieldsChange({ queryType: e.target.value })}
+        />
+
+        <Field
+          label="Query Key"
+          tooltip="key in the store to query e.g. Base64 encoded value based on prefix and address"
+          value={formData.queryKey || ""}
+          onChange={(e) => handleFieldsChange({ queryKey: e.target.value })}
+          type="string"
+        />
+
+        <Dropdown
+          label="Timeout"
+          tooltip="What should happen when the query times out"
+          value={formData.timeoutPolicy ? formData.timeoutPolicy : TimeoutPolicy.REJECT_QUERY_RESPONSE}
+          onChange={(e) => {
+            handleFieldsChange({
+              timeoutPolicy: Number(e.target.value),
+              timeoutDuration: Duration.fromPartial({ "seconds": BigInt(60) }),
+            });
+          }}
+          disabled={false}
+          options={TimeoutPolicyLabels}
+        />
       </div>
-
-      <Field
-        label="Query Type"
-        tooltip="path to the store, e.g. store/bank/key or store/staking/key"
-        type="string"
-        value={formData.queryType || ""}
-        onChange={(e) => handleFieldsChange({ queryType: e.target.value })}
-      />
-
-      <Field
-        label="Query Key"
-        tooltip="key in the store to query e.g. Base64 encoded value based on prefix and address"
-        value={formData.queryKey || ""}
-        onChange={(e) => handleFieldsChange({ queryKey: e.target.value })}
-        type="string"
-      />
-
-      <Dropdown
-        label="Timeout"
-        tooltip="What should happen when the query times out"
-        value={formData.timeoutPolicy ? formData.timeoutPolicy : TimeoutPolicy.REJECT_QUERY_RESPONSE}
-        onChange={(e) => {
-          handleFieldsChange({
-            timeoutPolicy: Number(e.target.value),
-            timeoutDuration: Duration.fromPartial({ "seconds": BigInt(60) }),
-          });
-        }}
-        disabled={false}
-        options={TimeoutPolicyLabels}
-      />
     </>
   );
 };

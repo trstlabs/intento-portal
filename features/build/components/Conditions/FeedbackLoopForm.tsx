@@ -41,12 +41,12 @@ export const FeedbackLoopForm = ({ feedbackLoop, onChange, setDisabled }: Feedba
     <Card
       variant="secondary"
       disabled
-      css={{ padding: '$6', margin: '$2' }}
+      css={{ padding: '$2', margin: '$2', marginTop: '$6' }}
     >
       <Tooltip
         label={
           "Use a response value as a value for a message"}>
-        <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Feedback Loop 🔁
+        <Text variant="header" align="center" color="secondary" css={{ margin: '$6' }}> Feedback Loop
         </Text>
       </Tooltip>
       <div style={{ display: 'flex', justifyContent: 'end' }}>
@@ -103,7 +103,7 @@ export const FeedbackLoopForm = ({ feedbackLoop, onChange, setDisabled }: Feedba
 
         options={valueTypeOptions}
       />
-      <Button css={{ marginBottom: '$6' }}
+      <Button css={{ margin: '$6' }}
         onClick={() => setShowICQConfig(!showICQConfig)}
         variant="ghost"
         iconRight={

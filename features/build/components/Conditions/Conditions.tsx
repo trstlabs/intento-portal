@@ -114,17 +114,7 @@ export const Conditions = ({
                   />}>
                 Feedback Loops
               </Button>
-              {showFeedbackLoops && <Button css={{ marginBottom: '$6' }}
-                onClick={() => handleAddFeedbackLoop()}
-                variant="ghost"
-                iconRight={
-                  <IconWrapper
-                    size="medium"
-                    rotation="-90deg"
-                    color="tertiary"
-                    icon={<PlusIcon />}
-                  />}>
-              </Button>}
+
             </Inline>
 
             {showFeedbackLoops &&
@@ -136,7 +126,18 @@ export const Conditions = ({
                 />
               )))
             }
-
+            {showFeedbackLoops && <Button css={{ marginBottom: '$6' }}
+              onClick={() => handleAddFeedbackLoop()}
+              variant="ghost"
+              icon={
+                <IconWrapper
+                  size="medium"
+                  rotation="-90deg"
+                  color="tertiary"
+                  icon={<PlusIcon />}
+                />
+                }>
+            </Button>}
             <Inline justifyContent="space-between" >
               <Button css={{ marginBottom: '$6' }}
                 onClick={() => {
@@ -155,17 +156,7 @@ export const Conditions = ({
                     icon={showComparisons ? <ChevronIcon rotation="90deg" /> : <Chevron />}
                   />}>
                 Comparisons</Button>
-              {showComparisons && <Button css={{ marginBottom: '$6' }}
-                onClick={() => handleAddComparison()}
-                variant="ghost"
-                iconRight={
-                  <IconWrapper
-                    size="medium"
-                    rotation="-90deg"
-                    color="tertiary"
-                    icon={<PlusIcon />}
-                  />}>
-              </Button>}
+
             </Inline>
 
             {showComparisons && (
@@ -178,7 +169,17 @@ export const Conditions = ({
 
               )))
             }
-
+            {showComparisons && <Button css={{ marginBottom: '$6' }}
+              onClick={() => handleAddComparison()}
+              variant="ghost"
+              icon={
+                <IconWrapper
+                  size="medium"
+                  rotation="-90deg"
+                  color="tertiary"
+                  icon={<PlusIcon />}
+                />}>
+            </Button>}
             <Button css={{ marginBottom: '$6' }}
               onClick={() => setShowStoplights(!showStoplights)}
               variant="ghost"
