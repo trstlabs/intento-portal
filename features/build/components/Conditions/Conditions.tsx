@@ -47,6 +47,15 @@ export const Conditions = ({
     onChange(newConditions)
   }
 
+  const handleChangeFeedbackLoop = (index, value: any) => {
+    let newConditions = conditions
+    newConditions.feedbackLoops[index] = value
+    if (value == undefined) {
+      newConditions.feedbackLoops.splice(index, 1)
+    }
+    onChange(newConditions)
+  }
+
   const handleAddFeedbackLoop = () => {
     let newConditions = conditions
     const newValue: FeedbackLoop = {
@@ -76,13 +85,7 @@ export const Conditions = ({
     newConditions.comparisons = [...conditions.comparisons, newValue] // Add a new empty object
     onChange(newConditions)
   }
-  const handleChangeFeedbackLoop = (index, value: any) => {
-    let newConditions = conditions
-    newConditions.feedbackLoops[index] = value
-    if (value == undefined) {
-      newConditions.feedbackLoops.splice(index, 1)
-    }
-  }
+
 
 
   return (
