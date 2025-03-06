@@ -36,6 +36,7 @@ const StyledInput = styled('input', {
     color: 'inherit',
     padding: '$2',
     margin: '$2',
+    fontSize: '16px',
 });
 
 const StyledLabel = styled(Text, {
@@ -66,7 +67,7 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
 
     useEffect(() => {
         setValues(JSON.parse(jsonValue).value || {});
-      }, [jsonValue]);
+    }, [jsonValue]);
 
     // Validation function
     const validateValues = async (values) => {
@@ -84,51 +85,49 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
         }
     };
 
-    // Handle change event
     const handleChange = useCallback((key, value) => {
         setValues((prevValues) => {
             const newValues = { ...prevValues };
             let current = newValues;
             const keys = key.split('.');
-    
+
             for (let i = 0; i < keys.length - 1; i++) {
                 const k = keys[i];
-                // Handle array index (e.g., amount[0])
                 if (k.includes('[')) {
                     const [arrKey, index] = k.split('[');
                     const arrIndex = parseInt(index.replace(']', ''), 10);
-                    
+
                     if (!Array.isArray(current[arrKey])) {
                         current[arrKey] = [];
                     }
-    
-                    // Clone the array and object at the specific index
+
                     current[arrKey] = [...current[arrKey]];
                     if (!current[arrKey][arrIndex]) {
-                        current[arrKey][arrIndex] = {}; // Ensure the object exists at the index
+                        current[arrKey][arrIndex] = {};
                     }
-                    current = current[arrKey][arrIndex]; // Move to the next level
+                    current = current[arrKey][arrIndex];
                 } else {
                     if (!current[k]) current[k] = isNaN(keys[i + 1]) ? {} : [];
                     current = current[k];
                 }
             }
-    
+
             const lastKey = keys[keys.length - 1];
-            current[lastKey] = value; // Assign the value at the last key
-    
-            // Trigger validation after updating the values
-            validateValues(newValues);
-    
-            // Trigger onChange callback with updated values
+            current[lastKey] = value;
+
             const updatedJSON = { ...JSON.parse(jsonValue), value: newValues };
-            onChange?.(JSON.stringify(updatedJSON, null, 2));
-    
+
+            setTimeout(() => {
+                validateValues(newValues);
+                onChange?.(JSON.stringify(updatedJSON, null, 2));
+            }, 0);
+
             return newValues;
         });
     }, [jsonValue, onChange, validateValues]);
-    
-    
+
+
+
 
     const handleNewFieldKeyChange = useCallback((path, value) => {
         setNewFieldKeys((prevKeys) => ({
@@ -252,3 +251,4 @@ function formatMainTitle(title) {
 }
 
 export default JsonFormEditor;
+

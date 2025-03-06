@@ -211,27 +211,13 @@ export const BuildComponent = ({
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
-
-
-    try {
-      let msgs = flowInput.msgs
-      msgs[index] = msg
-      let updatedFlowInput = {
-        ...flowInput,
-        msgs,
-      }
-      onFlowChange(updatedFlowInput)
-      // if (
-      //   JSON.parse(msg)
-      //   ['typeUrl'].split('.')
-      //     .find((data) => data.includes('Msg'))
-      // ) {
-
-      //   refetchICAData()
-      // }
-    } catch (e) {
-      console.log(e)
+    let msgs = flowInput.msgs
+    msgs[index] = msg
+    let updatedFlowInput = {
+      ...flowInput,
+      msgs,
     }
+    onFlowChange(updatedFlowInput)
   }
 
   async function handleChainChange(
