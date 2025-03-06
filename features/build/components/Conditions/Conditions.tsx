@@ -136,8 +136,9 @@ export const Conditions = ({
                   color="tertiary"
                   icon={<PlusIcon />}
                 />
-                }>
-            </Button>}
+              } />
+
+            }
             <Inline justifyContent="space-between" >
               <Button css={{ marginBottom: '$6' }}
                 onClick={() => {
@@ -178,8 +179,7 @@ export const Conditions = ({
                   rotation="-90deg"
                   color="tertiary"
                   icon={<PlusIcon />}
-                />}>
-            </Button>}
+                />} />}
             <Button css={{ marginBottom: '$6' }}
               onClick={() => setShowStoplights(!showStoplights)}
               variant="ghost"
