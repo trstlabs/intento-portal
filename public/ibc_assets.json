@@ -1,14 +1,14 @@
 [
   {
     "id": "Intento",
-    "name": "intento-test-1",
+    "name": "intento-ics-test-1",
     "registry_name": "intentozone",
     "symbol": "INTO",
-    "chain_id": "intento-test-1",
+    "chain_id": "intento-ics-test-1",
     "denom": "uinto",
     "decimals": 6,
     "denom_local": "uinto",
-    "logo_uri": "https://trstlabs.xyz/trst.svg",
+    "logo_uri": "https://docs.intento.zone/img/icon.png",
     "prefix": "into"
   },
   {
@@ -19,30 +19,13 @@
     "chain_id": "GAIA",
     "denom": "uatom",
     "decimals": 6,
-    "channel": "channel-0",
-    "channel_to_trst": "channel-0",
+    "channel": "channel-1",
+    "channel_to_trst": "channel-1",
     "denom_local": "ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2",
     "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
-    "connection_id": "connection-1",
+    "connection_id": "connection-0",
     "counterparty_connection_id": "connection-0",
     "prefix": "cosmos",
-    "rpc": "https://gaia-rpc-t.trustlesshub.com"
-  },
-  {
-    "id": "Osmosis",
-    "name": "Osmosis Local",
-    "symbol": "OSMO",
-    "chain_id": "OSMO",
-    "registry_name": "osmosistest",
-    "denom": "uosmo",
-    "decimals": 6,
-    "channel": "channel-1",
-    "channel_to_trst": "channel-0",
-    "denom_local": "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
-    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
-    "connection_id": "connection-3",
-    "counterparty_connection_id": "connection-1",
-    "prefix": "osmo",
-    "rpc": "https://osmo-rpc-t.trustlesshub.com"
+    "rpc": "https://provider-test-rpc.intento.zone"
   }
 ]
