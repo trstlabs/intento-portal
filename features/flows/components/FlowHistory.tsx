@@ -182,8 +182,7 @@ export const FlowHistory = ({
 
                           {timedOut && (
                             <Text variant="legend">
-                              Execution on the destination chain did not
-                              happen because it timed out
+                              Timed out relaying IBC packets for this execution
                             </Text>
                           )}
                         </Column>

@@ -928,6 +928,18 @@ export const FlowInfoBreakdown = ({
             </>
             <>
               <Tooltip
+                label={'If set to true, stops on any timeout that occurs'}
+              >
+                <Text variant="legend" color="secondary" align="left">
+                  Stop on Timeout
+                </Text>
+              </Tooltip>
+              <Text variant="header">
+                {flowInfo.configuration.stopOnTimeout ? '✔' : '✖'}
+              </Text>
+            </>
+            <>
+              <Tooltip
                 label={'If set to true, as a fallback, the owner balance is used to pay for local fees'}
               >
                 <Text variant="legend" color="secondary" align="left">
