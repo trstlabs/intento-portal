@@ -28,7 +28,7 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
     flowInfo.endTime &&
     flowInfo.execTime &&
     flowInfo.endTime.getSeconds() >= flowInfo.execTime.getSeconds()
-    && flowInfo.endTime.getTime() > Date.now()
+    && flowInfo.endTime.getTime() > Date.now() && flowInfo.execTime.getTime() > Date.now()
   return (
     <Link href={`/flows/${flowInfo.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>
