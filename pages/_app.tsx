@@ -58,15 +58,15 @@ function TrstApp({ Component, pageProps }: AppProps) {
           {
             name: 'Intento INTO',
             display: 'INTO',
-            symbol: 'uinto',
+            symbol: 'INTO',
             denom_units: [
               { denom: 'uinto', exponent: 0 },
               { denom: 'INTO', exponent: 6 },
             ],
             base: 'uinto',
             logo_URIs: {
-              png: 'https://www.trustlesshub.com/img/brand/icon.png',
-              svg: 'https://info.trstlabs.xyz/trst.svg',
+              png: 'https://intento.zone/assets/images/icon.png',
+              svg: 'https://intento.zone/assets/images/icon.svg',
             },
           },
         ],

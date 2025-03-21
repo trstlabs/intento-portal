@@ -1,14 +1,14 @@
 [
   {
-    "id": "Intento",
-    "name": "intento-ics-test-1",
+    "id": "Intento Testnet",
+    "name": "Intento Testnet",
     "registry_name": "intentozone",
     "symbol": "INTO",
     "chain_id": "intento-ics-test-1",
     "denom": "uinto",
     "decimals": 6,
     "denom_local": "uinto",
-    "logo_uri": "https://docs.intento.zone/img/icon.png",
+    "logo_uri": "https://intento.zone/assets/images/icon.png",
     "prefix": "into"
   },
   {
