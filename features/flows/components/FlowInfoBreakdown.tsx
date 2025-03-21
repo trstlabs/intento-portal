@@ -159,7 +159,7 @@ export const FlowInfoBreakdown = ({
     return setRequestedUpdateFlow(true)
   }
 
-  const handleUpdateFlowConfigClick = (config: ExecutionConfiguration) => {
+  function handleUpdateFlowConfigClick(config: ExecutionConfiguration)  {
 
     if (!isJsonValid) {
       //alert("Invalid JSON")
@@ -169,21 +169,19 @@ export const FlowInfoBreakdown = ({
       alert("Nothing to update")
       return
     }
-    try {
 
-      let params: MsgUpdateFlowParams = {
-        id: Number(flowInfo.id),
-        configuration: config,
-        owner: flowInfo.owner,
-      }
-
-      setUpdatedFlowParams(params)
-      console.log(params)
-    } catch (e) {
-      console.log(e)
+    let params: MsgUpdateFlowParams = {
+      id: Number(flowInfo.id),
+      configuration: config,
+      owner: flowInfo.owner,
     }
+
+    setUpdatedFlowParams(params)
+    console.log(params)
     return setRequestedUpdateFlow(true)
   }
+
+
   const shouldDisableUpdateFlowButton = false // !updatedFlowParams || !updatedFlowParams.id
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
