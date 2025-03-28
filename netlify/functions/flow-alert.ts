@@ -33,14 +33,16 @@ export const handler: Handler = async (event) => {
     await channel.attach()
 
     if (unsubscribe) {
-      await channel.presence.leave({ flowID })
-      console.log(`Unsubscribed ${email} from flow ID ${flowID}`)
-      return { statusCode: 200, body: 'Unsubscribed successfully' }
+      // Publish the "unsubscribe" event to be processed by the worker
+      await channel.publish("unsubscribe", { email, flowID })
+      console.log(`Published 'unsubscribe' event for ${email} from flow ID ${flowID}`)
+      return { statusCode: 200, body: 'Unsubscribe request sent' }
     }
 
-    await channel.presence.enter({ flowID })
-    console.log(`Subscribed ${email} to flow ID ${flowID}`)
-    return { statusCode: 200, body: 'Subscribed successfully' }
+    // Publish the "subscribe" event for worker processing
+    await channel.publish("subscribe", { email, flowID })
+    console.log(`Published 'subscribe' event for ${email} to flow ID ${flowID}`)
+    return { statusCode: 200, body: 'Subscribe request sent' }
   } catch (error) {
     console.error('Error processing request:', error)
     return { statusCode: 500, body: 'Internal server error' }
