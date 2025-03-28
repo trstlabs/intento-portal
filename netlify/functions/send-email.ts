@@ -38,7 +38,7 @@ export const handler: Handler = async (event, _context) => {
     console.log(`Sending emails for Flow ID ${flowID}:`, emails)
 
     await Promise.all(emails.map(email => {
-      const unsubscribeUrl = `${process.env.BASE_URL}/unsubscribe?flowID=${encodeURIComponent(flowID)}&email=${encodeURIComponent(email)}`;
+      const unsubscribeUrl = `${process.env.BASE_URL}/.netlify/functions/flow-alert?flowID=${encodeURIComponent(flowID)}&unsubscribe=true&email=${encodeURIComponent(email)}`;
       const flowUrl = `${process.env.BASE_URL}/flows/${flowID}`
 
       return transporter.sendMail({
