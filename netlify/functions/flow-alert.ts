@@ -3,23 +3,34 @@ import * as Ably from 'ably'
 
 export const handler: Handler = async (event) => {
   try {
-    const { email, flowID, unsubscribe } = JSON.parse(event.body || '{}')
+    let email, flowID, unsubscribe
+
+    if (event.httpMethod === 'GET') {
+      // Extract query parameters from the URL
+      const params = new URLSearchParams(event.queryStringParameters as any)
+      email = params.get('email')
+      flowID = params.get('flowID')
+      unsubscribe = params.get('unsubscribe') === 'true'
+    } else {
+      // Handle POST request with JSON body
+      ({ email, flowID, unsubscribe } = JSON.parse(event.body || '{}'))
+    }
 
     if (!email || !flowID) {
-      console.warn('Invalid request: Missing email or flowID', event.body)
+      console.warn('Invalid request: Missing email or flowID', event.body || event.queryStringParameters)
       return { statusCode: 400, body: 'Invalid request' }
     }
 
     console.log(`Processing request for ${email} with flowID: ${flowID}, unsubscribe: ${unsubscribe}`)
 
-    // Create a new Ably client with the dynamic clientId
+    // Create Ably client
     const ably = new Ably.Realtime({
       key: process.env.ABLY_API_KEY,
       clientId: email,
     })
 
     const channel = ably.channels.get('flow-events')
-    await channel.attach() // Ensure the channel is attached before presence operations
+    await channel.attach()
 
     if (unsubscribe) {
       await channel.presence.leave({ flowID })
