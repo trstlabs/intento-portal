@@ -53,7 +53,6 @@ export const executeSubmitFlow = async ({
   if (flowInput.connectionId && flowInput.hostConnectionId) {
     flowInput.hostedIcaConfig = undefined
   }
-  console.log('msgSubmitFlow', msgs)
   const msgSubmitFlow =
     intento.intent.v1beta1.MessageComposer.withTypeUrl.submitFlow({
       owner,
@@ -77,7 +76,8 @@ export const executeSubmitFlow = async ({
       conditions: flowInput.conditions,
       hostedIcaConfig: flowInput.hostedIcaConfig,
     })
-  console.log('msgSubmitFlow', msgSubmitFlow)
+  console.log('Submitting msgSubmitFlow ⬇')
+  console.log(msgSubmitFlow)
   return validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitFlow], {
       amount: [],

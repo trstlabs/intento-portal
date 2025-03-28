@@ -18,23 +18,30 @@ export const executeUpdateFlow = async ({
   let msgs = []
   if (flowParams.msgs) {
     transformAndEncodeMsgs(flowParams.msgs, client, msgs)
+    console.log(msgs)
   }
-  console.log(msgs)
+
   const msgUpdateFlow =
     intento.intent.v1beta1.MessageComposer.withTypeUrl.updateFlow({
       id: BigInt(flowParams.id),
       owner: flowParams.owner,
       connectionId: flowParams.connectionId ? flowParams.connectionId : '',
       msgs: msgs,
-      endTime: flowParams.endTime ? BigInt(flowParams.endTime) : BigInt(0),
+      endTime: flowParams.endTime
+        ? BigInt(Number(flowParams.endTime/ 1000).toFixed(0))
+        : BigInt(0),
       label: flowParams.label ? flowParams.label : '',
-      interval: flowParams.interval ? flowParams.interval : '',
-      startAt: flowParams.startAt ? BigInt(flowParams.startAt) : BigInt(0),
+      interval: flowParams.interval ? flowParams.interval.toString() + 's' : '',
+      startAt: flowParams.startAt
+        ? BigInt(Number(flowParams.startAt/ 1000).toFixed(0) )
+        : BigInt(0),
       configuration: flowParams.configuration
         ? flowParams.configuration
         : undefined,
       feeFunds: flowParams.feeFunds ? flowParams.feeFunds : [],
     })
+  console.log('Submitting MsgUpdateFlow ⬇')
+  console.log(msgUpdateFlow)
   return validateTransactionSuccess(
     await client.signAndBroadcast(flowParams.owner, [msgUpdateFlow], {
       amount: [],

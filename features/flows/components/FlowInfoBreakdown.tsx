@@ -16,6 +16,7 @@ import {
   IconWrapper,
   Chevron,
   Union,
+  useControlTheme,
 } from 'junoblocks'
 import Link from 'next/link'
 import React from 'react'
@@ -57,7 +58,7 @@ export const FlowInfoBreakdown = ({
   FlowInfoBreakdownProps) => {
 
   const [icaAddress, _] = useGetICA(flowInfo.icaConfig?.connectionId, flowInfo.owner)
-
+  const themeController = useControlTheme()
   const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
@@ -77,6 +78,7 @@ export const FlowInfoBreakdown = ({
     flowInfo.endTime.getTime() >= flowInfo.execTime.getTime() && flowInfo.endTime.getTime() > Date.now()
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
+
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
   const {
     mutate: handleSendFundsOnHost,
@@ -114,10 +116,15 @@ export const FlowInfoBreakdown = ({
   const [isJsonValid, setIsJsonValid] = useState(true)
   const [editorIndex, setEditorIndex] = useState(-1)
   const [editConfig, setEditConfig] = useState(false)
+  const [editExecution, setEditExecution] = useState(false)
   const [editMsgs, setEditMsgs] = useState([''])
   let flowParams: MsgUpdateFlowParams = {
     id: Number(flowInfo.id),
     owner: flowInfo.owner,
+    endTime: flowInfo.endTime.getTime(),
+    startAt: flowInfo.startTime.getTime(),
+    interval: Number(flowInfo.interval.seconds),
+
   }
 
   const [updatedFlowParams, setUpdatedFlowParams] = useState(flowParams)
@@ -150,7 +157,7 @@ export const FlowInfoBreakdown = ({
 
 
   //todo add support for multiple messages in exec message array
-  const handleUpdateFlowMsgClick = () => {
+  const handleUpdateFlowClick = () => {
     if (!isJsonValid) {
       //alert("Invalid JSON")
       return
@@ -159,17 +166,7 @@ export const FlowInfoBreakdown = ({
     return setRequestedUpdateFlow(true)
   }
 
-  function handleUpdateFlowConfigClick(config: ExecutionConfiguration)  {
-
-    if (!isJsonValid) {
-      //alert("Invalid JSON")
-      return
-    }
-    if (editMsgs.length == 0) {
-      alert("Nothing to update")
-      return
-    }
-
+  function handleUpdateFlowConfigClick(config: ExecutionConfiguration) {
     let params: MsgUpdateFlowParams = {
       id: Number(flowInfo.id),
       configuration: config,
@@ -179,6 +176,25 @@ export const FlowInfoBreakdown = ({
     setUpdatedFlowParams(params)
     console.log(params)
     return setRequestedUpdateFlow(true)
+  }
+
+  function setUpdateFlowInfo(field: string, value: any) {
+    let updatedFlowInfo = { ...flowInfo };
+  
+    if (field === 'interval') {
+      updatedFlowInfo.interval.seconds = BigInt(value);
+    } else {
+      updatedFlowInfo[field] = value;
+    }
+    let params: MsgUpdateFlowParams = {
+      id: Number(updatedFlowInfo.id),
+      owner: updatedFlowInfo.owner,
+      startAt: Date.now() - updatedFlowInfo.startTime.getTime() < 0 ? Number(updatedFlowInfo.startTime.getUTCSeconds()) : Number(0),
+      endTime: Number(updatedFlowInfo.endTime.getTime()),
+      interval: Number(updatedFlowInfo.interval.seconds)
+    };
+
+    setUpdatedFlowParams(params);
   }
 
 
@@ -551,7 +567,7 @@ export const FlowInfoBreakdown = ({
                       variant="secondary"
                       size="small"
                       disabled={shouldDisableUpdateFlowButton}
-                      onClick={handleUpdateFlowMsgClick}
+                      onClick={handleUpdateFlowClick}
                     >
                       {isExecutingUpdateFlow && <Spinner instant />}{' '}
                       {'Update Message'}
@@ -567,7 +583,23 @@ export const FlowInfoBreakdown = ({
           <Row>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {flowInfo.startTime && (
+              <Inline css={{ justifyContent: 'space-between' }} >
+                <Tooltip
+                  label={"Schedule execution of the flow"}
+                >
+                  <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+                    Execution
+                  </Text>
+                </Tooltip>
+                <Button
+                  variant="ghost"
+                  size="small"
+                  onClick={() => setEditExecution(!editExecution)}
+                >
+                  {!editExecution ? 'Edit' : 'Discard'}
+                </Button>
+              </Inline>
+              {!editExecution && <> {flowInfo.startTime && (
                 <>
                   <Tooltip
                     label={
@@ -585,54 +617,106 @@ export const FlowInfoBreakdown = ({
                   </Inline>
                 </>
               )}
-              <Tooltip
-                label={
-                  'Execution time is the time the next execution takes place. In case a trigger has ended, the execution time is the time of the last execution'
-                }
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Execution Time
+                <Tooltip
+                  label={
+                    'Execution time is the time the next execution takes place. In case a trigger has ended, the execution time is the time of the last execution'
+                  }
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Execution Time
+                  </Text>
+                </Tooltip>
+                <Inline gap={2}>
+                  <Text variant="body">
+                    {getRelativeTime(flowInfo.execTime.getTime())}
+                  </Text>
+                </Inline>
+                {flowInfo.interval.seconds.toString() != '0' && (
+                  <>
+                    {' '}
+                    <Tooltip
+                      label={'Interval is the fixed time between 2 executions'}
+                    >
+                      <Text variant="legend" color="secondary" align="left">
+                        Interval
+                      </Text>
+                    </Tooltip>
+                    <Inline gap={2}>
+                      <Text variant="body">
+                        {getDuration(Number(flowInfo.interval.seconds))}
+                      </Text>
+                    </Inline>
+                  </>
+                )}
+                {flowInfo.endTime.getTime() && (
+                  <>
+                    <Tooltip
+                      label={'End time is the time last time execution can place'}
+                    >
+                      <Text variant="legend" color="secondary" align="left">
+                        End time
+                      </Text>
+                    </Tooltip>
+                    <Inline gap={2}>
+                      <Text variant="body">
+                        {getRelativeTime(flowInfo.endTime.getTime())}
+                      </Text>
+                    </Inline>
+                  </>
+                )}
+              </>}
+              {editExecution && (
+                <Text>
+                  <Column gap={8} align="flex-start" justifyContent="flex-start">
+                    <Text>Start Time UTC</Text>
+                    <input style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
+                      type="datetime-local"
+                      value={updatedFlowParams.startAt ? new Date(updatedFlowParams.startAt).toISOString().slice(0, -8) : ''}
+                      onChange={(e) => setUpdateFlowInfo('startTime', new Date(e.target.value))}
+                    />
+                    <Text>Interval</Text>
+                    <select
+                      style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
+                      value={updatedFlowParams.interval} // Use flowInfo.interval as the default
+                      onChange={(e) => setUpdateFlowInfo('interval', Number(e.target.value))}
+                    >
+                      <option value={300}>5 minutes</option>
+                      <option value={600}>10 minutes</option>
+                      <option value={3600}>1 hour</option>
+                      <option value={86400}>1 day</option>
+                      <option value={604800}>1 week</option>
+                      <option value={2592000}>1 month</option>
+                    </select>
+
+                    <Text>End Time UTC</Text>
+                    <input style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
+                      type="datetime-local"
+                      value={updatedFlowParams.endTime ? new Date(updatedFlowParams.endTime).toISOString().slice(0, -8) : ''}
+
+                      onChange={(e) => setUpdateFlowInfo('endTime', new Date(e.target.value))}
+                    />
+                    <button onClick={() => setUpdateFlowInfo('endTime', flowInfo.execTime)}>
+                      Set End Time to Next Execution
+                    </button>
+                    <Button
+                      css={{ marginTop: '$8', margin: '$2' }}
+                      variant="secondary"
+                      size="small"
+                      disabled={false}
+                      onClick={handleUpdateFlowClick}
+                    >
+                      {isExecutingUpdateFlow && <Spinner instant />}{' '}
+                      {'Update Message'}
+                    </Button>
+                  </Column>
                 </Text>
-              </Tooltip>
-              <Inline gap={2}>
-                <Text variant="body">
-                  {getRelativeTime(flowInfo.execTime.getTime())}
-                </Text>
-              </Inline>
-              {flowInfo.interval.seconds.toString() != '0' && (
-                <>
-                  {' '}
-                  <Tooltip
-                    label={'Interval is the fixed time between 2 executions'}
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      Interval
-                    </Text>
-                  </Tooltip>
-                  <Inline gap={2}>
-                    <Text variant="body">
-                      {getDuration(Number(flowInfo.interval.seconds))}
-                    </Text>
-                  </Inline>
-                </>
+
               )}
-              {flowInfo.endTime.getTime() && (
-                <>
-                  <Tooltip
-                    label={'End time is the time last time execution can place'}
-                  >
-                    <Text variant="legend" color="secondary" align="left">
-                      End time
-                    </Text>
-                  </Tooltip>
-                  <Inline gap={2}>
-                    <Text variant="body">
-                      {getRelativeTime(flowInfo.endTime.getTime())}
-                    </Text>
-                  </Inline>
-                </>
-              )}
+
+
+
             </Column>
+
           </Row>
         )}
 

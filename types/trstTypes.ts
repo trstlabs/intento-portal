@@ -12,7 +12,7 @@ export interface MsgUpdateFlowParams {
   msgs?: string[]
   endTime?: number
   label?: string
-  interval?: string
+  interval?: number
   startAt?: number
   feeFunds?: Coin[]
   version?: string
