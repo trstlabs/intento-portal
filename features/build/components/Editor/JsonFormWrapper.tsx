@@ -128,7 +128,7 @@ export const JsonFormWrapper = ({
                         <span key={ei}>
                           {' '}
                           <Chip
-                            href="https://github.com/cosmos/chain-registry/blob/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
+                            href="https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
                             label={example.typeUrl
                               .split('.')
                               .find((data) => data.includes('Msg'))
