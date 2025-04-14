@@ -16,7 +16,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
-      "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
+      "description": "MsgUpdateParams is the Msg/UpdateParams request type."
     },
     "cosmos.slashing.v1beta1.Params": {
       "properties": {
@@ -33,12 +33,12 @@
           "type": "string",
           "format": "regex"
         },
-        "slashFrflowDoubleSign": {
+        "slashFractionDoubleSign": {
           "type": "string",
           "format": "binary",
           "binaryEncoding": "base64"
         },
-        "slashFrflowDowntime": {
+        "slashFractionDowntime": {
           "type": "string",
           "format": "binary",
           "binaryEncoding": "base64"

@@ -20,7 +20,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Create Permanent Locked Account",
-      "description": "MsgCreatePermanentLockedAccount defines a message that enables creating a permanent locked account. Since: cosmos-sdk 0.46"
+      "description": "MsgCreatePermanentLockedAccount defines a message that enables creating a permanent locked account."
     },
     "cosmos.base.v1beta1.Coin": {
       "properties": {

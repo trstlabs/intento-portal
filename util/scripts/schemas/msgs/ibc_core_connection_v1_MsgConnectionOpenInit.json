@@ -77,7 +77,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Version",
-      "description": "Version defines the versioning scheme used to negotiate the IBC verison in the connection handshake."
+      "description": "Version defines the versioning scheme used to negotiate the IBC version in the connection handshake."
     }
   }
 }

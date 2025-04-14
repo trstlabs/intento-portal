@@ -1,0 +1,12 @@
+version: v1
+plugins:
+  - name: jsonschema
+    out: ../../schemas/msgs
+    strategy: all
+    opt:
+      - plugins=grpc,Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types,Mcosmos/orm/v1/orm.proto=cosmossdk.io/orm
+      - prefix_schema_files_with_package
+      - disallow_additional_properties
+      - enums_as_constants
+      - enums_as_strings_only
+      

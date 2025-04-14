@@ -17,11 +17,12 @@
           "properties": {
             "typeUrl": {
               "type": "string",
-              "description": "A URL/resource name that uniquely identifies the type of the serialized protocol buffer message. This string must contain at least one \"/\" character. The last segment of the URL's path must represent the fully qualified name of the type (as in `path/google.protobuf.Duration`). The name should be in a canonical form (e.g., leading \".\" is not accepted). In practice, teams usually precompile into the binary all types that they expect it to use in the context of Any. However, for URLs which use the scheme `http`, `https`, or no scheme, one can optionally set up a type server that maps type URLs to message definitions as follows: * If no scheme is provided, `https` is assumed. * An HTTP GET on the URL must yield a [google.protobuf.Type][]   value in binary format, or produce an error. * Applications are allowed to cache lookup results based on the   URL, or have them precompiled into a binary to avoid any   lookup. Therefore, binary compatibility needs to be preserved   on changes to types. (Use versioned type names to manage   breaking changes.) Note: this functionality is not currently available in the official protobuf release, and it is not used for type URLs beginning with type.googleapis.com. Schemes other than `http`, `https` (or the empty scheme) might be used with implementation specific semantics."
+              "description": "A URL/resource name that uniquely identifies the type of the serialized protocol buffer message. This string must contain at least one \"/\" character. The last segment of the URL's path must represent the fully qualified name of the type (as in `path/google.protobuf.Duration`). The name should be in a canonical form (e.g., leading \".\" is not accepted). In practice, teams usually precompile into the binary all types that they expect it to use in the context of Any. However, for URLs which use the scheme `http`, `https`, or no scheme, one can optionally set up a type server that maps type URLs to message definitions as follows: * If no scheme is provided, `https` is assumed. * An HTTP GET on the URL must yield a [google.protobuf.Type][]   value in binary format, or produce an error. * Applications are allowed to cache lookup results based on the   URL, or have them precompiled into a binary to avoid any   lookup. Therefore, binary compatibility needs to be preserved   on changes to types. (Use versioned type names to manage   breaking changes.) Note: this functionality is not currently available in the official protobuf release, and it is not used for type URLs beginning with type.googleapis.com. As of May 2023, there are no widely used type server implementations and no plans to implement one. Schemes other than `http`, `https` (or the empty scheme) might be used with implementation specific semantics."
             }
           },
           "additionalProperties": true,
-          "type": "object"
+          "type": "object",
+          "description": "Deprecated: this field is unused."
         },
         "proofHeight": {
           "$ref": "#/definitions/ibc.core.client.v1.Height",
@@ -29,28 +30,35 @@
         },
         "proofTry": {
           "type": "string",
-          "description": "proof of the initialization the connection on Chain B: `UNITIALIZED -> TRYOPEN`",
+          "description": "proof of the initialization the connection on Chain B: `UNINITIALIZED -> TRYOPEN`",
           "format": "binary",
           "binaryEncoding": "base64"
         },
         "proofClient": {
           "type": "string",
-          "description": "proof of client state included in message",
+          "description": "Deprecated: this field is unused.",
           "format": "binary",
           "binaryEncoding": "base64"
         },
         "proofConsensus": {
           "type": "string",
-          "description": "proof of client consensus state",
+          "description": "Deprecated: this field is unused.",
           "format": "binary",
           "binaryEncoding": "base64"
         },
         "consensusHeight": {
           "$ref": "#/definitions/ibc.core.client.v1.Height",
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "Deprecated: this field is unused."
         },
         "signer": {
           "type": "string"
+        },
+        "hostConsensusStateProof": {
+          "type": "string",
+          "description": "Deprecated: this field is unused.",
+          "format": "binary",
+          "binaryEncoding": "base64"
         }
       },
       "additionalProperties": false,
@@ -72,7 +80,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Height",
-      "description": "Height is a monotonically increasing data type that can be compared against another Height for the purposes of updating and freezing clients Normally the RevisionHeight is incremented at each height while keeping RevisionNumber the same. However some consensus algorithms may choose to reset the height in certain conditions e.g. hard forks, state-machine breaking changes In these cases, the RevisionNumber is incremented so that height continues to be monitonically increasing even as the RevisionHeight gets reset"
+      "description": "Height is a monotonically increasing data type that can be compared against another Height for the purposes of updating and freezing clients Normally the RevisionHeight is incremented at each height while keeping RevisionNumber the same. However some consensus algorithms may choose to reset the height in certain conditions e.g. hard forks, state-machine breaking changes In these cases, the RevisionNumber is incremented so that height continues to be monitonically increasing even as the RevisionHeight gets reset Please note that json tags for generated Go code are overridden to explicitly exclude the omitempty jsontag. This enforces the Go json marshaller to always emit zero values for both revision_number and revision_height."
     },
     "ibc.core.connection.v1.Version": {
       "properties": {
@@ -91,7 +99,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Version",
-      "description": "Version defines the versioning scheme used to negotiate the IBC verison in the connection handshake."
+      "description": "Version defines the versioning scheme used to negotiate the IBC version in the connection handshake."
     }
   }
 }

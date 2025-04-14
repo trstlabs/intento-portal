@@ -23,7 +23,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Vote Weighted",
-      "description": "MsgVoteWeighted defines a message to cast a vote. Since: cosmos-sdk 0.43"
+      "description": "MsgVoteWeighted defines a message to cast a vote."
     },
     "cosmos.gov.v1beta1.WeightedVoteOption": {
       "properties": {
@@ -47,7 +47,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Weighted Vote Option",
-      "description": "WeightedVoteOption defines a unit of vote for vote split. Since: cosmos-sdk 0.43"
+      "description": "WeightedVoteOption defines a unit of vote for vote split."
     }
   }
 }

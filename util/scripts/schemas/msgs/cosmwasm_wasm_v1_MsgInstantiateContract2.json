@@ -46,7 +46,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Instantiate Contract 2",
-      "description": "MsgInstantiateContract2 create a new smart contract instance for the given code id with a predicable address."
+      "description": "MsgInstantiateContract2 create a new smart contract instance for the given code id with a predictable address."
     },
     "cosmos.base.v1beta1.Coin": {
       "properties": {

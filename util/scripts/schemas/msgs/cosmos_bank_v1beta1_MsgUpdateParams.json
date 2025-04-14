@@ -16,7 +16,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
-      "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
+      "description": "MsgUpdateParams is the Msg/UpdateParams request type."
     },
     "cosmos.bank.v1beta1.Params": {
       "properties": {

@@ -8,11 +8,12 @@
         },
         "previousChannelId": {
           "type": "string",
-          "description": "in the case of crossing hello's, when both chains call OpenInit, we need the channel identifier of the previous channel in state INIT"
+          "description": "Deprecated: this field is unused. Crossing hello's are no longer supported in core IBC."
         },
         "channel": {
           "$ref": "#/definitions/ibc.core.channel.v1.Channel",
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "NOTE: the version field within the channel has been deprecated. Its value will be ignored by core IBC."
         },
         "counterpartyVersion": {
           "type": "string"
@@ -33,7 +34,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Channel Open Try",
-      "description": "MsgChannelOpenInit defines a msg sent by a Relayer to try to open a channel on Chain B."
+      "description": "MsgChannelOpenInit defines a msg sent by a Relayer to try to open a channel on Chain B. The version field within the Channel field has been deprecated. Its value will be ignored by core IBC."
     },
     "ibc.core.channel.v1.Channel": {
       "properties": {
@@ -47,7 +48,7 @@
           ],
           "type": "string",
           "title": "State",
-          "description": "State defines if a channel is in one of the following states: CLOSED, INIT, TRYOPEN, OPEN or UNINITIALIZED."
+          "description": "State defines if a channel is in one of the following states: CLOSED, INIT, TRYOPEN, OPEN, or UNINITIALIZED."
         },
         "ordering": {
           "enum": [
@@ -111,7 +112,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Height",
-      "description": "Height is a monotonically increasing data type that can be compared against another Height for the purposes of updating and freezing clients Normally the RevisionHeight is incremented at each height while keeping RevisionNumber the same. However some consensus algorithms may choose to reset the height in certain conditions e.g. hard forks, state-machine breaking changes In these cases, the RevisionNumber is incremented so that height continues to be monitonically increasing even as the RevisionHeight gets reset"
+      "description": "Height is a monotonically increasing data type that can be compared against another Height for the purposes of updating and freezing clients Normally the RevisionHeight is incremented at each height while keeping RevisionNumber the same. However some consensus algorithms may choose to reset the height in certain conditions e.g. hard forks, state-machine breaking changes In these cases, the RevisionNumber is incremented so that height continues to be monitonically increasing even as the RevisionHeight gets reset Please note that json tags for generated Go code are overridden to explicitly exclude the omitempty jsontag. This enforces the Go json marshaller to always emit zero values for both revision_number and revision_height."
     }
   }
 }

@@ -31,7 +31,7 @@
           ],
           "type": "string",
           "title": "State",
-          "description": "State defines if a channel is in one of the following states: CLOSED, INIT, TRYOPEN, OPEN or UNINITIALIZED."
+          "description": "State defines if a channel is in one of the following states: CLOSED, INIT, TRYOPEN, OPEN, or UNINITIALIZED."
         },
         "ordering": {
           "enum": [
