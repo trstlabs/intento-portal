@@ -192,3 +192,58 @@ export const osmoExamples = [
     },
   },
 ]
+
+
+export const elysExamples = [
+  {
+    typeUrl: '/elys.amm.MsgSwapExactAmountIn',
+    value: {
+      sender: 'into1....',
+      routes: [{
+        poolId: "1", tokenOutDenom: "uinto"
+      }],
+      tokenIn: { denom: "uosmo", amount: "1000000" },
+      tokenOutMinAmount: '2000000',
+    },
+  },
+  {
+    typeUrl: '/elys.amm.MsgSwapExactAmountOut',
+    value: {
+      sender: 'into1....',
+      tokenInMaxAmount: '1000000',
+      tokenOut: { denom: "uinto", amount: "1000000" },
+    },
+  },
+  {
+    typeUrl: '/elys.amm.MsgJoinPool',
+    value: {
+      sender: 'into1....',
+      poolId: 'into1...',
+      shareOutAmount: '1000000',
+    },
+  },
+  {
+    typeUrl: '/elys.amm.MsgExitPool',
+    value: {
+      sender: 'into1....',
+      poolId: 'into1...',
+      shareInAmount: '1000000',
+      tokenOutMins: [{ denom: "uinto", amount: "1000000" }],
+    },
+  },
+  {
+    typeUrl: '/elys.estaking.MsgWithdrawReward',
+    value: {
+      delegatorAddress: 'into1....',
+      validatorAddress: 'intovaloper1...',
+    },
+  },
+  {
+    typeUrl: '/elys.estaking.MsgWithdrawReward',
+    value: {
+      delegatorAddress: 'into1....',
+      validatorAddress: 'intovaloper1...',
+    },
+  },
+  
+]

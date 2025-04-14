@@ -13,7 +13,7 @@ import {
 import React, { useState } from 'react'
 import JsonFormEditor from './DynamicForm'
 
-import { generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
+import { elysExamples, generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
 
 import { MessageSelector } from './MessageSelector'
 import { JsonCodeMirrorEditor } from './CodeMirror'
@@ -39,7 +39,11 @@ export const JsonFormWrapper = ({
   const [showJsonForm, setShowJsonForm] = useState(true)
   const extractedMsgTypeUrl =
     msg.length > 32 && msg.split('.').find((name) => name.includes('Msg'))
-  const msgTypeName = (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown'
+  const extractedMsgPrefix =
+    msg.length > 32 && msg.split('/')[1].split('.')[0] + " "
+  const extractedMsgModule =
+    msg.length > 32 && msg.split('.')[1] + " "
+  const msgTypeName = extractedMsgPrefix ? extractedMsgPrefix.charAt(0).toUpperCase() + extractedMsgPrefix.slice(1) +  extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) + (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown' : 'Unknown'
   const [validationErrors, setValidationErrors] = useState([])
   const [schema, setSchema] = useState(
     findFileBySuffix(msgTypeName)
@@ -124,7 +128,7 @@ export const JsonFormWrapper = ({
                         <span key={ei}>
                           {' '}
                           <Chip
-                            href="https://cosmwasm.com/_next/image/?url=%2Fcosmwasm-logo.png&w=3840&q=75"
+                            href="https://github.com/cosmos/chain-registry/blob/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
                             label={example.typeUrl
                               .split('.')
                               .find((data) => data.includes('Msg'))
@@ -146,6 +150,27 @@ export const JsonFormWrapper = ({
                           {' '}
                           <Chip
                             href="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg"
+                            label={example.typeUrl
+                              .split('.')
+                              .find((data) => data.includes('Msg'))
+                              .slice(3)
+                              .replace(/([A-Z])/g, ' $1')
+                              .trim()}
+                            onClick={() => {
+                              setMsgFromExample(example)
+                            }}
+                          />
+                        </span>
+                      ))}
+                    </>
+                  )}
+                  {chainSymbol == 'ELYS' || chainSymbol == 'ATOM' && (
+                    <>
+                      {elysExamples.map((example, ei) => (
+                        <span key={ei}>
+                          {' '}
+                          <Chip
+                            href="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
                             label={example.typeUrl
                               .split('.')
                               .find((data) => data.includes('Msg'))

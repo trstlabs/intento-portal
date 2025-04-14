@@ -7,9 +7,9 @@ import React, {
   useState,
 } from 'react'
 
-import * as tmpFiles from '../../../../util/scripts/schemas/msgs'
 import { MessageSelectorToggle } from './MessageSelectorToggle'
 import { CosmosMessageSelector } from './CosmosMessageSelector'
+import { schemaNames } from '../../../../util/scripts/schemas/msgs/schemaNames'
 
 export const MessageSelector = ({
   index,
@@ -23,30 +23,48 @@ export const MessageSelector = ({
   setExample: (index: number, msg: any) => void
 }): JSX.Element => {
   const wrapperRef = useRef<HTMLDivElement>()
+  const [messageList, setMessageList] = useState<ListType[]>([])
+  const [schemas, setSchemas] = useState<any>({})
 
-  const [messageList, _] = useState(createMessageList())
-
-  // Helper function to find and return proto json schema files by name
-  function createMessageList() {
-    let msgList: ListType[] = []
-    for (const key in tmpFiles) {
-      const msgName = key
-        .split('_')
-        .find((name) => name.includes('Msg'))
-        .split('"')[0]
-      msgList.push({ key: key, name: msgName, value: tmpFiles[key] })
+  // Helper function to dynamically load schemas by name
+  const loadSchemas = async () => {
+   
+    const loadedSchemas: any = {}
+    for (const schemaName of schemaNames) {
+      try {
+        // Dynamically import each schema JSON file
+        const schema = await import(`../../../../util/scripts/schemas/msgs/${schemaName}.json`)
+        loadedSchemas[schemaName] = schema.default || schema
+      } catch (error) {
+        console.error(`Failed to load schema ${schemaName}:`, error)
+      }
     }
-    return msgList
+    setSchemas(loadedSchemas)
   }
 
-  // const [isMessageListShowing, setMessageListShowing] = useState(false)
+  useEffect(() => {
+    loadSchemas()
+  }, [])
+
+  useEffect(() => {
+    if (Object.keys(schemas).length > 0) {
+      // Create message list only after schemas are loaded
+      const msgList: ListType[] = Object.keys(schemas).map((key) => ({
+        key,
+        name: key.split('_').find((name) => name.includes('Msg')) || '',
+        value: schemas[key],
+      }))
+      setMessageList(msgList)
+    }
+  }, [schemas])
+
   const [messageSearchQuery, setMessageSearchQuery] = useState('')
   const [isInputForSearchFocused, setInputForSearchFocused] = useState(false)
   const [filteredMessageList, setFilteredMessageList] = useState([])
   const [isMessageListShowing, setMessageListShowing] = useState(false)
 
   useOnClickOutside([wrapperRef], () => {
-    //setMessageListShowing(false)
+    // setMessageListShowing(false)
   })
 
   useEffect(() => {
@@ -54,7 +72,7 @@ export const MessageSelector = ({
     setFilteredMessageList(newList)
   }, [messageList, messageSearchQuery])
 
-  // Helper function to find and return proto json schema files by name
+  // Helper function to filter message list based on search query
   function filterMessageList(list, query) {
     return list.filter((message) =>
       message.name.toLowerCase().includes(query.toLowerCase())
@@ -77,7 +95,7 @@ export const MessageSelector = ({
             setSchema={setSchema}
             setExample={setExample}
             setMessageListShowing={setMessageListShowing}
-          />{' '}
+          />
         </Dialog>
       )}
       {!isMessageListShowing && (

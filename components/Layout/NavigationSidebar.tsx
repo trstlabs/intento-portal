@@ -57,7 +57,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     username,
     address,
     openView, assets,
-  } = useChain('intentozone')
+  } = useChain('intentotestnet')
 
 
   // Watch for address changes and trigger the mutation

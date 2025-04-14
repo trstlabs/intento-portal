@@ -53,7 +53,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
       // Push your data to assets and chains arrays here
 
       assets.push({
-        chain_name: 'intentozone',
+        chain_name: 'intentotestnet',
         assets: [
           {
             name: 'Intento INTO',
@@ -126,7 +126,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
   const isSmallScreen = useMedia('sm')
   const signerOptions: SignerOptions = {
     signingStargate: (chain: Chain) => {
-      if (chain.chain_name == 'intentozone') {
+      if (chain.chain_name == 'intentotestnet') {
         return getIntentoSigningClientOptions({ defaultTypes })
       } else {
         return getSigningCosmosClientOptions()

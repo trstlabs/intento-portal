@@ -25,7 +25,7 @@ import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 
 export default function Home() {
-  const { /* isWalletConnected, connect, */ address } = useChain('intentozone')
+  const { /* isWalletConnected, connect, */ address } = useChain('intentotestnet')
   const flowsPerPage = 20;
   const [allFlows, isLoading] = useFlowInfos(Number(flowsPerPage), undefined)
   const [flows, isMyFlowsLoading] = useFlowInfosByOwner(Number(flowsPerPage), undefined)

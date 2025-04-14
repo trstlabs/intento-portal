@@ -7,7 +7,7 @@ export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2],
 ) => {
   let { connect, getSigningStargateClient, address, username } =
-    useChain('intentozone')
+    useChain('intentotestnet')
 
   const [{ status }, setWalletState] = useRecoilState(walletState)
   const mutation = useMutation(async () => {
