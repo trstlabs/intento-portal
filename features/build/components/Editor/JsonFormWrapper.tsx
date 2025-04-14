@@ -164,7 +164,7 @@ export const JsonFormWrapper = ({
                       ))}
                     </>
                   )}
-                  {chainSymbol == 'ELYS' || chainSymbol == 'ATOM' && (
+                  {chainSymbol == 'ELYS'  && (
                     <>
                       {elysExamples.map((example, ei) => (
                         <span key={ei}>
