@@ -2,7 +2,7 @@
   {
     "id": "Intento Testnet",
     "name": "Intento Testnet",
-    "registry_name": "intentozone",
+    "registry_name": "intentotestnet",
     "symbol": "INTO",
     "chain_id": "intento-ics-test-1",
     "denom": "uinto",
@@ -27,5 +27,23 @@
     "counterparty_connection_id": "connection-0",
     "prefix": "cosmos",
     "rpc": "https://provider-test-rpc.intento.zone"
+  },
+  {
+    "id": "Osmosis",
+    "name": "Osmosis Testnet",
+    "symbol": "OSMO",
+    "chain_id": "osmo-test-5",
+    "registry_name": "osmosistestnet",
+    "denom": "uosmo",
+    "decimals": 6,
+    "channel": "channel-6",
+    "channel_to_trst": "channel-10363",
+    "denom_local": "ibc/0471F1C4E7AFD3F07702BEF6DC365268D64570F7C1FDC98EA6098DD6DE59817B",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
+    "connection_id": "connection-1",
+    "counterparty_connection_id": "connection-3985",
+    "prefix": "osmo",
+    "rpc": "'https://rpc.osmotest5.osmosis.zone",
+    "ica_unsupported": true
   }
 ]
