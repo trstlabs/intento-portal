@@ -67,7 +67,7 @@ export const FlowTransformButton = ({ flowInfo }) => {
 export async function transformFlowMsgs(info) {
     let msgs: string[] = []
 
-    if (info.msgs[0].typeUrl === '/cosmos.authz.v1beta1.MsgExec') {
+  
         const msgsObj = await fetchFlowMsgs(info.id.toString());
 
         msgsObj.forEach((msgObj: any, index) => {
@@ -86,25 +86,7 @@ export async function transformFlowMsgs(info) {
             msgs[index] = msg;
         });
 
-    } else {
-        info.msgs.forEach((msgAny: any, index) => {
-            //console.log("Original MsgAny:", JSON.stringify(msgAny.valueDecoded, null, 2));
-
-            let msgObj = { typeUrl: msgAny.typeUrl, value: msgAny.valueDecoded };
-
-            // msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
-
-            // console.log("After normalization:", JSON.stringify(msgObj, null, 2));
-
-            const msg = JSON.stringify(msgObj, (_, value) =>
-                typeof value === "bigint" ? value.toString() : value,
-                2
-            );
-
-            console.log("Transformed Msg:", msg);
-            msgs[index] = msg;
-        });
-    }
+  
 
     console.log("Final processed messages:", msgs);
     return msgs;

@@ -112,6 +112,16 @@ export const FlowInfoBreakdown = ({
 
 
 
+  const [transformedMsgs, setTransformedMsgs] = useState<string[]>([])
+
+  useEffect(() => {
+    async function fetchMsgs() {
+      const msgs = await transformFlowMsgs(flowInfo)
+      setTransformedMsgs(msgs)
+    }
+    fetchMsgs()
+  }, [flowInfo])
+
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [isJsonValid, setIsJsonValid] = useState(true)
   const [editorIndex, setEditorIndex] = useState(-1)
@@ -133,10 +143,8 @@ export const FlowInfoBreakdown = ({
     setEditorIndex(index)
 
     if (show) {
-      const msgs = await transformFlowMsgs(flowInfo);
-
       setEditorIndex(index)
-      setEditMsgs(msgs)
+      setEditMsgs(transformedMsgs.length ? transformedMsgs : await transformFlowMsgs(flowInfo))
       return
     }
     setEditorIndex(-1)
@@ -180,7 +188,7 @@ export const FlowInfoBreakdown = ({
 
   function setUpdateFlowInfo(field: string, value: any) {
     let updatedFlowInfo = { ...flowInfo };
-  
+
     if (field === 'interval') {
       updatedFlowInfo.interval.seconds = BigInt(value);
     } else {
@@ -494,15 +502,15 @@ export const FlowInfoBreakdown = ({
             )}
           </Column>
         </Row>
-        {flowInfo.msgs.map((msg: any, index) => (
-          <div key={index}>
+        {flowInfo.msgs.map((msg: any, msgIndex) => (
+          <div key={msgIndex}>
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
                 <Text variant="legend" color="secondary" align="left">
-                  Message {index + 1} Type
+                  Message {msgIndex + 1} Type
                 </Text>
                 <Inline gap={2}>
-                  <Text variant="body">{msg.typeUrl} </Text>
+                  <Text variant="body">{transformedMsgs[msgIndex] ? JSON.parse(transformedMsgs[msgIndex])?.typeUrl : msg.typeUrl} </Text>
                 </Inline>
 
                 <>
@@ -515,25 +523,25 @@ export const FlowInfoBreakdown = ({
                       <Button
                         variant="ghost"
                         size="small"
-                        onClick={() => showEditor(editorIndex != index, index)}
+                        onClick={() => showEditor(editorIndex != msgIndex, msgIndex)}
                       >
-                        {editorIndex != index ? 'Edit' : 'Discard'}
+                        {editorIndex != msgIndex ? 'Edit' : 'Discard'}
                       </Button>
                     ) : (
                       <Button
                         variant="ghost"
                         size="small"
                         onClick={() => {
-                          showEditor(editorIndex != index, index)
+                          showEditor(editorIndex != msgIndex, msgIndex)
                         }}
                       >
-                        {editorIndex != index ? 'Edit' : 'Discard'}
+                        {editorIndex != msgIndex ? 'Edit' : 'Discard'}
                       </Button>
                     )}
                   </Inline>
                   <Inline gap={2}>
                     <Text css={{ wordBreak: 'break-word' }} variant="body">
-                      <JsonViewer jsonValue={msg.valueDecoded} />
+                      <JsonViewer jsonValue={transformedMsgs[msgIndex] ? JSON.parse(transformedMsgs[msgIndex])?.value : msg.valueDecoded} />
                       {/* <pre
                         style={{
                           display: 'inline-block',
@@ -551,13 +559,13 @@ export const FlowInfoBreakdown = ({
                   </Inline>
                 </>
 
-                {editorIndex == index && editMsgs && editMsgs[index] &&
+                {editorIndex == msgIndex && editMsgs && editMsgs[msgIndex] &&
                   <>
 
                     <JsonFormWrapper
-                      index={index}
+                      index={msgIndex}
                       chainSymbol={"INTO"}
-                      msg={editMsgs[index]}
+                      msg={editMsgs[msgIndex]}
                       handleRemoveMsg={handleRemoveMsg}
                       handleChangeMsg={handleChangeMsg}
                       setIsJsonValid={setIsJsonValid}
