@@ -169,6 +169,7 @@ export const useICATokenBalance = (
   isICAChain: boolean
 ) => {
   const chain = useChainInfoByChainID(chainId)
+
   const { denom, decimals } = chain
   const { data, isLoading } = useQuery(
     `icaTokenBalance/${chainId}/${ibcWalletAddress}`,

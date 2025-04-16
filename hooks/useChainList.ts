@@ -1,5 +1,5 @@
 import { chains } from 'chain-registry'
-import { Chain } from '@chain-registry/types'
+
 import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
 import { useChains } from '@cosmos-kit/react'
@@ -27,33 +27,44 @@ export const useIBCAssetList = () => {
   const { data, isLoading, isError, error } = useQuery<IBCAssetInfo[]>(
     ['@ibc-asset-list'],
     async () => {
-      if (!process.env.NEXT_PUBLIC_IBC_ASSETS_URL) {
+      const url = process.env.NEXT_PUBLIC_IBC_ASSETS_URL
+
+      if (!url) {
+        console.error('IBC_ASSETS_URL is not defined')
         throw new Error('IBC_ASSETS_URL is not defined')
       }
 
-      const response = await fetch(process.env.NEXT_PUBLIC_IBC_ASSETS_URL)
+      const response = await fetch(url)
 
       if (!response.ok) {
+        console.error(`Failed to fetch IBC Asset List: ${response.statusText}`)
         throw new Error(
           `Failed to fetch IBC Asset List: ${response.statusText}`
         )
       }
 
-      const data = await response.json()
+      try {
+        const data = await response.json()
 
-      if (!Array.isArray(data)) {
-        throw new Error('IBC Asset List is not in the expected array format')
+        if (!Array.isArray(data)) {
+          console.error('IBC Asset List is not in the expected array format')
+          throw new Error('IBC Asset List is not in the expected array format')
+        }
+
+        return data
+      } catch (e) {
+        console.error('Error parsing IBC Asset List JSON:', e)
+        throw new Error('Failed to parse IBC Asset List JSON')
       }
-
-      return data
     },
     {
+      enabled: Boolean(process.env.NEXT_PUBLIC_IBC_ASSETS_URL),
       onError: (e) => {
         console.error('Error loading IBC Asset List:', e)
       },
-      refetchOnMount: true,
-      refetchIntervalInBackground: false,
-      retry: 3, // Automatically retry failed queries up to 3 times
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: false,
+      retry: 3, // Retry failed queries up to 3 times
       staleTime: 1000 * 60 * 5, // 5 minutes
     }
   )
@@ -62,7 +73,7 @@ export const useIBCAssetList = () => {
     console.warn('Failed to load IBC Asset List:', error)
   }
 
-  // Safely return data or an empty array to avoid undefined errors
+  // Return a consistent and safe output
   return [data ?? [], isLoading] as const
 }
 
@@ -70,7 +81,7 @@ export const useIBCAssetList = () => {
 export const useConnectChains = (chains: IBCAssetInfo[]) => {
   const chainList = chains[0]
     ? chains.map((chain) => chain.registry_name)
-    : ['intentozone']
+    : ['intentotestnet']
   useChains(chainList)
 }
 
@@ -80,7 +91,7 @@ export const useChainInfoByChainID = (chainId: string) => {
   const chainRegistyChain = chains.find((chain) => chain.chain_id == chainId)
   if (chainRegistyChain == undefined) {
     return transformChain(
-      chains.find((chain) => chain.chain_name == 'intentozone')
+      chains.find((chain) => chain.chain_name == 'intentotestnet')
     )
   }
   const chain = transformChain(chainRegistyChain)
@@ -101,13 +112,9 @@ export const useChainRegistryList = () => {
   return chainList
 }
 
-function transformChain(chain: Chain) {
+function transformChain(chain: any) {
   // Check for missing logo URIs and other conditions
-  if (
-    !chain ||
-    !chain.logo_URIs ||
-    (!chain.logo_URIs.svg && !chain.logo_URIs.png)
-  ) {
+  if (!chain) {
     return null
   }
   const symbol =
@@ -135,8 +142,11 @@ function transformChain(chain: Chain) {
     channel: '', // TODO: Find in ibc assets
     logo_uri: chain.logo_URIs
       ? chain.logo_URIs.png || chain.logo_URIs.svg || chain.logo_URIs.jpeg
+      : chain.images
+      ? chain.images.png || chain.images.svg || chain.images.jpeg
       : '',
     connection_id: '',
     prefix: chain.bech32_prefix,
+    status: chain.status,
   }
 }

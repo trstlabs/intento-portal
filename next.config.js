@@ -6,11 +6,19 @@ const withBundleJunoblocks = require('next-bundle-junoblocks')
 
 const config = {
   reactStrictMode: true,
+  productionBrowserSourceMaps: true, // Keep source maps for better debugging
   images: {
       domains: ['intento.zone'], // Add the external domain here
   },
-  reactStrictMode: true,
+
   webpack(config, { webpack }) {
+    // // config.optimization.splitChunks = {
+    // //   cacheGroups: {
+    // //     default: false,
+    // //   },
+    // // };
+    // config.optimization.runtimeChunk = false;
+    // // config.output.filename = 'static/chunks/[name].js';
     config.plugins.push(
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
@@ -38,4 +46,5 @@ module.exports = withBundleAnalyzer(
   process.env.BUNDLE_INTOBLOCKS === 'true'
     ? withBundleJunoblocks(config)
     : config
+    
 )

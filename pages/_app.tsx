@@ -31,7 +31,6 @@ import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 // import { GasPrice } from '@cosmjs/stargate';
 import { css, media, useMedia } from 'junoblocks'
 import { SignerOptions } from '@cosmos-kit/core'
-import { Chain } from '@chain-registry/types'
 import { useEffect, useState } from 'react'
 
 const toasterClassName = css({
@@ -57,6 +56,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
         assets: [
           {
             name: 'Intento INTO',
+            type_asset: "sdk.coin",
             display: 'INTO',
             symbol: 'INTO',
             denom_units: [
@@ -73,50 +73,54 @@ function TrstApp({ Component, pageProps }: AppProps) {
       })
 
       for (let asset of ibcAssetList) {
-        const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
-        console.log(rpcEndpoint, apiEndpoint)
-        chains.push({
-          chain_type: 'cosmos',
-          chain_name: asset.registry_name,
-          status: 'live',
-          network_type: 'testnet',
-          pretty_name: asset.name,
-          chain_id: asset.chain_id,
-          bech32_prefix: asset.prefix,
-          logo_URIs: { svg: asset.logo_uri },
-          // daemon_name: 'trstd',
-          // node_home: '$HOME/.trstd',
-          // key_algos: ['secp256k1'],
-          slip44: 118,
-          fees: {
-            fee_tokens: [
-              {
-                denom: asset.denom,
-                low_gas_price: 0.025,
-                average_gas_price: 0.05,
-                high_gas_price: 0.1,
-              },
-            ],
-          },
-          apis: {
-            rpc: [
-              {
-                address: rpcEndpoint,
-                provider: 'TRST Labs',
-              },
-            ],
-            rest: [
-              {
-                address: apiEndpoint,
-                provider: 'TRST Labs',
-              },
-            ],
-          },
-        })
 
-        console.log(chains[chains.length - 1])
+
+        if (asset.name.includes("Local")) {
+
+          const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
+          chains.push({
+            chain_type: 'cosmos',
+            chain_name: asset.registry_name,
+            status: 'live',
+            network_type: 'testnet',
+            pretty_name: asset.name,
+            chain_id: asset.chain_id,
+            bech32_prefix: asset.prefix,
+            logo_URIs: { svg: asset.logo_uri },
+            // daemon_name: 'trstd',
+            // node_home: '$HOME/.trstd',
+            // key_algos: ['secp256k1'],
+            slip44: 118,
+            fees: {
+              fee_tokens: [
+                {
+                  denom: asset.denom,
+                  low_gas_price: 0.025,
+                  average_gas_price: 0.05,
+                  high_gas_price: 0.1,
+                },
+              ],
+            },
+            apis: {
+              rpc: [
+                {
+                  address: rpcEndpoint,
+                  provider: '',
+                },
+              ],
+              rest: [
+                {
+                  address: apiEndpoint,
+                  provider: '',
+                },
+              ],
+            },
+          })
+
+          console.log(chains[chains.length - 1])
+        }
+        console.log(chains.find((i) => i.chain_name == 'cosmostest'))
       }
-      console.log(chains.find((i) => i.chain_name == 'cosmostest'))
       // Mark the data as pushed
       setDataPushed(true)
     }
@@ -125,14 +129,14 @@ function TrstApp({ Component, pageProps }: AppProps) {
 
   const isSmallScreen = useMedia('sm')
   const signerOptions: SignerOptions = {
-    signingStargate: (chain: Chain) => {
+    signingStargate: (chain: any) => {
       if (chain.chain_name == 'intentotestnet') {
         return getIntentoSigningClientOptions({ defaultTypes })
       } else {
         return getSigningCosmosClientOptions()
       }
     },
-    preferredSignType: (_chain: Chain) => {
+    preferredSignType: (_chain: any) => {
       // `preferredSignType` determines which signer is preferred for `getOfflineSigner` method. By default `amino`. It might affect the `OfflineSigner` used in `signingStargateClient` and `signingCosmwasmClient`. But if only one signer is provided, `getOfflineSigner` will always return this signer, `preferredSignType` won't affect anything.
       return 'direct'
     },
@@ -145,6 +149,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
           <ErrorBoundary>
             {dataPushed && (
               <ChainProvider
+                throwErrors="connect_only"
                 // logLevel="DEBUG"
                 chains={[...chainList]}
                 assetLists={[...assets]}
@@ -166,7 +171,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
                       rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
                       rest: [process.env.NEXT_PUBLIC_ATOM_API],
                     },
-                    osmosistest: {
+                    osmosis: {
                       isLazy: true,
                       rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
                       rest: [process.env.NEXT_PUBLIC_OSMO_API],
@@ -202,11 +207,11 @@ function TrstApp({ Component, pageProps }: AppProps) {
 export default TrstApp
 
 //workaround for typescript to know symbol at compile time
-function getEnvVarForSymbol(symbol: string): {
+function getEnvVarForSymbol(asset: any): {
   rpcEndpoint: string | undefined
   apiEndpoint: string | undefined
 } {
-  switch (symbol) {
+  switch (asset.symbol) {
     case 'INTO':
       return {
         rpcEndpoint: process.env.NEXT_PUBLIC_INTO_RPC,
@@ -231,6 +236,6 @@ function getEnvVarForSymbol(symbol: string): {
     // Add more cases as needed for other symbols
     default:
       console.log("UNDefined")
-      return { rpcEndpoint: undefined, apiEndpoint: undefined }
+      return { rpcEndpoint: asset.rpc, apiEndpoint: asset.api }
   }
 }
