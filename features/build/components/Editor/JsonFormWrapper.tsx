@@ -43,10 +43,10 @@ export const JsonFormWrapper = ({
     msg.length > 32 && msg.split('/')[1].split('.')[0] + " "
   const extractedMsgModule =
     msg.length > 32 && msg.split('.')[1] + " "
-  const msgTypeName = extractedMsgPrefix ? extractedMsgPrefix.charAt(0).toUpperCase() + extractedMsgPrefix.slice(1) +  extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) + (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown' : 'Unknown'
+  const msgTypeName = extractedMsgPrefix ? extractedMsgPrefix.charAt(0).toUpperCase() + extractedMsgPrefix.slice(1) + extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) + (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown' : 'Unknown'
   const [validationErrors, setValidationErrors] = useState([])
   const [schema, setSchema] = useState(
-    findFileBySuffix(msgTypeName)
+    findFileBySuffix(extractedMsgTypeUrl.split('"')[0])
   )
 
   const wasmEnabledList = JSON.parse(
@@ -164,7 +164,7 @@ export const JsonFormWrapper = ({
                       ))}
                     </>
                   )}
-                  {chainSymbol == 'ELYS'  && (
+                  {chainSymbol == 'ELYS' && (
                     <>
                       {elysExamples.map((example, ei) => (
                         <span key={ei}>
