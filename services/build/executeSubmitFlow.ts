@@ -1,7 +1,7 @@
 //import { ethers } from "ethers";
 //import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { toBase64, toUtf8 } from '@cosmjs/encoding'
+import { toUtf8 } from '@cosmjs/encoding'
 import { intento, GlobalDecoderRegistry } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { FlowInput } from '../../types/trstTypes'
@@ -100,14 +100,10 @@ export function transformAndEncodeMsgs(
     if (typeUrl.startsWith('/cosmwasm')) {
       alert('CosmWasm msgs are available for testing use only at the moment')
 
-      // Convert the msg to a JSON string and then to Base64
-      let msgString: string = JSON.stringify(value['msg'])
-      let msgBase64: string = toBase64(toUtf8(msgString))
-
-      console.log('CosmWasm JSON String:', msgString)
-      console.log('Base64 Encoded:', msgBase64)
-
-      value['msg'] = msgBase64
+      const msgObject = value["msg"]; // original JS object
+      const msgBytes: Uint8Array = toUtf8(JSON.stringify(msgObject));
+      
+      value["msg"] = msgBytes; // ✅ Proper byte array for protobuf
     }
 
     //to implement

@@ -182,7 +182,6 @@ export const FlowInfoBreakdown = ({
     }
 
     setUpdatedFlowParams(params)
-    console.log(params)
     return setRequestedUpdateFlow(true)
   }
 
@@ -227,7 +226,6 @@ export const FlowInfoBreakdown = ({
         msgs: newMsgs,
         owner: flowInfo.owner,
       }
-      console.log(params)
       setUpdatedFlowParams(params)
     } catch (e) {
       console.log(e)

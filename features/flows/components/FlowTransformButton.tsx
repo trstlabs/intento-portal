@@ -63,70 +63,72 @@ export const FlowTransformButton = ({ flowInfo }) => {
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
 };
 
-///temporary solution as typeUrls get lost in retrieving from intentojs/telescope as the objects are unwrapped there with the GlobalRegistry. We cannnot transpile without that setting becasue then we loose the full registry  needed to unwrap/wrap ourselves and  osmosis.gamm.v1beta1.load(registry) is unavailable without the useGlobalDecoderRegistry setting
 export async function transformFlowMsgs(info) {
-    let msgs: string[] = []
+    let msgs: string[] = [];
 
-  
-        const msgsObj = await fetchFlowMsgs(info.id.toString());
+    const msgsObj = await fetchFlowMsgs(info.id.toString());
 
-        msgsObj.forEach((msgObj: any, index) => {
-            console.log("Before normalization:", JSON.stringify(msgObj, null, 2));
+    msgsObj.forEach((msgObj: any, index) => {
+        console.log("Before normalization:", JSON.stringify(msgObj, null, 2));
 
-            msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
+        msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
+        console.log( msgObj["typeUrl"]?.includes("MsgExecuteContract") &&
+        typeof msgObj.value.msg === "string")
+        // 🔹 Decode MsgExecuteContract inner msg if applicable
+        if (
+            msgObj["typeUrl"]?.includes("MsgExecuteContract")
+        ) {
+            try {
+                const decodedMsg = JSON.parse(
+                    Buffer.from(msgObj.value.msg, "base64").toString("utf-8")
+                );
+                msgObj.value.msg = decodedMsg;
+                console.log("Decoded MsgExecuteContract msg:", decodedMsg);
+            } catch (e) {
+                console.warn("Failed to decode MsgExecuteContract msg:", e);
+            }
+        }
 
-            console.log("After normalization:", JSON.stringify(msgObj, null, 2));
+        console.log("After normalization & decoding:", JSON.stringify(msgObj, null, 2));
 
-            const msg = JSON.stringify(msgObj, (_, value) =>
-                typeof value === "bigint" ? value.toString() : value,
-                2
-            );
+        const msg = JSON.stringify(
+            msgObj,
+            (_, value) => (typeof value === "bigint" ? value.toString() : value),
+            2
+        );
 
-            console.log("After transformation:", msg);
-            msgs[index] = msg;
-        });
-
-  
+        console.log("After transformation:", msg);
+        msgs[index] = msg;
+    });
 
     console.log("Final processed messages:", msgs);
     return msgs;
 }
-//patch for the workaround
-const normalizeAmountField = (obj: any) => {
+
+const normalizeAmountField = (obj: any): any => {
     if (!obj || typeof obj !== "object") return obj;
 
+    // Handle arrays recursively
     if (Array.isArray(obj)) {
         return obj.map(normalizeAmountField);
     }
 
+    // If this object has a `value` key containing denom + amount, unwrap it
+    if (
+        "value" in obj &&
+        typeof obj.value === "object" &&
+        obj.value !== null &&
+        "amount" in obj.value &&
+        "denom" in obj.value
+    ) {
+        return {
+            denom: obj.value.denom,
+            amount: obj.value.amount,
+        };
+    }
+
+    // Recurse through the object
     return Object.fromEntries(
-        Object.entries(obj).map(([key, value]) => {
-            // Fix 'amount' field when it's an array with a 'value' field
-            if (key === "amount" && Array.isArray(value)) {
-                return [
-                    key,
-                    value.map((entry: any) => entry.value ? entry.value : entry), // Cast entry to `any`
-                ];
-            }
-
-            // Fix 'delegation.amount' or similar structures
-            if (key === "amount" && typeof value === "object" && value !== null) {
-                // Cast value to `any` to avoid TypeScript error
-                const valueAsAny = value as any;
-
-                if (valueAsAny.value && typeof valueAsAny.value === "object") {
-                    return [
-                        key,
-                        {
-                            denom: valueAsAny.value.denom || valueAsAny.value?.denom,
-                            amount: valueAsAny.value.amount || valueAsAny.amount,
-                        },
-                    ];
-                }
-            }
-
-            // Recursively apply normalization for nested objects
-            return [key, normalizeAmountField(value)];
-        })
+        Object.entries(obj).map(([key, value]) => [key, normalizeAmountField(value)])
     );
 };
