@@ -38,7 +38,7 @@
     "decimals": 6,
     "channel": "channel-6",
     "channel_to_trst": "channel-10363",
-    "denom_local": "ibc/B677BC83C7FDC5B28C0BF843798A13498692EDE28F826DB60D5B4530C53914B2",
+    "denom_local": "ibc/646315E3B0461F5FA4C5C8968A88FC45D4D5D04A45B98F1B8294DD82F386DD85",
     "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
     "connection_id": "connection-1",
     "counterparty_connection_id": "connection-3985",
