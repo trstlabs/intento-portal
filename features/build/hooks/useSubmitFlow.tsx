@@ -58,7 +58,7 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
       onSuccess(data) {
         console.log(data)
         let flowID = data.events
-          .find((event) => event.type == 'flow')
+          .find((event) => event.type == 'flow-created')
           .attributes.find((attr) => attr.key == 'flow-id').value
 
         console.log(flowID)
