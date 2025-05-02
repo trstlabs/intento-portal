@@ -8,11 +8,13 @@ const FlowAlert = () => {
   const [flowID, setFlowID] = useState<string | null>(null)
   const [owner, setOwner] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setFlowID(params.get("flowID"))
     setOwner(params.get("owner"))
+    setImageUrl(params.get("imageUrl"))  // Check for custom image URL in the query parameters
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,7 +94,11 @@ const FlowAlert = () => {
         </Button>
 
         <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <Image src="https://intento.zone/assets/images/intento_tiny.png" alt="Intento Logo" width={230} height={40} />
+          {imageUrl ? (
+            <Image src={imageUrl} alt="Custom Image" width={230} height={40} />
+          ) : (
+            <Image src="https://intento.zone/assets/images/intento_tiny.png" alt="Intento Logo" width={230} height={40} />
+          )}
         </div>
 
         <Text variant="caption" align="center" style={{ marginTop: '16px' }}>
