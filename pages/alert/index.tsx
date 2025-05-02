@@ -96,7 +96,7 @@ const FlowAlert = () => {
         </div>
 
         <Text variant="caption" align="center" style={{ marginTop: '16px' }}>
-          You’ll receive alerts for matching events. Emails are used solely for flow notifications and managed by TRST Labs.
+          You’ll receive alerts for matching events. Emails are used solely for flow notifications. The notification system is managed by TRST Labs.
         </Text>
 
       </form>
