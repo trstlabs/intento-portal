@@ -63,9 +63,10 @@ export const handler: Handler = async (event, _context) => {
           <li><strong>Actual:</strong> ${new Date(
             lastExecution.actual_exec_time
           ).toLocaleString()}</li>
-          <li><strong>Executed:</strong> ${
-            lastExecution.executed && '✅ Yes'
-          }</li>
+          ${
+            lastExecution.executed &&
+            `<li><strong>Executed:</strong>  ✅ Yes </li>`
+          }
           <li><strong>Timed Out:</strong> ${
             lastExecution.timed_out ? '⏱️ Yes' : 'No'
           }</li>
@@ -136,22 +137,22 @@ export const handler: Handler = async (event, _context) => {
   }
 }
 async function resolveDenom(denom: string): Promise<string> {
-  if (!denom.startsWith('ibc/')) return formatDenom(denom);
+  if (!denom.startsWith('ibc/')) return formatDenom(denom)
 
-  const hash = denom.split('/')[1];
-  const apiBase = process.env.NEXT_PUBLIC_INTO_API;
-  const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`;
+  const hash = denom.split('/')[1]
+  const apiBase = process.env.NEXT_PUBLIC_INTO_API
+  const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`
 
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('Failed to fetch denom trace');
-    const data = await res.json();
-    const base = data?.denom_trace?.base_denom || denom;
-    const path = data?.denom_trace?.path || '';
-    return `${formatDenom(base)} (${path})`;
+    const res = await fetch(url)
+    if (!res.ok) throw new Error('Failed to fetch denom trace')
+    const data = await res.json()
+    const base = data?.denom_trace?.base_denom || denom
+    const path = data?.denom_trace?.path || ''
+    return `${formatDenom(base)} (${path})`
   } catch (err) {
-    console.warn(`Failed to resolve denom ${denom}:`, err);
-    return denom;
+    console.warn(`Failed to resolve denom ${denom}:`, err)
+    return denom
   }
 }
 
@@ -162,4 +163,3 @@ function formatDenom(denom: string): string {
   }
   return denom.toUpperCase()
 }
-
