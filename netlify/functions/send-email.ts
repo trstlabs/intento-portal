@@ -50,7 +50,7 @@ export const handler: Handler = async (event, _context) => {
       lastExecution.exec_fee?.denom || 'unknown'
     )
     const img =
-      feeDenom == 'uelys'
+      feeDenom == 'ELYS'
         ? 'https://github.com/cosmos/chain-registry/blob/master/elys/images/elys.png'
         : 'https://intento.zone/assets/images/intento_tiny.png'
     const formattedHistory = lastExecution
@@ -104,7 +104,7 @@ export const handler: Handler = async (event, _context) => {
         return transporter.sendMail({
           from: process.env.GMAIL_USER,
           to: email,
-          subject: `🔔 ${eventType} event on Intento Flow ${flowID}`,
+          subject: `🔔 New ${eventType} event on flow ${flowID}`,
           html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
             <img src="${img}" alt="Intento" style="width: 120px; margin-bottom: 20px;" />
@@ -135,23 +135,31 @@ export const handler: Handler = async (event, _context) => {
     }
   }
 }
+async function resolveDenom(denom: string): Promise<string> {
+  if (!denom.startsWith('ibc/')) return formatDenom(denom);
 
-async function resolveDenom(denom) {
-  if (!denom.startsWith('ibc/')) return denom
-
-  const hash = denom.split('/')[1]
-  const apiBase = process.env.NEXT_PUBLIC_INTO_API
-  const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`
+  const hash = denom.split('/')[1];
+  const apiBase = process.env.NEXT_PUBLIC_INTO_API;
+  const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`;
 
   try {
-    const res = await fetch(url)
-    if (!res.ok) throw new Error('Failed to fetch denom trace')
-    const data = await res.json()
-    const base = data?.denom_trace?.base_denom || denom
-    const path = data?.denom_trace?.path || ''
-    return `${base} (${path})`
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Failed to fetch denom trace');
+    const data = await res.json();
+    const base = data?.denom_trace?.base_denom || denom;
+    const path = data?.denom_trace?.path || '';
+    return `${formatDenom(base)} (${path})`;
   } catch (err) {
-    console.warn(`Failed to resolve denom ${denom}:`, err)
-    return denom
+    console.warn(`Failed to resolve denom ${denom}:`, err);
+    return denom;
   }
 }
+
+function formatDenom(denom: string): string {
+  // If it starts with 'u' and is followed by letters, strip it and capitalize
+  if (/^u[a-z]+$/.test(denom)) {
+    return denom.slice(1).toUpperCase()
+  }
+  return denom.toUpperCase()
+}
+
