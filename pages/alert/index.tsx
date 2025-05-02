@@ -72,10 +72,10 @@ const FlowAlert = () => {
             outline: 'none',
           }}
         >
-          <option value="all">All Events</option>
           <option value="triggered">Triggered</option>
           <option value="timeout">Timed Out</option>
           <option value="error">Errors</option>
+          <option value="all">All Events</option>
         </select>
 
         <Button
@@ -96,8 +96,9 @@ const FlowAlert = () => {
         </div>
 
         <Text variant="caption" align="center" style={{ marginTop: '16px' }}>
-          You’ll receive alerts when matching events occur. Subscriptions are managed through Intento’s decentralized alert system.
+          You’ll receive alerts for matching events. Emails are used solely for flow notifications and managed by TRST Labs.
         </Text>
+
       </form>
     </Column>
   )
