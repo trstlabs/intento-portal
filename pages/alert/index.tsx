@@ -9,14 +9,18 @@ const FlowAlert = () => {
   const [owner, setOwner] = useState<string | null>(null)
   const [submitted, setSubmitted] = useState(false)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [theme, setTheme] = useState<"dark" | "light">("light")
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     setFlowID(params.get("flowID"))
     setOwner(params.get("owner"))
-    setImageUrl(params.get("imageUrl"))  // Check for custom image URL in the query parameters
+    setImageUrl(params.get("imageUrl"))
+    const themeParam = params.get("theme")
+    if (themeParam === "dark" || themeParam === "light") {
+      setTheme(themeParam)
+    }
   }, [])
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || (!flowID && !owner)) {
@@ -37,6 +41,18 @@ const FlowAlert = () => {
       alert("Failed to subscribe. Please try again.")
     }
   }
+  
+  const inputStyles = {
+    padding: '12px',
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    outline: 'none',
+    transition: 'border-color 0.3s ease-in-out',
+    backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
+    color: theme === "dark" ? "#fff" : "#000",
+    borderColor: theme === "dark" ? "#444" : "#ccc",
+  }
 
   return (
     <Column align="center" justifyContent="center" style={{ minHeight: '100vh', padding: '16px' }}>
@@ -52,27 +68,14 @@ const FlowAlert = () => {
           placeholder="Your Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{
-            padding: '12px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            outline: 'none',
-            transition: 'border-color 0.3s ease-in-out',
-          }}
+          style={inputStyles}
           required
         />
 
         <select
           value={type}
           onChange={(e) => setType(e.target.value)}
-          style={{
-            padding: '12px',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            outline: 'none',
-          }}
+          style={inputStyles}
         >
           <option value="triggered">Triggered</option>
           <option value="timeout">Timed Out</option>
@@ -94,17 +97,17 @@ const FlowAlert = () => {
         </Button>
 
         <div style={{ textAlign: "center", marginTop: "20px" }}>
-          {imageUrl ? (
-            <Image src={imageUrl} alt="Custom Image" width={230} height={40} />
-          ) : (
-            <Image src="https://intento.zone/assets/images/intento_tiny.png" alt="Intento Logo" width={230} height={40} />
-          )}
+          <Image
+            src={imageUrl || "https://intento.zone/assets/images/intento_tiny.png"}
+            alt="Custom or Default Logo"
+            width={230}
+            height={40}
+          />
         </div>
 
         <Text variant="caption" align="center" style={{ marginTop: '16px' }}>
           You’ll receive alerts for matching events. Emails are used solely for flow notifications. The notification system is managed by TRST Labs.
         </Text>
-
       </form>
     </Column>
   )
