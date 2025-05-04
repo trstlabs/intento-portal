@@ -688,9 +688,15 @@ export const FlowInfoBreakdown = ({
                     >
                       <option value={300}>5 minutes</option>
                       <option value={600}>10 minutes</option>
+                      <option value={600*3}>30 minutes</option>
                       <option value={3600}>1 hour</option>
+                      <option value={3600*2}>2 hours</option>
+                      <option value={3600*4}>4 hours</option>
+                      <option value={3600*12}>12 hours</option>
                       <option value={86400}>1 day</option>
+                      <option value={86400}>3 days</option>
                       <option value={604800}>1 week</option>
+                      <option value={604800*4}>4 weeks</option>
                       <option value={2592000}>1 month</option>
                     </select>
 
