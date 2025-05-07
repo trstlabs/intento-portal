@@ -24,11 +24,15 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
   const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.hostedIcaConfig?.hostedAddress)
   const ibcInfo = useIBCAssetInfoFromConnection(flowInfo.icaConfig.connectionId || hostedConnectionID)
 
-  const isActive =
+  const now = Date.now();
+
+const isActive =
     flowInfo.endTime &&
     flowInfo.execTime &&
-    flowInfo.endTime.getSeconds() >= flowInfo.execTime.getSeconds()
-    && flowInfo.endTime.getTime() > Date.now() && flowInfo.execTime.getTime() > Date.now()
+    flowInfo.endTime.getTime() > flowInfo.execTime.getTime() &&
+    flowInfo.endTime.getTime() > now &&
+    flowInfo.execTime.getTime() > now;
+    
   return (
     <Link href={`/flows/${flowInfo.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive}>

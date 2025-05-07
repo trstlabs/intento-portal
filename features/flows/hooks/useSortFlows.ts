@@ -68,8 +68,8 @@ function sortFlows(
     }
 
     if (sortBy.parameter === 'exec_time') {
-      const timeA = flowA.execTime.getSeconds()
-      const timeB = flowB.execTime.getSeconds()
+      const timeA = flowA.execTime.getTime()
+      const timeB = flowB.execTime.getTime()
 
       if (timeA > timeB) {
         return 1
