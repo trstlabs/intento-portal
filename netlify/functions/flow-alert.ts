@@ -2,6 +2,20 @@ import { Handler } from '@netlify/functions'
 import * as Ably from 'ably'
 
 export const handler: Handler = async (event) => {
+  const headers = {
+    'Access-Control-Allow-Origin': '*', // restrict to specific domains when tokenstream is in prod
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  }
+
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers,
+      body: 'Preflight OK',
+    }
+  }
+
   try {
     let email, flowID, owner, unsubscribe, type
 
@@ -13,17 +27,30 @@ export const handler: Handler = async (event) => {
       unsubscribe = params.get('unsubscribe') === 'true'
       type = params.get('type') || 'all'
     } else {
-      ({ email, flowID, owner, unsubscribe, type = 'all' } = JSON.parse(event.body || '{}'))
+      ;({
+        email,
+        flowID,
+        owner,
+        unsubscribe,
+        type = 'all',
+      } = JSON.parse(event.body || '{}'))
     }
 
     if (!email || (!flowID && !owner)) {
-      console.warn('Invalid request: Missing email or flowID/owner', event.body || event.queryStringParameters)
+      console.warn(
+        'Invalid request: Missing email or flowID/owner',
+        event.body || event.queryStringParameters
+      )
       return { statusCode: 400, body: 'Invalid request' }
     }
 
     const key = flowID ? 'flow:' + flowID : 'owner:' + owner
 
-    console.log(`Processing ${unsubscribe ? 'unsub' : 'sub'} request for ${email} on ${key} [type: ${type}]`)
+    console.log(
+      `Processing ${
+        unsubscribe ? 'unsub' : 'sub'
+      } request for ${email} on ${key} [type: ${type}]`
+    )
 
     const ably = new Ably.Realtime({
       key: process.env.ABLY_API_KEY,
@@ -33,9 +60,7 @@ export const handler: Handler = async (event) => {
     const channel = ably.channels.get('flow-events')
     await channel.attach()
 
-    const payload = flowID
-      ? { email, flowID, type }
-      : { email, owner, type }
+    const payload = flowID ? { email, flowID, type } : { email, owner, type }
 
     const action = unsubscribe ? 'unsubscribe' : 'subscribe'
     await channel.publish(action, payload)
