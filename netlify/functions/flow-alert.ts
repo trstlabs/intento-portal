@@ -41,7 +41,7 @@ export const handler: Handler = async (event) => {
         'Invalid request: Missing email or flowID/owner',
         event.body || event.queryStringParameters
       )
-      return { statusCode: 400, body: 'Invalid request' }
+      return { statusCode: 400, body: 'Invalid request', headers }
     }
 
     const key = flowID ? 'flow:' + flowID : 'owner:' + owner
@@ -68,9 +68,10 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 200,
       body: `${unsubscribe ? 'Unsubscribe' : 'Subscribe'} request sent`,
+      headers,
     }
   } catch (error) {
     console.error('Error processing request:', error)
-    return { statusCode: 500, body: 'Internal server error' }
+    return { statusCode: 500, body: 'Internal server error', headers }
   }
 }
