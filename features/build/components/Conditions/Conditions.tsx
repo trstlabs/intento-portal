@@ -34,30 +34,51 @@ export const Conditions = ({
   const [showComparisons, setShowComparisons] = useState(false)
 
   const handleInputChange = (field: keyof ExecutionConditions, value: any) => {
-    const newConditions = { ...conditions, [field]: value }
+    // Create a deep copy of the conditions to avoid mutation issues
+    const newConditions = {
+      ...conditions,
+      [field]: Array.isArray(value) ? [...value] : value
+    }
     onChange(newConditions)
   }
 
   const handleChangeComparison = (index, value: any) => {
-    let newConditions = conditions
-    newConditions.comparisons[index] = value
-    if (value == undefined) {
-      newConditions.comparisons.splice(index, 1)
+    // Create a deep copy of the conditions to avoid mutation issues
+    const newComparisons = [...conditions.comparisons];
+    
+    if (value === undefined) {
+      newComparisons.splice(index, 1);
+    } else {
+      newComparisons[index] = value;
     }
-    onChange(newConditions)
+    
+    const newConditions = {
+      ...conditions,
+      comparisons: newComparisons
+    };
+    
+    onChange(newConditions);
   }
 
   const handleChangeFeedbackLoop = (index, value: any) => {
-    let newConditions = conditions
-    newConditions.feedbackLoops[index] = value
-    if (value == undefined) {
-      newConditions.feedbackLoops.splice(index, 1)
+    // Create a deep copy of the conditions to avoid mutation issues
+    const newFeedbackLoops = [...conditions.feedbackLoops];
+    
+    if (value === undefined) {
+      newFeedbackLoops.splice(index, 1);
+    } else {
+      newFeedbackLoops[index] = value;
     }
-    onChange(newConditions)
+    
+    const newConditions = {
+      ...conditions,
+      feedbackLoops: newFeedbackLoops
+    };
+    
+    onChange(newConditions);
   }
 
   const handleAddFeedbackLoop = () => {
-    let newConditions = conditions
     const newValue: FeedbackLoop = {
       flowId: BigInt(0),
       responseIndex: 0,
@@ -67,12 +88,16 @@ export const Conditions = ({
       msgKey: "",
     }
 
-    newConditions.feedbackLoops = [...conditions.feedbackLoops, newValue] // Add a new empty object
+    // Create a new conditions object with the updated feedbackLoops array
+    const newConditions = {
+      ...conditions,
+      feedbackLoops: [...conditions.feedbackLoops, newValue]
+    }
+    
     onChange(newConditions)
   }
 
   const handleAddComparison = () => {
-    let newConditions = conditions
     const newValue: Comparison = {
       flowId: BigInt(0),
       responseIndex: 0,
@@ -82,7 +107,12 @@ export const Conditions = ({
       operand: "",
     }
 
-    newConditions.comparisons = [...conditions.comparisons, newValue] // Add a new empty object
+    // Create a new conditions object with the updated comparisons array
+    const newConditions = {
+      ...conditions,
+      comparisons: [...conditions.comparisons, newValue]
+    }
+    
     onChange(newConditions)
   }
 

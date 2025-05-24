@@ -22,37 +22,55 @@ export const Configuration = ({
   const [isConfigItemsShowing, _setConfigItemsShowing] = useState(!disabled)
 
   function saveResponses() {
-    let newConfig = config
-    newConfig.saveResponses = !config.saveResponses
+    // Create a deep copy of the config to avoid mutation issues
+    const newConfig = {
+      ...config,
+      saveResponses: !config.saveResponses
+    }
     onChange(newConfig)
   }
 
   function updatingDisabled() {
-    let newConfig = config
-    newConfig.updatingDisabled = !config.updatingDisabled
+    // Create a deep copy of the config to avoid mutation issues
+    const newConfig = {
+      ...config,
+      updatingDisabled: !config.updatingDisabled
+    }
     onChange(newConfig)
   }
 
   function stopOnFail() {
-    let newConfig = config
-    newConfig.stopOnFailure = !config.stopOnFailure
+    // Create a deep copy of the config to avoid mutation issues
+    const newConfig = {
+      ...config,
+      stopOnFailure: !config.stopOnFailure
+    }
     onChange(newConfig)
   }
 
   function stopOnSuccess() {
-    let newConfig = config
-    newConfig.stopOnSuccess = !config.stopOnSuccess
+    // Create a deep copy of the config to avoid mutation issues
+    const newConfig = {
+      ...config,
+      stopOnSuccess: !config.stopOnSuccess
+    }
     onChange(newConfig)
   }
 
   function stopOnTimeout() {
-    let newConfig = config
-    newConfig.stopOnTimeout = !config.stopOnTimeout
+    // Create a deep copy of the config to avoid mutation issues
+    const newConfig = {
+      ...config,
+      stopOnTimeout: !config.stopOnTimeout
+    }
     onChange(newConfig)
   }
   function fallback() {
-    let newConfig = config
-    newConfig.fallbackToOwnerBalance = !config.fallbackToOwnerBalance
+    // Create a deep copy of the config to avoid mutation issues
+    const newConfig = {
+      ...config,
+      fallbackToOwnerBalance: !config.fallbackToOwnerBalance
+    }
     onChange(newConfig)
   }
 

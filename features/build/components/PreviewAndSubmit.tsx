@@ -285,15 +285,32 @@ export const PreviewAndSubmit = ({
 
 
   function setConfig(updatedConfig: ExecutionConfiguration) {
-    let updatedFlowInput = flowInput
-    updatedFlowInput.configuration = updatedConfig
+    // Create a deep copy of the flowInput to avoid mutation issues
+    const updatedFlowInput = {
+      ...flowInput,
+      configuration: {
+        ...updatedConfig
+      }
+    }
     onFlowChange(updatedFlowInput)
   }
 
 
   function setConditions(updatedConfig: ExecutionConditions) {
-    let updatedFlowInput = flowInput
-    updatedFlowInput.conditions = updatedConfig
+    // Create a deep copy of the flowInput to avoid mutation issues
+    const updatedFlowInput = {
+      ...flowInput,
+      conditions: {
+        ...updatedConfig,
+        // Ensure arrays are properly copied
+        comparisons: [...updatedConfig.comparisons],
+        feedbackLoops: [...updatedConfig.feedbackLoops],
+        stopOnSuccessOf: [...updatedConfig.stopOnSuccessOf],
+        stopOnFailureOf: [...updatedConfig.stopOnFailureOf],
+        skipOnSuccessOf: [...updatedConfig.skipOnSuccessOf],
+        skipOnFailureOf: [...updatedConfig.skipOnFailureOf]
+      }
+    }
     onFlowChange(updatedFlowInput)
   }
 
