@@ -353,9 +353,7 @@ const TinyJsonViewer: React.FC<TinyJsonViewerProps> = ({ jsonValue }) => {
       // Extract the value object which contains the msgs array
       const valueObj = jsonValue.value || jsonValue;
       
-      // Debug the structure
-      console.log('MsgExec structure:', JSON.stringify(valueObj, null, 2));
-      
+
       // Try different ways to access the msgs array
       let msgs = [];
       if (valueObj.msgs && Array.isArray(valueObj.msgs)) {

@@ -18,6 +18,7 @@ import { toast } from 'react-hot-toast'
 import { FlowInput } from '../../../types/trstTypes'
 import { Chip, ChipSelected } from '../../../components/Layout/Chip'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
+import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { StepIcon } from '../../../icons/StepIcon'
 
 interface SchedulingSectionProps {
@@ -42,6 +43,12 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
   const [txLabel, setLabel] = useState(flowInput.label || '')
   // Use the chainSymbol directly instead of storing it in state to ensure it updates when the prop changes
   const feeFundsSymbol = chainSymbol || 'INTO'
+
+  // Get the denom_local for the current chain symbol
+  const ibcAssetInfo = useIBCAssetInfo(feeFundsSymbol)
+
+  const denomLocal = ibcAssetInfo?.denom_local || `u${feeFundsSymbol.toLowerCase()}`
+
   const [useMsgExec, setUseMsgExec] = useState(flowInput.msgs[0]?.includes("authz.v1beta1.MsgExec") || false)
 
   // Display states
@@ -100,7 +107,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
 
   // Fee calculation
   // Ensure fee calculation is updated with the latest values
-  const [expectedFeeAmount, _, feeSymbol] = useGetExpectedFlowFee(
+  const [expectedFeeAmount, _, feeDenom] = useGetExpectedFlowFee(
     Math.floor(duration / 1000),
     {
       ...flowInput,
@@ -112,14 +119,14 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
         flowInput.msgs
     },
     true, // isDialogShowing
-    feeFundsSymbol,
+    denomLocal, // Use denomLocal instead of feeFundsSymbol
     Math.floor(interval / 1000)
   )
 
   // Format the fee with 2 decimal places
   const expectedFee = typeof expectedFeeAmount === 'number' ? expectedFeeAmount.toFixed(2) : '0.00'
   // Use the symbol returned from the hook instead of feeFundsSymbol
-  const displaySymbol = feeSymbol || feeFundsSymbol
+  const displaySymbol = feeDenom == "uinto" ? "INTO" : feeFundsSymbol
 
   // Update flowInput when scheduling parameters change
   useEffect(() => {

@@ -490,7 +490,7 @@ export const PreviewAndSubmit = ({
           </Inline>
           <Conditions
             conditions={flowInput.conditions}
-            disabled={!flowInput.conditions}
+            disabled={false}
             onChange={setConditions}
           />
         </Column>
@@ -510,7 +510,7 @@ export const PreviewAndSubmit = ({
           </Inline>
           <Configuration
             config={flowInput.configuration}
-            disabled={!icaAddress && !chainHasIAModule}
+            disabled={false}
             onChange={setConfig}
           />
         </Column>

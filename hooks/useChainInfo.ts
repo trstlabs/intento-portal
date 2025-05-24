@@ -35,8 +35,8 @@ const chainInfoQueryKey = '@chain-info'
 
 export const unsafelyReadChainInfoCache = () =>
   queryClient.getQueryCache().find(chainInfoQueryKey)?.state?.data as
-    | ChainInfo
-    | undefined
+  | ChainInfo
+  | undefined
 
 export const useIBCChainInfo = (chainId: string) => {
   const { data, isLoading } = useQuery<ChainInfo>(
@@ -54,10 +54,12 @@ export const useIBCChainInfo = (chainId: string) => {
   return [data, isLoading] as const
 }
 
+
+
 export const useGetExpectedFlowFee = (
   durationSeconds: number,
   flowInput: FlowInput,
-  isDialogShowing: boolean,
+  _isDialogShowing: boolean, // Prefixed with underscore to indicate it's unused
   denom: string,
   intervalSeconds?: number
 ) => {
@@ -67,38 +69,115 @@ export const useGetExpectedFlowFee = (
 
   const client = useIntentoRpcClient()
 
+  // Create a stable query key that includes all relevant parameters
+  // Use JSON.stringify for the flowInput.msgs to ensure it's properly compared
+  const queryKey = [
+    'expectedFlowFee',
+    durationSeconds,
+    intervalSeconds,
+    denom,
+    flowInput.msgs?.length || 0,
+    JSON.stringify(flowInput.msgs)
+  ]
 
   const { data, isLoading } = useQuery(
-    `expectedFlowFee/${durationSeconds}/${intervalSeconds}/${denom}`,
+    queryKey,
     async () => {
-
-      if (intentModuleParams == undefined) {
-        intentModuleParams = await getFlowParams(client)
-        setTriggerModuleData(intentModuleParams)
+      // Make sure client exists and has the intento property before proceeding
+      if (!client || !client.intento) {
+        console.warn('RPC client not ready or missing intento property')
+        return { fee: 0, symbol: denom }
       }
+
+      if (!intentModuleParams) {
+        try {
+          intentModuleParams = await getFlowParams(client)
+          setTriggerModuleData(intentModuleParams)
+        } catch (error) {
+          console.error('Error getting flow params:', error)
+          return { fee: 0, symbol: denom }
+        }
+      }
+
+      // Validate inputs
+      if (!flowInput.msgs || flowInput.msgs.length === 0) {
+        console.warn('No messages in flowInput')
+        return { fee: 0, symbol: denom }
+      }
+
+      // Calculate recurrences based on interval and duration
       const recurrences =
-        intervalSeconds && intervalSeconds < durationSeconds
+        intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
           ? Math.floor(durationSeconds / intervalSeconds)
           : 1
-      const fee = getExpectedFlowFee(
-        intentModuleParams,
-        200000,
-        flowInput.msgs.length,
-        recurrences,
-        denom
-      )
-      console.log(fee)
-      return fee
+
+      try {
+        // Ensure we have valid parameters before calling getExpectedFlowFee
+        if (!intentModuleParams || !denom) {
+          console.warn('Missing required parameters for fee calculation')
+          return { fee: 0, symbol: denom }
+        }
+
+        // Get the actual denom to use based on the symbol
+        // Always use denom_local from ibcAssetInfo if available
+
+        console.log('Using denom for fee calculation:', denom)
+
+        // Log the denoms we're using
+        console.log('Fee calculation:', {
+          denom,
+          recurrences,
+          lenMsgs: flowInput.msgs.length,
+        })
+
+        // First try with the actual denom (denom_local)
+        let fee = getExpectedFlowFee(
+          intentModuleParams,
+          200000, // Default gas used
+          flowInput.msgs.length,
+          recurrences,
+          denom
+        )
+
+        // Always calculate the fee in uinto for comparison and fallback
+        const intoFee = getExpectedFlowFee(
+          intentModuleParams,
+          200000, // Default gas used
+          flowInput.msgs.length,
+          recurrences,
+          'uinto' // Use the native token for comparison
+        )
+
+        console.log(`Fee in denom: ${fee}, Fee in INTO: ${intoFee}`)
+
+        // If fee is 0 but intoFee is not, it means the provided denom isn't supported
+        // In this case, use the intoFee but keep the original symbol for display
+        if (fee === 0 && intoFee > 0) {
+          console.log(`No fee found for ${denom}, using INTO fee instead:`, intoFee)
+          fee = intoFee
+          denom = 'uinto'
+          return { fee, symbol: denom }
+        }
+
+        return { fee, denom }
+      } catch (error) {
+        console.error('Error calculating fee:', error)
+        return { fee: 0, symbol: denom }
+      }
     },
     {
-      enabled: Boolean(durationSeconds && flowInput.msgs && isDialogShowing && denom),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: true,
+      enabled: Boolean(durationSeconds && flowInput.msgs && denom && client),
+      refetchOnMount: true,
+      staleTime: 10000, // Consider data stale after 10 seconds
+      cacheTime: 30000, // Keep in cache for 30 seconds
+      retry: 1, // Limit retries to avoid excessive error messages
+      onError: (error) => {
+        console.error('Error calculating expected fee:', error)
+      }
     }
   )
-  
-  return [data, isLoading] as const
+
+  return [data?.fee || 0, isLoading, data?.symbol || denom] as const
 }
 
 export const useGetAllValidators = () => {
