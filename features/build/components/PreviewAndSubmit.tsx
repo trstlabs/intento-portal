@@ -8,10 +8,10 @@ import {
   Column,
   styled,
   IconWrapper,
-  PlusIcon,
-
+  PlusIcon
 } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
+
 import {
   useSubmitFlow,
   useRegisterAccount,
@@ -29,7 +29,7 @@ import {
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
-import { JsonFormWrapper } from './Editor/JsonFormWrapper'
+// import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
 import { FlowInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
@@ -40,6 +40,10 @@ import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
 import { convertDenomToMicroDenom } from '../../../util/conversion'
 import { HostedAccountCard } from './HostedAccountCard'
+import { SchedulingSection } from './SchedulingSection'
+import TinyJsonViewer from './Editor/TinyJsonViewer'
+
+
 
 
 
@@ -65,7 +69,7 @@ export const PreviewAndSubmit = ({
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
-  const [_isJsonValid, setIsJsonValid] = useState(true)
+
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
@@ -109,7 +113,7 @@ export const PreviewAndSubmit = ({
   }
 
   useEffect(() => inputRef.current?.focus(), [])
-  
+
   // Reference to the ChainSelector component
   const chainSelectorRef = useRef<any>(null)
 
@@ -153,7 +157,7 @@ export const PreviewAndSubmit = ({
 
   const handleSubmitTxClick = () => {
     connectExternalWallet(null)
-    return setRequestedSubmitTx(true)
+    handleSubmitTx() // Call handleSubmitTx directly instead of showing dialog
   }
 
   // ICA funds
@@ -346,14 +350,12 @@ export const PreviewAndSubmit = ({
   ] = useState({ isShowing: false })
 
   const shouldDisableSubmitButton =
-
     (flowInput.msgs[0] &&
       flowInput.msgs[0].length == 0 &&
       JSON.parse(flowInput.msgs[0])['typeUrl'].length < 5)
 
   const shouldDisableBuildButton =
     shouldDisableSubmitButton
-
 
   return (
     <StyledDivForContainer>
@@ -365,8 +367,8 @@ export const PreviewAndSubmit = ({
           color="tertiary"
           css={{ padding: '0 $15 0 $6' }}
         >
-          Choose where to execute
-        </Text>{' '}
+          Chain to execute on
+        </Text>
       </Inline>
 
       <Card
@@ -382,6 +384,7 @@ export const PreviewAndSubmit = ({
                 Chain
               </Text>{' '}
               <ChainSelector
+              disabled
                 ref={chainSelectorRef}
                 onChange={(update) => {
                   handleChainChange(
@@ -473,32 +476,23 @@ export const PreviewAndSubmit = ({
               color="tertiary"
               css={{ padding: '0 $15 0 $6' }}
             >
-              Define what to execute
+              Messages to be executed
             </Text>
           </Inline>
-          {flowInput.msgs.map((msg, index) => (
-            <div key={index}>
-              <JsonFormWrapper
-                index={index}
-                chainSymbol={chainSymbol}
-                msg={msg}
-                setExample={setExample}
-                handleRemoveMsg={handleRemoveMsg}
-                handleChangeMsg={handleChangeMsg}
-                setIsJsonValid={setIsJsonValid}
-              />
-            </div>
-          ))}
-          <Card variant="secondary" disabled css={{ margin: '$6' }}>
-            <Column>
-              <Button
-                css={{ margin: '$2' }}
-                icon={<IconWrapper icon={<PlusIcon />} />}
-                variant="ghost"
-                iconColor="tertiary"
-                onClick={handleAddMsg}
-              />
-            </Column>
+          <Card
+            css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
+            variant="secondary"
+            disabled
+          >
+            <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+              <Column>
+                {flowInput.msgs.map((msg, index) => (
+                  <div key={index} style={{ marginBottom: index < flowInput.msgs.length - 1 ? '16px' : '0' }}>
+                    <TinyJsonViewer jsonValue={JSON.parse(msg)} />
+                  </div>
+                ))}
+              </Column>
+            </CardContent>
           </Card>
         </>
       )}
@@ -536,10 +530,10 @@ export const PreviewAndSubmit = ({
               color="tertiary"
               css={{ padding: '0 $15 0 $6' }}
             >
-              Specify conditions
+              Execution conditions
             </Text>
           </Inline>
-          <Conditions 
+          <Conditions
             conditions={flowInput.conditions}
             disabled={!flowInput.conditions}
             onChange={setConditions}
@@ -556,7 +550,7 @@ export const PreviewAndSubmit = ({
               color="tertiary"
               css={{ padding: '0 $15 0 $6' }}
             >
-              Configure execution
+              Execution configuration
             </Text>
           </Inline>
           <Configuration
@@ -566,6 +560,14 @@ export const PreviewAndSubmit = ({
           />
         </Column>
       )}
+
+      <SchedulingSection
+        flowInput={flowInput}
+        chainSymbol={chainSymbol}
+        onFlowChange={onFlowChange}
+        icaAddress={icaAddress}
+
+      />
       <Inline
         css={{
           margin: '$4 $6 $8',
@@ -588,11 +590,10 @@ export const PreviewAndSubmit = ({
           variant="primary"
           size="large"
           disabled={shouldDisableBuildButton}
-          onClick={() =>
-            setSubmitFlowDialogState({
-              isShowing: true,
-            })
-          }
+          onClick={() => {
+            onFlowChange(flowInput)
+            handleSubmitFlow()
+          }}
           iconLeft={<GearIcon />}
         >
           {isExecutingSchedule ? <Spinner instant /> : 'Schedule'}

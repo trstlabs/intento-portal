@@ -15,7 +15,7 @@ const StyledLabel = styled(Text, {
 
 const StyledObjectLabel = styled(Text, {
     fontWeight: 'bold',
-    fontSize: '14px',
+    fontSize: '10px',
     color: '$colors$primary',
     background: '$gray200',
 });
@@ -25,7 +25,7 @@ const StyledValue = styled('div', {
     margin: '$2',
     background: '$gray200',
     borderRadius: '$2',
-    fontSize: '16px',
+    fontSize: '12px',
 });
 
 const JsonViewer = ({ jsonValue }) => {
