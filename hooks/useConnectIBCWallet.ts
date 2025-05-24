@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
@@ -14,7 +13,7 @@ export const useConnectIBCWallet = (
   mutationOptions,
   fromRegistry = false
 ) => {
-  const [{ status }, setWalletState] = useRecoilState(ibcWalletState)
+  const [_, setWalletState] = useRecoilState(ibcWalletState)
   // const hasConnected = useRef(false) // Prevent multiple connects
 
   // Always call hooks, even with fallback values to avoid breaking the hook order

@@ -26,7 +26,7 @@ const FlowAlert = () => {
       setTheme(themeParam)
       themeController.toggle()
     }
-  }, [theme])
+  }, [theme, themeController])
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || (!flowID && !owner)) {

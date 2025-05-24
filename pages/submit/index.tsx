@@ -36,7 +36,6 @@ export default function Submit() {
     
     let {
       isWalletConnected,
-      status: walletStatus,
       connect,
       disconnect,
       username,
@@ -105,7 +104,7 @@ export default function Submit() {
       setTheme(themeParam)
       themeController.toggle()
     }
-  }, [theme])
+  }, [theme, themeController])
   
   useEffect(() => {
       const fetchFlowInput = async () => {
@@ -334,7 +333,7 @@ export default function Submit() {
               </Button>
               
               <Text variant="caption" align="center" style={{ marginTop: '16px', fontSize: '12px' }}>
-                You'll receive alerts for matching events. Emails are used solely for flow notifications.
+                You&apos;ll receive alerts for matching events. Emails are used solely for flow notifications.
               </Text>
             </form>
             
