@@ -7,8 +7,6 @@ import {
   Text,
   Column,
   styled,
-  IconWrapper,
-  PlusIcon
 } from 'junoblocks'
 import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
 
@@ -219,15 +217,7 @@ export const PreviewAndSubmit = ({
   }
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-  const handleChangeMsg = (index: number) => (msg: string) => {
-    let msgs = flowInput.msgs
-    msgs[index] = msg
-    let updatedFlowInput = {
-      ...flowInput,
-      msgs,
-    }
-    onFlowChange(updatedFlowInput)
-  }
+  
 
   async function handleChainChange(
     chainId: string,
@@ -293,21 +283,6 @@ export const PreviewAndSubmit = ({
 
   }, [hostedICA]);
 
-  function setExample(index: number, msgObject: any) {
-    try {
-      const msg = JSON.stringify(msgObject, null, '\t')
-      let newMsg = msg.replaceAll('uinto', denom)
-      newMsg = newMsg.replaceAll('into', prefix)
-
-      let updatedFlowInput = flowInput
-      updatedFlowInput.msgs[index] = newMsg
-      //updatedFlowInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
-
-      onFlowChange(updatedFlowInput)
-    } catch (e) {
-      alert(e)
-    }
-  }
 
   function setConfig(updatedConfig: ExecutionConfiguration) {
     let updatedFlowInput = flowInput
@@ -322,27 +297,7 @@ export const PreviewAndSubmit = ({
     onFlowChange(updatedFlowInput)
   }
 
-  function handleAddMsg() {
-    let newMsgs = [...flowInput.msgs]
-    let emptyMsg = ''
-    newMsgs.push(emptyMsg)
-    let updatedFlowInput = flowInput
-    updatedFlowInput.msgs = newMsgs
-    onFlowChange(updatedFlowInput)
-  }
-  function handleRemoveMsg(index: number) {
-    let updatedFlowInput = flowInput
-
-    const newMsgs = updatedFlowInput.msgs.filter(
-      (msg) => msg !== updatedFlowInput.msgs[index]
-    )
-
-    if (index == 0 && newMsgs.length == 0) {
-      newMsgs[index] = ''
-    }
-    updatedFlowInput.msgs = newMsgs
-    onFlowChange(updatedFlowInput)
-  }
+  
 
   const [
     { isShowing: isSubmitFlowDialogShowing },

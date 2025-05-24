@@ -437,10 +437,6 @@ const TinyJsonViewer: React.FC<TinyJsonViewerProps> = ({ jsonValue }) => {
           }
         }
       }
-      
-      // Create a summary of the nested messages
-      const summaries = nestedMessages.map(msg => msg.summary);
-      
       // Remove duplicate messages for cleaner display
       const uniqueMessages = [];
       const seenSummaries = new Set();
