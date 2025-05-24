@@ -58,7 +58,7 @@ export const useUpdateFlow = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
-                        title="Your trigger is updated!"
+                        title="Your flow is updated!"
                         body={`An on-chain flow was updated succesfully`}
 
                         onClose={() => toast.dismiss(t.id)}

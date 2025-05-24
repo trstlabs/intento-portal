@@ -65,7 +65,7 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
         toast.custom((t) => (
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}
-            title="Your trigger is submitted!"
+            title="Your flow is submitted!"
             body={`An on-chain flow was created succesfully! Your unique ID is ${flowID}`}
             buttons={
               <Button

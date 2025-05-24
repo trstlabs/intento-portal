@@ -659,7 +659,7 @@ export const SubmitFlowDialog = ({
                   </Inline>
                   <Inline justifyContent={'space-between'} align="center">
                     <Tooltip
-                      label="Name your trigger so you can find it back later by name"
+                      label="Name your flow so you can find it back later by name"
                       aria-label="Fund Flow - INTO (Optional)"
                     >
                       <Text color="disabled" wrap={false} variant="legend">
