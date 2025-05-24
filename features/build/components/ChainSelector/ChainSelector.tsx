@@ -4,33 +4,71 @@ import {
   styled,
   Union,
 } from 'junoblocks'
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect, forwardRef } from 'react'
 
 import { ChainSelectorToggle } from './ChainSelectorToggle'
 import { ChainSelectorDialog } from './ChainSelectorDialog'
 import { ChainInfo } from './ChainSelectorSelectList'
+import { useIBCAssetList, useChainRegistryList } from '../../../../hooks/useChainList'
 
 
 type ChainSelectorProps = {
   disabled?: boolean
   onChange: (ChainInfo: ChainInfo) => void
+  initialChainId?: string
 }
 
-export const ChainSelector = ({
-  disabled,
-  onChange,
-}: ChainSelectorProps) => {
+export const ChainSelector = forwardRef<HTMLDivElement, ChainSelectorProps>((
+  {
+    disabled,
+    onChange,
+    initialChainId,
+  }, ref
+) => {
   const wrapperRef = useRef()
   const [isChainListShowing, setChainListShowing] = useState(false)
   // const ibcInfo = useIBCAssetInfoFromConnection(connectionID)
   const [selectedChain, setSelectedChain] = useState({ logoURI: undefined, name: undefined })
+ 
+  // Get chain lists from hooks
+  const chainRegistryList = useChainRegistryList()
+  const [icaAssetList, isIcaAssetListLoading] = useIBCAssetList()
+  
+  // Auto-select chain based on initialChainId
+  useEffect(() => {
+    if (initialChainId && !selectedChain.logoURI && chainRegistryList.length > 0 && !isIcaAssetListLoading) {
+      console.log('Looking for chain with ID:', initialChainId)
+      console.log('Available chains:', [...chainRegistryList, ...icaAssetList].map(c => c.chain_id).join(', '))
+      
+      // Find the chain with matching chainId
+      const matchingChain = [...chainRegistryList, ...icaAssetList].find(
+        chain => chain.chain_id === initialChainId
+      )
 
-  // useEffect(() => {
-  //   if (ibcInfo && !selectedChain.logoURI) {
-
-
-  //   }
-  // }, [ibcInfo])
+      if (matchingChain) {
+        console.log('Found matching chain:', matchingChain.name)
+        
+        // Create ChainInfo object
+        const chainInfo = new ChainInfo()
+        chainInfo.chainId = matchingChain.chain_id
+        chainInfo.connectionId = matchingChain.connection_id || ''
+        // Handle different property names between chain types
+        chainInfo.hostConnectionId = ''
+        chainInfo.name = matchingChain.name
+        chainInfo.logoURI = matchingChain.logo_uri
+        chainInfo.denom = matchingChain.denom
+        chainInfo.symbol = matchingChain.symbol
+        chainInfo.prefix = matchingChain.prefix
+        chainInfo.trstDenom = matchingChain.denom_local || ''
+        
+        // Update selected chain and trigger onChange
+        setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })
+        onChange(chainInfo)
+      } else {
+        console.log('No matching chain found for ID:', initialChainId)
+      }
+    }
+  }, [initialChainId, onChange, selectedChain.logoURI, chainRegistryList, icaAssetList, isIcaAssetListLoading])
 
   const handleSelectChain = (chainInfo: ChainInfo) => {
     setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })
@@ -43,7 +81,7 @@ export const ChainSelector = ({
   }
 
   return (
-    <StyledDivForContainer ref={wrapperRef}>
+    <StyledDivForContainer ref={ref || wrapperRef}>
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {!isChainListShowing && (
@@ -79,7 +117,7 @@ export const ChainSelector = ({
       )}
     </StyledDivForContainer>
   )
-}
+})
 
 const sharedStyles = {
   alignItems: 'center',
