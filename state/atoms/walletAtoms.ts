@@ -22,7 +22,7 @@ type GeneratedWalletState<
   client: TClient | null
   status: WalletStatusType
   address: string
-  assets: AssetList | undefined
+  assets?: AssetList | undefined
 }
 
 type CreateWalletStateArgs<TState = {}> = {
