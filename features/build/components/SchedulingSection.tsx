@@ -7,7 +7,6 @@ import {
   Column,
   styled,
   IconWrapper,
-  DialogDivider,
   Toast,
   Error,
   Tooltip,
@@ -19,16 +18,18 @@ import { FlowInput } from '../../../types/trstTypes'
 import { Chip, ChipSelected } from '../../../components/Layout/Chip'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
-import { StepIcon } from '../../../icons/StepIcon'
 
 interface SchedulingSectionProps {
   flowInput: FlowInput
-  chainSymbol: string
+  chainSymbol?: string
   onFlowChange: (flowInput: FlowInput) => void
-  icaAddress?: string
+  //icaAddress?: string
+  onFeeCalculated?: (fee: string, symbol: string) => void
+  useMsgExec?: boolean
+  //setUseMsgExec?: (value: boolean) => void
 }
 
-export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAddress }: SchedulingSectionProps) => {
+export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeCalculated, useMsgExec: propUseMsgExec }: SchedulingSectionProps) => {
   // Time constants
   const HOUR_MS = 3600000
   const DAY_MS = HOUR_MS * 24
@@ -40,7 +41,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
   const [startTime, setStartTime] = useState(flowInput.startTime ? flowInput.startTime * 1000 : 0)
   const [duration, setDuration] = useState(flowInput.duration ? flowInput.duration * 1000 : 30 * DAY_MS)
   const [interval, setInterval] = useState(flowInput.interval ? flowInput.interval * 1000 : DAY_MS)
-  const [txLabel, setLabel] = useState(flowInput.label || '')
+  const [txLabel, _setLabel] = useState(flowInput.label || '')
   // Use the chainSymbol directly instead of storing it in state to ensure it updates when the prop changes
   const feeFundsSymbol = chainSymbol || 'INTO'
 
@@ -49,7 +50,12 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
 
   const denomLocal = ibcAssetInfo?.denom_local || `u${feeFundsSymbol.toLowerCase()}`
 
-  const [useMsgExec, setUseMsgExec] = useState(flowInput.msgs[0]?.includes("authz.v1beta1.MsgExec") || false)
+  // Use parent's state if provided, otherwise use local state
+  const [localUseMsgExec, _setLocalUseMsgExec] = useState(flowInput.msgs[0]?.includes("authz.v1beta1.MsgExec") || false)
+
+  // Use the prop values if provided, otherwise use local state
+  const useMsgExec = propUseMsgExec !== undefined ? propUseMsgExec : localUseMsgExec
+  //const setUseMsgExec = propSetUseMsgExec || setLocalUseMsgExec
 
   // Display states
   const [displayInterval, setDisplayInterval] = useState(
@@ -127,6 +133,13 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
   const expectedFee = typeof expectedFeeAmount === 'number' ? expectedFeeAmount.toFixed(2) : '0.00'
   // Use the symbol returned from the hook instead of feeFundsSymbol
   const displaySymbol = feeDenom == "uinto" ? "INTO" : feeFundsSymbol
+
+  // Notify parent component about fee calculation
+  useEffect(() => {
+    if (onFeeCalculated) {
+      onFeeCalculated(expectedFee, displaySymbol)
+    }
+  }, [expectedFee, displaySymbol, onFeeCalculated])
 
   // Update flowInput when scheduling parameters change
   useEffect(() => {
@@ -290,17 +303,6 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
 
   return (
     <Column>
-      <Inline css={{ margin: '$6', marginTop: '$16' }}>
-        <StepIcon step={5} />
-        <Text
-          align="center"
-          variant="body"
-          color="tertiary"
-          css={{ padding: '0 $15 0 $6' }}
-        >
-          Schedule execution
-        </Text>
-      </Inline>
       <Card
         css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
         variant="secondary"
@@ -309,7 +311,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
           <Column css={{ gap: 24 }}>
 
-            <div style={{ width: '100%', backgroundColor: '$colors$light50', borderRadius: '12px', padding: '16px', backdropFilter: 'blur(10px)' }}>
+            <div style={{ width: '100%', backgroundColor: '$colors$dark5', borderRadius: '12px', padding: '16px', backdropFilter: 'blur(10px)' }}>
               <Column css={{ width: '100%' }}>
                 {/* Start Time Section */}
                 <Inline justifyContent="space-between" align="center" css={{ marginBottom: 16 }}>
@@ -542,7 +544,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
                 </Inline>
 
                 {/* Label Section */}
-                <Inline justifyContent="space-between" align="center">
+                {/* <Inline justifyContent="space-between" align="center">
                   <Tooltip label="Name your flow so you can find it later by name">
                     <Text variant="body">Label (Optional)</Text>
                   </Tooltip>
@@ -551,48 +553,14 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
                     value={txLabel}
                     onChange={({ target: { value } }) => setLabel(value)}
                   />
-                </Inline>
+                </Inline> */}
               </Column>
             </div>
 
-            <DialogDivider offsetY="$10" />
-            {/* Summary Section */}
+            {/* <DialogDivider offsetY="$10" />
+
             <div style={{ width: '100%', background: '$backgroundColors$base', borderRadius: '8px', padding: '20px' }}>
               <Column css={{ width: '100%' }}>
-                <Text variant="header" css={{ marginBottom: 20, fontSize: '18px' }}>Summary</Text>
-
-                <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
-                  <Text variant="body">Start Time:</Text>
-                  <Text variant="body" color="tertiary">{displayStartTime}</Text>
-                </Inline>
-
-                {interval > 0 && (
-                  <>
-                    <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
-                      <Text variant="body">Interval:</Text>
-                      <Text variant="body" color="tertiary">{displayInterval}</Text>
-                    </Inline>
-
-                    <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
-                      <Text variant="body">Duration:</Text>
-                      <Text variant="body" color="tertiary">{displayDuration}</Text>
-                    </Inline>
-
-                    <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
-                      <Text variant="body">Recurrences:</Text>
-                      <Text variant="body" color="tertiary">
-                        {Math.floor(duration / interval)}
-                      </Text>
-                    </Inline>
-                  </>
-                )}
-
-                <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
-                  <Text variant="body">Estimated Fee:</Text>
-                  <Text variant="body" color="tertiary">
-                    ~ {expectedFee} {displaySymbol}
-                  </Text>
-                </Inline>
 
                 {icaAddress && flowInput.connectionId && flowInput.msgs[0] && (
                   <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
@@ -623,19 +591,12 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, icaAdd
                     </Inline>
                   </Inline>
                 )}
-
-                {txLabel && (
-                  <Inline justifyContent="space-between">
-                    <Text variant="body">Label:</Text>
-                    <Text variant="body" color="tertiary">{txLabel}</Text>
-                  </Inline>
-                )}
               </Column>
-            </div>
+            </div> */}
           </Column>
-        </CardContent>
-      </Card>
-    </Column>
+        </CardContent >
+      </Card >
+    </Column >
   )
 }
 

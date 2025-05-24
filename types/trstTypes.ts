@@ -32,6 +32,8 @@ export class FlowInput {
   icaAddressForAuthZ?: string
   connectionId?: string
   hostConnectionId?: string
+  email?: string
+  alertType?: string
 }
 
 export type SelectChainInfo = {

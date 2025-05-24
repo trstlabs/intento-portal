@@ -6,7 +6,7 @@ const ActionCard = styled('div', {
   padding: '$4',
   margin: '$2',
   borderRadius: '$2',
-  backgroundColor: '$colors$light50',
+  backgroundColor: '$colors$dark5',
   backdropFilter: 'blur(8px)',
   transition: 'background-color 0.2s ease',
   '&:hover': {

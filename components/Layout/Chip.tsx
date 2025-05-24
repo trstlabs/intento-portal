@@ -3,10 +3,10 @@ import { styled } from "junoblocks"
 const ChipContainer = styled('div', {
     display: 'inline-block',
     fontSize: '12px',
-    color: '$colors$black',
+    color: '$colors$dark90',
     borderRadius: '$2',
-    backgroundColor: '$colors$light95',
-    border: '1px solid $colors$light95',
+    backgroundColor: '$colors$dark10',
+    border: '1px solid $colors$dark10',
     padding: '0.5em 0.75em',
     margin: '0.25em 0.4em',
     cursor: 'pointer',
@@ -38,7 +38,7 @@ const ChipContainer = styled('div', {
     cursor: 'pointer',
     border: '1px solid $borderColors$selected',
     fontWeight: 'bold',
-    color: '$colors$black',
-    backgroundColor: '$colors$light70',
+    color: '$colors$dark',
+    backgroundColor: '$colors$dark20',
   })
   

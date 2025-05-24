@@ -7,8 +7,14 @@ import {
   Text,
   Column,
   styled,
+  IconWrapper,
+  Toast,
+  InfoIcon,
+  useControlTheme,
+  useMedia,
 } from 'junoblocks'
-import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
+import { toast } from 'react-hot-toast'
+import React, { useEffect, useState, useRef, useMemo } from 'react'
 
 import {
   useSubmitFlow,
@@ -31,7 +37,7 @@ import { IcaCard } from './IcaCard'
 import { sleep } from '../../../localtrst/utils'
 import { FlowInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
-import { GearIcon, TransferIcon } from '../../../icons'
+import { GearIcon } from '../../../icons'
 import { SubmitFlowDialog } from './SubmitFlowDialog'
 import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
@@ -41,6 +47,8 @@ import { HostedAccountCard } from './HostedAccountCard'
 import { SchedulingSection } from './SchedulingSection'
 import TinyJsonViewer from './Editor/TinyJsonViewer'
 
+import { FlowSummary } from './FlowSummary'
+
 
 
 
@@ -49,14 +57,35 @@ type FlowsInputProps = {
   flowInput: FlowInput
   onFlowChange: (flowInput: FlowInput) => void
   initialChainId?: string
-} & HTMLProps<HTMLInputElement>
+  isMobile?: boolean
+}
 
 export const PreviewAndSubmit = ({
   flowInput,
   onFlowChange,
   initialChainId,
+  isMobile: propIsMobile,
 }: FlowsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
+
+  const [useMsgExec, _setUseMsgExec] = useState(false)
+  const [calculatedFee, setCalculatedFee] = useState('0')
+  const [feeSymbol, setFeeSymbol] = useState('')
+  
+  // Theme controller
+  const themeController = useControlTheme()
+  // Get current theme
+  const theme = themeController.theme.name === 'dark' ? 'dark' : 'light'
+  
+  // Check if on mobile - use prop if provided, otherwise use internal check
+  const internalIsMobile = useMedia('sm')
+  const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
+
+  // Handler for fee calculation updates from SchedulingSection
+  const handleFeeCalculated = (fee: string, symbol: string) => {
+    setCalculatedFee(fee)
+    setFeeSymbol(symbol)
+  }
 
   const [prefix, setPrefix] = useState('into')
   const [denom, setDenom] = useState('uinto')
@@ -65,7 +94,7 @@ export const PreviewAndSubmit = ({
   const [chainSymbol, setChainSymbol] = useState('INTO')
   const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAINID || "")
   const [chainIsConnected, setChainIsConnected] = useState(false)
-  const [chainHasIAModule, setChainHasIAModule] = useState(true)
+  const [_chainHasIAModule, setChainHasIAModule] = useState(true)
 
 
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
@@ -152,11 +181,6 @@ export const PreviewAndSubmit = ({
       ),
     [isExecutingSubmitTx, requestedSubmitTx, handleSubmitTx]
   )
-
-  const handleSubmitTxClick = () => {
-    connectExternalWallet(null)
-    handleSubmitTx() // Call handleSubmitTx directly instead of showing dialog
-  }
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
@@ -331,6 +355,14 @@ export const PreviewAndSubmit = ({
 
   return (
     <StyledDivForContainer>
+      {/* Main container with responsive layout */}
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: '24px'
+      }}>
+        {/* Left column - Flow configuration */}
+        <div style={{ flex: isMobile ? '1' : '3' }}>
       <Inline css={{ margin: '$6', marginTop: '$12', }}>
         <StepIcon step={1} />
         <Text
@@ -492,10 +524,33 @@ export const PreviewAndSubmit = ({
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
       />
+      <Column>
+        <Inline css={{ margin: '$6', marginTop: '$16' }}>
+          <StepIcon step={3} />
+          <Text
+            align="center"
+            variant="body"
+            color="tertiary"
+            css={{ padding: '0 $15 0 $6' }}
+          >
+            Schedule execution
+          </Text>
+        </Inline>
+        <SchedulingSection
+          flowInput={flowInput}
+          chainSymbol={chainSymbol}
+          onFlowChange={onFlowChange}
+          //icaAddress={icaAddress}
+          onFeeCalculated={handleFeeCalculated}
+          useMsgExec={useMsgExec}
+          //setUseMsgExec={setUseMsgExec}
+        />
+      </Column>
+
       {flowInput.conditions && (
         <Column>
           <Inline css={{ margin: '$6', marginTop: '$16' }}>
-            <StepIcon step={3} />
+            <StepIcon step={4} />
             <Text
               align="center"
               variant="body"
@@ -512,10 +567,12 @@ export const PreviewAndSubmit = ({
           />
         </Column>
       )}
-      {flowInput.configuration && (
+      
+      {/* Only show configuration in first column on mobile */}
+      {isMobile && flowInput.configuration && (
         <Column>
           <Inline css={{ margin: '$6', marginTop: '$16' }}>
-            <StepIcon step={4} />
+            <StepIcon step={5} />
             <Text
               align="center"
               variant="body"
@@ -532,51 +589,171 @@ export const PreviewAndSubmit = ({
           />
         </Column>
       )}
+        </div>
+        
+        {/* Right column - Flow summary, notifications and submit button */}
+        <div style={{ flex: isMobile ? '1' : '2' }}>
+          {/* Configuration in second column for non-mobile */}
+          {!isMobile && flowInput.configuration && (
+            <Column>
+              <Inline css={{ margin: '$6', marginTop: '$12' }}>
+                <StepIcon step={5} />
+                <Text
+                  align="center"
+                  variant="body"
+                  color="tertiary"
+                  css={{ padding: '0 $15 0 $6' }}
+                >
+                  Execution configuration
+                </Text>
+              </Inline>
+              <Configuration
+                config={flowInput.configuration}
+                disabled={false}
+                onChange={setConfig}
+              />
+            </Column>
+          )}
 
-      <SchedulingSection
-        flowInput={flowInput}
-        chainSymbol={chainSymbol}
-        onFlowChange={onFlowChange}
-        icaAddress={icaAddress}
+          {/* Summary of conditions, configuration and scheduling */}
+          <Column>
+            <Inline css={{ margin: '$4', marginTop: isMobile ? '$16' : '$12' }}>
+              <StepIcon step={6} />
+              <Text
+                align="center"
+                variant="body"
+                color="tertiary"
+                css={{ padding: '0 $15 0 $6' }}
+              >
+                Flow summary
+              </Text>
+            </Inline>
+            <FlowSummary 
+              flowInput={flowInput}
+              displaySymbol={feeSymbol || chainSymbol || ''}
+              expectedFee={calculatedFee}
+              useMsgExec={useMsgExec}
+            />
+          </Column>
+          
+          {/* Email Subscription as a form */}
+          <Card variant={"secondary"} disabled css={{ 
+            backgroundColor: '$colors$dark5', 
+            borderRadius: '12px', 
+            padding: '$3', 
+            margin: '$3', 
+            alignSelf: 'flex-start' 
+          }}>
+            <Text align="center"  color="secondary" style={{ fontSize: '14px', marginBottom: '16px' }}>
+              Subscribe to Alerts
+            </Text>
+            
+            <form 
+              style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                // Form submission is handled by the Schedule button
+              }}
+            >
+              <input
+                type="email"
+                name="email"
+                placeholder="Your Email"
+                value={flowInput.email || ''}
+                onChange={(e) => onFlowChange({ ...flowInput, email: e.target.value })}
+                style={{
+                  padding: '12px',
+                  border: `1px solid ${theme === "dark" ? '#444' : '#ccc'}`,
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  outline: 'none',
+                  transition: 'border-color 0.3s ease-in-out',
+                  backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
+                  color: theme === "dark" ? "#fff" : "#000",
+                  width: '100%',
+                  marginBottom: '16px'
+                }}
+                autoComplete="email"
+              />
 
-      />
-      <Inline
-        css={{
-          margin: '$4 $6 $8',
-          padding: '$5 $5 $8',
-          justifyContent: 'end',
-        }}
-      >
-        <Button
-          css={{ margin: '$4', columnGap: '$4' }}
-          variant="primary"
-          size="large"
-          disabled={shouldDisableSubmitButton && chainHasIAModule}//ia module need  endpoint specified for this
-          onClick={() => handleSubmitTxClick()}
-          iconLeft={<TransferIcon />}
-        >
-          {isExecutingSchedule ? <Spinner instant /> : 'Send messages now'}
-        </Button>
-        <Button
-          css={{ margin: '$4', columnGap: '$4' }}
-          variant="primary"
-          size="large"
-          disabled={shouldDisableBuildButton}
-          onClick={() => {
-            onFlowChange(flowInput)
-            handleSubmitFlow()
-          }}
-          iconLeft={<GearIcon />}
-        >
-          {isExecutingSchedule ? <Spinner instant /> : 'Schedule'}
-        </Button>
-      </Inline>
+              <select
+                name="alertType"
+                value={flowInput.alertType || 'all'}
+                onChange={(e) => onFlowChange({ ...flowInput, alertType: e.target.value })}
+                style={{
+                  padding: '12px',
+                  border: `1px solid ${theme === "dark" ? '#444' : '#ccc'}`,
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  outline: 'none',
+                  transition: 'border-color 0.3s ease-in-out',
+                  backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
+                  color: theme === "dark" ? "#fff" : "#000",
+                  width: '100%',
+                  marginBottom: '16px'
+                }}
+              >
+                <option value="triggered">Triggered</option>
+                <option value="timeout">Timed Out</option>
+                <option value="error">Errors</option>
+                <option value="all">All Events</option>
+              </select>
+              
+              <Text  color="tertiary"  align="center" style={{ marginTop: '16px', fontSize: '12px' }}>
+                You'll receive alerts for matching events. Emails are used solely for flow notifications.
+              </Text>
+            </form>
+          </Card>
+          
+          {/* Schedule Button */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              onFlowChange(flowInput);
+              
+              // Remind user about email subscription if not provided
+              if (!flowInput.email) {
+                toast.custom((t) => (
+                  <Toast
+                    icon={<IconWrapper icon={<InfoIcon />} color="secondary" />}
+                    title="Email Notification Reminder"
+                    body="You haven't provided an email for notifications. You can still schedule the flow, but you won't receive alerts about its execution."
+                    onClose={() => toast.dismiss(t.id)}
+                  />
+                ), { duration: 5000 })
+              }
+              
+              handleSubmitFlow();
+            }}
+          >
+            <Inline
+              css={{
+                margin: '$4 $6 $8',
+                padding: '$5 $5 $8',
+                justifyContent: 'end',
+              }}
+            >
+              <Button
+                type="submit"
+                css={{ margin: '$4', columnGap: '$4' }}
+                variant="primary"
+                size="large"
+                disabled={shouldDisableBuildButton}
+                iconLeft={<GearIcon />}
+              >
+                {isExecutingSchedule ? <Spinner instant /> : 'Schedule'}
+              </Button>
+            </Inline>
+          </form>
+        </div>
+      </div>
     </StyledDivForContainer>
   )
 }
 
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
+  padding: '$4',
 })
 
 export function Row({ children }) {

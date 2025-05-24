@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Button, Column, styled, Text, useControlTheme } from 'junoblocks'
+import {  Column, styled, Text, useControlTheme, useMedia } from 'junoblocks'
 import Image from 'next/image'
 import { useChain } from '@cosmos-kit/react'
 import { useRecoilState } from 'recoil'
@@ -12,9 +12,9 @@ import { PreviewAndSubmit } from '../../features/build/components/PreviewAndSubm
 import { FlowInput as FlowInputType } from '../../types/trstTypes'
 
 const StyledWrapper = styled('div', {
-  backgroundColor: '$backgroundColors$base',
   minHeight: '100vh',
-  padding: '16px'
+  padding: '16px',
+  transition: 'background-color 0.3s ease',
 })
 
 export default function Submit() {
@@ -22,14 +22,16 @@ export default function Submit() {
     const [flowInput, setFlowInput] = useState<FlowInputType | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
-    const [email, setEmail] = useState("")
-    const [type, setType] = useState("all")
-    const [submitted, setSubmitted] = useState(false)
+
     const [imageUrl, setImageUrl] = useState<string | null>("https://intento.zone/assets/images/intento_tiny.png")
     const [theme, setTheme] = useState<"dark" | "light">("dark")
     const [chainId, setChainId] = useState<string | null>(null)
+    const [bgColor, setBgColor] = useState<string>("#2a3f5a") // Default warm blueish-gray
     
     const themeController = useControlTheme()
+    
+    // Check if on mobile
+    const isMobile = useMedia('sm')
     
     // Wallet connection state and functions
     const [{ status }, setWalletState] = useRecoilState(walletState)
@@ -97,6 +99,13 @@ export default function Submit() {
     if (chainParam) {
       setChainId(chainParam)
       console.log('Chain parameter detected:', chainParam)
+    }
+    
+    // Get background color parameter
+    const bgColorParam = params.get("bgColor")
+    if (bgColorParam && /^#([0-9A-F]{3}){1,2}$/i.test(bgColorParam)) {
+      setBgColor(bgColorParam)
+      console.log('Background color parameter detected:', bgColorParam)
     }
     
     const themeParam = params.get("theme")
@@ -176,55 +185,39 @@ export default function Submit() {
       fetchFlowInput();
     }, [router.isReady, router.query]);
   
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) {
-      alert("Please provide a valid email.")
-      return
-    }
-
-    try {
-      const response = await fetch("/.netlify/functions/flow-alert", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          email, 
-          flowID: flowInput?.label || "unknown", 
-          type 
-        }),
-      })
-
-      if (response.ok) {
-        setSubmitted(true)
-        setEmail("")
-      } else {
-        alert("Failed to subscribe. Please try again.")
-      }
-    } catch (err) {
-      console.error("Error subscribing to alerts:", err)
-      alert("Failed to subscribe. Please try again.")
-    }
-  }
-
-  const inputStyles = {
-    padding: '12px',
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    outline: 'none',
-    transition: 'border-color 0.3s ease-in-out',
-    backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
-    color: theme === "dark" ? "#fff" : "#000",
-    borderColor: theme === "dark" ? "#444" : "#ccc",
-    width: '100%',
-    marginBottom: '16px'
-  }
-
+  
   return (
-    <StyledWrapper>
-      <Column align="center" justifyContent="center" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%', marginBottom: '24px', marginTop: '24px' }}>
-          <div style={{ textAlign: 'center', flex: 1 }}>
+    <StyledWrapper style={{
+      backgroundColor: bgColor,
+      backgroundImage: `linear-gradient(to bottom, ${bgColor}00, ${bgColor}99)`,
+    }}>
+      <Column align="center" justifyContent="center" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', overflow: 'hidden' }}>
+        <div style={{ 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
+          justifyContent: 'space-between', 
+          alignItems: isMobile ? 'center' : 'flex-start', 
+          width: '100%', 
+          marginBottom: '24px', 
+          marginTop: '24px' 
+        }}>
+         
+          <div style={{ textAlign: 'center', flex: 1, marginBottom: isMobile ? '20px' : '0' }}>
+          {imageUrl && (
+                <div style={{ position: 'relative', margin: '0 auto' }}>
+                  <Image
+                    src={imageUrl}
+                    alt="Logo"
+                    width={180}
+                    height={100}
+                    onError={() => {
+                      console.error('Image failed to load:', imageUrl);
+                      setImageUrl("https://intento.zone/assets/images/intento_tiny.png");
+                    }}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </div>
+              )}
             <Text variant="header" align="center" style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px' }}>
               Sign and Submit Flows 💫
             </Text>
@@ -257,7 +250,7 @@ export default function Submit() {
           </div>
           
           {/* Wallet Button */}
-          <div style={{ width: '300px', marginLeft: '20px' }}>
+          <div style={{ width: isMobile ? '100%' : '300px', marginLeft: isMobile ? '0' : '20px' }}>
             <WalletButton
               onClick={openView}
               connected={walletStatusesConnected && isClientConnected}
@@ -268,10 +261,9 @@ export default function Submit() {
             />
           </div>
         </div>
-        
-        <div style={{ display: 'flex', width: '100%', gap: '24px', flexDirection: window.innerWidth > 768 ? 'row' : 'column' }}>
+      
           {/* Main content - Flow submission */}
-          <div style={{ flex: 3 }}>
+          <div style={{ width: '100%' }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '40px' }}>
                 <Text>Loading your flow data...</Text>
@@ -285,6 +277,7 @@ export default function Submit() {
                 flowInput={flowInput}
                 onFlowChange={setFlowInput}
                 initialChainId={chainId}
+                isMobile={isMobile}
               />
             ) : (
               <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -293,69 +286,9 @@ export default function Submit() {
             )}
           </div>
           
-          {/* Sidebar - Alert subscription */}
-          <div style={{ flex: 1, backgroundColor: theme === "dark" ? "rgba(30, 30, 30, 0.5)" : "rgba(240, 240, 240, 0.5)", borderRadius: '12px', padding: '24px', alignSelf: 'flex-start' }}>
-            <Text variant="header" align="center" style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '16px' }}>
-              Subscribe to Flow Alerts
-            </Text>
-            
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-              <input
-                type="email"
-                placeholder="Your Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                style={inputStyles}
-                required
-              />
+         
 
-              <select
-                value={type}
-                onChange={(e) => setType(e.target.value)}
-                style={inputStyles}
-              >
-                <option value="triggered">Triggered</option>
-                <option value="timeout">Timed Out</option>
-                <option value="error">Errors</option>
-                <option value="all">All Events</option>
-              </select>
-
-              <Button
-                type="submit"
-                variant="primary"
-                style={{
-                  padding: '12px',
-                  borderRadius: '8px',
-                  marginBottom: '16px'
-                }}
-              >
-                {submitted ? "Subscribed!" : "Subscribe to Alerts"}
-              </Button>
-              
-              <Text variant="caption" align="center" style={{ marginTop: '16px', fontSize: '12px' }}>
-                You&apos;ll receive alerts for matching events. Emails are used solely for flow notifications.
-              </Text>
-            </form>
-            
-            <div style={{ textAlign: "center", marginTop: "24px" }}>
-              {imageUrl && (
-                <div style={{ position: 'relative', margin: '0 auto' }}>
-                  <Image
-                    src={imageUrl}
-                    alt="Logo"
-                    width={180}
-                    height={100}
-                    onError={() => {
-                      console.error('Image failed to load:', imageUrl);
-                      setImageUrl("https://intento.zone/assets/images/intento_tiny.png");
-                    }}
-                    style={{ objectFit: 'contain' }}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+  
       </Column>
     </StyledWrapper>
   );

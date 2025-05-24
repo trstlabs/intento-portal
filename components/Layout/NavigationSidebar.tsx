@@ -504,7 +504,7 @@ const StyledDivForLogo = styled('div', {
     marginBottom: '$2',
   },
   '& svg': {
-    color: '$colors$black',
+    color: '$colors$dark',
   },
 
   [media.sm]: {

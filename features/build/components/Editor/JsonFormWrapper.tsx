@@ -270,7 +270,7 @@ export function Chip({ label, onClick, href = '' }) {
 const ChipContainer = styled('div', {
   display: 'inline-block',
   fontSize: '10px',
-  color: '$colors$black',
+  color: '$colors$dark',
   borderRadius: '$2',
   backgroundColor: '$colors$light95',
   padding: '0.5em 0.75em',

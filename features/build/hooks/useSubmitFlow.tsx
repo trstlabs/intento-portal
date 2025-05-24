@@ -62,11 +62,34 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
           .attributes.find((attr) => attr.key == 'flow-id').value
 
         console.log(flowID)
+        
+        // Subscribe to flow alerts if email is provided
+        if (flowInput.email) {
+          console.log(`Subscribing email ${flowInput.email} to flow ${flowID}`)
+          fetch("/.netlify/functions/flow-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              email: flowInput.email, 
+              flowID: flowID, 
+              type: flowInput.alertType || "all" // Use selected alert type or default to all
+            }),
+          }).then(response => {
+            if (response.ok) {
+              console.log('Successfully subscribed to flow alerts')
+            } else {
+              console.error('Failed to subscribe to flow alerts')
+            }
+          }).catch(err => {
+            console.error('Error subscribing to flow alerts:', err)
+          })
+        }
+        
         toast.custom((t) => (
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}
             title="Your flow is submitted!"
-            body={`An on-chain flow was created succesfully! Your unique ID is ${flowID}`}
+            body={`An on-chain flow was created succesfully! Your unique ID is ${flowID}${flowInput.email ? ' and notifications will be sent to your email' : ''}`}
             buttons={
               <Button
                 as="a"
