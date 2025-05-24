@@ -1,7 +1,7 @@
 //import { ethers } from "ethers";
 //import { Coin } from '@cosmjs/stargate'
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { toUtf8 } from '@cosmjs/encoding'
+import { fromBech32, toBech32, toUtf8 } from '@cosmjs/encoding'
 import { intento, GlobalDecoderRegistry } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { FlowInput } from '../../types/trstTypes'
@@ -78,12 +78,33 @@ export const executeSubmitFlow = async ({
     })
   console.log('Submitting msgSubmitFlow ⬇')
   console.log(msgSubmitFlow)
-  return validateTransactionSuccess(
+  const result = await validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitFlow], {
       amount: [],
       gas: '300000',
     })
   )
+
+  // 🧠 Prepare and send proof
+  const proof = {
+    address: toInjectiveAddress(owner),
+    txHash: result.transactionHash,
+    flowLabel: flowInput.label,
+    timestamp: Math.floor(Date.now() / 1000),
+  }
+  console.log(proof)
+
+  await fetch('/.netlify/functions/log-proof', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.NEXT_PUBLIC_TRIGGERPORTAL_SECRET!,
+    },
+
+    body: JSON.stringify(proof),
+  })
+
+  return result
 }
 
 export function transformAndEncodeMsgs(
@@ -100,10 +121,10 @@ export function transformAndEncodeMsgs(
     if (typeUrl.startsWith('/cosmwasm')) {
       alert('CosmWasm msgs are available for testing use only at the moment')
 
-      const msgObject = value["msg"]; // original JS object
-      const msgBytes: Uint8Array = toUtf8(JSON.stringify(msgObject));
-      
-      value["msg"] = msgBytes; // ✅ Proper byte array for protobuf
+      const msgObject = value['msg'] // original JS object
+      const msgBytes: Uint8Array = toUtf8(JSON.stringify(msgObject))
+
+      value['msg'] = msgBytes // ✅ Proper byte array for protobuf
     }
 
     //to implement
@@ -150,4 +171,9 @@ export function transformAndEncodeMsgs(
 
     msgs.push(msgAny)
   }
+}
+
+function toInjectiveAddress(address: string): string {
+  const { data } = fromBech32(address)
+  return toBech32('inj', data)
 }
