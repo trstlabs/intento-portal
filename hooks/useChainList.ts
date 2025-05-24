@@ -91,7 +91,7 @@ export const useChainInfoByChainID = (chainId: string) => {
   const chainRegistyChain = chains.find((chain) => chain.chain_id == chainId)
   if (chainRegistyChain == undefined) {
     return transformChain(
-      chains.find((chain) => chain.chain_name == 'intentotestnet')
+      chains.find((chain) => chain.chain_name == 'cosmostest')
     )
   }
   const chain = transformChain(chainRegistyChain)

@@ -26,8 +26,8 @@ export const useConnectIBCWallet = (
     assetInfo = useChainInfoByChainID(safeChainId)
   }
 
-  const chainRegistryName = assetInfo?.registry_name || 'cosmostest'
-  const { getSigningStargateClient, connect, address, assets } =
+  const chainRegistryName = assetInfo?.registry_name || 'cosmoshub'
+  const { getSigningStargateClient, connect, address } =
     useChain(chainRegistryName)
 
   const mutation = useMutation(async () => {
@@ -67,7 +67,7 @@ export const useConnectIBCWallet = (
         address,
         client: ibcChainClient,
         status: WalletStatusType.connected,
-        assets,
+
       })
     } catch (error) {
       toast.error('Failed to connect IBC wallet')
@@ -84,34 +84,34 @@ export const useConnectIBCWallet = (
     }
   }, mutationOptions)
 
-  useEffect(() => {
-    if (!assetInfo || status !== WalletStatusType.restored) {
-      return
-    }
+  // useEffect(() => {
+  //   if (!assetInfo || status !== WalletStatusType.restored) {
+  //     return
+  //   }
 
-    let isMounted = true
-    // hasConnected.current = true // Prevent multiple runs
+  //   let isMounted = true
+  //   // hasConnected.current = true // Prevent multiple runs
 
-    const restoreConnection = async () => {
-      try {
-        await connect()
-        if (isMounted && address) {
-          mutation.mutate(null)
-        } else {
-          console.error('Address not available after reconnecting.')
-          isMounted = false // Cleanup
-        }
-      } catch (error) {
-        console.error('Error restoring connection:', error)
-      }
-    }
+  //   const restoreConnection = async () => {
+  //     try {
+  //       await connect()
+  //       if (isMounted && address) {
+  //         mutation.mutate(null)
+  //       } else {
+  //         console.error('Address not available after reconnecting.')
+  //         isMounted = false // Cleanup
+  //       }
+  //     } catch (error) {
+  //       console.error('Error restoring connection:', error)
+  //     }
+  //   }
 
-    restoreConnection()
+  //   restoreConnection()
 
-    return () => {
-      isMounted = false // Cleanup
-    }
-  }, [status, assetInfo, connect, address])
+  //   return () => {
+  //     isMounted = false // Cleanup
+  //   }
+  // }, [status, assetInfo, connect, address])
 
   return mutation
 }

@@ -56,7 +56,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     disconnect,
     username,
     address,
-    openView, assets,
+    openView
   } = useChain('intentotestnet')
 
 
@@ -79,8 +79,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       status: WalletStatusType.idle,
       address: '',
       key: null,
-      client: null,
-      assets: assets,
+      client: null
     })
     // window.location.reload()
   }

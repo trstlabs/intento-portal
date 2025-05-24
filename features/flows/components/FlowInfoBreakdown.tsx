@@ -101,8 +101,9 @@ export const FlowInfoBreakdown = ({
     }
   }, [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost])
 
-  const { mutate: connectExternalWallet = () => { } } = useConnectIBCWallet(symbol, chainId, false) || {};
+
   const handleSendFundsOnHostClick = () => {
+    const { mutate: connectExternalWallet = () => { } } = useConnectIBCWallet(symbol, chainId, false) || {};
     if (chainId != '') {
       connectExternalWallet(null)
     }

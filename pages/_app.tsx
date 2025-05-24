@@ -50,7 +50,6 @@ function TrstApp({ Component, pageProps }: AppProps) {
   useEffect(() => {
     if (!dataPushed) {
       // Push your data to assets and chains arrays here
-
       assets.push({
         chain_name: 'intentotestnet',
         assets: [

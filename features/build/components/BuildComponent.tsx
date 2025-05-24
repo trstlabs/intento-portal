@@ -347,9 +347,8 @@ export const BuildComponent = ({
       JSON.parse(flowInput.msgs[0])['typeUrl'].length < 5)
 
   const shouldDisableBuildButton =
-    shouldDisableSubmitButton ||
-    isExecutingRegisterICA ||
-    (!icaAddress && !hostedAccount && !chainHasIAModule)
+    shouldDisableSubmitButton
+
 
   return (
     <StyledDivForContainer>
