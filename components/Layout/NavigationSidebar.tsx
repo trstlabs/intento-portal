@@ -25,7 +25,7 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode, useEffect, useState, useMemo } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__, APP_NAME } from 'util/constants'
 
@@ -48,6 +48,18 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
+  
+  // Determine which logo to use based on the base URL
+  const logoSrc = useMemo(() => {
+    // Check if we're running in the browser
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname
+      if (hostname === 'portal.intento.zone') {
+        return '/img/flowportal.png'
+      }
+    }
+    return '/img/triggerportal-text-logo-blue.png'
+  }, [])
 
   let {
     isWalletConnected,
@@ -300,7 +312,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
                 {/*  <Logo data-logo="" width="37px" height="47px" /> */}
                 <StyledPNG
                   css={{ maxWidth: '100px' }}
-                  src="/img/triggerportal-text-logo-blue.png"
+                  src={logoSrc}
                 />
               </StyledDivForLogo>
             </Link>{' '}
@@ -328,7 +340,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
           <StyledDivForLogo as="a">
             <div data-logo-label="">
-              <StyledPNG src="/img/triggerportal-text-logo-blue.png" />
+              <StyledPNG src={logoSrc} />
             </div>
           </StyledDivForLogo>
 
