@@ -32,7 +32,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   tokenSymbol = 'ATOM' // Default to ATOM if not provided
 }) => {
   // Get wallet state and connection
-  const [ibcState, setIbcState] = useRecoilState(ibcWalletState)
+  const [ibcState, _setIbcState] = useRecoilState(ibcWalletState)
   
   // Setup wallet connection
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
