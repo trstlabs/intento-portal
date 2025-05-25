@@ -2,7 +2,7 @@ import { chains } from 'chain-registry'
 
 import { useEffect, useState } from 'react'
 import { useQuery } from 'react-query'
-import { useChains } from '@cosmos-kit/react'
+import { useChains } from '@cosmos-kit/react-lite'
 
 export type IBCAssetInfo = {
   id: string
@@ -87,15 +87,31 @@ export const useConnectChains = (chains: IBCAssetInfo[]) => {
 
 //useIBCAssetInfoBySymbol
 export const useChainInfoByChainID = (chainId: string) => {
-  //idea: use useChainRegistryList here
-  const chainRegistyChain = chains.find((chain) => chain.chain_id == chainId)
-  if (chainRegistyChain == undefined) {
-    return transformChain(
-      chains.find((chain) => chain.chain_name == 'cosmostest')
-    )
+  // First try to get chain info from local ibc_assets.json
+  const [ibcAssets] = useIBCAssetList()
+  
+  if (ibcAssets && ibcAssets.length > 0) {
+    const localChain = ibcAssets.find(asset => asset.chain_id === chainId)
+    if (localChain) {
+      return localChain
+    }
   }
-  const chain = transformChain(chainRegistyChain)
-  return chain
+  
+  // Fallback to chain registry if not found in local assets
+  const chainRegistyChain = chains.find((chain) => chain.chain_id === chainId)
+  if (chainRegistyChain) {
+    return transformChain(chainRegistyChain)
+  }
+  
+  // As a last resort, try to find by chain name (for backward compatibility)
+  const fallbackChain = chains.find((chain) => chain.chain_name === 'cosmostest')
+  if (fallbackChain) {
+    console.warn(`Chain with ID ${chainId} not found, falling back to cosmostest`)
+    return transformChain(fallbackChain)
+  }
+  
+  console.error(`No chain found for ID: ${chainId} and no fallback available`)
+  return null
 }
 
 export const useChainRegistryList = () => {

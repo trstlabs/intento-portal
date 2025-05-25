@@ -21,7 +21,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
-  useGetHostedICA, useGetHostICAAddress,
+  useGetHostedICAByConnectionID, useGetHostICAAddress,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -75,7 +75,7 @@ export const BuildComponent = ({
     icaAddress,
     chainIsConnected
   )
-  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(flowInput.connectionId)
+  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByConnectionID(flowInput.connectionId)
   const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId)
 
   const refetchHostedICA = useRefetchQueries([

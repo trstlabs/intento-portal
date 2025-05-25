@@ -61,7 +61,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     return '/img/triggerportal-text-logo-blue.png'
   }, [])
 
-  let {
+  const {
     isWalletConnected,
     status: walletStatus,
     connect,

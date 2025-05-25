@@ -121,7 +121,7 @@ export const useGetExpectedFlowFee = (
         // Get the actual denom to use based on the symbol
         // Always use denom_local from ibcAssetInfo if available
 
-        console.log('Using denom for fee calculation:', denom)
+        //console.log('Using denom for fee calculation:', denom)
 
         // Log the denoms we're using
         console.log('Fee calculation:', {

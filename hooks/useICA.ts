@@ -60,22 +60,16 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
   return [ica, isLoading] as const
 }
 
-export const useGetHostedICA = (connectionId: string) => {
+export const useGetHostedICAByConnectionID = (connectionId: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `hostedAccount/${connectionId}`,
     async () => {
       const hostedAccs = await getHostedAccounts({ rpcClient })
-      // console.log(hostedAccs)
       const hostedAcc = hostedAccs?.find(
         (account) => account.icaConfig.connectionId == connectionId
       )
 
-      // const resp: string = await getICA({
-      //   owner: hostedAcc.address,
-      //   connectionId,
-      //   rpcClient,
-      // })
       return hostedAcc
     },
     {
@@ -89,29 +83,29 @@ export const useGetHostedICA = (connectionId: string) => {
   return [ica, isLoading] as const
 }
 
-// export const useGetHostICAAddressFromHostAddress = (address: string) => {
-//   const rpcClient = useIntentoRpcClient()
 
-//   const { data: ica, isLoading } = useQuery(
-//     `hostICAAddressFromHostAddress/${address}`,
-//     async () => {
-//       const resp = await getHostedAccount({ rpcClient, address })
-//       let [icaAddress, _] = useGetHostICAAddress(
-//         address,
-//         resp.hostedAccount.icaConfig.connectionId
-//       )
-//       return icaAddress
-//     },
-//     {
-//       enabled: Boolean(rpcClient && !!address && address.length > 40),
-//       refetchOnMount: false,
-//       staleTime: 30000,
-//       cacheTime: 300000,
-//     }
-//   )
+export const useGetHostedICAByHostedAddress = (address: string) => {
+  const rpcClient = useIntentoRpcClient()
+  const { data: ica, isLoading } = useQuery(
+    `hostedAccountByAddress/${address}`,
+    async () => {
+      const hostedAccs = await getHostedAccounts({ rpcClient })
+      const hostedAcc = hostedAccs?.find(
+        (account) => account.hostedAddress == address
+      )
 
-//   return [ica, isLoading] as const
-// }
+      return hostedAcc
+    },
+    {
+      enabled: Boolean(address && rpcClient),
+      refetchOnMount: false,
+      staleTime: 30000,
+      cacheTime: 300000,
+    }
+  )
+
+  return [ica, isLoading] as const
+}
 
 export const useGetConnectionIDFromHostAddress = (address: string) => {
   const rpcClient = useIntentoRpcClient()
@@ -209,7 +203,6 @@ export const useAuthZMsgGrantInfoForUser = (
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(chainId)
-
   const { data, isLoading } = useQuery(
     `userAuthZGrants/${grantee}`,
     async () => {
