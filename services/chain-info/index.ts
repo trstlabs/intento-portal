@@ -146,19 +146,38 @@ export const getExpectedFlowFee = (
   recurrences: number,
   denom: string
 ) => {
-  const flexFeeForPeriod = (Number(intentParams.flowFlexFeeMul) / 1000) * gasUsed
+  console.log("intentParams", intentParams)
 
-  const flowFee =
-    recurrences * flexFeeForPeriod +
-    recurrences * Number(intentParams.burnFeePerMsg) * lenMsgs
-  const denomCoin = intentParams.gasFeeCoins.find((coin) => coin.denom == denom)
-  if (denomCoin == undefined) {
+  // Step 1: Base gas fee units (like the 'gasFeeAmount' in Go)
+  const gasFeeUnits = (gasUsed * Number(intentParams.flowFlexFeeMul)) / 1000
+
+  // Step 2: Find the gas fee coin price for the denom
+  const denomCoin = intentParams.gasFeeCoins.find((coin) => coin.denom === denom)
+  if (!denomCoin) {
+    console.warn(`Denom ${denom} not found in gasFeeCoins`)
     return 0
   }
-  const flowFeeForDenom = flowFee * Number(denomCoin.amount)
-  const flowFeeNormalized = convertMicroDenomToDenom(flowFeeForDenom, 6)
 
-  return Number(flowFeeNormalized.toFixed(4))
+  const gasPricePerUnit = Number(denomCoin.amount) // microdenom per gas unit
+  const gasFeeInMicro = gasFeeUnits * gasPricePerUnit
+
+  // Step 3: Add burn fee if applicable
+  let totalFlowFeeInMicro = gasFeeInMicro
+
+  // Only apply burn fee if denom matches the primary denom (e.g., 'uinto')
+  if (denom === 'uinto') {
+    const burnFeePerMsg = Number(intentParams.burnFeePerMsg)
+    const burnFeeInMicro = burnFeePerMsg * lenMsgs
+    totalFlowFeeInMicro += burnFeeInMicro
+  }
+
+  // Step 4: Multiply by recurrences
+  totalFlowFeeInMicro *= recurrences
+
+  // Step 5: Convert to denom units (1e6 micro = 1 denom)
+  const flowFeeInDenom = totalFlowFeeInMicro / 1e6
+
+  return Number(flowFeeInDenom.toFixed(6)) // Show up to 6 decimals for clarity
 }
 
 function blockInfoAndCalculateApr(
