@@ -88,6 +88,7 @@ export default function Submit() {
     // Check for theme parameter in URL
     const params = new URLSearchParams(window.location.search)
     
+    
     // Get imageUrl parameter
     const imageUrlParam = params.get("imageUrl")
     if (imageUrlParam) {
@@ -98,15 +99,44 @@ export default function Submit() {
     const chainParam = params.get("chain")
     if (chainParam) {
       setChainId(chainParam)
-      console.log('Chain parameter detected:', chainParam)
+     // console.log('Chain parameter detected:', chainParam)
     }
     
-    // Get background color parameter
-    const bgColorParam = params.get("bgColor")
-    if (bgColorParam && /^#([0-9A-F]{3}){1,2}$/i.test(bgColorParam)) {
-      setBgColor(bgColorParam)
-      console.log('Background color parameter detected:', bgColorParam)
+    // Get background color parameter with fallback to URL hash
+    let bgColorParam = params.get("bgColor") || '';
+    console.log('Initial bgColorParam:', bgColorParam);
+    
+    // If empty, try to get from URL hash
+    if (!bgColorParam && typeof window !== 'undefined') {
+      const hash = window.location.hash;
+      if (hash && hash.startsWith('#')) {
+        bgColorParam = hash.substring(1); // Remove the #
+        //console.log('Using color from URL hash:', bgColorParam);
+      }
     }
+    
+    // Process the color if we have a value
+    if (bgColorParam) {
+      // Clean the input
+      let cleanColor = bgColorParam.trim();
+      
+      // Remove any trailing = signs and spaces
+      cleanColor = cleanColor.replace(/[= ]+$/, '');
+      
+      // Remove any # characters and add a single one at the start
+      cleanColor = cleanColor.replace(/#/g, '');
+      cleanColor = `#${cleanColor}`;
+      
+      // Validate hex color (3 or 6 digits after #)
+      if (/^#(?:[0-9a-f]{3}){1,2}$/i.test(cleanColor)) {
+       // console.log('Setting background color to:', cleanColor);
+        setBgColor(cleanColor);
+      } else {
+        console.warn('Invalid hex color format. Expected #RGB or #RRGGBB. Got:', cleanColor);
+        // Set a default color if needed
+        // setBgColor('#000000'); // Uncomment and set your default color if desired
+      }
+    } 
     
     const themeParam = params.get("theme")
     if (themeParam === "light") {
@@ -164,7 +194,7 @@ export default function Submit() {
               conditions: parsedData?.conditions || undefined,
               hostedIcaConfig: parsedData?.hostedIcaConfig || undefined,
               icaAddressForAuthZ: parsedData?.icaAddressForAuthZ || undefined,
-              connectionId: parsedData?.connectionId || "",
+              connectionId: parsedData?.connectionId || undefined,
               hostConnectionId: parsedData?.hostConnectionId || undefined
             };
       
