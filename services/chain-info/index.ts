@@ -1,5 +1,4 @@
 import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
-import { convertMicroDenomToDenom } from 'junoblocks'
 import { StargateClient } from '@cosmjs/stargate'
 
 import { Params } from 'intentojs/dist/codegen/intento/intent/v1beta1/params'
