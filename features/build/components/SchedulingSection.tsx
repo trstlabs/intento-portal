@@ -10,7 +10,6 @@ import {
   Toast,
   Error,
   Tooltip,
-  Union
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
@@ -363,7 +362,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                     </Inline>
                   ) : (
                     <Inline css={{ gap: 8 }}>
-                      <Union>
+                    
                         <StyledInputWithBorder
                           placeholder="e.g. 1 hour"
                           value={editStartTimeValue}
@@ -385,7 +384,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                         >
                           Set
                         </Button>
-                      </Union>
+                     
                       <Button size="small" variant="ghost" onClick={() => setEditStartTime(false)}>
                         Cancel
                       </Button>
@@ -441,7 +440,6 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                     </Inline>
                   ) : (
                     <Inline css={{ gap: 8 }}>
-                      <Union>
                         <StyledInputWithBorder
                           placeholder="e.g. 3 days"
                           value={editIntervalValue}
@@ -460,7 +458,6 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                         >
                           Set
                         </Button>
-                      </Union>
                       <Button size="small" variant="ghost" onClick={() => setEditInterval(false)}>
                         Cancel
                       </Button>
@@ -516,7 +513,6 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                     </Inline>
                   ) : (
                     <Inline css={{ gap: 8 }}>
-                      <Union>
                         <StyledInputWithBorder
                           placeholder="e.g. 45 days"
                           value={editDurationValue}
@@ -535,7 +531,6 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                         >
                           Set
                         </Button>
-                      </Union>
                       <Button size="small" variant="ghost" onClick={() => setEditDuration(false)}>
                         Cancel
                       </Button>

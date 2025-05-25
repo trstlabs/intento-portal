@@ -116,9 +116,9 @@ function TrstApp({ Component, pageProps }: AppProps) {
             },
           })
 
-          console.log(chains[chains.length - 1])
+          // console.log(chains[chains.length - 1])
         }
-        console.log(chains.find((i) => i.chain_name == 'cosmostest'))
+        // console.log(chains.find((i) => i.chain_name == 'cosmostest'))
       }
       // Mark the data as pushed
       setDataPushed(true)
@@ -182,6 +182,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
                     },
                   },
                 }}
+                // No walletModal needed for @cosmos-kit/react
               >
                 <Component {...pageProps} />
               </ChainProvider>
@@ -234,7 +235,6 @@ function getEnvVarForSymbol(asset: any): {
 
     // Add more cases as needed for other symbols
     default:
-      console.log("UNDefined")
       return { rpcEndpoint: asset.rpc, apiEndpoint: asset.api }
   }
 }

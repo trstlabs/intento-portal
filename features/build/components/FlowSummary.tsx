@@ -10,19 +10,26 @@ import React from 'react'
 // which includes conditions and configuration
 import { FlowInput } from '../../../types/trstTypes'
 import { ConditionsSummary } from './Conditions/ConditionsSummary'
+import { AuthzGrantCheck } from './AuthzGrantCheck'
 
 interface FlowSummaryProps {
   flowInput: FlowInput
   displaySymbol: string
   expectedFee: string
   useMsgExec?: boolean
+  chainId?: string
+  grantee?: string
+  tokenSymbol?: string
 }
 
 export const FlowSummary: React.FC<FlowSummaryProps> = ({
   flowInput,
   displaySymbol,
   expectedFee,
-  useMsgExec
+  useMsgExec,
+  chainId,
+  grantee,
+  tokenSymbol
 }) => {
   // Calculate scheduling info
   const interval = flowInput.interval ? flowInput.interval * 1000 : 0
@@ -35,12 +42,18 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     if (ms === 0) return 'None'
 
     const hours = ms / (1000 * 60 * 60)
-
+    const minutes = ms / (1000 * 60)
     if (hours < 48) {
-      return hours === 1 ? '1 hour' : `${hours} hours`
+      if (hours < 1){
+        return minutes === 1  ? '1 minute' : `${minutes.toFixed()} minutes`
+      }
+      return hours === 1 ? '1 hour' : `${hours.toFixed()} hours`
     } else {
       const days = hours / 24
-      return days === 1 ? '1 day' : `${days} days`
+      if (days <= 0.98){
+        return "~1 day"
+      }
+      return days === 1 ? '1 day' : `${days.toFixed()} days`
     }
   }
 
@@ -105,6 +118,16 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
               </Inline>
             )}
           </Column>
+
+          {/* Authorization Check */}
+          {chainId && grantee && flowInput.msgs && flowInput.msgs.length > 0 && (
+            <AuthzGrantCheck
+              flowInput={flowInput}
+              chainId={chainId}
+              grantee={grantee}
+              tokenSymbol={tokenSymbol}
+            />
+          )}
 
           {/* Conditions Summary */}
           {(flowInput.conditions || flowInput.configuration) && (

@@ -25,7 +25,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
-  useGetHostedICA, useGetHostICAAddress,
+  useGetHostedICAByHostedAddress, useGetHostICAAddress,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -70,21 +70,21 @@ export const PreviewAndSubmit = ({
 
   const [useMsgExec, _setUseMsgExec] = useState(false)
   const [calculatedFee, setCalculatedFee] = useState('0')
-  const [feeSymbol, setFeeSymbol] = useState('')
-  
+
+
   // Theme controller
   const themeController = useControlTheme()
   // Get current theme
   const theme = themeController.theme.name === 'dark' ? 'dark' : 'light'
-  
+
   // Check if on mobile - use prop if provided, otherwise use internal check
   const internalIsMobile = useMedia('sm')
   const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
 
   // Handler for fee calculation updates from SchedulingSection
-  const handleFeeCalculated = (fee: string, symbol: string) => {
+  const handleFeeCalculated = (fee: string) => {
     setCalculatedFee(fee)
-    setFeeSymbol(symbol)
+
   }
 
   const [prefix, setPrefix] = useState('into')
@@ -95,6 +95,16 @@ export const PreviewAndSubmit = ({
   const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAINID || "")
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
+  
+  // Initialize connectionId if not set
+  useEffect(() => {
+    if (!flowInput.connectionId && chainId) {
+      // Find the default connectionId for this chainId
+      const defaultConnectionId = "connection-0" // Default value, adjust as needed
+      const updatedFlowInput = { ...flowInput, connectionId: defaultConnectionId }
+      onFlowChange(updatedFlowInput)
+    }
+  }, [chainId, flowInput, onFlowChange])
 
 
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
@@ -108,11 +118,15 @@ export const PreviewAndSubmit = ({
     icaAddress,
     chainIsConnected
   )
-  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICA(flowInput.connectionId)
-  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId)
-
+  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByHostedAddress(flowInput.hostedIcaConfig.hostedAddress || "")
+  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId || "")
+  
+  // Log with proper null check to avoid undefined issues
+  // useEffect(() => {
+  //   console.log("hostedICA", hostedICA, "flowInput.connectionId", flowInput.connectionId || "<not set>")
+  // }, [hostedICA, flowInput.connectionId]) 
   const refetchHostedICA = useRefetchQueries([
-    `hostInterchainAccount/${hostedAccount?.hostedAddress || ""}/${flowInput.connectionId}`,
+    `hostInterchainAccount/${hostedAccount?.hostedAddress || ""}/${flowInput.connectionId || ""}`,
   ])
   const refetchAuthZForHostedICA = useRefetchQueries(
     `userAuthZGrants / ${hostedICA}`
@@ -241,7 +255,7 @@ export const PreviewAndSubmit = ({
   }
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-  
+
 
   async function handleChainChange(
     chainId: string,
@@ -253,7 +267,8 @@ export const PreviewAndSubmit = ({
     chainSymbol: string
   ) {
     // alert(denom + newDenom)
-    let updatedFlowInput = flowInput
+    // Create a deep copy of flowInput to ensure all properties are properly updated
+    let updatedFlowInput = JSON.parse(JSON.stringify(flowInput))
     updatedFlowInput.connectionId = connectionId
     updatedFlowInput.hostConnectionId = hostConnectionId
     flowInput.msgs.map((editMsg, editIndex) => {
@@ -338,8 +353,6 @@ export const PreviewAndSubmit = ({
     onFlowChange(updatedFlowInput)
   }
 
-  
-
   const [
     { isShowing: isSubmitFlowDialogShowing },
     setSubmitFlowDialogState,
@@ -356,241 +369,241 @@ export const PreviewAndSubmit = ({
   return (
     <StyledDivForContainer>
       {/* Main container with responsive layout */}
-      <div style={{ 
-        display: 'flex', 
+      <div style={{
+        display: 'flex',
         flexDirection: isMobile ? 'column' : 'row',
         gap: '24px'
       }}>
         {/* Left column - Flow configuration */}
         <div style={{ flex: isMobile ? '1' : '3' }}>
-      <Inline css={{ margin: '$6', marginTop: '$12', }}>
-        <StepIcon step={1} />
-        <Text
-          align="center"
-          variant="body"
-          color="tertiary"
-          css={{ padding: '0 $15 0 $6' }}
-        >
-          Chain to execute on
-        </Text>
-      </Inline>
-
-      <Card
-        css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$1' }}
-        variant="secondary"
-        disabled
-      >
-        <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-          <Column>
-
-            <Row>
-              <Text align="center" variant="caption">
-                Chain
-              </Text>{' '}
-              <ChainSelector
-              disabled
-                ref={chainSelectorRef}
-                onChange={(update) => {
-                  handleChainChange(
-                    update.chainId,
-                    update.connectionId,
-                    update.hostConnectionId,
-                    update.prefix,
-                    update.denom,
-                    update.name,
-                    update.symbol
-                  )
-                }}
-                initialChainId={initialChainId}
-              />{' '}
-              {
-                /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
-                chainIsConnected &&
-                !isIcaLoading &&
-                flowInput.connectionId != '' && (
-                  <>
-                    <Button
-                      css={{
-                        margin: '$2',
-                        overflow: 'hidden',
-                        float: 'left',
-                      }}
-                      variant="secondary"
-                      onClick={() => handleRegisterAccountClick()}
-                    >
-                      {' '}
-                      {isExecutingRegisterICA ? (
-                        <Spinner instant />
-                      ) : (
-                        'Self-Host ICA'
-                      )}
-                    </Button>
-                  </>
-                )
-              }
-            </Row>
-            {chainName &&
-              chainIsConnected &&
-              (isIcaLoading ? (
-                <Spinner size={18} style={{ margin: 0 }} />
-              ) : (
-                <>
-                  {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
-                    hostedAccount={hostedAccount}
-                    hostedICAAddress={hostedICA}
-                    chainSymbol={chainSymbol}
-                    chainId={chainId}
-                    flowInput={flowInput}
-                  />}
-                    {/* <Text variant="caption">
-                      No Self-hosted Interchain Account for selected chain: {chainName}.
-                    </Text> */}</>
-                  ) : (
-                    <IcaCard
-                      icaAddress={icaAddress}
-                      chainSymbol={chainSymbol}
-                      feeFundsHostChain={feeFundsHostChain}
-                      icaBalance={icaBalance}
-                      isIcaBalanceLoading={isIcaBalanceLoading}
-                      shouldDisableSendHostChainFundsButton={
-                        shouldDisableSendHostChainFundsButton
-                      }
-                      hostDenom={denom}
-                      chainId={chainId}
-                      flowInput={flowInput}
-                      isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                      setFeeFundsHostChain={(fees) =>
-                        setFeeFundsHostChain(fees)
-                      }
-                      handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                    />
-                  )}
-                </>
-              ))}
-          </Column>
-        </CardContent>
-      </Card>
-      {flowInput.msgs && flowInput.msgs.length > 0 && (
-        <>
-          <Inline css={{ margin: '$6', marginTop: '$16' }}>
-            <StepIcon step={2} />
+          <Inline css={{ margin: '$6', marginTop: '$12', }}>
+            <StepIcon step={1} />
             <Text
               align="center"
               variant="body"
               color="tertiary"
               css={{ padding: '0 $15 0 $6' }}
             >
-              Messages to be executed
+              Chain to execute on
             </Text>
           </Inline>
+
           <Card
-            css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
+            css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$1' }}
             variant="secondary"
             disabled
           >
             <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
               <Column>
-                {flowInput.msgs.map((msg, index) => (
-                  <div key={index} style={{ marginBottom: index < flowInput.msgs.length - 1 ? '16px' : '0' }}>
-                    <TinyJsonViewer jsonValue={JSON.parse(msg)} />
-                  </div>
-                ))}
+
+                <Row>
+                  <Text align="center" variant="caption">
+                    Chain
+                  </Text>{' '}
+                  <ChainSelector
+                    disabled
+                    ref={chainSelectorRef}
+                    onChange={(update) => {
+                      handleChainChange(
+                        update.chainId,
+                        update.connectionId,
+                        update.hostConnectionId,
+                        update.prefix,
+                        update.denom,
+                        update.name,
+                        update.symbol
+                      )
+                    }}
+                    initialChainId={initialChainId}
+                  />{' '}
+                  {
+                /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
+                    chainIsConnected &&
+                    !isIcaLoading &&
+                    flowInput.connectionId != '' && (
+                      <>
+                        <Button
+                          css={{
+                            margin: '$2',
+                            overflow: 'hidden',
+                            float: 'left',
+                          }}
+                          variant="secondary"
+                          onClick={() => handleRegisterAccountClick()}
+                        >
+                          {' '}
+                          {isExecutingRegisterICA ? (
+                            <Spinner instant />
+                          ) : (
+                            'Self-Host ICA'
+                          )}
+                        </Button>
+                      </>
+                    )
+                  }
+                </Row>
+                {chainName &&
+                  chainIsConnected &&
+                  (isIcaLoading ? (
+                    <Spinner size={18} style={{ margin: 0 }} />
+                  ) : (
+                    <>
+                      {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
+                        hostedAccount={hostedAccount}
+                        hostedICAAddress={hostedICA}
+                        chainSymbol={chainSymbol}
+                        chainId={chainId}
+                        flowInput={flowInput}
+                      />}
+                        {/* <Text variant="caption">
+                      No Self-hosted Interchain Account for selected chain: {chainName}.
+                    </Text> */}</>
+                      ) : (
+                        <IcaCard
+                          icaAddress={icaAddress}
+                          chainSymbol={chainSymbol}
+                          feeFundsHostChain={feeFundsHostChain}
+                          icaBalance={icaBalance}
+                          isIcaBalanceLoading={isIcaBalanceLoading}
+                          shouldDisableSendHostChainFundsButton={
+                            shouldDisableSendHostChainFundsButton
+                          }
+                          hostDenom={denom}
+                          chainId={chainId}
+                          flowInput={flowInput}
+                          isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
+                          setFeeFundsHostChain={(fees) =>
+                            setFeeFundsHostChain(fees)
+                          }
+                          handleSendFundsOnHostClick={handleSendFundsOnHostClick}
+                        />
+                      )}
+                    </>
+                  ))}
               </Column>
             </CardContent>
           </Card>
-        </>
-      )}
-      <SubmitFlowDialog
-        chainSymbol={chainSymbol}
-        icaBalance={icaBalance}
-        icaAddress={icaAddress}
-        flowInput={flowInput}
-        isDialogShowing={isSubmitFlowDialogShowing}
-        onRequestClose={() =>
-          setSubmitFlowDialogState({
-            isShowing: false,
-          })
-        }
-        shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
-        isLoading={isExecutingSchedule}
-        feeFundsHostChain={feeFundsHostChain}
-        shouldDisableSendHostChainFundsButton={
-          shouldDisableSendHostChainFundsButton
-        }
-        isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-        setFeeFundsHostChain={setFeeFundsHostChain}
-        handleSubmitFlow={(flowInput) =>
-          handleSubmitFlowClick(flowInput)
-        }
-        handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-      />
-      <Column>
-        <Inline css={{ margin: '$6', marginTop: '$16' }}>
-          <StepIcon step={3} />
-          <Text
-            align="center"
-            variant="body"
-            color="tertiary"
-            css={{ padding: '0 $15 0 $6' }}
-          >
-            Schedule execution
-          </Text>
-        </Inline>
-        <SchedulingSection
-          flowInput={flowInput}
-          chainSymbol={chainSymbol}
-          onFlowChange={onFlowChange}
-          //icaAddress={icaAddress}
-          onFeeCalculated={handleFeeCalculated}
-          useMsgExec={useMsgExec}
-          //setUseMsgExec={setUseMsgExec}
-        />
-      </Column>
+          {flowInput.msgs && flowInput.msgs.length > 0 && (
+            <>
+              <Inline css={{ margin: '$6', marginTop: '$16' }}>
+                <StepIcon step={2} />
+                <Text
+                  align="center"
+                  variant="body"
+                  color="tertiary"
+                  css={{ padding: '0 $15 0 $6' }}
+                >
+                  Messages to be executed
+                </Text>
+              </Inline>
+              <Card
+                css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
+                variant="secondary"
+                disabled
+              >
+                <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+                  <Column>
+                    {flowInput.msgs.map((msg, index) => (
+                      <div key={index} style={{ marginBottom: index < flowInput.msgs.length - 1 ? '16px' : '0' }}>
+                        <TinyJsonViewer jsonValue={JSON.parse(msg)} />
+                      </div>
+                    ))}
+                  </Column>
+                </CardContent>
+              </Card>
+            </>
+          )}
+          <SubmitFlowDialog
+            chainSymbol={chainSymbol}
+            icaBalance={icaBalance}
+            icaAddress={icaAddress}
+            flowInput={flowInput}
+            isDialogShowing={isSubmitFlowDialogShowing}
+            onRequestClose={() =>
+              setSubmitFlowDialogState({
+                isShowing: false,
+              })
+            }
+            shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
+            isLoading={isExecutingSchedule}
+            feeFundsHostChain={feeFundsHostChain}
+            shouldDisableSendHostChainFundsButton={
+              shouldDisableSendHostChainFundsButton
+            }
+            isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
+            setFeeFundsHostChain={setFeeFundsHostChain}
+            handleSubmitFlow={(flowInput) =>
+              handleSubmitFlowClick(flowInput)
+            }
+            handleSendFundsOnHostClick={handleSendFundsOnHostClick}
+          />
+          <Column>
+            <Inline css={{ margin: '$6', marginTop: '$16' }}>
+              <StepIcon step={3} />
+              <Text
+                align="center"
+                variant="body"
+                color="tertiary"
+                css={{ padding: '0 $15 0 $6' }}
+              >
+                Schedule execution
+              </Text>
+            </Inline>
+            <SchedulingSection
+              flowInput={flowInput}
+              chainSymbol={chainSymbol}
+              onFlowChange={onFlowChange}
+              //icaAddress={icaAddress}
+              onFeeCalculated={handleFeeCalculated}
+              useMsgExec={useMsgExec}
+            //setUseMsgExec={setUseMsgExec}
+            />
+          </Column>
 
-      {flowInput.conditions && (
-        <Column>
-          <Inline css={{ margin: '$6', marginTop: '$16' }}>
-            <StepIcon step={4} />
-            <Text
-              align="center"
-              variant="body"
-              color="tertiary"
-              css={{ padding: '0 $15 0 $6' }}
-            >
-              Execution conditions
-            </Text>
-          </Inline>
-          <Conditions
-            conditions={flowInput.conditions}
-            disabled={false}
-            onChange={setConditions}
-          />
-        </Column>
-      )}
-      
-      {/* Only show configuration in first column on mobile */}
-      {isMobile && flowInput.configuration && (
-        <Column>
-          <Inline css={{ margin: '$6', marginTop: '$16' }}>
-            <StepIcon step={5} />
-            <Text
-              align="center"
-              variant="body"
-              color="tertiary"
-              css={{ padding: '0 $15 0 $6' }}
-            >
-              Execution configuration
-            </Text>
-          </Inline>
-          <Configuration
-            config={flowInput.configuration}
-            disabled={false}
-            onChange={setConfig}
-          />
-        </Column>
-      )}
+          {flowInput.conditions && (
+            <Column>
+              <Inline css={{ margin: '$6', marginTop: '$16' }}>
+                <StepIcon step={4} />
+                <Text
+                  align="center"
+                  variant="body"
+                  color="tertiary"
+                  css={{ padding: '0 $15 0 $6' }}
+                >
+                  Execution conditions
+                </Text>
+              </Inline>
+              <Conditions
+                conditions={flowInput.conditions}
+                disabled={false}
+                onChange={setConditions}
+              />
+            </Column>
+          )}
+
+          {/* Only show configuration in first column on mobile */}
+          {isMobile && flowInput.configuration && (
+            <Column>
+              <Inline css={{ margin: '$6', marginTop: '$16' }}>
+                <StepIcon step={5} />
+                <Text
+                  align="center"
+                  variant="body"
+                  color="tertiary"
+                  css={{ padding: '0 $15 0 $6' }}
+                >
+                  Execution configuration
+                </Text>
+              </Inline>
+              <Configuration
+                config={flowInput.configuration}
+                disabled={false}
+                onChange={setConfig}
+              />
+            </Column>
+          )}
         </div>
-        
+
         {/* Right column - Flow summary, notifications and submit button */}
         <div style={{ flex: isMobile ? '1' : '2' }}>
           {/* Configuration in second column for non-mobile */}
@@ -628,27 +641,30 @@ export const PreviewAndSubmit = ({
                 Flow summary
               </Text>
             </Inline>
-            <FlowSummary 
+            <FlowSummary
               flowInput={flowInput}
-              displaySymbol={feeSymbol || chainSymbol || ''}
+              displaySymbol={chainSymbol}
               expectedFee={calculatedFee}
               useMsgExec={useMsgExec}
+              chainId={chainId}
+              grantee={hostedICA || icaAddress}
+              tokenSymbol={chainSymbol}
             />
           </Column>
-          
+
           {/* Email Subscription as a form */}
-          <Card variant={"secondary"} disabled css={{ 
-            backgroundColor: '$colors$dark5', 
-            borderRadius: '12px', 
-            padding: '$3', 
-            margin: '$3', 
-            alignSelf: 'flex-start' 
+          <Card variant={"secondary"} disabled css={{
+            backgroundColor: '$colors$dark5',
+            borderRadius: '12px',
+            padding: '$3',
+            margin: '$3',
+            alignSelf: 'flex-start'
           }}>
-            <Text align="center"  color="secondary" style={{ fontSize: '14px', marginBottom: '16px' }}>
+            <Text align="center" color="secondary" style={{ fontSize: '14px', marginBottom: '16px' }}>
               Subscribe to Alerts
             </Text>
-            
-            <form 
+
+            <form
               style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
               onSubmit={(e) => {
                 e.preventDefault();
@@ -668,8 +684,8 @@ export const PreviewAndSubmit = ({
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                   outline: 'none',
                   transition: 'border-color 0.3s ease-in-out',
-                  backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
-                  color: theme === "dark" ? "#fff" : "#000",
+                  backgroundColor: '$colors$dark50',
+                  color: '$colors$dark',
                   width: '100%',
                   marginBottom: '16px'
                 }}
@@ -687,8 +703,8 @@ export const PreviewAndSubmit = ({
                   boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
                   outline: 'none',
                   transition: 'border-color 0.3s ease-in-out',
-                  backgroundColor: theme === "dark" ? "#1e1e1e" : "#fff",
-                  color: theme === "dark" ? "#fff" : "#000",
+                  backgroundColor: '$colors$dark50',
+                  color: '$colors$dark',
                   width: '100%',
                   marginBottom: '16px'
                 }}
@@ -698,19 +714,19 @@ export const PreviewAndSubmit = ({
                 <option value="error">Errors</option>
                 <option value="all">All Events</option>
               </select>
-              
-              <Text  color="tertiary"  align="center" style={{ marginTop: '16px', fontSize: '12px' }}>
+
+              <Text color="tertiary" align="center" style={{ marginTop: '16px', fontSize: '12px' }}>
                 You'll receive alerts for matching events. Emails are used solely for flow notifications.
               </Text>
             </form>
           </Card>
-          
+
           {/* Schedule Button */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               onFlowChange(flowInput);
-              
+
               // Remind user about email subscription if not provided
               if (!flowInput.email) {
                 toast.custom((t) => (
@@ -722,7 +738,7 @@ export const PreviewAndSubmit = ({
                   />
                 ), { duration: 5000 })
               }
-              
+
               handleSubmitFlow();
             }}
           >

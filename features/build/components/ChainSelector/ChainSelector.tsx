@@ -37,8 +37,8 @@ export const ChainSelector = forwardRef<HTMLDivElement, ChainSelectorProps>((
   // Auto-select chain based on initialChainId
   useEffect(() => {
     if (initialChainId && !selectedChain.logoURI && chainRegistryList.length > 0 && !isIcaAssetListLoading) {
-      console.log('Looking for chain with ID:', initialChainId)
-      console.log('Available chains:', [...chainRegistryList, ...icaAssetList].map(c => c.chain_id).join(', '))
+      // console.log('Looking for chain with ID:', initialChainId)
+      // console.log('Available chains:', [...chainRegistryList, ...icaAssetList].map(c => c.chain_id).join(', '))
       
       // Find the chain with matching chainId
       const matchingChain = [...chainRegistryList, ...icaAssetList].find(
