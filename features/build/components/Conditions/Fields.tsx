@@ -131,8 +131,8 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
           {label}
         </Text>
       )}
-      <Text variant="body">
-        <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+      <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+        <Text variant="body">
           <StyledInput 
             ref={inputRef} // Attach ref to StyledInput
             type={type}
@@ -149,10 +149,14 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
               fontSize: '16px', // Larger font size for readability
               fontWeight: 400, // Light font weight for modern look
               backgroundColor: 'transparent', // Transparent background for minimal look
-              transition: 'border-color 0.3s ease, transform 0.2s ease', // Smooth transitions
+              transition: 'border-color 0.2s', // Smooth transition for focus
             }}
-            onFocus={(e) => (e.target.style.borderBottomColor = '#007aff')} // Apple blue on focus
-            onBlur={(e) => (e.target.style.borderBottomColor = '#D1D1D6')} // Light gray when not focused
+            onFocus={(e) => {
+              e.target.style.borderBottom = '2px solid #4a90e2'; // Blue bottom border on focus
+            }}
+            onBlur={(e) => {
+              e.target.style.borderBottom = '1px solid #ccc'; // Revert on blur
+            }}
           />
           <span 
             ref={spanRef}
@@ -166,9 +170,9 @@ export const Field = ({ label, tooltip, value, onChange, disabled, type = 'text'
           >
             {value || ' '}
           </span>
-        </div>
+        </Text>
         {errorInput && <Text variant="caption" css={{ marginTop: '2px', color: 'red' }}>{errorInput || 'Unknown error occurred'}</Text>}
-      </Text>
+      </div>
     </div>
   );
 };
