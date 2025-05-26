@@ -1,7 +1,7 @@
 [
   {
     "id": "Intento Testnet",
-    "name": "Intento Testnet",
+    "name": "Intento Testnet Local",
     "registry_name": "intentotestnet",
     "symbol": "INTO",
     "chain_id": "intento-ics-test-1",
@@ -26,7 +26,7 @@
     "connection_id": "connection-0",
     "counterparty_connection_id": "connection-0",
     "prefix": "cosmos",
-    "rpc": "https://provider-test-rpc.intento.zone"
+    "rpc": "https://gaia-rpc-t.trustlesshub.com"
   },
   {
     "id": "Osmosis",
@@ -43,7 +43,6 @@
     "connection_id": "connection-1",
     "counterparty_connection_id": "connection-3985",
     "prefix": "osmo",
-    "rpc": "'https://rpc.osmotest5.osmosis.zone",
-    "ica_unsupported": true
+    "rpc": "https://rpc.osmotest5.osmosis.zone"
   }
 ]
