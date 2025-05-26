@@ -1,7 +1,7 @@
 [
   {
     "id": "Intento Testnet",
-    "name": "Intento Testnet Local",
+    "name": "Intento Testnet",
     "registry_name": "intentotestnet",
     "symbol": "INTO",
     "chain_id": "intento-ics-test-1",
