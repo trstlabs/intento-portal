@@ -98,7 +98,7 @@ export const executeSubmitFlow = async ({
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': process.env.NEXT_PUBLIC_TRIGGERPORTAL_SECRET!,
+      'x-api-key': process.env.TRIGGERPORTAL_SECRET!,
     },
 
     body: JSON.stringify(proof),
