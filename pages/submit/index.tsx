@@ -104,7 +104,6 @@ export default function Submit() {
     
     // Get background color parameter with fallback to URL hash
     let bgColorParam = params.get("bgColor") || '';
-    console.log('Initial bgColorParam:', bgColorParam);
     
     // If empty, try to get from URL hash
     if (!bgColorParam && typeof window !== 'undefined') {
@@ -238,8 +237,9 @@ export default function Submit() {
                   <Image
                     src={imageUrl}
                     alt="Logo"
-                    width={180}
-                    height={100}
+                    unoptimized
+                    width={220}
+                    height={120}
                     onError={() => {
                       console.error('Image failed to load:', imageUrl);
                       setImageUrl("https://intento.zone/assets/images/intento_tiny.png");

@@ -145,7 +145,6 @@ export const getExpectedFlowFee = (
   recurrences: number,
   denom: string
 ) => {
-  console.log("intentParams", intentParams)
 
   // Step 1: Base gas fee units (like the 'gasFeeAmount' in Go)
   const gasFeeUnits = (gasUsed * Number(intentParams.flowFlexFeeMul)) / 1000

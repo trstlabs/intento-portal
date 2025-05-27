@@ -14,7 +14,7 @@ export type IBCAssetInfo = {
   denom: string
   decimals: number
   denom_local: string
-  channel_to_trst: string
+  channel_to_intento: string
   channel: string
   logo_uri: string
   connection_id?: string
@@ -154,7 +154,7 @@ function transformChain(chain: any) {
         : '',
     decimals: 6, // Standard, TODO: Adjust as needed
     denom_local: '', // TODO: Find in ibc assets
-    channel_to_trst: '', // TODO: Find in ibc assets
+    channel_to_intento: '', // TODO: Find in ibc assets
     channel: '', // TODO: Find in ibc assets
     logo_uri: chain.logo_URIs
       ? chain.logo_URIs.png || chain.logo_URIs.svg || chain.logo_URIs.jpeg

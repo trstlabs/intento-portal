@@ -5,19 +5,6 @@ import {
   HostedICAConfig,
 } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
-export interface MsgUpdateFlowParams {
-  owner: string
-  id: number
-  connectionId?: string
-  msgs?: string[]
-  endTime?: number
-  label?: string
-  interval?: number
-  startAt?: number
-  feeFunds?: Coin[]
-  version?: string
-  configuration?: ExecutionConfiguration
-}
 
 export class FlowInput {
   label?: string
@@ -45,9 +32,24 @@ export type SelectChainInfo = {
   logo_uri: string
   denom: string
   channel?: string
-  channel_to_trst?: string
+  channel_to_intento?: string
   connection_id?: string
   counterparty_connection_id?: string
   prefix?: string
   denom_local?: string
+}
+
+
+export interface MsgUpdateFlowParams {
+  owner: string
+  id: number
+  connectionId?: string
+  msgs?: string[]
+  endTime?: number
+  label?: string
+  interval?: number
+  startAt?: number
+  feeFunds?: Coin[]
+  version?: string
+  configuration?: ExecutionConfiguration
 }
