@@ -119,7 +119,7 @@ export const useTransferAssetMutation = ({
           denom: ibcAssetInfo.denom_local,
         },
         'transfer',
-        ibcAssetInfo.channel_to_trst,
+        ibcAssetInfo.channel_to_intento,
         undefined,
         timeout,
         //'',
