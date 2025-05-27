@@ -33,7 +33,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
 }) => {
   // Get wallet state and connection
   const [ibcState, _setIbcState] = useRecoilState(ibcWalletState)
-  
+
   // Setup wallet connection
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
     tokenSymbol,
@@ -49,23 +49,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
     }
   )
 
-  // Auto-connect wallet on mount if not connected
-  useEffect(() => {
-    const connectIfNeeded = async () => {
-      if (!ibcState.address && chainId && tokenSymbol) {
-        try {
-          console.log('Attempting to auto-connect wallet...')
-          await connectExternalWallet()
-        } catch (error) {
-          console.warn('Auto-connect failed, user needs to connect manually', error)
-        }
-      }
-    }
-    
-    // Small delay to ensure wallet providers are ready
-    const timeout = setTimeout(connectIfNeeded, 500)
-    return () => clearTimeout(timeout)
-  }, [chainId, tokenSymbol, ibcState.address, connectExternalWallet])
+
 
   // Get authorization grants
   const [authzGrants, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
@@ -77,15 +61,15 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   // Check if all required grants are present and not expired
   const { allGrantsValid, expiredGrants, missingGrants } = useMemo(() => {
     if (!authzGrants) {
-      return { 
-        allGrantsValid: false, 
-        expiredGrants: [], 
-        missingGrants: [] 
+      return {
+        allGrantsValid: false,
+        expiredGrants: [],
+        missingGrants: []
       }
     }
 
     const flowEndTime = (flowInput.startTime || Math.floor(Date.now() / 1000)) + (flowInput.duration || 0)
-    
+
     const missing = authzGrants.filter(grant => !grant.hasGrant)
     const expired = authzGrants.filter(grant => {
       if (!grant.expiration) return false
@@ -109,7 +93,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   })
 
   // Show connection UI if not connected
-  if (!ibcState.address) {
+  if (!ibcState.address || ibcState.status !== WalletStatusType.connecting && ibcState.status !== WalletStatusType.connected) {
     return (
       <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
         <Inline justifyContent="space-between">
@@ -184,7 +168,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
               • {expiredGrants.length} authorization{expiredGrants.length > 1 ? 's' : ''} will expire before flow ends
             </Text>
           )}
-          
+
           <Button
             variant="secondary"
             size="small"
