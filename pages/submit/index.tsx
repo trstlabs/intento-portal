@@ -235,6 +235,7 @@ export default function Submit() {
               <div style={{ position: 'relative', margin: '0 auto' }}>
                 {imageUrl && (
                   <div style={{ position: 'relative', margin: '0 auto' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageUrl}
                       alt="Logo"
