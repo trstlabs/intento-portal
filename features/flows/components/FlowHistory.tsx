@@ -91,12 +91,9 @@ export const FlowHistory = ({
 
     <>
       {flowHistory && flowHistory.length > 0 && (
-        <>
-          {' '}
+
           <Row>
-            {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
-              {' '}
               <Inline>
 
                 <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
@@ -216,7 +213,7 @@ export const FlowHistory = ({
               {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
             </Column>
           </Row>
-        </>
+
       )}
 
     </>
@@ -233,7 +230,6 @@ function Row({ children }) {
         margin: '$4',
         justifyContent: 'space-between',
         alignItems: 'center',
-        overflow: 'scroll',
         boxShadow: '$light',
         borderRadius: '18px',
         border: '1px solid $borderColors$default',
