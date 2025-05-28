@@ -9,7 +9,7 @@ import React, { useRef, useState, useEffect, forwardRef } from 'react'
 import { ChainSelectorToggle } from './ChainSelectorToggle'
 import { ChainSelectorDialog } from './ChainSelectorDialog'
 import { ChainInfo } from './ChainSelectorSelectList'
-import { useIBCAssetList, useChainRegistryList } from '../../../../hooks/useChainList'
+import { useIBCAssetList } from '../../../../hooks/useChainList'
 
 
 type ChainSelectorProps = {
@@ -29,46 +29,37 @@ export const ChainSelector = forwardRef<HTMLDivElement, ChainSelectorProps>((
   const [isChainListShowing, setChainListShowing] = useState(false)
   // const ibcInfo = useIBCAssetInfoFromConnection(connectionID)
   const [selectedChain, setSelectedChain] = useState({ logoURI: undefined, name: undefined })
- 
-  // Get chain lists from hooks
-  const chainRegistryList = useChainRegistryList()
-  const [icaAssetList, isIcaAssetListLoading] = useIBCAssetList()
-  
-  // Auto-select chain based on initialChainId
-  useEffect(() => {
-    if (initialChainId && !selectedChain.logoURI && chainRegistryList.length > 0 && !isIcaAssetListLoading) {
-      // console.log('Looking for chain with ID:', initialChainId)
-      // console.log('Available chains:', [...chainRegistryList, ...icaAssetList].map(c => c.chain_id).join(', '))
-      
-      // Find the chain with matching chainId
-      const matchingChain = [...chainRegistryList, ...icaAssetList].find(
-        chain => chain.chain_id === initialChainId
-      )
 
-      if (matchingChain) {
-        console.log('Found matching chain:', matchingChain.name)
-        
-        // Create ChainInfo object
-        const chainInfo = new ChainInfo()
-        chainInfo.chainId = matchingChain.chain_id
-        chainInfo.connectionId = matchingChain.connection_id || ''
-        // Handle different property names between chain types
-        chainInfo.hostConnectionId = ''
-        chainInfo.name = matchingChain.name
-        chainInfo.logoURI = matchingChain.logo_uri
-        chainInfo.denom = matchingChain.denom
-        chainInfo.symbol = matchingChain.symbol
-        chainInfo.prefix = matchingChain.prefix
-        chainInfo.trstDenom = matchingChain.denom_local || ''
-        
-        // Update selected chain and trigger onChange
-        setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })
-        onChange(chainInfo)
-      } else {
-        console.log('No matching chain found for ID:', initialChainId)
-      }
+  // In ChainSelector.tsx
+const [icaAssetList] = useIBCAssetList() // This uses ibc_assets.json
+
+// Replace the chainRegistryList with icaAssetList for the initial selection
+useEffect(() => {
+  if (initialChainId && !selectedChain.logoURI && icaAssetList.length > 0) {
+    const matchingChain = icaAssetList.find(
+      chain => chain.chain_id === initialChainId
+    )
+
+    if (matchingChain) {
+      const chainInfo = new ChainInfo()
+      chainInfo.chainId = matchingChain.chain_id
+      chainInfo.connectionId = matchingChain.connection_id || ''
+      chainInfo.hostConnectionId =/*  matchingChain.host_connection_id ||  */''
+      chainInfo.name = matchingChain.name
+      chainInfo.logoURI = matchingChain.logo_uri
+      chainInfo.denom = matchingChain.denom
+      chainInfo.symbol = matchingChain.symbol
+      chainInfo.prefix = matchingChain.prefix
+      chainInfo.trstDenom = matchingChain.denom_local || ''
+      
+      setSelectedChain({ 
+        logoURI: chainInfo.logoURI, 
+        name: chainInfo.name 
+      })
+      onChange(chainInfo)
     }
-  }, [initialChainId, onChange, selectedChain.logoURI, chainRegistryList, icaAssetList, isIcaAssetListLoading])
+  }
+}, [initialChainId, icaAssetList, onChange])
 
   const handleSelectChain = (chainInfo: ChainInfo) => {
     setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })

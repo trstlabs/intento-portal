@@ -95,7 +95,7 @@ export const PreviewAndSubmit = ({
   const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAINID || "")
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
-  
+
   // Initialize connectionId if not set
   useEffect(() => {
     if (!flowInput.connectionId && chainId) {
@@ -120,7 +120,7 @@ export const PreviewAndSubmit = ({
   )
   const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByHostedAddress(flowInput.hostedIcaConfig.hostedAddress || "")
   const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId || "")
-  
+
   // Log with proper null check to avoid undefined issues
   // useEffect(() => {
   //   console.log("hostedICA", hostedICA, "flowInput.connectionId", flowInput.connectionId || "<not set>")
@@ -244,10 +244,6 @@ export const PreviewAndSubmit = ({
 
   const shouldDisableAuthzGrantButton = !hostedICA || flowInput.msgs.includes("authz.v1beta1.MsgExec")
 
-
-  const handleRegisterAccountClick = () => {
-    return setRequestedRegisterICA(true)
-  }
 
   const handleSubmitFlowClick = (flowInput: FlowInput) => {
     onFlowChange(flowInput)
@@ -415,32 +411,8 @@ export const PreviewAndSubmit = ({
                       )
                     }}
                     initialChainId={initialChainId}
-                  />{' '}
-                  {
-                /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
-                    chainIsConnected &&
-                    !isIcaLoading &&
-                    flowInput.connectionId != '' && (
-                      <>
-                        <Button
-                          css={{
-                            margin: '$2',
-                            overflow: 'hidden',
-                            float: 'left',
-                          }}
-                          variant="secondary"
-                          onClick={() => handleRegisterAccountClick()}
-                        >
-                          {' '}
-                          {isExecutingRegisterICA ? (
-                            <Spinner instant />
-                          ) : (
-                            'Self-Host ICA'
-                          )}
-                        </Button>
-                      </>
-                    )
-                  }
+                  />
+
                 </Row>
                 {chainName &&
                   chainIsConnected &&
