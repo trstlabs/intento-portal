@@ -7,7 +7,6 @@ import {
   Spinner,
 } from 'junoblocks'
 import { CheckCircle, AlertTriangle } from 'lucide-react'
-import { useEffect } from 'react'
 import { useRecoilState } from 'recoil'
 import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { FlowInput } from '../../../types/trstTypes'
