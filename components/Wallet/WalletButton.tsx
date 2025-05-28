@@ -59,7 +59,7 @@ export const WalletButton = ({
 
   return (
     <StyledWalletButton {...props} role="button">
-      <IconWrapper size="medium" css={{ color: '#103b64' }} icon={<Connect />} />
+      <IconWrapper size="medium" css={{ color: '#4da1ff' }} icon={<Connect />} />
       <div data-content="" onClick={onClick} style={{ cursor: "pointer" }} >
         <Text variant="link" color="body">
           {walletName}
@@ -70,7 +70,7 @@ export const WalletButton = ({
             '-webkit-background-clip': 'text',
             '-webkit-text-fill-color': 'transparent',
             backgroundImage:
-              'linear-gradient(90.55deg, #103b64 1.35%, #144a7d 19.1%, #185996 37.37%, #1c68af 58.83%, #1c68af 75.84%, #1c68af 99.52%)',
+              'linear-gradient(90deg, #4da1ff, #7fc7ff, #4da1ff)'
           }}
         >
           {formatTokenBalance(balance, { includeCommaSeparation: true })}{' '}
@@ -83,7 +83,7 @@ export const WalletButton = ({
               '-webkit-background-clip': 'text',
               '-webkit-text-fill-color': 'transparent',
               backgroundImage:
-                'linear-gradient(90.55deg, #103b64 1.35%, #144a7d 19.1%, #185996 37.37%, #1c68af 58.83%, #1c68af 75.84%, #1c68af 99.52%)',
+                'linear-gradient(90deg, #4da1ff, #7fc7ff, #4da1ff)'
             }}
           >
             {formatTokenBalance(balance.balance, { includeCommaSeparation: true })}{' '}
@@ -135,10 +135,7 @@ const StyledDivForFlows = styled('div', {
   alignItems: 'center',
   justifyContent: 'center',
   height: '100%',
-  background:
-    'linear-gradient(to right, $colors$white0 0%, $colors$white95 5%, $colors$white)',
   borderRadius: '$2',
-  opacity: 0,
   transition: 'opacity .1s ease-out',
 })
 
@@ -155,12 +152,13 @@ const StyledWalletButton = styled('div', {
   columnGap: '$space$6',
   padding: '$4 $6 $5',
   borderRadius: '$2',
+  backgroundColor: '$colors$dark5',
   textAlign: 'left',
-  border: '1px solid $borderColors$default',
+
   '&:hover': {
     border: '1px solid $borderColors$selected',
     [`${StyledDivForFlows}`]: {
-      opacity: 1,
+      opacity: 10,
     },
   },
   [media.sm]: {
