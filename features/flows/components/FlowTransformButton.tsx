@@ -63,28 +63,44 @@ export const FlowTransformButton = ({ flowInfo }) => {
 
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
 };
-
-// Helper function to extract value objects and handle nested structures
-const extractValueObjects = (obj: any): any => {
-    if (!obj || typeof obj !== 'object') return obj;
+const cleanMessageObject = (obj: any, seen = new WeakSet()): any => {
+    // Handle primitives and null
+    if (obj === null || typeof obj !== 'object') {
+        return obj;
+    }
     
+    // Handle circular references
+    if (seen.has(obj)) {
+        return undefined;
+    }
+    seen.add(obj);
+
     // Handle arrays
     if (Array.isArray(obj)) {
-        return obj.map(extractValueObjects);
+        return obj.map(item => cleanMessageObject(item, seen));
     }
-    
-    // If this is a message with typeUrl and value, extract the value
-    if (obj.typeUrl && obj.value && typeof obj.value === 'object') {
+
+    // For objects with typeUrl and value, keep them as is
+    if (obj.typeUrl && 'value' in obj) {
         return {
-            ...obj,
-            ...extractValueObjects(obj.value)  // Recursively process the value object
+            typeUrl: obj.typeUrl,
+            value: cleanMessageObject(obj.value, seen)
         };
     }
-    
-    // Process all properties recursively
+
+    // For other objects, clean each property
     const result: Record<string, any> = {};
     for (const [key, value] of Object.entries(obj)) {
-        result[key] = extractValueObjects(value);
+        // If the value is an object with a value property, unwrap it
+        if (value && typeof value === 'object' && 'value' in value && 
+            Object.keys(value).length === 1) {
+            result[key] = cleanMessageObject(value.value, seen);
+        } else {
+            const cleanedValue = cleanMessageObject(value, seen);
+            if (cleanedValue !== undefined) {
+                result[key] = cleanedValue;
+            }
+        }
     }
     return result;
 };
@@ -98,26 +114,38 @@ export async function transformFlowMsgs(info) {
         if (Array.isArray(msgsObj)) {
             msgsObj.forEach((msgObj: any, index) => {
                 try {
-                    console.log("Before normalization:", JSON.stringify(msgObj, null, 2));
+                    console.log("Original message:", JSON.stringify(msgObj, null, 2));
 
                     // First normalize amount fields
                     msgObj = normalizeAmountField(msgObj);
                     
-                    // Then extract value objects and handle nested structures
-                    msgObj = extractValueObjects(msgObj);
-
-                    // Decode MsgExecuteContract inner msg if applicable
-                    if (msgObj["typeUrl"]?.includes("MsgExecuteContract") &&
-                        typeof msgObj.msg === "string") {
+                    // Clean and transform the message object
+                    msgObj = cleanMessageObject(msgObj);
+                    
+                    // Handle MsgExecuteContract with base64 encoded msg
+                    if (msgObj.typeUrl?.includes("MsgExecuteContract") && 
+                        msgObj.msg && typeof msgObj.msg === 'string') {
                         try {
                             const decodedMsg = JSON.parse(
-                                Buffer.from(msgObj.msg, "base64").toString("utf-8")
+                                Buffer.from(msgObj.msg, 'base64').toString('utf-8')
                             );
-                            msgObj.msg = decodedMsg;
-                            console.log("Decoded MsgExecuteContract msg:", decodedMsg);
+                            msgObj.msg = cleanMessageObject(decodedMsg);
                         } catch (e) {
                             console.warn("Failed to decode MsgExecuteContract msg:", e);
                         }
+                    }
+                    
+                    // Handle nested msgs array (common in MsgExec)
+                    if (Array.isArray(msgObj.msgs)) {
+                        msgObj.msgs = msgObj.msgs.map((nestedMsg: any) => {
+                            if (nestedMsg.typeUrl && nestedMsg.value) {
+                                return {
+                                    typeUrl: nestedMsg.typeUrl,
+                                    ...cleanMessageObject(nestedMsg.value)
+                                };
+                            }
+                            return cleanMessageObject(nestedMsg);
+                        });
                     }
 
                     const msg = JSON.stringify(
@@ -125,6 +153,7 @@ export async function transformFlowMsgs(info) {
                         (_, value) => (typeof value === "bigint" ? value.toString() : value),
                         2
                     );
+                    console.log("Transformed message:", msg);
                     msgs[index] = msg;
                 } catch (error) {
                     console.error(`Error processing message at index ${index}:`, error);
