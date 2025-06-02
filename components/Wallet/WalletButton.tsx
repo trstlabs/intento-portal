@@ -73,7 +73,7 @@ export const WalletButton = ({
               'linear-gradient(90deg, #4da1ff, #7fc7ff, #4da1ff)'
           }}
         >
-          {formatTokenBalance(balance, { includeCommaSeparation: true })}{' '}
+          {formatTokenBalance(balance.toFixed(2), { includeCommaSeparation: true })}{' '}
           {baseToken?.symbol}
         </Text>
         {!loadingBalances && ibcBalances?.map((balance, i) =>
@@ -86,7 +86,7 @@ export const WalletButton = ({
                 'linear-gradient(90deg, #4da1ff, #7fc7ff, #4da1ff)'
             }}
           >
-            {formatTokenBalance(balance.balance, { includeCommaSeparation: true })}{' '}
+            {formatTokenBalance(balance.balance.toFixed(2), { includeCommaSeparation: true })}{' '}
             {balance.tokenSymbol}
           </Text>
         )}
