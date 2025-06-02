@@ -125,10 +125,10 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     interval
   )
 
-  // Format the fee with 2 decimal places
+  // Format the fee with 2 decimal places and determine the display symbol
   const expectedFee = typeof expectedFeeAmount === 'number' ? expectedFeeAmount.toFixed(2) : '0.00'
-  // Use the symbol returned from the hook instead of feeFundsSymbol
-  const displaySymbol = feeDenom == "uinto" ? "INTO" : feeFundsSymbol
+  // Always use the symbol from the fee calculation, defaulting to 'INTO' if not available
+  const displaySymbol = feeDenom === 'uinto' ? 'INTO' : (feeDenom ? feeDenom.toUpperCase().replace('U', '') : 'INTO')
 
   // Notify parent component about fee calculation
   useEffect(() => {
@@ -480,7 +480,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                   {!editDuration ? (
                     <Inline css={{ gap: 8 }}>
                       <Inline css={{ gap: 8 }}>
-                        {timeLabels.slice(7, 14).map((label) => {
+                        {timeLabels.slice(7, 12).map((label) => {
                           const isSelected = displayDuration === label;
                           return isSelected ? (
                             <ChipSelected
