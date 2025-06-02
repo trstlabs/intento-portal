@@ -295,7 +295,7 @@ const TinyJsonViewer: React.FC<TinyJsonViewerProps> = ({ jsonValue, bgColor }) =
         let contract = 'contract';
 
         if (value && value.contract) {
-          contract = value.contract.substring(0, 8) + '...';
+          contract = value.contract.substring(0, 6) + '.. ' + value.contract.substring(value.contract.length - 10, value.contract.length);
         }
 
         return `Execute smart contract ${contract}`;
