@@ -58,6 +58,7 @@ type FlowsInputProps = {
   onFlowChange: (flowInput: FlowInput) => void
   initialChainId?: string
   isMobile?: boolean
+  bgColor?: string
 }
 
 export const PreviewAndSubmit = ({
@@ -65,6 +66,7 @@ export const PreviewAndSubmit = ({
   onFlowChange,
   initialChainId,
   isMobile: propIsMobile,
+  bgColor,
 }: FlowsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
@@ -477,7 +479,7 @@ export const PreviewAndSubmit = ({
                   <Column>
                     {flowInput.msgs.map((msg, index) => (
                       <div key={index} style={{ marginBottom: index < flowInput.msgs.length - 1 ? '16px' : '0' }}>
-                        <TinyJsonViewer jsonValue={JSON.parse(msg)} />
+                        <TinyJsonViewer jsonValue={JSON.parse(msg)} bgColor={bgColor} />
                       </div>
                     ))}
                   </Column>
@@ -693,7 +695,7 @@ export const PreviewAndSubmit = ({
             </form>
           </Card>
 
-          {/* Schedule Button */}
+          {/* Create Button */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -705,7 +707,7 @@ export const PreviewAndSubmit = ({
                   <Toast
                     icon={<IconWrapper icon={<InfoIcon />} color="secondary" />}
                     title="Email Notification Reminder"
-                    body="You haven't provided an email for notifications. You can still schedule the flow, but you won't receive alerts about its execution."
+                    body="You haven't provided an email for notifications. You can still Create the flow, but you won't receive alerts about its execution."
                     onClose={() => toast.dismiss(t.id)}
                   />
                 ), { duration: 5000 })
@@ -716,23 +718,26 @@ export const PreviewAndSubmit = ({
           >
             <Inline
               css={{
-                margin: '$4 $6 $8',
-                padding: '$5 $5 $8',
+                margin: '$8',
+                padding: '$8',
                 justifyContent: 'end',
               }}
-            >
+            >   <StyledPNG src="./img/poweredbyintento.png" />
               <Button
                 type="submit"
                 css={{ margin: '$4', columnGap: '$4' }}
-                variant="primary"
+                variant="branded"
                 size="large"
                 disabled={shouldDisableBuildButton}
                 iconLeft={<GearIcon />}
               >
-                {isExecutingSchedule ? <Spinner instant /> : 'Schedule'}
+                {isExecutingSchedule ? <Spinner instant /> : 'Create'}
               </Button>
+           
             </Inline>
+            
           </form>
+  
         </div>
       </div>
     </StyledDivForContainer>
@@ -766,4 +771,17 @@ export const StyledInput = styled('input', {
   color: 'inherit',
   padding: '$2',
   margin: '$2',
+})
+
+
+const StyledPNG = styled('img', {
+
+  maxWidth: '200px',
+  maxHeight: '400px',
+  zIndex: '$1',
+  paddingRight: '$8',
+  marginRight: '$8',
+  userSelect: 'none',
+  userDrag: 'none',
+  display: 'block',
 })

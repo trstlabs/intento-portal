@@ -29,6 +29,19 @@ export default function Submit() {
 
   const themeController = useControlTheme()
 
+  // Set theme based on URL parameter or default to dark
+  useEffect(() => {
+    const urlTheme = router.query.theme as string | undefined
+    if (urlTheme === 'light') {
+      themeController.setLightTheme(true)
+      setTheme('light')
+    } else {
+      // Default to dark theme if no theme specified or if 'dark' is explicitly set
+      themeController.setDarkTheme(true)
+      setTheme('dark')
+    }
+  }, [router.query.theme])
+
   // Check if on mobile
   const isMobile = useMedia('sm')
 
@@ -249,7 +262,6 @@ export default function Submit() {
                     />
                   </div>
                 )}
-
               </div>
             )}
             <Text variant="header" align="center" style={{ fontSize: '32px', fontWeight: 'bold', marginBottom: '8px' }}>
@@ -312,10 +324,11 @@ export default function Submit() {
               onFlowChange={setFlowInput}
               initialChainId={chainId}
               isMobile={isMobile}
+              bgColor={bgColor}
             />
           ) : (
             <div style={{ textAlign: 'center', padding: '40px' }}>
-              <Text>No flow input data available</Text>
+              <Text>No flow data available</Text>
             </div>
           )}
         </div>
