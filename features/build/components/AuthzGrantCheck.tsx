@@ -51,11 +51,12 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
 
 
   // Get authorization grants
-  const [authzGrants, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
+  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch } = useAuthZMsgGrantInfoForUser(
     chainId,
     grantee,
     flowInput
   )
+
 
   // Check if all required grants are present and not expired
   const { allGrantsValid, expiredGrants, missingGrants } = useMemo(() => {
@@ -88,7 +89,10 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
     grantee,
     grantInfos: [...missingGrants, ...expiredGrants],
     expirationDurationMs: (flowInput.duration || 0) * 1000 + 86400000, // Add 1 day buffer
-    coin: { denom: 'uinto', amount: '0' } as Coin
+    coin: { denom: 'uinto', amount: '0' } as Coin,
+    onSuccess: () => {
+      refetch()
+    },
   })
 
   // Show connection UI if not connected
@@ -138,21 +142,24 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
 
   return (
     <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
-      <Inline justifyContent="space-between">
+      <Inline justifyContent="space-between" align="center">
         <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>Authorizations</Text>
-        {allGrantsValid ? (
-          <Inline css={{ gap: '$2' }}>
-            <CheckCircle size={16} color="#00C851" />
-            <Text variant="body" color="valid" css={{ fontSize: '12px' }}>All authorizations valid</Text>
-          </Inline>
-        ) : (
-          <Inline css={{ gap: '$2' }}>
-            <AlertTriangle size={16} color="#FFD700" />
-            <Text variant="body" color="error" css={{ fontSize: '12px' }}>
-              {missingGrants.length > 0 ? 'Missing authorizations' : 'Expiring authorizations'}
-            </Text>
-          </Inline>
-        )}
+        <Inline >
+
+          {allGrantsValid ? (
+            <Inline css={{ gap: '$2' }}>
+              <CheckCircle size={16} color="#00C851" />
+              <Text variant="body" color="valid" css={{ fontSize: '12px' }}>All authorizations valid</Text>
+            </Inline>
+          ) : (
+            <Inline css={{ gap: '$2' }}>
+              <AlertTriangle size={16} color="#FFD700" />
+              <Text variant="body" color="error" css={{ fontSize: '12px' }}>
+                {missingGrants.length > 0 ? 'Missing authorizations' : 'Expiring authorizations'}
+              </Text>
+            </Inline>
+          )}
+        </Inline>
       </Inline>
 
       {!allGrantsValid && (

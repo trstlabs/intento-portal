@@ -52,9 +52,8 @@ export const HostedAccountCard = ({
   ) || {};
 
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
-  const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] =
-    useState(false)
-  const [authzGrants, isAuthzGrantsLoading] = useAuthZMsgGrantInfoForUser(
+  const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] = useState(false)
+  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
     chainId,
     hostedICAAddress,
     flowInput
@@ -63,9 +62,12 @@ export const HostedAccountCard = ({
     useCreateAuthzGrant({
       grantee: hostedICAAddress,
       grantInfos: authzGrants
-        ? authzGrants.filter((authzGrants) => authzGrants.hasGrant == false)
+        ? authzGrants.filter((grant) => !grant.hasGrant)
         : [],
       coin: undefined,
+      onSuccess: () => {
+        refetchAuthzGrants()
+      },
     }) || {};
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
     if (shouldTrigger) {

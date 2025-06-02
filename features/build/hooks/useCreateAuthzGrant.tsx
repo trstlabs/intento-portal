@@ -24,6 +24,7 @@ type UseCreateAuthzGrantParams = {
   grantInfos: GrantResponse[]
   coin?: Coin
   expirationDurationMs?: number
+  onSuccess?: () => void
 }
 
 export const useCreateAuthzGrant = ({
@@ -31,6 +32,7 @@ export const useCreateAuthzGrant = ({
   grantInfos,
   expirationDurationMs,
   coin,
+  onSuccess,
 }: UseCreateAuthzGrantParams) => {
   const { address, client, status } = useRecoilValue(ibcWalletState)
 
@@ -65,11 +67,15 @@ export const useCreateAuthzGrant = ({
         console.log(data)
         //popConfetti(true)
         //
-        toast.success('Succesfully created AuthZ grant')
-        if (coin.amount != '0') {
-          toast.success('Succesfully sent funds')
+        toast.success('Successfully created AuthZ grant')
+        if (coin?.amount && coin.amount !== '0') {
+          toast.success('Successfully sent funds')
         }
         refetchQueries()
+        // Call the onSuccess callback if provided
+        if (onSuccess) {
+          onSuccess()
+        }
       },
       onError(e) {
         const errorMessage = formatSdkErrorMessage(e)

@@ -203,9 +203,17 @@ export const useAuthZMsgGrantInfoForUser = (
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(chainId)
-  const { data, isLoading } = useQuery(
-    `userAuthZGrants/${grantee}`,
+  
+  // Include wallet address in the query key to force refetch when wallet changes
+  const queryKey = `userAuthZGrants/${grantee}/${ibcState.address}`
+  
+  const { data, isLoading, refetch } = useQuery(
+    queryKey,
     async () => {
+      if (!ibcState.address || !grantee || !flowInput?.connectionId) {
+        return []
+      }
+
       let grants: GrantResponse[] = []
       const granteeGrants = await getAuthZGrantsForGrantee({
         grantee,
@@ -213,68 +221,66 @@ export const useAuthZMsgGrantInfoForUser = (
         rpc: chain.rpc,
       })
 
-      if (!granteeGrants) return undefined
-      // console.log(granteeGrants)
-      for (const msg of flowInput.msgs) {
-        let parsedMsg = JSON.parse(msg)
-        let msgTypeUrl = parsedMsg.typeUrl
-        if (msgTypeUrl === '/cosmos.authz.v1beta1.MsgExec') {
-          // Extract messages from MsgExec
-          const execMsgs = parsedMsg.value.msgs || []
-          for (const execMsg of execMsgs) {
-            // console.log(execMsg)
-            let execMsgTypeUrl = execMsg.typeUrl
-            // console.log(execMsgTypeUrl)
-            const grantMatch = granteeGrants.find(
-              (grant) => grant.msgTypeUrl === execMsgTypeUrl
-            )
+      if (!granteeGrants) return []
 
+      for (const msg of flowInput.msgs) {
+        try {
+          const parsedMsg = JSON.parse(msg)
+          const msgTypeUrl = parsedMsg.typeUrl
+          
+          if (msgTypeUrl === '/cosmos.authz.v1beta1.MsgExec') {
+            // Handle nested MsgExec
+            const execMsgs = parsedMsg.value?.msgs || []
+            for (const execMsg of execMsgs) {
+              const execMsgTypeUrl = execMsg.typeUrl
+              const grantMatch = granteeGrants.find(
+                (grant) => grant.msgTypeUrl === execMsgTypeUrl
+              )
+              grants.push(
+                grantMatch || {
+                  msgTypeUrl: execMsgTypeUrl,
+                  expiration: undefined,
+                  hasGrant: false,
+                }
+              )
+            }
+          } else {
+            // Handle direct message types
+            const grantMatch = granteeGrants.find(
+              (grant) => grant.msgTypeUrl === msgTypeUrl
+            )
             grants.push(
               grantMatch || {
-                msgTypeUrl: execMsgTypeUrl,
+                msgTypeUrl,
                 expiration: undefined,
                 hasGrant: false,
               }
             )
           }
-        } else {
-          const grantMatch = granteeGrants.find(
-            (grant) => grant.msgTypeUrl === msgTypeUrl
-          )
-
-          grants.push(
-            grantMatch || {
-              msgTypeUrl,
-              expiration: undefined,
-              hasGrant: false,
-            }
-          )
+        } catch (error) {
+          console.error('Error processing message:', msg, error)
         }
       }
-      console.log('grants', grants, 'grantee', grantee)
+      
       return grants
     },
     {
       enabled: Boolean(
+        ibcState.status === WalletStatusType.connected &&
+        ibcState.address &&
         grantee &&
-          chain &&
-          // chain.rpc &&
-          // grantee !== '' &&
-          // chainId &&
-          // ibcState.status === WalletStatusType.connected &&
-          //          grantee.includes(ibcState.address.slice(0, 5)) &&
-          // flowInput.msgs[0] &&
-          // flowInput.msgs[0].includes('typeUrl') &&
-          flowInput.connectionId
+        chainId &&
+        flowInput?.connectionId
       ),
-      refetchOnMount: 'always', // Refetch when the component mounts
-      refetchInterval: 30000,    // Refetch every 30 seconds
-      // staleTime: 15000,           // Cache expires after 15 seconds
-      // cacheTime: 300000,         // Cache data for 5 minutes
+      refetchOnMount: 'always',
+      refetchOnWindowFocus: true,
+      refetchInterval: 10000, // Reduce refetch interval to 10 seconds
+      staleTime: 5000, // Reduce stale time to 5 seconds
+      cacheTime: 60000, // Cache for 1 minute
     }
   )
 
-  return [data, isLoading] as const
+  return { grants: data || [], isLoading, refetch }
 }
 
 export const useFeeGrantAllowanceForUser = (granter: string) => {
