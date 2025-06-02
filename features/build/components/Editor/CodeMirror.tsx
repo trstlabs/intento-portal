@@ -30,39 +30,65 @@ export const JsonCodeMirrorEditor = ({
   const isMedium = useMedia('md')
   const themeController = useControlTheme()
 
-  return (
+  // Use a ref to track the previous value and prevent unnecessary updates
+  const prevJsonValueRef = React.useRef(jsonValue);
+  
+  // Only update if the incoming value has actually changed
+  const handleChange = React.useCallback((val: string) => {
+    if (val === prevJsonValueRef.current) return;
+    
+    prevJsonValueRef.current = val;
+    onChange?.(val);
 
-    <StyledDivForContainer>  {validationErrors && <ErrorStack validationErrors={validationErrors} />}
+    // Only validate if we have a validation function
+    if (setValidationErrors) {
+      try {
+        const parsedJSON = JSON.parse(val);
+        const errors = validateJSON(parsedJSON, jsonSchema);
+        
+        if (errors && errors.length > 0) {
+          setValidationErrors(errors);
+          onValidate?.(false);
+        } else {
+          setValidationErrors([]);
+          onValidate?.(true);
+        }
+      } catch (e) {
+        // Only show error if the input is not empty
+        if (val.trim() !== '') {
+          setValidationErrors([`Invalid JSON: ${e.message}`]);
+          onValidate?.(false);
+        } else {
+          setValidationErrors([]);
+        }
+      }
+    }
+  }, [jsonSchema, onChange, onValidate, setValidationErrors]);
+
+  // Update the ref when the prop changes
+  React.useEffect(() => {
+    prevJsonValueRef.current = jsonValue;
+  }, [jsonValue]);
+
+  return (
+    <StyledDivForContainer>
+      {validationErrors && validationErrors.length > 0 && (
+        <ErrorStack validationErrors={validationErrors} />
+      )}
       <ReactCodeMirror
-        /*  maxWidth={isSmall ? "280px" : "580px"} */
         width={isMedium ? 'auto' : 'auto'}
         value={jsonValue}
         extensions={[json()]}
-        onChange={(val: string) => {
-          if (!setValidationErrors) {
-            return
-          }
-          onChange?.(val)
-
-          try {
-            let parsedJSON = JSON.parse(val)
-
-            let errors = validateJSON(parsedJSON, jsonSchema)
-            if (errors) {
-              setValidationErrors(errors)
-              onValidate?.(false)
-            } else {
-              onValidate?.(true)
-              setValidationErrors([""])
-            }
-          } catch (e) {
-            setValidationErrors([`Error validating: ${e.message}`])
-            onValidate?.(false)
-          }
-        }}
+        onChange={handleChange}
         theme={themeController.theme.name === 'dark' ? 'dark' : 'light'}
         placeholder={JSON.stringify(defaultPlaceholder, null, 2)}
-        style={{ border: 'none', height: '100%' }}
+        style={{ 
+          border: '1px solid var(--colors-dark10)',
+          borderRadius: '4px',
+          height: '100%',
+          minHeight: '200px',
+          padding: '8px'
+        }}
       />
     </StyledDivForContainer>
 

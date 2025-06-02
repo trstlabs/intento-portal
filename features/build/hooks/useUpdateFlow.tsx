@@ -15,7 +15,7 @@ import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { walletState, WalletStatusType, ibcWalletState } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
@@ -31,6 +31,8 @@ export const useUpdateFlow = ({
     flowParams,
 }: UseUpdateFlowArgs) => {
     const { client, status, address } = useRecoilValue(walletState)
+    const ibcWalletStateValue = useRecoilValue(ibcWalletState)
+    const ibcWalletAddress = ibcWalletStateValue?.address
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
@@ -48,6 +50,7 @@ export const useUpdateFlow = ({
             return await executeUpdateFlow({
                 flowParams,
                 client,
+                ibcWalletAddress
             })
 
         },

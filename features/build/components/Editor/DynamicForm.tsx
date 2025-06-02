@@ -107,12 +107,17 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
         }
     };
 
+    // Debounce timer for form updates
+    const debounceTimerRef = React.useRef<NodeJS.Timeout>();
+    
     const handleChange = useCallback((key, value) => {
-        setValues((prevValues) => {
-            const newValues = { ...prevValues };
+        // Update local state immediately for responsive UI
+        setValues(prevValues => {
+            const newValues = JSON.parse(JSON.stringify(prevValues));
             let current = newValues;
             const keys = key.split('.');
 
+            // Navigate to the target property
             for (let i = 0; i < keys.length - 1; i++) {
                 const k = keys[i];
                 if (k.includes('[')) {
@@ -122,28 +127,73 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
                     if (!Array.isArray(current[arrKey])) {
                         current[arrKey] = [];
                     }
-
+                    
+                    // Create a new array to trigger React's state update
                     current[arrKey] = [...current[arrKey]];
                     if (!current[arrKey][arrIndex]) {
                         current[arrKey][arrIndex] = {};
                     }
                     current = current[arrKey][arrIndex];
                 } else {
-                    if (!current[k]) current[k] = isNaN(keys[i + 1]) ? {} : [];
+                    if (!current[k]) {
+                        current[k] = isNaN(keys[i + 1]) ? {} : [];
+                    }
                     current = current[k];
                 }
             }
 
+
+            // Only update if the value has actually changed
             const lastKey = keys[keys.length - 1];
+            if (current[lastKey] === value) {
+                return prevValues; // No change needed
+            }
+            
             current[lastKey] = value;
-
-            const updatedJSON = { ...JSON.parse(jsonValue), value: newValues };
-            validateValues(newValues);
-            onChange?.(JSON.stringify(updatedJSON, null, 2));
-
             return newValues;
         });
+
+        // Clear any pending debounce
+        if (debounceTimerRef.current) {
+            clearTimeout(debounceTimerRef.current);
+        }
+
+        // Set a new debounce timer
+        debounceTimerRef.current = setTimeout(() => {
+            setValues(currentValues => {
+                // Create a deep copy of the current JSON value or initialize a new one
+                let currentJson;
+                try {
+                    currentJson = jsonValue ? JSON.parse(jsonValue) : { value: {} };
+                } catch (e) {
+                    currentJson = { value: {} };
+                }
+                
+                // Update the value while preserving other properties
+                const updatedJSON = { 
+                    ...currentJson,
+                    value: currentValues 
+                };
+                
+                const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
+                
+                // Validate and update
+                validateValues(currentValues);
+                onChange?.(updatedJsonString);
+                
+                return currentValues;
+            });
+        }, 300); // 300ms debounce
     }, [jsonValue, onChange, validateValues]);
+    
+    // Clean up timer on unmount
+    React.useEffect(() => {
+        return () => {
+            if (debounceTimerRef.current) {
+                clearTimeout(debounceTimerRef.current);
+            }
+        };
+    }, []);
 
 
 

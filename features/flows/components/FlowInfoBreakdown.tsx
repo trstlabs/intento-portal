@@ -119,13 +119,11 @@ export const FlowInfoBreakdown = ({
     async function fetchMsgs() {
       const msgs = await transformFlowMsgs(flowInfo)
       if (msgs != undefined) {
-
-
         setTransformedMsgs(msgs)
       }
     }
     fetchMsgs()
-  }, [flowInfo])
+  }, []) // Empty dependency array means this effect runs once on mount
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const [isJsonValid, setIsJsonValid] = useState(true)
@@ -184,14 +182,19 @@ export const FlowInfoBreakdown = ({
       return;
     }
 
-    // Update the flow params with the latest messages
-    setUpdatedFlowParams(prevParams => ({
-      ...prevParams,
-      msgs: editMsgs
-    }));
+    // Create the updated params with the latest messages
+    const updatedParams = {
+      ...flowParams,
+      msgs: editMsgs,
+      owner: flowInfo.owner,
+      id: Number(flowInfo.id)
+    };
 
-    // Trigger the update
-    return setRequestedUpdateFlow(true);
+    console.log('Updating flow with params:', updatedParams);
+    
+    // Update the state and trigger the update
+    setUpdatedFlowParams(updatedParams);
+    setRequestedUpdateFlow(true);
   }
 
   function handleUpdateFlowConfigClick(config: ExecutionConfiguration) {
@@ -227,30 +230,76 @@ export const FlowInfoBreakdown = ({
 
   const shouldDisableUpdateFlowButton = false // !updatedFlowParams || !updatedFlowParams.id
 
-  //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
-  const handleChangeMsg = (index: number) => (msg: string) => {
-    console.log("index", index)
-    if (!isJsonValid) {
-      return
-    }
-    try {
-
-      let newMsgs = editMsgs
-
-      newMsgs[index] = msg
-
-      setEditMsgs(newMsgs)
-
-      let params: MsgUpdateFlowParams = {
-        id: Number(flowInfo.id),
-        msgs: newMsgs,
-        owner: flowInfo.owner,
+  // Debounce timer reference
+  const debounceTimerRef = React.useRef<NodeJS.Timeout>();
+  
+  // Handle message changes in the editor with debouncing
+  const handleChangeMsg = (index: number) => {
+    return (msg: string) => {
+      // Skip if the message hasn't changed
+      if (editMsgs[index] === msg) {
+        return;
       }
-      setUpdatedFlowParams(params)
-    } catch (e) {
-      console.log(e)
-    }
-  }
+
+      // Update local state immediately for responsive UI
+      setEditMsgs(prevMsgs => {
+        const newMsgs = [...prevMsgs];
+        
+        // Ensure we have enough slots in the array
+        while (newMsgs.length <= index) {
+          newMsgs.push('{}');
+        }
+        
+        // Only update if the message has actually changed
+        if (newMsgs[index] !== msg) {
+          newMsgs[index] = msg;
+        }
+        
+        return newMsgs;
+      });
+
+      // Clear any pending debounce
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+
+      // Set a new debounce timer
+      debounceTimerRef.current = setTimeout(() => {
+        // Only validate JSON when user stops typing for a bit
+        if (!isJsonValid) {
+          try {
+            JSON.parse(msg);
+            setIsJsonValid(true);
+          } catch (e) {
+            console.error('Invalid JSON:', e);
+            return;
+          }
+        }
+
+        // Update flow params after debounce
+        setEditMsgs(currentMsgs => {
+          setUpdatedFlowParams(prevParams => ({
+            ...prevParams,
+            id: Number(flowInfo.id),
+            msgs: [...currentMsgs],
+            owner: flowInfo.owner,
+            endTime: flowInfo.endTime.getTime(),
+            interval: Number(flowInfo.interval.seconds)
+          }));
+          return currentMsgs;
+        });
+      }, 500); // 500ms debounce
+    };
+  };
+  
+  // Clean up timer on unmount
+  React.useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   function handleRemoveMsg(index: number) {
 
