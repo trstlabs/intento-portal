@@ -137,7 +137,7 @@ export const FlowInfoBreakdown = ({
     id: Number(flowInfo.id),
     owner: flowInfo.owner,
     endTime: flowInfo.endTime.getTime(),
-    startAt: flowInfo.startTime.getTime(),
+    startAt: 0,
     interval: Number(flowInfo.interval.seconds),
 
   }
@@ -216,7 +216,7 @@ export const FlowInfoBreakdown = ({
     let params: MsgUpdateFlowParams = {
       id: Number(updatedFlowInfo.id),
       owner: updatedFlowInfo.owner,
-      startAt: Date.now() - updatedFlowInfo.startTime.getTime() < 0 ? Number(updatedFlowInfo.startTime.getUTCSeconds()) : Number(0),
+      startAt: field === 'startAt' ? Number(updatedFlowInfo.startTime.getUTCSeconds()) : Number(0),
       endTime: Number(updatedFlowInfo.endTime.getTime()),
       interval: Number(updatedFlowInfo.interval.seconds)
     };
