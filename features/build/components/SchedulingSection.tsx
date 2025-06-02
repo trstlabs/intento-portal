@@ -29,17 +29,14 @@ interface SchedulingSectionProps {
 }
 
 export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeCalculated, useMsgExec: propUseMsgExec }: SchedulingSectionProps) => {
-  // Time constants
-  const HOUR_MS = 3600000
-  const DAY_MS = HOUR_MS * 24
-  const WEEK_MS = DAY_MS * 7
-  const MONTH_MS = DAY_MS * 30
-  const YEAR_MS = DAY_MS * 365
+  // Time constants in milliseconds
+  const HOUR_MS = 60 * 60 * 1000
+  const DAY_MS = 24 * HOUR_MS
 
-  // State for scheduling parameters
-  const [startTime, setStartTime] = useState(flowInput.startTime ? flowInput.startTime * 1000 : 0)
-  const [duration, setDuration] = useState(flowInput.duration ? flowInput.duration * 1000 : 30 * DAY_MS)
-  const [interval, setInterval] = useState(flowInput.interval ? flowInput.interval * 1000 : DAY_MS)
+  // State for scheduling parameters (all in milliseconds for flowInput)
+  const [startTime, setStartTime] = useState(flowInput.startTime || 0)
+  const [duration, setDuration] = useState(flowInput.duration || 30 * 24 * 60 * 60 * 1000) // 30 days in ms
+  const [interval, setInterval] = useState(flowInput.interval || 24 * 60 * 60 * 1000) // 1 day in ms
   const [txLabel, _setLabel] = useState(flowInput.label || '')
   // Use the chainSymbol directly instead of storing it in state to ensure it updates when the prop changes
   const feeFundsSymbol = chainSymbol || 'INTO'
@@ -58,19 +55,19 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
 
   // Display states
   const [displayInterval, setDisplayInterval] = useState(
-    flowInput.interval ? formatTimeDisplay(flowInput.interval * 1000) : '1 day'
+    flowInput.interval ? formatTimeDisplay(flowInput.interval) : '1 day'
   )
   const [editInterval, setEditInterval] = useState(false)
   const [editIntervalValue, setEditIntervalValue] = useState('1 day')
 
   const [displayDuration, setDisplayDuration] = useState(
-    flowInput.duration ? formatTimeDisplay(flowInput.duration * 1000) : '30 days'
+    flowInput.duration ? formatTimeDisplay(flowInput.duration) : '30 days'
   )
   const [editDuration, setEditDuration] = useState(false)
   const [editDurationValue, setEditDurationValue] = useState('30 days')
 
   const [displayStartTime, setDisplayStartTime] = useState(
-    flowInput.startTime && flowInput.startTime > 0 ? formatTimeDisplay((flowInput.startTime - Math.floor(Date.now() / 1000)) * 1000) : 'Right Away'
+    flowInput.startTime && flowInput.startTime > 0 ? formatTimeDisplay(flowInput.startTime) : 'Right Away'
   )
   const [editStartTime, setEditStartTime] = useState(false)
   const [editStartTimeValue, setEditStartTimeValue] = useState('1 hour')
@@ -93,39 +90,39 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     'Custom',
   ]
 
-  const timeSecondValues = [
-    0,
-    HOUR_MS,
-    HOUR_MS * 3,
-    HOUR_MS * 6,
-    HOUR_MS * 12,
-    HOUR_MS * 24,
-    DAY_MS * 2,
-    DAY_MS * 3,
-    DAY_MS * 5,
-    WEEK_MS,
-    WEEK_MS * 2,
-    DAY_MS * 30,
-    DAY_MS * 90,
-    -1, // Custom value indicator
+  // Time values in milliseconds
+  const timeMsValues = [
+    0,                          // None
+    HOUR_MS,                    // 1 hour
+    3 * HOUR_MS,                // 3 hours
+    6 * HOUR_MS,                // 6 hours
+    12 * HOUR_MS,               // 12 hours
+    DAY_MS,                     // 1 day
+    2 * DAY_MS,                 // 2 days
+    3 * DAY_MS,                 // 3 days
+    5 * DAY_MS,                 // 5 days
+    7 * DAY_MS,                 // 1 week
+    14 * DAY_MS,                // 2 weeks
+    30 * DAY_MS,                // 30 days
+    90 * DAY_MS,                // 90 days
+    -1,                         // Custom value indicator
   ]
 
-  // Fee calculation
-  // Ensure fee calculation is updated with the latest values
+  // Fee calculation with current values
   const [expectedFeeAmount, _, feeDenom] = useGetExpectedFlowFee(
-    Math.floor(duration / 1000),
+    duration,
     {
       ...flowInput,
-      interval: Math.floor(interval / 1000),
-      duration: Math.floor(duration / 1000),
-      startTime: startTime > 0 ? Math.floor(Date.now() / 1000) + Math.floor(startTime / 1000) : 0,
+      interval,
+      duration,
+      startTime,
       msgs: useMsgExec && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec") ?
         [`authz.v1beta1.MsgExec${flowInput.msgs[0]}`] :
         flowInput.msgs
     },
     true, // isDialogShowing
-    denomLocal, // Use denomLocal instead of feeFundsSymbol
-    Math.floor(interval / 1000)
+    denomLocal,
+    interval
   )
 
   // Format the fee with 2 decimal places
@@ -145,9 +142,10 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     const updatedFlowInput = {
       ...flowInput,
       label: txLabel,
-      startTime: startTime > 0 ? Math.floor(Date.now() / 1000) + Math.floor(startTime / 1000) : 0,
-      interval: interval > 0 ? Math.floor(interval / 1000) : 0,
-      duration: duration > 0 ? Math.floor(duration / 1000) : 0,
+      // Store all times in milliseconds for executeSubmitFlow
+      startTime: startTime > 0 ? startTime : 0,
+      interval: interval > 0 ? interval : 0,
+      duration: duration > 0 ? duration : 0,
       msgs: useMsgExec && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec") ?
         [`authz.v1beta1.MsgExec${flowInput.msgs[0]}`] :
         flowInput.msgs
@@ -158,25 +156,28 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
   // Format time display based on milliseconds
   function formatTimeDisplay(ms: number): string {
     if (ms === 0) return 'Right Away'
-
-    if (ms === DAY_MS) return '1 day'
-    if (ms === WEEK_MS) return '1 week'
-    if (ms < HOUR_MS) {
-      return `${Math.floor(ms / (HOUR_MS / 60))} minutes`
-    } else if (ms <= HOUR_MS * 48) { // Up to 48 hours, show in hours
-      const hours = Math.floor(ms / HOUR_MS)
+    
+    const seconds = Math.floor(ms / 1000)
+    
+    if (seconds < 60) {
+      return seconds === 1 ? '1 second' : `${seconds} seconds`
+    } else if (seconds < 60 * 60) {
+      const minutes = Math.floor(seconds / 60)
+      return minutes === 1 ? '1 minute' : `${minutes} minutes`
+    } else if (seconds < 60 * 60 * 24 * 2) { // Less than 2 days, show in hours
+      const hours = Math.floor(seconds / (60 * 60))
       return hours === 1 ? '1 hour' : `${hours} hours`
-    } else if (ms < WEEK_MS) {
-      const days = Math.floor(ms / DAY_MS)
+    } else if (seconds < 60 * 60 * 24 * 7) { // Less than 1 week, show in days
+      const days = Math.floor(seconds / (60 * 60 * 24))
       return days === 1 ? '1 day' : `${days} days`
-    } else if (ms < MONTH_MS) {
-      const weeks = Math.floor(ms / WEEK_MS)
+    } else if (seconds < 60 * 60 * 24 * 30) { // Less than 1 month, show in weeks
+      const weeks = Math.floor(seconds / (60 * 60 * 24 * 7))
       return weeks === 1 ? '1 week' : `${weeks} weeks`
-    } else if (ms < YEAR_MS) {
-      const months = Math.floor(ms / MONTH_MS)
+    } else if (seconds < 60 * 60 * 24 * 365) { // Less than 1 year, show in months
+      const months = Math.floor(seconds / (60 * 60 * 24 * 30))
       return months === 1 ? '1 month' : `${months} months`
     } else {
-      const years = Math.floor(ms / YEAR_MS)
+      const years = Math.floor(seconds / (60 * 60 * 24 * 365))
       return years === 1 ? '1 year' : `${years} years`
     }
   }
@@ -239,10 +240,10 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     setDisplayStartTime('Right Away')
   }
 
-  function convertTime(input: string) {
+  function convertTime(input: string): number {
     // If input is just a number, assume it's in hours
     if (/^\d+$/.test(input.trim())) {
-      return Number(input.trim()) * HOUR_MS
+      return Number(input.trim()) * 60 * 60 * 1000 // Convert hours to ms
     }
 
     const numberMatch = input.match(/\d+/g)
@@ -251,22 +252,24 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     const number = Number(numberMatch[0])
     const lowerInput = input.toLowerCase()
 
-    if (lowerInput.includes('hour')) {
-      return number * HOUR_MS
-    } else if (lowerInput.includes('day')) {
-      return number * DAY_MS
+    if (lowerInput.includes('second') || lowerInput.includes('sec')) {
+      return number * 1000
     } else if (lowerInput.includes('minute') || lowerInput.includes('min')) {
-      return number * (HOUR_MS / 60)
+      return number * 60 * 1000
+    } else if (lowerInput.includes('hour')) {
+      return number * 60 * 60 * 1000
+    } else if (lowerInput.includes('day')) {
+      return number * 24 * 60 * 60 * 1000
     } else if (lowerInput.includes('week')) {
-      return number * WEEK_MS
+      return number * 7 * 24 * 60 * 60 * 1000
     } else if (lowerInput.includes('month')) {
-      return number * MONTH_MS
+      return number * 30 * 24 * 60 * 60 * 1000
     } else if (lowerInput.includes('year')) {
-      return number * YEAR_MS
+      return number * 365 * 24 * 60 * 60 * 1000
     }
 
     // If we can't determine the unit but have a number, default to hours
-    return number * HOUR_MS
+    return number * 60 * 60 * 1000
   }
 
   function cleanCustomInputForDisplay(input: string) {
@@ -331,7 +334,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                               onClick={() =>
                                 handleStartTime(
                                   label,
-                                  timeSecondValues[timeLabels.indexOf(label)]
+                                  timeMsValues[timeLabels.indexOf(label)]
                                 )
                               }
                             />
@@ -342,7 +345,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                               onClick={() =>
                                 handleStartTime(
                                   label,
-                                  timeSecondValues[timeLabels.indexOf(label)]
+                                  timeMsValues[timeLabels.indexOf(label)]
                                 )
                               }
                             />
@@ -413,7 +416,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                               onClick={() =>
                                 handleInterval(
                                   label,
-                                  timeSecondValues[timeLabels.indexOf(label)]
+                                  timeMsValues[timeLabels.indexOf(label)]
                                 )
                               }
                             />
@@ -424,7 +427,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                               onClick={() =>
                                 handleInterval(
                                   label,
-                                  timeSecondValues[timeLabels.indexOf(label)]
+                                  timeMsValues[timeLabels.indexOf(label)]
                                 )
                               }
                             />
@@ -486,7 +489,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                               onClick={() =>
                                 handleDuration(
                                   label,
-                                  timeSecondValues[timeLabels.indexOf(label)]
+                                  timeMsValues[timeLabels.indexOf(label)]
                                 )
                               }
                             />
@@ -497,7 +500,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                               onClick={() =>
                                 handleDuration(
                                   label,
-                                  timeSecondValues[timeLabels.indexOf(label)]
+                                  timeMsValues[timeLabels.indexOf(label)]
                                 )
                               }
                             />

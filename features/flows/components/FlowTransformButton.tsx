@@ -38,6 +38,7 @@ export const FlowTransformButton = ({ flowInfo }) => {
         const flowInput: FlowInput = {
             // Your transformation logic here
             duration: info.endTime.getMilliseconds() - info.startTime.getMilliseconds(),
+            interval: Number(info.interval.seconds) * 1000 + Number(info.interval.nanos),
             msgs: msgs,
             conditions: info.conditions,
             configuration: info.configuration,
@@ -72,8 +73,8 @@ export async function transformFlowMsgs(info) {
         console.log("Before normalization:", JSON.stringify(msgObj, null, 2));
 
         msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
-        console.log( msgObj["typeUrl"]?.includes("MsgExecuteContract") &&
-        typeof msgObj.value.msg === "string")
+        console.log(msgObj["typeUrl"]?.includes("MsgExecuteContract") &&
+            typeof msgObj.value.msg === "string")
         // 🔹 Decode MsgExecuteContract inner msg if applicable
         if (
             msgObj["typeUrl"]?.includes("MsgExecuteContract")

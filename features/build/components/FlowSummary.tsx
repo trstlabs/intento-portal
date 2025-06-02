@@ -31,34 +31,44 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
   grantee,
   tokenSymbol
 }) => {
-  // Calculate scheduling info
-  const interval = flowInput.interval ? flowInput.interval * 1000 : 0
-  const duration = flowInput.duration ? flowInput.duration * 1000 : 0
-  const startTime = flowInput.startTime ? flowInput.startTime * 1000 : 0
+  // Calculate scheduling info (all values are in milliseconds)
+  const interval = flowInput.interval || 0
+  const duration = flowInput.duration || 0
+  const startTime = flowInput.startTime || 0
   const recurrences = interval > 0 ? Math.floor(duration / interval) : 0
 
   // Format time display
   const formatTimeDisplay = (ms: number): string => {
     if (ms === 0) return 'None'
-
-    const hours = ms / (1000 * 60 * 60)
-    const minutes = ms / (1000 * 60)
-    if (hours < 48) {
-      if (hours < 1){
-        return minutes === 1  ? '1 minute' : `${minutes.toFixed()} minutes`
-      }
-      return hours === 1 ? '1 hour' : `${hours.toFixed()} hours`
+    
+    const seconds = Math.floor(ms / 1000)
+    
+    if (seconds < 60) {
+      return seconds === 1 ? '1 second' : `${seconds} seconds`
+    } else if (seconds < 60 * 60) {
+      const minutes = Math.floor(seconds / 60)
+      return minutes === 1 ? '1 minute' : `${minutes} minutes`
+    } else if (seconds < 60 * 60 * 24 * 2) { // Less than 2 days, show in hours
+      const hours = Math.floor(seconds / (60 * 60))
+      return hours === 1 ? '1 hour' : `${hours} hours`
+    } else if (seconds < 60 * 60 * 24 * 7) { // Less than 1 week, show in days
+      const days = Math.floor(seconds / (60 * 60 * 24))
+      return days === 1 ? '1 day' : `${days} days`
+    } else if (seconds < 60 * 60 * 24 * 30) { // Less than 1 month, show in weeks
+      const weeks = Math.floor(seconds / (60 * 60 * 24 * 7))
+      return weeks === 1 ? '1 week' : `${weeks} weeks`
+    } else if (seconds < 60 * 60 * 24 * 365) { // Less than 1 year, show in months
+      const months = Math.floor(seconds / (60 * 60 * 24 * 30))
+      return months === 1 ? '1 month' : `${months} months`
     } else {
-      const days = hours / 24
-      if (days <= 0.98){
-        return "~1 day"
-      }
-      return days === 1 ? '1 day' : `${days.toFixed()} days`
+      const years = Math.floor(seconds / (60 * 60 * 24 * 365))
+      return years === 1 ? '1 year' : `${years} years`
     }
   }
 
+  // For start time, show relative time from now
   const displayStartTime = startTime > 0
-    ? formatTimeDisplay((flowInput.startTime - Math.floor(Date.now() / 1000)) * 1000)
+    ? formatTimeDisplay(startTime)
     : 'Right Away'
 
   const displayInterval = interval > 0 ? formatTimeDisplay(interval) : 'None'
