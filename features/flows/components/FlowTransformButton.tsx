@@ -64,43 +64,79 @@ export const FlowTransformButton = ({ flowInfo }) => {
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
 };
 
+// Helper function to extract value objects and handle nested structures
+const extractValueObjects = (obj: any): any => {
+    if (!obj || typeof obj !== 'object') return obj;
+    
+    // Handle arrays
+    if (Array.isArray(obj)) {
+        return obj.map(extractValueObjects);
+    }
+    
+    // If this is a message with typeUrl and value, extract the value
+    if (obj.typeUrl && obj.value && typeof obj.value === 'object') {
+        return {
+            ...obj,
+            ...extractValueObjects(obj.value)  // Recursively process the value object
+        };
+    }
+    
+    // Process all properties recursively
+    const result: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj)) {
+        result[key] = extractValueObjects(value);
+    }
+    return result;
+};
+
 export async function transformFlowMsgs(info) {
     let msgs: string[] = [];
 
-    const msgsObj = await fetchFlowMsgs(info.id.toString());
+    try {
+        const msgsObj = await fetchFlowMsgs(info.id.toString());
 
-    msgsObj.forEach((msgObj: any, index) => {
-        console.log("Before normalization:", JSON.stringify(msgObj, null, 2));
+        if (Array.isArray(msgsObj)) {
+            msgsObj.forEach((msgObj: any, index) => {
+                try {
+                    console.log("Before normalization:", JSON.stringify(msgObj, null, 2));
 
-        msgObj = normalizeAmountField(msgObj); // 🔹 Fix amount field here
-        console.log(msgObj["typeUrl"]?.includes("MsgExecuteContract") &&
-            typeof msgObj.value.msg === "string")
-        // 🔹 Decode MsgExecuteContract inner msg if applicable
-        if (
-            msgObj["typeUrl"]?.includes("MsgExecuteContract")
-        ) {
-            try {
-                const decodedMsg = JSON.parse(
-                    Buffer.from(msgObj.value.msg, "base64").toString("utf-8")
-                );
-                msgObj.value.msg = decodedMsg;
-                console.log("Decoded MsgExecuteContract msg:", decodedMsg);
-            } catch (e) {
-                console.warn("Failed to decode MsgExecuteContract msg:", e);
-            }
+                    // First normalize amount fields
+                    msgObj = normalizeAmountField(msgObj);
+                    
+                    // Then extract value objects and handle nested structures
+                    msgObj = extractValueObjects(msgObj);
+
+                    // Decode MsgExecuteContract inner msg if applicable
+                    if (msgObj["typeUrl"]?.includes("MsgExecuteContract") &&
+                        typeof msgObj.msg === "string") {
+                        try {
+                            const decodedMsg = JSON.parse(
+                                Buffer.from(msgObj.msg, "base64").toString("utf-8")
+                            );
+                            msgObj.msg = decodedMsg;
+                            console.log("Decoded MsgExecuteContract msg:", decodedMsg);
+                        } catch (e) {
+                            console.warn("Failed to decode MsgExecuteContract msg:", e);
+                        }
+                    }
+
+                    const msg = JSON.stringify(
+                        msgObj,
+                        (_, value) => (typeof value === "bigint" ? value.toString() : value),
+                        2
+                    );
+                    msgs[index] = msg;
+                } catch (error) {
+                    console.error(`Error processing message at index ${index}:`, error);
+                    // Continue with next message if one fails
+                }
+            });
         }
-
-        console.log("After normalization & decoding:", JSON.stringify(msgObj, null, 2));
-
-        const msg = JSON.stringify(
-            msgObj,
-            (_, value) => (typeof value === "bigint" ? value.toString() : value),
-            2
-        );
-
-        console.log("After transformation:", msg);
-        msgs[index] = msg;
-    });
+    } catch (error) {
+        console.warn("Failed to fetch flow messages, continuing with empty messages array:", error);
+        // Return empty array to allow the edit flow to continue
+        return undefined
+    }
 
     console.log("Final processed messages:", msgs);
     return msgs;
