@@ -114,7 +114,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
               <Text variant="body" color="tertiary">~ {expectedFee} {displaySymbol}</Text>
             </Inline>
 
-            {useMsgExec !== undefined && (
+            {useMsgExec !== false && (
               <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
                 <Text variant="body">Submit as MsgExec</Text>
                 <Text variant="body" color="tertiary">{useMsgExec ? 'Yes' : 'No'}</Text>
