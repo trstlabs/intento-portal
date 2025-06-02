@@ -14,12 +14,14 @@ type ExecuteSubmitFlowArgs = {
   owner: string
   flowInput: FlowInput
   client: SigningStargateClient
+  ibcWalletAddress?: string
 }
 
 export const executeSubmitFlow = async ({
   client,
   flowInput,
   owner,
+  ibcWalletAddress,
 }: ExecuteSubmitFlowArgs): Promise<any> => {
   let startAtInt = 0
   if (flowInput.startTime && flowInput.startTime > 0) {
@@ -32,10 +34,18 @@ export const executeSubmitFlow = async ({
   console.log('interval (s)', flowInput.interval / 1000)
   let duration = flowInput.duration + 'ms'
   let interval = flowInput.interval + 'ms'
-  let msgs = []
+  let msgs: Any[] = []
 
-  transformAndEncodeMsgs(flowInput.msgs, client, msgs)
-  console.log(msgs)
+  // Process messages and replace any placeholder addresses
+  const inputMsgs = Array.isArray(flowInput.msgs) ? flowInput.msgs : [flowInput.msgs];
+  msgs = transformAndEncodeMsgs({
+    flowInputMsgs: inputMsgs,
+    client,
+    msgs: [],
+    ownerAddress: owner,
+    ibcWalletAddress
+  });
+  console.log('Processed messages:', msgs);
 
   if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ != '') {
     const encodeObject2 = {
@@ -110,14 +120,56 @@ export const executeSubmitFlow = async ({
 }
 
 
-export function transformAndEncodeMsgs(
-  flowInputMsgs: string[],
-  client: SigningStargateClient,
-  msgs: Any[]
-) {
+interface TransformAndEncodeMsgsParams {
+  flowInputMsgs: string[]
+  client: SigningStargateClient
+  msgs?: Any[]
+  ownerAddress?: string
+  ibcWalletAddress?: string
+}
+
+export function transformAndEncodeMsgs({
+  flowInputMsgs,
+  client,
+  msgs = [],
+  ownerAddress,
+  ibcWalletAddress
+}: TransformAndEncodeMsgsParams): Any[] {
+  // Helper function to recursively process message values and replace placeholders
+  const processValue = (value: any): any => {
+    if (value === 'GET_SENDER') {
+      if (!ownerAddress) {
+        throw new Error('GET_SENDER placeholder found but no owner address provided');
+      }
+      return ownerAddress;
+    }
+    
+    if (value === 'GET_IBC_SENDER') {
+      if (!ibcWalletAddress) {
+        throw new Error('GET_IBC_SENDER placeholder found but no IBC wallet connected');
+      }
+      return ibcWalletAddress;
+    }
+    
+    if (Array.isArray(value)) {
+      return value.map(processValue);
+    }
+    
+    if (value !== null && typeof value === 'object') {
+      const result: Record<string, any> = {};
+      for (const [key, val] of Object.entries(value)) {
+        result[key] = processValue(val);
+      }
+      return result;
+    }
+    
+    return value;
+  };
   for (let msgJSON of flowInputMsgs) {
     let parsedMsg = JSON.parse(msgJSON);
-    let value = parsedMsg['value'];
+    
+    // Process the message value to replace any GET_SENDER placeholders
+    let value = processValue(parsedMsg['value']);
     let typeUrl: string = parsedMsg['typeUrl'].toString();
 
     // Handle CosmWasm MsgExecuteContract
@@ -131,7 +183,7 @@ export function transformAndEncodeMsgs(
         msg: msgBytes,
         funds: value.funds || [],
       });
-
+      console.log("wasmMsg", wasmMsg)
       const anyMsg = Any.fromPartial({
         typeUrl,
         value: MsgExecuteContract.encode(wasmMsg).finish(),
@@ -158,13 +210,13 @@ export function transformAndEncodeMsgs(
             msg: innerMsgBytes,
             funds: innerValue.funds || [],
           });
-
+          console.log("innerValue", innerValue)
           return Any.fromPartial({
             typeUrl: innerTypeUrl,
             value: MsgExecuteContract.encode(innerWasmMsg).finish(),
           });
         }
-
+        console.log("innerValue", innerValue)
         // Otherwise, let the registry handle it
         return client.registry.encodeAsAny({
           typeUrl: innerTypeUrl,
@@ -194,6 +246,8 @@ export function transformAndEncodeMsgs(
 
     msgs.push(encoded);
   }
+  
+  return msgs;
 }
 
 

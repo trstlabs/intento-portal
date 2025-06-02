@@ -95,11 +95,11 @@ export const ibcWalletState = createWalletState<
   SigningStargateClient,
   {
     /* ibc wallet is connected */
-    tokenSymbol?: string
+    chainId?: string
   }
 >({
   key: 'ibc-wallet',
   default: {
-    tokenSymbol: null,
+    chainId: null,
   },
 })

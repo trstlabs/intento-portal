@@ -8,17 +8,30 @@ import { transformAndEncodeMsgs } from './executeSubmitFlow'
 type executeUpdateFlowArgs = {
   flowParams: MsgUpdateFlowParams
   client: SigningStargateClient
+  ibcWalletAddress?: string
 }
 
 export const executeUpdateFlow = async ({
   client,
   flowParams,
+  ibcWalletAddress,
 }: executeUpdateFlowArgs): Promise<any> => {
   console.log(flowParams)
-  let msgs = []
+  let msgs: any[] = []
   if (flowParams.msgs) {
-    transformAndEncodeMsgs(flowParams.msgs, client, msgs)
-    console.log(msgs)
+    // IBC wallet address is passed as a parameter
+    const inputMsgs = Array.isArray(flowParams.msgs) ? flowParams.msgs : [flowParams.msgs];
+    
+    // Process and encode messages, replacing placeholders
+    msgs = transformAndEncodeMsgs({
+      flowInputMsgs: inputMsgs,
+      client,
+      msgs: [],
+      ownerAddress: flowParams.owner,
+      ibcWalletAddress: ibcWalletAddress || undefined
+    });
+    
+    console.log('Encoded messages:', msgs);
   }
 
   const msgUpdateFlow =
