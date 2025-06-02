@@ -23,33 +23,38 @@ export const executeCreateAuthzGrant = async ({
   expirationDurationMs,
   coin,
 }: ExecuteCreateAuthzGrantArgs): Promise<any> => {
-  // let expireAt = ((Date.now() + 31556926000) / 1000).toFixed() //31556926000=1year in ms
-  // if (expirationDurationMs != undefined) {
-  //   expireAt = ((Date.now() + expirationDurationMs) / 1000).toFixed()
-  // }
-  console.log(expirationDurationMs)
+
   const msgObjects = []
+
+  // Calculate expiration timestamp if duration is provided
+  const expiration = expirationDurationMs ? {
+    seconds: BigInt(Math.floor((Date.now() / 1000 + expirationDurationMs / 1000))),
+    nanos: 0
+  } : undefined
+  console.log(expiration)
+
   for (let typeUrl of typeUrls) {
-    let msgAuthzGrant = MsgGrant.fromPartial({
-      granter,
-      grantee,
+    const msgAuthzGrant = MsgGrant.fromPartial({
+      granter: granter,
+      grantee: grantee,
       grant: {
         authorization: {
-          typeUrl: '/cosmos.authz.v1beta1.GenericAuthorization',
-          value: GenericAuthorization.encode({
-            msg: typeUrl,
-          }).finish(),
+          typeUrl: typeUrl,
+          value: GenericAuthorization.encode(
+            GenericAuthorization.fromPartial({
+              msg: typeUrl,
+            }),
+          ).finish(),
         },
-        //expiration: { seconds: undefined },
+        expiration: expiration,
       },
     })
-    // console.log(msgAuthzGrant)
+
     const MsgGrantAllowanceObject = {
       typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
       value: msgAuthzGrant,
     }
-    // console.log(msgAuthzGrant)
-    // console.log(MsgGrantAllowanceObject)
+
     msgObjects.push(MsgGrantAllowanceObject)
   }
 
@@ -68,5 +73,5 @@ export const executeCreateAuthzGrant = async ({
     msgObjects.push(MsgSendObject)
   }
 
-  return await client.signAndBroadcast(granter, msgObjects, { gas: msgObjects.length == 0 ? "50000" : "100000", amount: []} )
+  return await client.signAndBroadcast(granter, msgObjects, { gas: msgObjects.length == 0 ? "50000" : "100000", amount: [] })
 }
