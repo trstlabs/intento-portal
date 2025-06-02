@@ -55,10 +55,21 @@ const StyledErrorText = styled(Text, {
 });
 
 const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValidate }) => {
-    const schemaDefinition = schema.definitions[schema.$ref.replace('#/definitions/', '')];
-    const properties = schemaDefinition ? schemaDefinition.properties : null;
+    // Handle case where schema or schema.definitions is missing
+    const schemaDefinition = schema?.definitions && schema.$ref 
+        ? schema.definitions[schema.$ref.replace('#/definitions/', '')]
+        : schema; // Fall back to schema directly if no definitions or $ref
+        
+    const properties = schemaDefinition?.properties || schema?.properties || {};
 
-    const initialValues = JSON.parse(jsonValue).value || {};
+    // Safely parse JSON and handle potential errors
+    let parsedValue: { value?: any } = {};
+    try {
+        parsedValue = jsonValue ? JSON.parse(jsonValue) : {};
+    } catch (e) {
+        console.error('Failed to parse JSON value:', e);
+    }
+    const initialValues = parsedValue.value || {};
     const [values, setValues] = useState(initialValues);
     const [newFieldKeys, setNewFieldKeys] = useState({}); // State object for new field keys
     const [errors, setErrors] = useState({}); // State for validation errors

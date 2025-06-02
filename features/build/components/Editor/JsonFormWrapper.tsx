@@ -10,7 +10,7 @@ import {
   Card,
   CardContent, styled
 } from 'junoblocks'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import JsonFormEditor from './DynamicForm'
 
 import { elysExamples, generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
@@ -46,16 +46,32 @@ export const JsonFormWrapper = ({
    const msgTypeNameFile = (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown'
   const msgTypeName = extractedMsgPrefix ? extractedMsgPrefix.charAt(0).toUpperCase() + extractedMsgPrefix.slice(1) + extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) + (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown' : 'Unknown'
   const [validationErrors, setValidationErrors] = useState([])
-  const [schema, setSchema] = useState(
-    findFileBySuffix(msgTypeNameFile)
-  )
+  const [schema, setSchema] = useState(() => {
+    const initialSchema = findFileBySuffix(msgTypeNameFile)
+    // If no schema found, return a basic schema that accepts any JSON object
+    return initialSchema || {
+      type: 'object',
+      properties: {},
+      additionalProperties: true
+    }
+  })
+  const [lastUpdated, setLastUpdated] = useState(Date.now())
 
   const wasmEnabledList = JSON.parse(
     process.env.NEXT_PUBLIC_WASM_ENABLED_LIST || '[]'
   )
 
-  function setMsgFromExample(msg) {
+  // Update schema when msg changes
+  useEffect(() => {
+    const newSchema = findFileBySuffix(msgTypeNameFile)
+    if (newSchema) {
+      setSchema(newSchema)
+      // Force a re-render when schema updates
+      setLastUpdated(Date.now())
+    }
+  }, [msg, msgTypeNameFile])
 
+  function setMsgFromExample(msg) {
     const schema = findFileBySuffix(
       msg.typeUrl
         .split('.')
@@ -63,36 +79,41 @@ export const JsonFormWrapper = ({
     )
 
     let errors = validateJSON(msg, schema)
-    setSchema(
-      schema
-    )
+    setSchema(schema || {
+      type: 'object',
+      properties: {},
+      additionalProperties: true
+    })
     setValidationErrors([])
-    setIsJsonValid(errors && errors.length >= 0)
+    setIsJsonValid(!errors || errors.length === 0)
+    
     if (errors) {
       setValidationErrors(errors)
-
     }
 
+    // Force update the form
+    setLastUpdated(Date.now())
+    
     return setExample(index, msg)
-
   }
 
   return (
-    <>
-      <Column>
-        <Card
-          css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
-          variant="secondary"
-          disabled
-        >
-          <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-            {setExample && <Inline css={{ justifyContent: 'space-between' }} >
+    <Column>
+      <Card
+        css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
+        variant="secondary"
+        disabled
+      >
+        <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+          {setExample && (
+            <Inline css={{ justifyContent: 'space-between' }}>
               <MessageSelector
                 msgTypeName={msgTypeName}
                 setSchema={setSchema}
                 setExample={setExample}
                 index={index}
-              /><Text variant="legend" color="disabled" align={'center'}>
+              />
+              <Text variant="legend" color="disabled" align={'center'}>
                 <a
                   target={'_blank'}
                   href="https://chat.openai.com/g/g-cRhoPo6YH-cosmonaut"
@@ -102,8 +123,8 @@ export const JsonFormWrapper = ({
                 </a>
               </Text>
             </Inline>
-            }
-            <Column>
+          )}
+          <Column>
               {setExample && <>
                 <Inline css={{ display: 'inline', paddingTop: '$4' }} >
                   {generalExamples.map((example, ei) => (
@@ -191,7 +212,6 @@ export const JsonFormWrapper = ({
               </>
               }
               <div style={{ margin: '$4', padding: '$4' }}>
-
                 <Inline css={{ justifyContent: 'space-between' }}>
                   <Button
                     variant="ghost"
@@ -205,7 +225,6 @@ export const JsonFormWrapper = ({
                         name="advanced-mode"
                         onChange={() => setShowJsonForm((show) => !show)}
                         checked={!showJsonForm}
-
                         optionLabels={['Advanced', 'Editor View']}
                       />
                     }
@@ -222,35 +241,36 @@ export const JsonFormWrapper = ({
                         Discard
                       </Button>
                     </div>
-                  )}</Inline>
-
+                  )}
+                </Inline>
+                
+                {showJsonForm ? (
+                  <JsonFormEditor
+                    key={`json-editor-${index}-${lastUpdated}`}
+                    jsonValue={msg}
+                    schema={schema}
+                    validationErrors={validationErrors}
+                    onChange={handleChangeMsg(index)}
+                    onValidate={(isValid) => {
+                      setIsJsonValid(isValid)
+                    }}
+                  />
+                ) : (
+                  <JsonCodeMirrorEditor
+                    key={`code-editor-${index}-${lastUpdated}`}
+                    jsonValue={msg}
+                    onChange={handleChangeMsg(index)}
+                    onValidate={(isValid) => {
+                      setIsJsonValid(isValid)
+                    }}
+                  />
+                )}
               </div>
-              {showJsonForm && msgTypeName != 'Unknown' ? (
-                <JsonFormEditor
-                  jsonValue={msg}
-                  schema={schema}
-                  onChange={handleChangeMsg(index)}
-                  onValidate={setIsJsonValid}
-                  validationErrors={validationErrors}
-
-                />
-
-              ) : (
-                <JsonCodeMirrorEditor
-                  jsonSchema={schema}
-                  jsonValue={msg}
-                  onChange={handleChangeMsg(index)}
-                  onValidate={setIsJsonValid}
-                  validationErrors={validationErrors}
-                  setValidationErrors={setValidationErrors}
-                />
-              )}
-            </Column>{' '}
+            </Column>
           </CardContent>
         </Card>
-      </Column >
-    </>
-  )
+      </Column>
+    )
 }
 
 export type ListType = { key: string; name: string; value: any }

@@ -118,7 +118,11 @@ export const FlowInfoBreakdown = ({
   useEffect(() => {
     async function fetchMsgs() {
       const msgs = await transformFlowMsgs(flowInfo)
-      setTransformedMsgs(msgs)
+      if (msgs != undefined) {
+
+
+        setTransformedMsgs(msgs)
+      }
     }
     fetchMsgs()
   }, [flowInfo])
@@ -138,14 +142,22 @@ export const FlowInfoBreakdown = ({
 
   }
 
-  const [updatedFlowParams, setUpdatedFlowParams] = useState(flowParams)
+  const [updatedFlowParams, setUpdatedFlowParams] = useState<MsgUpdateFlowParams>({
+    ...flowParams,
+    msgs: [] // Initialize with empty messages array
+  })
 
   async function showEditor(show: boolean, index: number) {
     setEditorIndex(index)
 
     if (show) {
       setEditorIndex(index)
-      setEditMsgs(transformedMsgs.length ? transformedMsgs : await transformFlowMsgs(flowInfo))
+      if (transformedMsgs.length) {
+        setEditMsgs(transformedMsgs)
+      }else{
+        setEditMsgs(["{}"])
+      }
+
       return
     }
     setEditorIndex(-1)
@@ -165,14 +177,21 @@ export const FlowInfoBreakdown = ({
   }, [isExecutingUpdateFlow, requestedUpdateFlow, handleUpdateFlow])
 
 
-  //todo add support for multiple messages in exec message array
+  // Update flow with new messages
   const handleUpdateFlowClick = () => {
     if (!isJsonValid) {
-      //alert("Invalid JSON")
-      return
+      console.log('Invalid JSON in messages:', editMsgs);
+      return;
     }
 
-    return setRequestedUpdateFlow(true)
+    // Update the flow params with the latest messages
+    setUpdatedFlowParams(prevParams => ({
+      ...prevParams,
+      msgs: editMsgs
+    }));
+
+    // Trigger the update
+    return setRequestedUpdateFlow(true);
   }
 
   function handleUpdateFlowConfigClick(config: ExecutionConfiguration) {
@@ -689,15 +708,15 @@ export const FlowInfoBreakdown = ({
                     >
                       <option value={300}>5 minutes</option>
                       <option value={600}>10 minutes</option>
-                      <option value={600*3}>30 minutes</option>
+                      <option value={600 * 3}>30 minutes</option>
                       <option value={3600}>1 hour</option>
-                      <option value={3600*2}>2 hours</option>
-                      <option value={3600*4}>4 hours</option>
-                      <option value={3600*12}>12 hours</option>
+                      <option value={3600 * 2}>2 hours</option>
+                      <option value={3600 * 4}>4 hours</option>
+                      <option value={3600 * 12}>12 hours</option>
                       <option value={86400}>1 day</option>
                       <option value={86400}>3 days</option>
                       <option value={604800}>1 week</option>
-                      <option value={604800*4}>4 weeks</option>
+                      <option value={604800 * 4}>4 weeks</option>
                       <option value={2592000}>1 month</option>
                     </select>
 
