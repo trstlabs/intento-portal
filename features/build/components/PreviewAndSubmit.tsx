@@ -99,6 +99,7 @@ export const PreviewAndSubmit = ({
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
 
+  
   // Initialize connectionId if not set
   useEffect(() => {
     if (!flowInput.connectionId && chainId) {
@@ -201,7 +202,6 @@ export const PreviewAndSubmit = ({
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
-    chainSymbol,
     chainId,
     {
       onError: (error: Error) => {
@@ -425,7 +425,6 @@ export const PreviewAndSubmit = ({
                       {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
                         hostedAccount={hostedAccount}
                         hostedICAAddress={hostedICA}
-                        chainSymbol={chainSymbol}
                         chainId={chainId}
                         flowInput={flowInput}
                       />}
@@ -622,7 +621,6 @@ export const PreviewAndSubmit = ({
               useMsgExec={useMsgExec}
               chainId={chainId}
               grantee={hostedICA || icaAddress}
-              tokenSymbol={feeSymbol}
             />
           </Column>
 

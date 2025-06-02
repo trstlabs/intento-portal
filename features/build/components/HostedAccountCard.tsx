@@ -20,7 +20,6 @@ import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hos
 interface HostedAccountCardProps {
   hostedAccount: HostedAccount
   hostedICAAddress: string
-  chainSymbol: string
   chainId: string
   flowInput: FlowInput
 }
@@ -28,7 +27,6 @@ interface HostedAccountCardProps {
 export const HostedAccountCard = ({
   hostedAccount,
   hostedICAAddress,
-  chainSymbol,
   chainId,
   flowInput
 }: HostedAccountCardProps) => {
@@ -41,7 +39,6 @@ export const HostedAccountCard = ({
   // ICA funds
   const { mutate: connectExternalWallet = () => { }
   } = useConnectIBCWallet(
-    chainSymbol,
     chainId,
     {
       onError(error) {

@@ -47,7 +47,6 @@ export default function Transfer() {
   const { chain_id } = useIBCAssetInfo(selectedToken) || {}
 
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
-    selectedToken,
     chain_id,
     {
       onError(error) {

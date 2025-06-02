@@ -15,7 +15,7 @@ import {
   TransactionStatus,
   transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { walletState, WalletStatusType, ibcWalletState } from 'state/atoms/walletAtoms'
 
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { particleState } from '../../../state/atoms/particlesAtoms'
@@ -28,6 +28,7 @@ type UseSubmitFlowArgs = {
 
 export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
   const { client, address, status } = useRecoilValue(walletState)
+  const { address: ibcWalletAddress } = useRecoilValue(ibcWalletState)
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
   const [_, popConfetti] = useRecoilState(particleState)
@@ -51,6 +52,7 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
         owner: address,
         flowInput,
         client,
+        ibcWalletAddress,
       })
       return response
     },

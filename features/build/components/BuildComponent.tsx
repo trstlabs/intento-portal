@@ -153,7 +153,6 @@ export const BuildComponent = ({
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
-    chainSymbol,
     chainId,
     {
       onError(error) {
@@ -424,7 +423,6 @@ export const BuildComponent = ({
                   {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
                     hostedAccount={hostedAccount}
                     hostedICAAddress={hostedICA}
-                    chainSymbol={chainSymbol}
                     chainId={chainId}
                     flowInput={flowInput}
                   />}

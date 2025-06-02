@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { ibcWalletState, walletState, WalletStatusType } from 'state/atoms/walletAtoms'
-import { useIBCAssetInfo } from './useIBCAssetInfo'
+import { useIBCAssetInfoByChainID } from './useIBCAssetInfo'
 import { useChain } from '@cosmos-kit/react'
 import { useChainInfoByChainID } from './useChainList'
 import toast from 'react-hot-toast'
@@ -9,7 +9,6 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { useEffect } from 'react'
 
 export const useConnectIBCWallet = (
-  tokenSymbol,
   chainId,
   mutationOptions,
   fromRegistry = false
@@ -17,11 +16,9 @@ export const useConnectIBCWallet = (
   const [_, setWalletState] = useRecoilState(ibcWalletState)
   const queryClient = useQueryClient()
   const mainWallet = useRecoilValue(walletState)
-  
-  // Always call hooks, even with fallback values to avoid breaking the hook order
-  const safeTokenSymbol = tokenSymbol ?? ''
+
   const safeChainId = chainId ?? ''
-  
+
   // Effect to handle main wallet changes
   useEffect(() => {
     if (mainWallet.status === WalletStatusType.connected && mainWallet.address) {
@@ -33,13 +30,13 @@ export const useConnectIBCWallet = (
         client: null,
         assets: undefined
       }));
-      
+
       // Invalidate any queries that depend on the wallet
       try {
         queryClient.invalidateQueries({
-          predicate: (query) => 
-            Array.isArray(query.queryKey) && 
-            query.queryKey[0] === 'wallet' && 
+          predicate: (query) =>
+            Array.isArray(query.queryKey) &&
+            query.queryKey[0] === 'wallet' &&
             query.queryKey[1] === 'grants'
         });
       } catch (error) {
@@ -49,13 +46,13 @@ export const useConnectIBCWallet = (
   }, [mainWallet.address, mainWallet.status, queryClient]);
 
   // Call all hooks unconditionally at the top level
-  const assetInfo = useIBCAssetInfo(safeTokenSymbol)
+  const assetInfo = useIBCAssetInfoByChainID(safeChainId)
   const registryInfo = useChainInfoByChainID(safeChainId)
-  
+
   // Then decide which one to use based on fromRegistry flag
   const finalAssetInfo = fromRegistry ? registryInfo : assetInfo
   const chainRegistryName = finalAssetInfo?.registry_name || 'cosmoshub'
-  
+
   const { getSigningStargateClient, connect, address } = useChain(chainRegistryName)
 
   // Function to add local chain to Keplr
@@ -70,7 +67,7 @@ export const useConnectIBCWallet = (
       } catch (error) {
         console.warn('Failed to fetch chain info from ibc_assets.json:', error);
       }
-      
+
       // Fallback to default values if chain info not found
       if (!chainInfo) {
         console.warn(`Chain info not found for chainId: ${chainId}, using defaults`);
@@ -140,12 +137,6 @@ export const useConnectIBCWallet = (
 
   const mutation = useMutation(async () => {
     console.log('useConnectIBCWallet: Starting wallet connection...');
-    
-    if (!tokenSymbol) {
-      const error = new Error('You must provide `tokenSymbol` before connecting to the wallet.');
-      console.error(error.message);
-      throw error;
-    }
 
     if (!assetInfo) {
       const error = new Error('Asset info for the provided `tokenSymbol` was not found.');
@@ -157,16 +148,16 @@ export const useConnectIBCWallet = (
     console.log('Setting wallet state to connecting...');
     setWalletState((value) => ({
       ...value,
-      tokenSymbol,
+      chainId,
       status: WalletStatusType.connecting,
     }));
 
     try {
       console.log('Initiating wallet connection...');
-      
+
       // First, ensure the correct chain is selected in Keplr
       console.log('Ensuring correct chain is selected in Keplr...');
-      
+
       // Always try to add/suggest the chain to Keplr for local/dev environments
       if (process.env.NODE_ENV === 'development' || !['cosmoshub', 'osmosis', 'juno', 'stargaze', 'osmo', 'stars'].some(
         chain => (assetInfo.registry_name || '').toLowerCase().includes(chain)
@@ -182,7 +173,7 @@ export const useConnectIBCWallet = (
           console.warn('Error adding chain to Keplr:', error);
         }
       }
-      
+
       // Explicitly switch to the correct chain before connecting
       const keplr = (window as any).keplr;
       if (keplr) {
@@ -193,22 +184,22 @@ export const useConnectIBCWallet = (
           console.warn(`Failed to switch to chain ${chainId}:`, error);
         }
       }
-      
+
       // Then try to connect the wallet
       console.log('Initiating wallet connection...');
       await connect();
       console.log('Wallet connect initiated, waiting for address...');
-      
+
       // Wait for the wallet connection to be established
       // We'll try a few times to get the address
       let attempts = 0;
       const maxAttempts = 10;
       let currentAddress = address;
-      
+
       while (!currentAddress && attempts < maxAttempts) {
         console.log(`Waiting for wallet address (attempt ${attempts + 1}/${maxAttempts})...`);
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // Force refresh the address from the wallet
         try {
           const keplr = (window as any).keplr;
@@ -223,17 +214,17 @@ export const useConnectIBCWallet = (
         } catch (error) {
           console.warn('Error getting address from Keplr:', error);
         }
-        
+
         // Fallback to the hook's address if Keplr direct access fails
         if (!currentAddress) {
           currentAddress = address;
         }
-        
+
         attempts++;
       }
-      
+
       console.log(`Final address check: ${currentAddress || 'not available'}`);
-      
+
       // If we still don't have an address, the user might have cancelled the connection
       if (!currentAddress) {
         const error = new Error('Wallet connection was not completed. Please ensure your wallet is properly connected and try again.');
@@ -252,10 +243,10 @@ export const useConnectIBCWallet = (
       }
 
       console.log('Wallet connected successfully:', { address: currentAddress });
-      
+
       // Update the wallet state with the connected wallet info
       setWalletState({
-        tokenSymbol,
+        chainId,
         address: currentAddress,
         client: ibcChainClient,
         status: WalletStatusType.connected,
@@ -264,11 +255,11 @@ export const useConnectIBCWallet = (
       toast.error('Failed to connect IBC wallet')
 
       setWalletState({
-        tokenSymbol: null,
         address: '',
         client: null,
         status: WalletStatusType.error,
         assets: undefined,
+        chainId: undefined
       })
 
       throw error
@@ -314,7 +305,7 @@ export const useConnectIBCWallet = (
         client: null,
         address: '',
         assets: undefined,
-        tokenSymbol: null,
+        chainId: null,
       });
     }
   }

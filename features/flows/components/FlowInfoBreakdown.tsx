@@ -59,7 +59,6 @@ export const FlowInfoBreakdown = ({
 
   const [icaAddress, _] = useGetICA(flowInfo.icaConfig?.connectionId, flowInfo.owner)
   const themeController = useControlTheme()
-  const symbol = ibcInfo ? ibcInfo.symbol : ''
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
   const [showICAHostButtons, setShowICAHostButtons] = useState(false)
@@ -103,7 +102,7 @@ export const FlowInfoBreakdown = ({
 
 
   const handleSendFundsOnHostClick = () => {
-    const { mutate: connectExternalWallet = () => { } } = useConnectIBCWallet(symbol, chainId, false) || {};
+    const { mutate: connectExternalWallet = () => { } } = useConnectIBCWallet(chainId, false) || {};
     if (chainId != '') {
       connectExternalWallet(null)
     }

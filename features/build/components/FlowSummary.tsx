@@ -19,7 +19,6 @@ interface FlowSummaryProps {
     useMsgExec?: boolean
     chainId?: string
     grantee?: string
-    tokenSymbol?: string
 }
 
 export const FlowSummary: React.FC<FlowSummaryProps> = ({
@@ -29,7 +28,6 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     useMsgExec,
     chainId,
     grantee,
-    tokenSymbol
 }) => {
     // Calculate scheduling info (all values are in milliseconds)
     const interval = flowInput.interval || 0
@@ -123,7 +121,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
 
                         {flowInput.label && (
                             <Inline justifyContent="space-between" css={{ paddingLeft: '$4' }}>
-                                <Text variant="body">Label</Text>
+                                <Text variant="body">Label </Text>
                                 <Text variant="body" color="tertiary">{flowInput.label}</Text>
                             </Inline>
                         )}
@@ -135,7 +133,6 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                             flowInput={flowInput}
                             chainId={chainId}
                             grantee={grantee}
-                            tokenSymbol={tokenSymbol}
                         />
                     )}
 

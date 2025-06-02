@@ -53,7 +53,6 @@ export const IcaCard = ({
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
-    chainSymbol,
     chainId,
     {
       onError(error) {

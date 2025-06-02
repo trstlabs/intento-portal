@@ -21,21 +21,18 @@ interface AuthzGrantCheckProps {
   flowInput: FlowInput
   chainId: string
   grantee: string
-  tokenSymbol?: string
 }
 
 export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   flowInput,
   chainId,
-  grantee,
-  tokenSymbol = 'ATOM' // Default to ATOM if not provided
+  grantee
 }) => {
   // Get wallet state and connection
   const [ibcState, _setIbcState] = useRecoilState(ibcWalletState)
 
   // Setup wallet connection
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
-    tokenSymbol,
     chainId,
     {
       onSuccess: () => {

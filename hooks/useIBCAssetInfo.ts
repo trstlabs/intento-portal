@@ -14,6 +14,13 @@ export const useIBCAssetInfo = (assetSymbol: string) => {
   )
 }
 
+export const useIBCAssetInfoByChainID = (id: string) => {
+  const [assetList] = useIBCAssetList()
+  return useMemo(
+    () => getIBCAssetInfo('chain_id', id, assetList),
+    [assetList, id]
+  )
+}
 
 export const useIBCAssetInfoFromConnection = (ibcConnectionID: string) => {
   const [assetList] = useIBCAssetList()
