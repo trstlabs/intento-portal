@@ -4,17 +4,17 @@ import { useRecoilValue } from 'recoil'
 import { convertMicroDenomToDenom } from 'util/conversion'
 
 import { WalletStatusType, ibcWalletState } from '../state/atoms/walletAtoms'
-import { useIBCAssetInfo } from './useIBCAssetInfo'
+import { useIBCAssetInfoByChainID } from './useIBCAssetInfo'
 
 
 export const useIBCTokenBalance = () => {
-  const { status, tokenSymbol: symbol, address } = useRecoilValue(ibcWalletState)
-  const ibcAsset = useIBCAssetInfo(symbol)
+  const { status, address, chainId } = useRecoilValue(ibcWalletState)
+  const ibcAsset = useIBCAssetInfoByChainID(chainId)
 
   const { data: balance = 0, isLoading } = useQuery(
-    `ibcTokenBalance/${symbol}/${address}`,
+    `ibcTokenBalance/${chainId}/${address}`,
     async () => {
-      if (!symbol || !address) {
+      if (!address) {
         // Return default value if symbol or address is not available
         return 0
       }
@@ -27,7 +27,7 @@ export const useIBCTokenBalance = () => {
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(status === WalletStatusType.connected && address && symbol && ibcAsset && ibcAsset.denom && ibcAsset.rpc), // Ensures query is only enabled when all conditions are met
+      enabled: Boolean(status === WalletStatusType.connected && address && chainId && ibcAsset && ibcAsset.denom && ibcAsset.rpc), // Ensures query is only enabled when all conditions are met
       refetchOnMount: 'always', // Refetch when the component mounts
       refetchInterval: 30000,    // Refetch every 30 seconds
       staleTime: 30000,          // Cache expires after 30 seconds
