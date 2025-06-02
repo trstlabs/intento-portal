@@ -1,5 +1,6 @@
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { useRecoilValue } from 'recoil'
+import { useEffect, useRef } from 'react'
 
 import {
   ibcWalletState,
@@ -203,12 +204,14 @@ export const useAuthZMsgGrantInfoForUser = (
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(chainId)
+  const prevAddressRef = useRef(ibcState.address)
+  const queryClient = useQueryClient()
   
-  // Include wallet address in the query key to force refetch when wallet changes
-  const queryKey = `userAuthZGrants/${grantee}/${ibcState.address}`
+  // Base query key without the status to invalidate all related queries
+  const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}`
   
   const { data, isLoading, refetch } = useQuery(
-    queryKey,
+    [baseQueryKey, ibcState.status], // Include status in the query key array
     async () => {
       if (!ibcState.address || !grantee || !flowInput?.connectionId) {
         return []
@@ -277,8 +280,27 @@ export const useAuthZMsgGrantInfoForUser = (
       refetchInterval: 10000, // Reduce refetch interval to 10 seconds
       staleTime: 5000, // Reduce stale time to 5 seconds
       cacheTime: 60000, // Cache for 1 minute
+      // Force refetch when wallet address changes
+      refetchOnReconnect: true,
+      notifyOnChangeProps: ['data', 'error']
     }
   )
+
+  // Invalidate and refetch when wallet address changes
+  useEffect(() => {
+    if (ibcState.address && ibcState.address !== prevAddressRef.current) {
+      prevAddressRef.current = ibcState.address
+      // Invalidate all queries for this grantee/address combination
+      queryClient.invalidateQueries(baseQueryKey, { refetchActive: true, refetchInactive: true })
+    }
+  }, [ibcState.address, queryClient, baseQueryKey])
+
+  // Also refetch when the wallet status changes to connected
+  useEffect(() => {
+    if (ibcState.status === WalletStatusType.connected) {
+      refetch()
+    }
+  }, [ibcState.status, refetch])
 
   return { grants: data || [], isLoading, refetch }
 }

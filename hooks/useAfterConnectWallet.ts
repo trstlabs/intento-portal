@@ -52,32 +52,10 @@ export const useAfterConnectWallet = (
         connect()
         mutation.mutate(null)
       }
-    }, // eslint-disable-next-line
+    }, 
     [status]
   )
 
-  // useEffect(
-  //   function listenToWalletAddressChangeInKeplr() {
-  //     function reconnectWallet() {
-  //       disconnect()
-
-  //       console.log(username, address, status)
-
-  //       connect()
-  //       mutation.mutate(null)
-  //       console.log(username, address, status)
-  //       console.log("REFTC", address)
-  //       refetchQueries()
-  //     }
-
-  //     window.addEventListener('keplr_keystorechange', reconnectWallet)
-  //     return () => {
-  //       window.removeEventListener('keplr_keystorechange', reconnectWallet)
-  //     }
-  //   },
-  //   // eslint-disable-next-line
-  //   [status]
-  // )
 
   return mutation
 }

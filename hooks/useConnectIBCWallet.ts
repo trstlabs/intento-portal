@@ -1,11 +1,12 @@
-import { useMutation } from 'react-query'
-import { useRecoilState } from 'recoil'
-import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { useMutation, useQueryClient } from 'react-query'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { ibcWalletState, walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 import { useChain } from '@cosmos-kit/react'
 import { useChainInfoByChainID } from './useChainList'
 import toast from 'react-hot-toast'
 import { ChainInfo } from '@keplr-wallet/types'
+import { useEffect } from 'react'
 
 export const useConnectIBCWallet = (
   tokenSymbol,
@@ -14,11 +15,38 @@ export const useConnectIBCWallet = (
   fromRegistry = false
 ) => {
   const [_, setWalletState] = useRecoilState(ibcWalletState)
-  // const hasConnected = useRef(false) // Prevent multiple connects
-
+  const queryClient = useQueryClient()
+  const mainWallet = useRecoilValue(walletState)
+  
   // Always call hooks, even with fallback values to avoid breaking the hook order
   const safeTokenSymbol = tokenSymbol ?? ''
   const safeChainId = chainId ?? ''
+  
+  // Effect to handle main wallet changes
+  useEffect(() => {
+    if (mainWallet.status === WalletStatusType.connected && mainWallet.address) {
+      // When main wallet changes, reset IBC wallet if it was connected
+      setWalletState(prev => ({
+        ...prev,
+        status: WalletStatusType.idle, // Reset to idle state when main wallet changes
+        address: '',
+        client: null,
+        assets: undefined
+      }));
+      
+      // Invalidate any queries that depend on the wallet
+      try {
+        queryClient.invalidateQueries({
+          predicate: (query) => 
+            Array.isArray(query.queryKey) && 
+            query.queryKey[0] === 'wallet' && 
+            query.queryKey[1] === 'grants'
+        });
+      } catch (error) {
+        console.error('Error invalidating wallet queries:', error);
+      }
+    }
+  }, [mainWallet.address, mainWallet.status, queryClient]);
 
   // Call all hooks unconditionally at the top level
   const assetInfo = useIBCAssetInfo(safeTokenSymbol)
@@ -276,5 +304,18 @@ export const useConnectIBCWallet = (
   //   }
   // }, [status, assetInfo, connect, address])
 
-  return mutation
+  // Return the mutation with proper typing and additional methods
+  return {
+    ...mutation,
+    mutate: mutation.mutate,
+    reset: () => {
+      setWalletState({
+        status: WalletStatusType.idle,
+        client: null,
+        address: '',
+        assets: undefined,
+        tokenSymbol: null,
+      });
+    }
+  }
 }

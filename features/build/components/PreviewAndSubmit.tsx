@@ -203,11 +203,10 @@ export const PreviewAndSubmit = ({
     chainSymbol,
     chainId,
     {
-      onError(error) {
-        console.log(error)
+      onError: (error: Error) => {
+        console.error('Failed to connect wallet:', error)
       },
-    },
-    !chainIsConnected
+    }
   )
 
 
