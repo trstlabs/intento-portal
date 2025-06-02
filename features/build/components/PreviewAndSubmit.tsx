@@ -72,6 +72,7 @@ export const PreviewAndSubmit = ({
 
   const [useMsgExec, _setUseMsgExec] = useState(false)
   const [calculatedFee, setCalculatedFee] = useState('0')
+  const [feeSymbol, setFeeSymbol] = useState('INTO')
 
 
   // Theme controller
@@ -84,9 +85,9 @@ export const PreviewAndSubmit = ({
   const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
 
   // Handler for fee calculation updates from SchedulingSection
-  const handleFeeCalculated = (fee: string) => {
+  const handleFeeCalculated = (fee: string, symbol: string) => {
     setCalculatedFee(fee)
-
+    setFeeSymbol(symbol)
   }
 
   const [prefix, setPrefix] = useState('into')
@@ -616,12 +617,12 @@ export const PreviewAndSubmit = ({
             </Inline>
             <FlowSummary
               flowInput={flowInput}
-              displaySymbol={chainSymbol}
+              displaySymbol={feeSymbol}
               expectedFee={calculatedFee}
               useMsgExec={useMsgExec}
               chainId={chainId}
               grantee={hostedICA || icaAddress}
-              tokenSymbol={chainSymbol}
+              tokenSymbol={feeSymbol}
             />
           </Column>
 
