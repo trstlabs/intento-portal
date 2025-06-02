@@ -94,7 +94,7 @@ const cleanMessageObject = (obj: any, seen = new WeakSet()): any => {
         // If the value is an object with a value property, unwrap it
         if (value && typeof value === 'object' && 'value' in value && 
             Object.keys(value).length === 1) {
-            result[key] = cleanMessageObject(value.value, seen);
+            result[key] = cleanMessageObject((value as { value: any }).value, seen);
         } else {
             const cleanedValue = cleanMessageObject(value, seen);
             if (cleanedValue !== undefined) {
