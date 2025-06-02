@@ -63,22 +63,33 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
     const properties = schemaDefinition?.properties || schema?.properties || {};
 
     // Safely parse JSON and handle potential errors
-    let parsedValue: { value?: any } = {};
-    try {
-        parsedValue = jsonValue ? JSON.parse(jsonValue) : {};
-    } catch (e) {
-        console.error('Failed to parse JSON value:', e);
-    }
-    const initialValues = parsedValue.value || {};
-    const [values, setValues] = useState(initialValues);
+    const parseJsonValue = (value: string) => {
+        try {
+            const parsed = value ? JSON.parse(value) : {};
+            return parsed.value || {};
+        } catch (e) {
+            console.error('Failed to parse JSON value:', e);
+            return {};
+        }
+    };
+
+    const [values, setValues] = useState(() => parseJsonValue(jsonValue));
     const [newFieldKeys, setNewFieldKeys] = useState({}); // State object for new field keys
     const [errors, setErrors] = useState({}); // State for validation errors
+    const [prevJsonValue, setPrevJsonValue] = useState(jsonValue);
+
+    // Reset form values when jsonValue changes (e.g., when switching between editor and advanced mode)
+    useEffect(() => {
+        if (jsonValue !== prevJsonValue) {
+            setValues(parseJsonValue(jsonValue));
+            setPrevJsonValue(jsonValue);
+            setErrors({});
+        }
+    }, [jsonValue, prevJsonValue]);
 
     const validationSchema = yup.object().shape(createValidationSchema(properties));
 
-    useEffect(() => {
-        setValues(JSON.parse(jsonValue).value || {});
-    }, [jsonValue]);
+    // Remove the old useEffect that was causing duplicate updates
 
     // Validation function
     const validateValues = async (values) => {
@@ -127,11 +138,8 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             current[lastKey] = value;
 
             const updatedJSON = { ...JSON.parse(jsonValue), value: newValues };
-
-            setTimeout(() => {
-                validateValues(newValues);
-                onChange?.(JSON.stringify(updatedJSON, null, 2));
-            }, 0);
+            validateValues(newValues);
+            onChange?.(JSON.stringify(updatedJSON, null, 2));
 
             return newValues;
         });
