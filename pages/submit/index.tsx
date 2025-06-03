@@ -196,7 +196,7 @@ export default function Submit() {
           // Ensure all required fields are present with default values
           const flowInputData: FlowInputType = {
             msgs: parsedData?.msgs || [],
-            duration: parsedData?.duration || 0,
+            duration: parsedData?.duration || undefined,
             label: parsedData?.label || '',
             interval: parsedData?.interval || undefined,
             startTime: parsedData?.startTime || undefined,

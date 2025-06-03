@@ -35,8 +35,8 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
 
   // State for scheduling parameters (all in milliseconds for flowInput)
   const [startTime, setStartTime] = useState(flowInput.startTime || 0)
-  const [duration, setDuration] = useState(flowInput.duration || 30 * 24 * 60 * 60 * 1000) // 30 days in ms
-  const [interval, setInterval] = useState(flowInput.interval || 24 * 60 * 60 * 1000) // 1 day in ms
+  const [duration, setDuration] = useState(flowInput.duration ||  24 * 60 * 60 * 1000) // 
+  const [interval, setInterval] = useState(flowInput.interval ||  60 * 60 * 1000) // 
   const [txLabel, _setLabel] = useState(flowInput.label || '')
   // Use the chainSymbol directly instead of storing it in state to ensure it updates when the prop changes
   const feeFundsSymbol = chainSymbol || 'INTO'
@@ -55,13 +55,13 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
 
   // Display states
   const [displayInterval, setDisplayInterval] = useState(
-    flowInput.interval ? formatTimeDisplay(flowInput.interval) : '1 day'
+    flowInput.interval ? formatTimeDisplay(flowInput.interval) : '1 hour'
   )
   const [editInterval, setEditInterval] = useState(false)
   const [editIntervalValue, setEditIntervalValue] = useState('1 day')
-
+  
   const [displayDuration, setDisplayDuration] = useState(
-    flowInput.duration ? formatTimeDisplay(flowInput.duration) : '30 days'
+    flowInput.duration ? formatTimeDisplay(flowInput.duration) : '24 hours'
   )
   const [editDuration, setEditDuration] = useState(false)
   const [editDurationValue, setEditDurationValue] = useState('30 days')
@@ -473,14 +473,14 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                   <Inline align="center">
                     <Text css={{ fontSize: '20px', marginRight: '8px' }}>⏰</Text>
                     <Tooltip label="How long this flow should run for">
-                      <Text css={{ fontWeight: '500' }} variant="body">Duration (Optional)</Text>
+                      <Text css={{ fontWeight: '500' }} variant="body">Duration</Text>
                     </Tooltip>
                   </Inline>
 
                   {!editDuration ? (
                     <Inline css={{ gap: 8 }}>
                       <Inline css={{ gap: 8 }}>
-                        {timeLabels.slice(7, 12).map((label) => {
+                        {timeLabels.slice(5, 12).map((label) => {
                           const isSelected = displayDuration === label;
                           return isSelected ? (
                             <ChipSelected
