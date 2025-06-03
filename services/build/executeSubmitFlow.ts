@@ -137,16 +137,16 @@ export function transformAndEncodeMsgs({
 }: TransformAndEncodeMsgsParams): Any[] {
   // Helper function to recursively process message values and replace placeholders
   const processValue = (value: any): any => {
-    if (value === 'GET_SENDER') {
+    if (value === 'Your Intento Address') {
       if (!ownerAddress) {
-        throw new Error('GET_SENDER placeholder found but no owner address provided');
+        throw new Error('Your Intento Address placeholder found but no owner address provided');
       }
       return ownerAddress;
     }
     
-    if (value === 'GET_IBC_SENDER') {
+    if (value == 'Your Address') {
       if (!ibcWalletAddress) {
-        throw new Error('GET_IBC_SENDER placeholder found but no IBC wallet connected');
+        throw new Error('Your Address placeholder found but no IBC wallet connected');
       }
       return ibcWalletAddress;
     }
@@ -168,7 +168,7 @@ export function transformAndEncodeMsgs({
   for (let msgJSON of flowInputMsgs) {
     let parsedMsg = JSON.parse(msgJSON);
     
-    // Process the message value to replace any GET_SENDER placeholders
+    // Process the message value to replace any Your Intento Address placeholders
     let value = processValue(parsedMsg['value']);
     let typeUrl: string = parsedMsg['typeUrl'].toString();
 
