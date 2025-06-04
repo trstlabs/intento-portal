@@ -39,7 +39,7 @@ export const executeCreateAuthzGrant = async ({
       grantee: grantee,
       grant: {
         authorization: {
-          typeUrl: typeUrl,
+          typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
           value: GenericAuthorization.encode(
             GenericAuthorization.fromPartial({
               msg: typeUrl,
