@@ -44,5 +44,22 @@
     "counterparty_connection_id": "connection-4071",
     "prefix": "osmo",
     "rpc": "https://rpc.osmotest5.osmosis.zone"
+  },
+  {
+    "id": "Elys Testnet",
+    "name": "Elys Testnet",
+    "registry_name": "elystestnet",
+    "symbol": "ELYS",
+    "chain_id": "elysicstestnet-1",
+    "denom": "uelys",
+    "decimals": 6,
+    "channel": "channel-13",
+    "channel_to_intento": "channel-97",
+    "denom_local": "ibc/17409F270CB2FE874D5E3F339E958752DEC39319E5A44AD0399D2D1284AD499C",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png",
+    "connection_id": "connection-3",
+    "counterparty_connection_id": "connection-13",
+    "prefix": "elys",
+    "rpc": "https://rpc.testnet.elys.network"
   }
 ]
