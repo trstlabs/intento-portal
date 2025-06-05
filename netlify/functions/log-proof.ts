@@ -16,7 +16,7 @@ async function storeProof(address: string, proof: Proof) {
   const res = await fetch(url, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${CF_API_TOKEN}`,
+      Authorization: `Bearer ${CF_API_TOKEN}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(proof),
@@ -37,10 +37,18 @@ const handler: Handler = async (event) => {
     event.headers['x-api-key'] || event.headers['X-Api-Key']
   const expectedSecret = process.env.TRIGGERPORTAL_SECRET
 
-  if (!incomingSecret || incomingSecret !== expectedSecret) {
-    return {
-      statusCode: 403,
-      body: 'Forbidden',
+  const isBackendRequest = incomingSecret && incomingSecret === expectedSecret
+
+  if (!isBackendRequest) {
+    const origin = event.headers.origin || ''
+    const allowedOrigins = ['https://triggerportal.zone', 'https://portal.intento.zone', ]
+
+    if (!allowedOrigins.includes(origin)) {
+      console.warn('Blocked frontend attempt from', origin)
+      return {
+        statusCode: 403,
+        body: 'Forbidden',
+      }
     }
   }
 
@@ -55,12 +63,10 @@ const handler: Handler = async (event) => {
       }
     }
 
-    // Add current timestamp if missing
     if (!body.timestamp) {
       body.timestamp = Date.now()
     }
 
-    // Store proof in Cloudflare KV
     await storeProof(body.address, body)
 
     return {
