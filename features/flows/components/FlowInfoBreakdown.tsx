@@ -208,22 +208,31 @@ export const FlowInfoBreakdown = ({
   }
 
   function setUpdateFlowInfo(field: string, value: any) {
-    let updatedFlowInfo = { ...flowInfo };
-
-    if (field === 'interval') {
-      updatedFlowInfo.interval.seconds = BigInt(value);
-    } else {
-      updatedFlowInfo[field] = value;
-    }
-    let params: MsgUpdateFlowParams = {
-      id: Number(updatedFlowInfo.id),
-      owner: updatedFlowInfo.owner,
-      startAt: field === 'startAt' ? Number(updatedFlowInfo.startTime.getUTCSeconds()) : Number(0),
-      endTime: Number(updatedFlowInfo.endTime.getTime()),
-      interval: Number(updatedFlowInfo.interval.seconds)
+    // Only update the specific field that changed
+    const params: MsgUpdateFlowParams = {
+      id: Number(flowInfo.id),
+      owner: flowInfo.owner,
     };
 
+    // Only include the fields that are being updated
+    if (field === 'interval') {
+      params.interval = Number(value);
+      // Convert interval to seconds if needed
+      if (value < 1000000000) { // Assuming if it's less than 31 years in seconds, it's in seconds
+        params.interval = Number(value);
+      }
+    } else if (field === 'endTime') {
+      params.endTime = value.getTime();
+    } else if (field === 'startAt') {
+      params.startAt = value.getTime();
+    } else {
+      // For any other field, just set it directly
+      params[field] = value;
+    }
+
+    console.log('Updating flow with params:', params);
     setUpdatedFlowParams(params);
+    setRequestedUpdateFlow(true);
   }
 
 
@@ -746,7 +755,7 @@ export const FlowInfoBreakdown = ({
                     <input style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
                       type="datetime-local"
                       value={updatedFlowParams.startAt ? new Date(updatedFlowParams.startAt).toISOString().slice(0, -8) : ''}
-                      onChange={(e) => setUpdateFlowInfo('startTime', new Date(e.target.value))}
+                      onChange={(e) => setUpdateFlowInfo('startAt', new Date(e.target.value))}
                     />
                     <Text>Interval</Text>
                     <select

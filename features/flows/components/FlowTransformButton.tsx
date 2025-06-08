@@ -63,7 +63,7 @@ export const FlowTransformButton = ({ flowInfo }) => {
 
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
 };
-const cleanMessageObject = (obj: any, seen = new WeakSet()): any => {
+const cleanMessageObject = (obj: any, seen = new WeakSet(), isMsgField = false): any => {
     // Handle primitives and null
     if (obj === null || typeof obj !== 'object') {
         return obj;
@@ -77,26 +77,32 @@ const cleanMessageObject = (obj: any, seen = new WeakSet()): any => {
 
     // Handle arrays
     if (Array.isArray(obj)) {
-        return obj.map(item => cleanMessageObject(item, seen));
+        return obj.map(item => cleanMessageObject(item, seen, isMsgField));
     }
 
     // For objects with typeUrl and value, keep them as is
     if (obj.typeUrl && 'value' in obj) {
         return {
             typeUrl: obj.typeUrl,
-            value: cleanMessageObject(obj.value, seen)
+            value: cleanMessageObject(obj.value, seen, isMsgField)
         };
     }
 
     // For other objects, clean each property
     const result: Record<string, any> = {};
     for (const [key, value] of Object.entries(obj)) {
+        // Preserve the original casing of the 'msg' field in MsgExecuteContract
+        if (key === 'msg' && !isMsgField) {
+            result[key] = value; // Keep the original value without transformation
+            continue;
+        }
+        
         // If the value is an object with a value property, unwrap it
         if (value && typeof value === 'object' && 'value' in value && 
             Object.keys(value).length === 1) {
-            result[key] = cleanMessageObject((value as { value: any }).value, seen);
+            result[key] = cleanMessageObject((value as { value: any }).value, seen, key === 'msg');
         } else {
-            const cleanedValue = cleanMessageObject(value, seen);
+            const cleanedValue = cleanMessageObject(value, seen, key === 'msg');
             if (cleanedValue !== undefined) {
                 result[key] = cleanedValue;
             }

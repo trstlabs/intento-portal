@@ -1,7 +1,6 @@
 import { media, styled, useControlTheme, useMedia } from 'junoblocks'
 import { MAIN_PANE_MAX_WIDTH } from 'util/constants'
 
-import { ExtensionSidebar } from './ExtensionSidebar'
 import { FooterBar } from './FooterBar'
 import { NavigationSidebar } from './NavigationSidebar'
 
@@ -14,12 +13,10 @@ import { particleState } from '../../state/atoms/particlesAtoms'
 
 export const AppLayout = ({
   navigationSidebar = <NavigationSidebar />,
-  extensionSidebar = <ExtensionSidebar />,
   footerBar = <FooterBar />,
   children,
 }) => {
   const isSmallScreen = useMedia('sm')
-  const isMediumScreen = useMedia('md')
   const themeController = useControlTheme()
 
   const [isConfetti, popConfetti] = useRecoilState(particleState)
@@ -48,15 +45,9 @@ export const AppLayout = ({
     console.log(container);
   };
 
- /// const particlesRef = useRef<Container | null>(null)
+
   const isDarkMode = themeController.theme.name === 'dark'
 
-  // useEffect(() => {
-  //   if (particlesRef.current) {
-  //     // Update particles configuration if needed
-  //     particlesRef.current.refresh()
-  //   }
-  // }, [isDarkMode, isConfetti])
 
   if (isSmallScreen) {
     return (
@@ -83,7 +74,7 @@ export const AppLayout = ({
             <StyledChildrenLight>{children}</StyledChildrenLight>
           )}
         </StyledContainer>
-        {!isMediumScreen && extensionSidebar}
+       
       </StyledWrapper>
       {init &&
         <Particles
@@ -99,7 +90,7 @@ export const AppLayout = ({
 const StyledWrapper = styled('div', {
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
+
   minHeight: '100vh',
   backgroundColor: '$backgroundColors$base',
   [media.md]: {
@@ -125,7 +116,7 @@ const StyledContainer = styled('div', {
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'space-between',
+
   padding: '0 $24 $24 $24',
   '& main': {
     margin: '0 auto',

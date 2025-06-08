@@ -1,36 +1,64 @@
 import { AppLayout, PageHeader } from 'components'
-
 import {
   ButtonWithDropdownForSorting,
   SortDirections,
-
   SortParameters,
   useSortFlows,
 } from '../features/flows'
 import {
+  Button,
   Column,
   ConnectIcon,
+  IconWrapper,
   Inline,
   media,
   Spinner,
   styled,
   Text,
-  /*   Tooltip, */
 } from 'junoblocks'
-import React, { useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
 import { FlowCard } from '../features/flows/components/FlowCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 export default function Home() {
-  const { /* isWalletConnected, connect, */ address } = useChain('intentotestnet')
+  const { address } = useChain('intentotestnet')
   const flowsPerPage = 20;
-  const [allFlows, isLoading] = useFlowInfos(Number(flowsPerPage), undefined)
+  const [paginationKey, setPaginationKey] = useState<Uint8Array | undefined>(undefined)
+  const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
+  const [allFlows, isLoading] = useFlowInfos(Number(flowsPerPage), paginationKey)
   const [flows, isMyFlowsLoading] = useFlowInfosByOwner(Number(flowsPerPage), undefined)
-  const { sortDirection, sortParameter, setSortDirection, setSortParameter } =
-    useSortControllers()
+  const { sortDirection, sortParameter, setSortDirection, setSortParameter } = useSortControllers()
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Handle pagination
+  const handleNextPage = useCallback(() => {
+    if (allFlows?.pagination?.nextKey) {
+      setPaginationHistory(prev => [...prev, paginationKey])
+      setPaginationKey(allFlows.pagination.nextKey)
+    }
+  }, [allFlows?.pagination?.nextKey, paginationKey])
+
+  const handlePrevPage = useCallback(() => {
+    if (paginationHistory.length > 0) {
+      const newHistory = [...paginationHistory]
+      const prevKey = newHistory.pop()
+      setPaginationHistory(newHistory)
+      setPaginationKey(prevKey)
+    }
+  }, [paginationHistory])
+
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true)
+    // Clear pagination to go back to first page
+    setPaginationKey(undefined)
+    setPaginationHistory([])
+    // Small delay to show loading state
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }, [])
 
   const infoArgs = { infos: flows?.flowInfos || [], address }
   const [myFlows, isSorting] = useSortFlows({
@@ -44,11 +72,11 @@ export default function Home() {
     ),
   })
 
-  const shouldShowAutoCompound =
-    !myFlows?.length ||
-    myFlows.find((tx) => tx.label === 'Autocompound') == undefined
-  const shouldShowFetchingState = isLoading && !allFlows?.flowInfos.length && isMyFlowsLoading && !myFlows?.length
+  const shouldShowAutoCompound = !myFlows?.length || myFlows.find((tx) => tx.label === 'Autocompound') == undefined
+  const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flowInfos.length && isMyFlowsLoading && !myFlows?.length
   const shouldRenderMyFlows = Boolean(myFlows?.length)
+  const hasNextPage = Boolean(allFlows?.pagination?.nextKey)
+  const hasPrevPage = paginationHistory.length > 0
 
   const pageHeaderContents = (
     <PageHeader
@@ -146,22 +174,93 @@ export default function Home() {
           </Column>
         )
       }
-      <StyledDivForFlowsGrid>
-        {allFlows?.flowInfos.map((flowInfo, index) => (
-          <FlowCard
-            key={index}
-            //structuredClone does not work on ios
-            flowInfo={structuredClone(flowInfo)}
-          />
-        ))}
-      </StyledDivForFlowsGrid>
+      <Column gap={4}>
+
+
+        <StyledDivForFlowsGrid>
+          {isLoading || isRefreshing ? (
+            // Show placeholders while loading
+            Array(16).fill(0).map((_, index) => (
+              <FlowCard
+                key={`placeholder-${index}`}
+                flowInfo={null}
+                isMyFlow={false}
+              />
+            ))
+          ) : allFlows?.flowInfos?.length > 0 ? (
+            // Show actual flows when loaded
+            allFlows.flowInfos.map((flowInfo) => (
+              <FlowCard
+                key={`${flowInfo.id}`}
+                flowInfo={flowInfo}
+                isMyFlow={flowInfo.owner === address}
+              />
+            ))
+          ) : (
+            // Show message when no flows found (only after loading is complete)
+            <Column css={{ gridColumn: '1 / -1', textAlign: 'center', padding: '$12 $6' }}>
+              <Text variant="secondary">No flows found</Text>
+            </Column>
+          )}
+        </StyledDivForFlowsGrid>
+
+        {(hasPrevPage || hasNextPage) && (
+          <Inline >
+
+            <Button
+              variant="ghost"
+              size="large"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              iconLeft={
+                isRefreshing && (
+                  <IconWrapper icon={<Spinner instant />} />
+                )
+              }
+            >
+              Refresh
+            </Button>
+            <Button
+              variant="ghost"
+              size="large"
+              onClick={handlePrevPage}
+              disabled={!hasPrevPage || isRefreshing}
+              iconLeft={
+                isRefreshing ? (
+                  <IconWrapper icon={<Spinner instant />} />
+                ) : (
+                  <IconWrapper icon={<ArrowLeft />} />
+                )
+              }
+            >
+              Previous
+            </Button>
+            <Button
+              variant="ghost"
+              size="large"
+              onClick={handleNextPage}
+              disabled={!hasNextPage || isRefreshing}
+              iconRight={
+                isRefreshing ? (
+                  <IconWrapper icon={<Spinner instant />} />
+                ) : (
+                  <IconWrapper icon={<ArrowRight />} />
+                )
+              }
+            >
+              Next
+            </Button>
+
+          </Inline>
+        )}
+      </Column>
 
       {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout >
   )
 }
 
-const useSortControllers = () => {
+export const useSortControllers = () => {
   const storeKeyForParameter = '@flows/sort/parameter'
   const storeKeyForDirection = '@flows/sort/direction'
 
@@ -194,17 +293,24 @@ const useSortControllers = () => {
 const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: '1fr 1fr',
-  columnGap: '$3',
-  rowGap: '$8',
-
-  '@media (max-width: 1360px)': {
-    gridTemplateColumns: '1fr',
-    columnGap: '$10',
-    rowGap: '$12',
-  },
-
+  columnGap: '$6',
+  rowGap: '$12',
+  padding: '0 0 $12 0',
   [media.sm]: {
-    gridTemplateColumns: '1fr',
-    rowGap: '$8',
+    gridTemplateColumns: '1fr 1fr',
+  },
+  [media.md]: {
+    gridTemplateColumns: '1fr 1fr 1fr',
+  },
+  [media.lg]: {
+    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+  },
+  '& .spin': {
+    animation: 'spin 1s linear infinite',
+    '@keyframes spin': {
+      '0%': { transform: 'rotate(0deg)' },
+      '100%': { transform: 'rotate(360deg)' },
+    },
   },
 })
+

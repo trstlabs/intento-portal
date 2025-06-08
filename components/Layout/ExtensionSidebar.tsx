@@ -1,18 +1,18 @@
 import { Button, ErrorIcon, styled, Text, UpRightArrowIcon } from 'junoblocks'
 
 import { __TEST_MODE__ } from '../../util/constants'
-import ImageRotator from './ImageRotator'
+import ImageRotator from '../ImageRotator'
 
 export const ExtensionSidebar = () => {
   return (
     <StyledDivForWrapper>
       <StyledDivForTitleWrapper>
         <ErrorIcon color="primary" size="large" />
-        <Text>This is a {__TEST_MODE__ ? 'localnet' : 'testnet'} version</Text>
+        <Text>This is a {__TEST_MODE__ ? 'Mainnet' : 'testnet'} version</Text>
       </StyledDivForTitleWrapper>
       <Text css={{ padding: '$9 0 $11' }}>
         {process.env.NEXT_PUBLIC_SITE_TITLE} is currently{' '}
-        {__TEST_MODE__ ? 'operating in localnet mode' : 'in beta'}.
+        {__TEST_MODE__ ? 'operating in Mainnet mode' : 'in beta'}.
       </Text>
       <Button
         as="a"

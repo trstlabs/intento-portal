@@ -27,7 +27,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { ReactNode, useEffect, useState, useMemo } from 'react'
 import { useChain } from '@cosmos-kit/react'
-import { __TEST_MODE__, APP_NAME } from 'util/constants'
+import { __TEST_MODE__ } from 'util/constants'
 
 import { SwapIcon } from '../../icons/Swap'
 // import { TransferIcon } from '../../icons/Transfer'
@@ -48,14 +48,14 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
-  
+
   // Determine which logo to use based on the base URL
   const logoSrc = useMemo(() => {
     // Check if we're running in the browser
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname
       if (hostname === 'portal.intento.zone') {
-        return '/img/flowportal.png'
+        return '/img/intentoportal.png'
       }
     }
     return '/img/triggerportal-text-logo-blue.png'
@@ -73,7 +73,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
 
   // Watch for address changes and trigger the mutation
-  const { mutate: afterConnectWallet = () => {} } = useAfterConnectWallet() || {};
+  const { mutate: afterConnectWallet = () => { } } = useAfterConnectWallet() || {};
   // Watch for address changes and trigger the mutation
   useEffect(() => {
     if (address) {
@@ -304,8 +304,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Column gap={6}>
           <Inline
             align="center"
-            justifyContent="space-between"
-            css={{ padding: '0 $12' }}
+            justifyContent="center"
           >
             <Link href="/" passHref>
               <StyledDivForLogo as="a">
@@ -317,7 +316,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
               </StyledDivForLogo>
             </Link>{' '}
             <Text variant="caption" color="primary" css={{ textAlign: 'end' }}>
-              {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
+              {__TEST_MODE__ ? 'Mainnet' : 'Testnet'}
             </Text>
             {triggerMenuButton}
           </Inline>
@@ -351,7 +350,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           color="primary"
           css={{ textAlign: 'center', paddingBottom: '$5' }}
         >
-          {__TEST_MODE__ ? 'Localnet' : 'Testnet'}
+          {__TEST_MODE__ ? 'Mainnet' : 'Testnet'}
         </Text>
         {walletButton}
 
@@ -359,9 +358,10 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       </StyledMenuContainer>
 
       <Column>
-        <Text variant="legend" css={{ padding: '$4 $3' }}>
-          {APP_NAME} v{process.env.NEXT_PUBLIC_APP_VERSION}
-        </Text>
+
+        <StyledDivForLogo>
+          <StyledPNG src="/img/poweredbyintento.png" alt="Powered by Intento" />
+        </StyledDivForLogo>
         <Inline css={{ display: 'grid' }}>
           <Button
             iconLeft={<MoonIcon />}
