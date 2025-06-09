@@ -63,12 +63,13 @@ export const FlowTransformButton = ({ flowInfo }) => {
 
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
 };
+
 const cleanMessageObject = (obj: any, seen = new WeakSet(), isMsgField = false): any => {
     // Handle primitives and null
     if (obj === null || typeof obj !== 'object') {
         return obj;
     }
-    
+
     // Handle circular references
     if (seen.has(obj)) {
         return undefined;
@@ -88,23 +89,33 @@ const cleanMessageObject = (obj: any, seen = new WeakSet(), isMsgField = false):
         };
     }
 
-    // For other objects, clean each property
-    const result: Record<string, any> = {};
+    // Special handling for the msg field
+    if (isMsgField && obj.value && typeof obj.value === 'object') {
+        // Unwrap the value property and process its contents
+        return cleanMessageObject(obj.value, seen, false);
+    }
+
+    // Process regular objects
+    const result: any = {};
     for (const [key, value] of Object.entries(obj)) {
-        // Preserve the original casing of the 'msg' field in MsgExecuteContract
-        if (key === 'msg' && !isMsgField) {
-            result[key] = value; // Keep the original value without transformation
+        // Skip null/undefined values
+        if (value === null || value === undefined) {
             continue;
         }
-        
+
+        // Convert streamId to stream_id
+        const newKey = toSnakeCase(key);
+
         // If the value is an object with a value property, unwrap it
-        if (value && typeof value === 'object' && 'value' in value && 
-            Object.keys(value).length === 1) {
-            result[key] = cleanMessageObject((value as { value: any }).value, seen, key === 'msg');
+        if (value && typeof value === 'object' && 'value' in value) {
+            const cleaned = cleanMessageObject(value.value, seen, newKey === 'msg');
+            if (cleaned !== undefined) {
+                result[newKey] = cleaned;
+            }
         } else {
-            const cleanedValue = cleanMessageObject(value, seen, key === 'msg');
+            const cleanedValue = cleanMessageObject(value, seen, newKey === 'msg');
             if (cleanedValue !== undefined) {
-                result[key] = cleanedValue;
+                result[newKey] = cleanedValue;
             }
         }
     }
@@ -124,12 +135,12 @@ export async function transformFlowMsgs(info) {
 
                     // First normalize amount fields
                     msgObj = normalizeAmountField(msgObj);
-                    
+
                     // Clean and transform the message object
                     msgObj = cleanMessageObject(msgObj);
-                    
+
                     // Handle MsgExecuteContract with base64 encoded msg
-                    if (msgObj.typeUrl?.includes("MsgExecuteContract") && 
+                    if (msgObj.typeUrl?.includes("MsgExecuteContract") &&
                         msgObj.msg && typeof msgObj.msg === 'string') {
                         try {
                             const decodedMsg = JSON.parse(
@@ -140,7 +151,7 @@ export async function transformFlowMsgs(info) {
                             console.warn("Failed to decode MsgExecuteContract msg:", e);
                         }
                     }
-                    
+
                     // Handle nested msgs array (common in MsgExec)
                     if (Array.isArray(msgObj.msgs)) {
                         msgObj.msgs = msgObj.msgs.map((nestedMsg: any) => {
@@ -204,3 +215,9 @@ const normalizeAmountField = (obj: any): any => {
         Object.entries(obj).map(([key, value]) => [key, normalizeAmountField(value)])
     );
 };
+
+// Helper function to convert camelCase to snake_case
+const toSnakeCase = (str: string): string => {
+    return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+};
+
