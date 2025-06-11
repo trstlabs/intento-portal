@@ -99,7 +99,7 @@ export const PreviewAndSubmit = ({
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
 
-  
+
   // Initialize connectionId if not set
   useEffect(() => {
     if (!flowInput.connectionId && chainId) {
@@ -645,15 +645,7 @@ export const PreviewAndSubmit = ({
             </Text>
 
             <form
-              css={{
-                display: 'flex',
-                flexDirection: 'column',
-                width: '100%',
-                gap: '$4',
-                '@media (min-width: 480px)': {
-                  gap: '$6',
-                },
-              }}
+
               onSubmit={(e) => {
                 e.preventDefault();
                 // Form submission is handled by the Schedule button
@@ -729,29 +721,9 @@ export const PreviewAndSubmit = ({
 
               handleSubmitFlow();
             }}
-            css={{
-              width: '100%',
-              marginTop: '$8',
-              padding: '$4 0',
-              borderTop: '1px solid $colors$dark10',
-            }}
+
           >
-            <div css={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '$6',
-              width: '100%',
-              maxWidth: '800px',
-              margin: '0 auto',
-              padding: '0 $4',
-              '@media (min-width: 768px)': {
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: '0 $8',
-              },
-            }}>
+            <div>
               <StyledPNG src="./img/poweredbyintento.png" css={{
                 maxWidth: '180px',
                 '@media (min-width: 480px)': {
@@ -777,7 +749,7 @@ export const PreviewAndSubmit = ({
               </Button>
             </div>
           </form>
-  
+
         </div>
       </div>
     </StyledDivForContainer>
@@ -790,7 +762,7 @@ const StyledDivForContainer = styled('div', {
   width: '100%',
   maxWidth: '1200px',
   margin: '0 auto',
-  
+
   '@media (max-width: 768px)': {
     padding: '$2',
   },
