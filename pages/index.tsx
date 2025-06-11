@@ -176,35 +176,7 @@ export default function Home() {
       }
       <Column gap={4}>
 
-
-        <StyledDivForFlowsGrid>
-          {isLoading || isRefreshing ? (
-            // Show placeholders while loading
-            Array(16).fill(0).map((_, index) => (
-              <FlowCard
-                key={`placeholder-${index}`}
-                flowInfo={null}
-                isMyFlow={false}
-              />
-            ))
-          ) : allFlows?.flowInfos?.length > 0 ? (
-            // Show actual flows when loaded
-            allFlows.flowInfos.map((flowInfo) => (
-              <FlowCard
-                key={`${flowInfo.id}`}
-                flowInfo={flowInfo}
-                isMyFlow={flowInfo.owner === address}
-              />
-            ))
-          ) : (
-            // Show message when no flows found (only after loading is complete)
-            <Column css={{ gridColumn: '1 / -1', textAlign: 'center', padding: '$12 $6' }}>
-              <Text variant="secondary">No flows found</Text>
-            </Column>
-          )}
-        </StyledDivForFlowsGrid>
-
-        {(hasPrevPage || hasNextPage) && (
+      {(hasPrevPage || hasNextPage) && (
           <Inline >
 
             <Button
@@ -253,6 +225,34 @@ export default function Home() {
 
           </Inline>
         )}
+
+        <StyledDivForFlowsGrid>
+          {isLoading || isRefreshing ? (
+            // Show placeholders while loading
+            Array(16).fill(0).map((_, index) => (
+              <FlowCard
+                key={`placeholder-${index}`}
+                flowInfo={null}
+                isMyFlow={false}
+              />
+            ))
+          ) : allFlows?.flowInfos?.length > 0 ? (
+            // Show actual flows when loaded
+            allFlows.flowInfos.map((flowInfo) => (
+              <FlowCard
+                key={`${flowInfo.id}`}
+                flowInfo={flowInfo}
+                isMyFlow={flowInfo.owner === address}
+              />
+            ))
+          ) : (
+            // Show message when no flows found (only after loading is complete)
+            <Column css={{ gridColumn: '1 / -1', textAlign: 'center', padding: '$12 $6' }}>
+              <Text variant="secondary">No flows found</Text>
+            </Column>
+          )}
+        </StyledDivForFlowsGrid>
+
       </Column>
 
       {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
@@ -292,12 +292,12 @@ export const useSortControllers = () => {
 
 const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
+  gridTemplateColumns: '1fr',
   columnGap: '$6',
   rowGap: '$12',
   padding: '0 0 $12 0',
   [media.sm]: {
-    gridTemplateColumns: '1fr 1fr',
+    gridTemplateColumns: '1fr',
   },
   [media.md]: {
     gridTemplateColumns: '1fr 1fr 1fr',

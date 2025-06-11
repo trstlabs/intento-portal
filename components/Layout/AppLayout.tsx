@@ -20,11 +20,17 @@ export const AppLayout = ({
   const themeController = useControlTheme()
 
   const [isConfetti, popConfetti] = useRecoilState(particleState)
-  if (isConfetti) {
-    setTimeout(() => popConfetti(false), 4000)
-  }
-
   const [init, setInit] = useState(false);
+
+  useEffect(() => {
+    if (isConfetti) {
+      const timer = setTimeout(() => {
+        popConfetti(false);
+      }, 4000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isConfetti, popConfetti]);
 
   // this should be run only once per application lifetime
   useEffect(() => {
@@ -63,6 +69,170 @@ export const AppLayout = ({
     )
   }
 
+  // Define the particles configuration inline
+  const particlesConfig = {
+    fpsLimit: 120,
+    particles: {
+      number: {
+        value: 100,
+        density: {
+          enable: true,
+          value_area: 800
+        }
+      },
+      color: {
+        value: isDarkMode ? "#ADD8E6" : "#000000"
+      },
+      shape: {
+        type: "circle"
+      },
+      opacity: {
+        value: 0.5,
+        random: true,
+        animation: {
+          enable: true,
+          speed: 1,
+          minimumValue: 0.1,
+          sync: false
+        }
+      },
+      size: {
+        value: 3,
+        random: true
+      },
+      move: {
+        enable: true,
+        speed: 2,
+        direction: "none" as const,
+        random: true,
+        straight: false,
+        outModes: {
+          default: "out" as const
+        }
+      }
+    },
+    interactivity: {
+      detectsOn: "canvas" as const,
+      events: {
+        onHover: {
+          enable: true,
+          mode: "grab"
+        },
+        resize: {
+          enable: true
+        }
+      },
+      modes: {
+        grab: {
+          distance: 140,
+          links: {
+            opacity: 0.5
+          }
+        }
+      }
+    },
+    detectRetina: true
+  };
+
+  // Confetti configuration
+  const confettiConfig = {
+    emitters: {
+      position: {
+        x: 50,
+        y: 50
+      },
+      rate: {
+        quantity: 10,
+        delay: 0.1
+      }
+    },
+    particles: {
+      color: {
+        value: ["#1E00FF", "#FF0061", "#E1FF00", "#00FF9E"]
+      },
+      move: {
+        decay: 0.05,
+        direction: "top" as const,
+        enable: true,
+        gravity: {
+          enable: true
+        },
+        outModes: {
+          top: "none" as const,
+          default: "destroy" as const
+        },
+        speed: { min: 25, max: 50 }
+      },
+      number: {
+        value: 0
+      },
+      opacity: {
+        value: 1
+      },
+      rotate: {
+        value: {
+          min: 0,
+          max: 360
+        },
+        direction: "random",
+        animation: {
+          enable: true,
+          speed: 30
+        }
+      },
+      tilt: {
+        direction: "random",
+        enable: true,
+        value: { min: 0, max: 360 },
+        animation: {
+          enable: true,
+          speed: 30
+        }
+      },
+      shape: {
+        type: ["circle", "square"]
+      },
+      size: {
+        value: 8
+      },
+      roll: {
+        darken: {
+          enable: true,
+          value: 25
+        },
+        enlighten: {
+          enable: true,
+          value: 25
+        },
+        enable: true,
+        speed: {
+          min: 5,
+          max: 15
+        }
+      },
+      wobble: {
+        distance: 30,
+        enable: true,
+        speed: {
+          min: -7,
+          max: 7
+        }
+      }
+    },
+    responsive: [
+      {
+        maxWidth: 600,
+        options: {
+          particles: {
+            move: {
+              speed: 15
+            }
+          }
+        }
+      }
+    ]
+  };
+
   return (
     <>
       <StyledWrapper>
@@ -74,15 +244,14 @@ export const AppLayout = ({
             <StyledChildrenLight>{children}</StyledChildrenLight>
           )}
         </StyledContainer>
-       
       </StyledWrapper>
-      {init &&
+      {init && (
         <Particles
           id="tsparticles"
           particlesLoaded={particlesLoaded}
-          url={isDarkMode ? (isConfetti ? '/confetti.json' : '/stars_bg.json') : (isConfetti ? '/confetti.json' : '')}
+          options={isConfetti ? confettiConfig : (isDarkMode ? particlesConfig : {})}
         />
-      }
+      )}
     </>
   )
 }

@@ -1,4 +1,4 @@
-## TriggerPortal interface
+## Intento Portal interface
 
 Interface to build transactions and workflows on-chain. 
 Using Trustless Triggers and Trustless Contracts through the TrustlessJS library. 

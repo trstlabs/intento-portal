@@ -32,15 +32,21 @@ export default function Submit() {
   // Set theme based on URL parameter or default to dark
   useEffect(() => {
     const urlTheme = router.query.theme as string | undefined
-    if (urlTheme === 'light') {
-      themeController.setLightTheme(true)
-      setTheme('light')
-    } else {
-      // Default to dark theme if no theme specified or if 'dark' is explicitly set
-      themeController.setDarkTheme(true)
-      setTheme('dark')
+    const isLightTheme = urlTheme === 'light'
+    
+    // Only update if there's a change
+    if ((isLightTheme && theme !== 'light') || (!isLightTheme && theme !== 'dark')) {
+      if (isLightTheme) {
+        themeController.setLightTheme(true)
+        setTheme('light')
+      } else {
+        themeController.setDarkTheme(true)
+        setTheme('dark')
+      }
     }
-  }, [router.query.theme])
+    // Remove themeController from dependencies to prevent infinite loops
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.theme, theme])
 
   // Check if on mobile
   const isMobile = useMedia('sm')

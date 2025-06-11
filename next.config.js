@@ -42,9 +42,14 @@ const config = {
   },
 }
 
-module.exports = withBundleAnalyzer(
-  process.env.BUNDLE_INTOBLOCKS === 'true'
-    ? withBundleJunoblocks(config)
-    : config
-    
-)
+// Enable Webpack 5's filesystem cache in development
+const withBundleConfig = process.env.BUNDLE_INTOBLOCKS === 'true'
+  ? withBundleJunoblocks(config)
+  : config;
+
+// Only add bundle analyzer in development or when explicitly enabled
+const nextConfig = process.env.ANALYZE === 'true' 
+  ? withBundleAnalyzer(withBundleConfig)
+  : withBundleConfig;
+
+module.exports = nextConfig;

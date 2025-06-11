@@ -22,7 +22,7 @@ export const executeClaimClaimable = async ({
       address,
       [claimMsg],
       'auto',
-      'claim from TriggerPortal'
+      'claim from Intento Portal'
     )
   )
 }

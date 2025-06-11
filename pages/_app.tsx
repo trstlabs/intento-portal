@@ -10,7 +10,15 @@ import { Toaster } from 'react-hot-toast'
 import { QueryClientProvider } from 'react-query'
 import { RecoilRoot } from 'recoil'
 import { queryClient } from 'services/queryClient'
-import ibcAssetList from './../public/ibc_assets.json'
+// Try-catch for JSON import to catch any parsing errors
+let ibcAssetList = [];
+try {
+  const assetList = require('public/ibc_assets.json');
+  console.log('Successfully loaded ibc_assets.json:', assetList);
+  ibcAssetList = assetList;
+} catch (error) {
+  console.error('Failed to load ibc_assets.json:', error);
+}
 
 import { NextJsAppRoot } from '../components/NextJsAppRoot'
 import { __TEST_MODE__ } from '../util/constants'
@@ -29,9 +37,11 @@ import {
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
 // import { GasPrice } from '@cosmjs/stargate';
-import { css, media, useMedia } from 'junoblocks'
+import { css, media } from 'junoblocks'
 import { SignerOptions } from '@cosmos-kit/core'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react';
+
+import Head from 'next/head';
 
 const toasterClassName = css({
   [media.sm]: {
@@ -39,16 +49,22 @@ const toasterClassName = css({
     padding: 0,
     bottom: '$6 !important',
   },
-}).toString()
+}).toString();
 
 const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets, ...metamaskWallets]
-
 var chainList = chains
-function TrstApp({ Component, pageProps }: AppProps) {
-  const [dataPushed, setDataPushed] = useState(false)
+function IntentoPortalApp({ Component, pageProps }: AppProps) {
+  const [dataPushed, setDataPushed] = useState(false);
+
+
+
+
+  console.log('App mounting, dataPushed:', dataPushed, 'ibcAssetList:', ibcAssetList, 'length:', ibcAssetList?.length);
 
   useEffect(() => {
-    if (!dataPushed) {
+    console.log('Effect running. dataPushed:', dataPushed, 'ibcAssetList exists:', !!ibcAssetList, 'length:', ibcAssetList?.length);
+    if (!dataPushed && ibcAssetList && ibcAssetList.length > 0) {
+      console.log('Adding chains and assets...');
       // Push your data to assets and chains arrays here
       assets.push({
         chain_name: 'intentotestnet',
@@ -124,9 +140,7 @@ function TrstApp({ Component, pageProps }: AppProps) {
       setDataPushed(true)
     }
   }, [dataPushed])
-  // console.log(assets.find((i) => i.chain_name == 'cosmoshub'))
 
-  const isSmallScreen = useMedia('sm')
   const signerOptions: SignerOptions = {
     signingStargate: (chain: any) => {
       if (chain.chain_name == 'intentotestnet') {
@@ -142,69 +156,82 @@ function TrstApp({ Component, pageProps }: AppProps) {
   }
 
   return (
-    <RecoilRoot>
-      <QueryClientProvider client={queryClient}>
-        <NextJsAppRoot>
-          <ErrorBoundary>
-            {dataPushed && (
-              <ChainProvider
-                throwErrors="connect_only"
-                // logLevel="DEBUG"
-                chains={[...chainList]}
-                assetLists={[...assets]}
-                wallets={wallets}
-                signerOptions={signerOptions}
-                walletConnectOptions={{
-                  signClient: {
-                    projectId: 'fa03e8566efb5455b17a0e1f888f0e14',
-                  },
-                }}
-                //isLazy = true, no validation because these are not part of the chain registry
-                endpointOptions={{
-                  endpoints: {
-                    intentozone: {
-                      isLazy: true,
-                    },
-                    cosmostest: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
-                      rest: [process.env.NEXT_PUBLIC_ATOM_API],
-                    },
-                    osmosis: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
-                      rest: [process.env.NEXT_PUBLIC_OSMO_API],
-                    },
-                    host: {
-                      isLazy: true,
-                      rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
-                      rest: [process.env.NEXT_PUBLIC_COSM_API],
-                    },
-                  },
-                }}
-                // No walletModal needed for @cosmos-kit/react
-              >
-                <Component {...pageProps} />
-              </ChainProvider>
-            )}
-            {__TEST_MODE__ && <TestnetDialog />}
-            <Toaster
-              position={isSmallScreen ? 'bottom-center' : 'top-right'}
-              toastOptions={{
-                className: '',
-                duration: 20000,
+    <>
+      <Head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+      </Head>
+      <RecoilRoot>
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={<div>Loading...</div>}>
+            {dataPushed && <ChainProvider
+              throwErrors="connect_only"
+              // logLevel="DEBUG"
+              chains={[...chainList]}
+              assetLists={[...assets]}
+              wallets={wallets}
+              signerOptions={signerOptions}
+              walletConnectOptions={{
+                signClient: {
+                  projectId: 'fa03e8566efb5455b17a0e1f888f0e14',
+                },
               }}
-              containerClassName={toasterClassName}
-              containerStyle={isSmallScreen ? { inset: 0 } : undefined}
-            />
-          </ErrorBoundary>
-        </NextJsAppRoot>
-      </QueryClientProvider>
-    </RecoilRoot>
-  )
+              //isLazy = true, no validation because these are not part of the chain registry
+              endpointOptions={{
+                endpoints: {
+                  intentozone: {
+                    isLazy: true,
+                  },
+                  cosmostest: {
+                    isLazy: true,
+                    rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
+                    rest: [process.env.NEXT_PUBLIC_ATOM_API],
+                  },
+                  osmosis: {
+                    isLazy: true,
+                    rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
+                    rest: [process.env.NEXT_PUBLIC_OSMO_API],
+                  },
+                  host: {
+                    isLazy: true,
+                    rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
+                    rest: [process.env.NEXT_PUBLIC_COSM_API],
+                  },
+                },
+              }}
+            >
+              <NextJsAppRoot>
+                <ErrorBoundary>
+                  <Component {...pageProps} />
+                  <Toaster
+                    position="bottom-center"
+                    toastOptions={{
+                      className: toasterClassName,
+                      style: {
+                        borderRadius: '8px',
+                        background: '#2C2C2E',
+                        color: '#fff',
+                        padding: '16px',
+                        fontSize: '14px',
+                        maxWidth: '500px',
+                        width: '100%',
+                      },
+                    }}
+                  />
+                  {__TEST_MODE__ && <TestnetDialog />}
+                </ErrorBoundary>
+              </NextJsAppRoot>
+            </ChainProvider>}
+          </Suspense>
+        </QueryClientProvider>
+      </RecoilRoot>
+    </>
+  );
 }
 
-export default TrstApp
+export default IntentoPortalApp;
 
 //workaround for typescript to know symbol at compile time
 function getEnvVarForSymbol(asset: any): {
