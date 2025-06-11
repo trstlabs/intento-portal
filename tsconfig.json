@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
+    "skipLibCheck": true, // Skip type checking of declaration files to resolve third-party library issues
     "preserveConstEnums": true,
     "removeComments": false,
     "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
-    "skipLibCheck": false, // Set to false to ensure type checking for all declaration files
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": false,
@@ -23,14 +23,14 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "jsx": "preserve",
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./node_modules/@types", "./types"],
     "types": ["node", "jest"], // Explicitly specify the types to include
     "paths": {
       "": ["./*"],
       "react": ["./node_modules/@types/react"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/**/*"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/**/*", "types/**/*"],
   "exclude": [
     "node_modules",
     "util/scripts/intento",

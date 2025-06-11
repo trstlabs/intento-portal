@@ -210,19 +210,26 @@ export function lazyLoadImages(): (() => void) | void {
   // Initial check
   lazyLoad();
   
+  // Check if window is defined (browser environment)
+  if (typeof window === 'undefined') {
+    return;
+  }
+
   // Add event listeners with passive for better performance
   const scrollOptions: AddEventListenerOptions = { passive: true };
   const resizeOptions: AddEventListenerOptions = { passive: true };
   const orientationOptions: AddEventListenerOptions = { passive: true };
   
-  window.addEventListener('scroll', lazyLoad, scrollOptions);
-  window.addEventListener('resize', lazyLoad, resizeOptions);
-  window.addEventListener('orientationchange', lazyLoad, orientationOptions);
+  const win = window as Window & typeof globalThis;
+  
+  win.addEventListener('scroll', lazyLoad, scrollOptions);
+  win.addEventListener('resize', lazyLoad, resizeOptions);
+  win.addEventListener('orientationchange', lazyLoad, orientationOptions);
   
   // Return cleanup function
   return () => {
-    window.removeEventListener('scroll', lazyLoad, scrollOptions);
-    window.removeEventListener('resize', lazyLoad, resizeOptions);
-    window.removeEventListener('orientationchange', lazyLoad, orientationOptions);
+    win.removeEventListener('scroll', lazyLoad, scrollOptions);
+    win.removeEventListener('resize', lazyLoad, resizeOptions);
+    win.removeEventListener('orientationchange', lazyLoad, orientationOptions);
   };
 }

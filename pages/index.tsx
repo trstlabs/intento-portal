@@ -292,19 +292,28 @@ export const useSortControllers = () => {
 
 const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
-  gridTemplateColumns: '1fr',
-  columnGap: '$6',
-  rowGap: '$12',
-  padding: '0 0 $12 0',
+  gridTemplateColumns: '1fr 1fr',
+  columnGap: '$3',
+  rowGap: '$8',
+
+  '@media (max-width: 1360px)': {
+    gridTemplateColumns: '1fr',
+    columnGap: '$10',
+    rowGap: '$12',
+  },
+
   [media.sm]: {
     gridTemplateColumns: '1fr',
+    rowGap: '$8',
   },
   [media.md]: {
-    gridTemplateColumns: '1fr 1fr 1fr',
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: '$8',
   },
   [media.lg]: {
-    gridTemplateColumns: '1fr 1fr 1fr 1fr',
+    gridTemplateColumns: 'repeat(4, 1fr)',
   },
+
   '& .spin': {
     animation: 'spin 1s linear infinite',
     '@keyframes spin': {

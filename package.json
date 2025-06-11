@@ -49,7 +49,7 @@
     "focus-visible": "^5.2.0",
     "formik": "^2.4.6",
     "gsap": "^3.7.1",
-    "intentojs": "0.9.4",
+    "intentojs": "0.9.4-r2",
     "jsonschema": "^1.4.1",
     "junoblocks": "0.2.93",
     "lucide-react": "^0.511.0",
@@ -64,6 +64,7 @@
     "react-use": "^17.4.0",
     "recoil": "^0.7.4",
     "sass": "^1.45.0",
+    "sharp": "^0.34.2",
     "web-vitals": "^5.0.2",
     "yup": "^1.4.0"
   },
@@ -107,6 +108,6 @@
     "next-on-netlify": "^3.0.1",
     "postcss": "^8.3.5",
     "prettier": "^2.3.2",
-    "typescript": "4.8.3"
+    "typescript": "^5.0.0"
   }
 }
