@@ -92,42 +92,42 @@ export const FlowHistory = ({
     <>
       {flowHistory && flowHistory.length > 0 && (
 
-          <Row>
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
-              <Inline>
+        <Row>
+          <Column gap={8} align="flex-start" justifyContent="flex-start">
+            <Inline>
 
-                <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
-                  Execution History
-                </Text>
-              </Inline>
-              {flowHistory
-                ?.slice(0).filter((entry, index, self) => self.findIndex(e => e.scheduledExecTime === entry.scheduledExecTime) === index)
-                .map(
-                  (
-                    {
-                      execFee,
-                      actualExecTime,
-                      msgResponses,
-                      executed,
-                      errors,
-                      timedOut,
-                      queryResponses
+              <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+                Execution History
+              </Text>
+            </Inline>
+            {flowHistory
+              ?.slice(0).filter((entry, index, self) => self.findIndex(e => e.scheduledExecTime === entry.scheduledExecTime) === index)
+              .map(
+                (
+                  {
+                    execFee,
+                    actualExecTime,
+                    msgResponses,
+                    executed,
+                    errors,
+                    timedOut,
+                    queryResponses
 
-                    },
-                    index
-                  ) => (
-                    <div key={index}>
-                      <Column
-                        gap={2}
-                        align="flex-start"
-                        justifyContent="flex-start"
-                      >
-                        <Column>
-                          <Text variant="body">
-                            At {getRelativeTime(actualExecTime.getTime())}{' '}
-                          </Text>
-                        </Column>
-                        {/*  {actualExecTime.getSeconds() -
+                  },
+                  index
+                ) => (
+                  <div key={index}>
+                    <Column
+                      gap={2}
+                      align="flex-start"
+                      justifyContent="flex-start"
+                    >
+                      <Column>
+                        <Text variant="body">
+                          At {getRelativeTime(actualExecTime.getTime())}{' '}
+                        </Text>
+                      </Column>
+                      {/*  {actualExecTime.getSeconds() -
                             scheduledExecTime.getSeconds() >=
                             5 && (
                             <Column>
@@ -139,80 +139,86 @@ export const FlowHistory = ({
                               </Text>
                             </Column>
                           )} */}
-                        <Column>
-                          <Text variant="legend">
-                            Exec Fee:{' '}
-                            {convertMicroDenomToDenom(execFee.amount, 6)} INTO
-                          </Text>
-                        </Column>
+                      <Column>
+                        <Text variant="legend">
+                          Exec Fee:{' '}
+                          {convertMicroDenomToDenom(execFee.amount, 6)} INTO
+                        </Text>
+                      </Column>
 
-                        <Column>
+                      <Column>
 
-                          {queryResponses.map((queryResponse) => (
-                            <Column>
-                              <Text variant="legend">
-                                Query Response:  {queryResponse}
-                              </Text>
-                            </Column>
-                          ))}
-                        </Column>
-
-                        {errors.map((err, _) => (
+                        {queryResponses.map((queryResponse) => (
                           <Column>
                             <Text variant="legend">
-                              🔴 {err}
+                              Query Response:  {queryResponse}
                             </Text>
                           </Column>
                         ))}
-
-                        <Column>
-                          <Text variant="legend">
-                            Executed: {executed && <>🟢</>}{' '}
-                            {!executed &&
-                              (Date.now() - actualExecTime.valueOf() >
-                                60000 && !timedOut ? (
-                                  <>🔴</>
-                                ) || errors[0] : (timedOut ?
-                                  <>⏱️</> : <>⌛</>
-                              ))}
-                          </Text>
-
-                          {timedOut && (
-                            <Text variant="legend">
-                              Timed out relaying IBC packets for this execution
-                            </Text>
-                          )}
-                        </Column>
-                        {msgResponses.map((msg: any, i) => (
-                          <div key={i}>
-                            <Card css={{ padding: '$6', marginTop: '$4' }}>
-                              <Column gap={8} align="flex-start" justifyContent="flex-start">
-                                <Text variant="legend" color="secondary" align="left">
-                                  Message Response
-                                </Text>
-                                <Text variant="caption" >{msg.typeUrl} ✓ </Text>
-
-                                {msg.value.length != 0 &&
-                                  <>
-                                    <Text variant="legend" color="secondary" align="left">
-                                      Message Response Value
-                                    </Text>
-                                    <Text variant="caption"> {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), null, 2)}</Text>
-                                  </>
-                                }
-                              </Column>
-                            </Card>
-
-                          </div>))}
                       </Column>
 
+                      {errors.map((err, _) => (
+                        <Column>
+                          <Text variant="legend">
+                            🔴 {err}
+                          </Text>
+                        </Column>
+                      ))}
 
-                    </div>
-                  )
-                )}
-              {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
-            </Column>
-          </Row>
+                      <Column>
+                        <Text variant="legend">
+                          Executed: {executed && <>🟢</>}{' '}
+                          {!executed &&
+                            (Date.now() - actualExecTime.valueOf() >
+                              60000 && !timedOut ? (
+                                <>🔴</>
+                              ) || errors[0] : (timedOut ?
+                                <>⏱️</> : <>⌛</>
+                            ))}
+                        </Text>
+
+                        {timedOut && (
+                          <Text variant="legend">
+                            Timed out relaying IBC packets for this execution
+                          </Text>
+                        )}
+                      </Column>
+                      {msgResponses.map((msg: any, i) => (
+                        <div key={i}>
+                          <Card css={{ padding: '$6', marginTop: '$4' }}>
+                            <Column gap={8} align="flex-start" justifyContent="flex-start">
+                              <Text variant="legend" color="secondary" align="left">
+                                Message Response
+                              </Text>
+                              <Text variant="caption" >{msg.typeUrl} ✓ </Text>
+
+                              {msg.value.length != 0 && (
+                                <>
+                                  <Text variant="legend" color="secondary" align="left">
+                                    Message Response Value
+                                  </Text>
+                                  <Text variant="caption">
+                                    {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), (_key, value) =>
+                                      typeof value === 'bigint'
+                                        ? value.toString()
+                                        : value // return everything else unchanged
+                                      , 2)}
+                                  </Text>
+                                </>
+                              )}
+                            </Column>
+                          </Card>
+
+                        </div>))}
+                    </Column>
+
+
+                  </div>
+                )
+              )}
+            {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
+          </Column>
+        </Row>
 
       )}
 
