@@ -11,7 +11,6 @@ import {
   ConnectIcon,
   IconWrapper,
   Inline,
-  media,
   Spinner,
   styled,
   Text,
@@ -292,26 +291,42 @@ export const useSortControllers = () => {
 
 const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
-  gridTemplateColumns: '1fr 1fr',
-  columnGap: '$3',
-  rowGap: '$8',
-
-  '@media (max-width: 1360px)': {
+  gridTemplateColumns: '1fr',
+  gap: '$8',
+  width: '100%',
+  maxWidth: '100%',
+  padding: '0 $6 $12 $6',
+  boxSizing: 'border-box',
+  
+  // Default mobile styles (applies to all screen sizes unless overridden)
+  '@media (max-width: 639px)': {
     gridTemplateColumns: '1fr',
-    columnGap: '$10',
-    rowGap: '$12',
+    gap: '$8',
   },
-
-  [media.sm]: {
+  
+  // Small screens (mobile) - adjust padding only
+  '@media (min-width: 640px) and (max-width: 767px)': {
+    padding: '0 $8 $12 $8',
     gridTemplateColumns: '1fr',
-    rowGap: '$8',
+    gap: '$8',
   },
-  [media.md]: {
+  
+  // Medium screens (tablets) - 2 columns
+  '@media (min-width: 768px) and (max-width: 1023px)': {
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '$8',
   },
-  [media.lg]: {
+  
+  // Large screens (desktops) - 3 columns
+  '@media (min-width: 1024px) and (max-width: 1279px)': {
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: '$10',
+  },
+  
+  // Extra large screens - 4 columns
+  '@media (min-width: 1280px)': {
     gridTemplateColumns: 'repeat(4, 1fr)',
+    gap: '$12',
   },
 
   '& .spin': {
@@ -322,4 +337,3 @@ const StyledDivForFlowsGrid = styled('div', {
     },
   },
 })
-

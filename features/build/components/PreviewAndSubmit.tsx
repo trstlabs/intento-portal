@@ -628,16 +628,32 @@ export const PreviewAndSubmit = ({
           <Card variant={"secondary"} disabled css={{
             backgroundColor: '$colors$dark5',
             borderRadius: '12px',
-            padding: '$3',
-            margin: '$3',
-            alignSelf: 'flex-start'
+            padding: '$6',
+            margin: '$4 0',
+            width: '100%',
+            maxWidth: '600px',
+            '@media (min-width: 768px)': {
+              margin: '$6 auto',
+              padding: '$8',
+            },
+            '@media (min-width: 1024px)': {
+              maxWidth: '800px',
+            },
           }}>
             <Text align="center" color="secondary" style={{ fontSize: '14px', marginBottom: '16px' }}>
               Subscribe to Alerts
             </Text>
 
             <form
-              style={{ display: 'flex', flexDirection: 'column', width: '100%' }}
+              css={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '100%',
+                gap: '$4',
+                '@media (min-width: 480px)': {
+                  gap: '$6',
+                },
+              }}
               onSubmit={(e) => {
                 e.preventDefault();
                 // Form submission is handled by the Schedule button
@@ -713,27 +729,53 @@ export const PreviewAndSubmit = ({
 
               handleSubmitFlow();
             }}
+            css={{
+              width: '100%',
+              marginTop: '$8',
+              padding: '$4 0',
+              borderTop: '1px solid $colors$dark10',
+            }}
           >
-            <Inline
-              css={{
-                margin: '$8',
-                padding: '$8',
-                justifyContent: 'end',
-              }}
-            >   <StyledPNG src="./img/poweredbyintento.png" />
+            <div css={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '$6',
+              width: '100%',
+              maxWidth: '800px',
+              margin: '0 auto',
+              padding: '0 $4',
+              '@media (min-width: 768px)': {
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0 $8',
+              },
+            }}>
+              <StyledPNG src="./img/poweredbyintento.png" css={{
+                maxWidth: '180px',
+                '@media (min-width: 480px)': {
+                  maxWidth: '200px',
+                },
+              }} />
               <Button
                 type="submit"
-                css={{ margin: '$4', columnGap: '$4' }}
+                css={{
+                  width: '100%',
+                  maxWidth: '300px',
+                  '@media (min-width: 480px)': {
+                    width: 'auto',
+                    padding: '0 $12',
+                  },
+                }}
                 variant="branded"
                 size="large"
                 disabled={shouldDisableBuildButton}
                 iconLeft={<GearIcon />}
               >
-                {isExecutingSchedule ? <Spinner instant /> : 'Create'}
+                {isExecutingSchedule ? <Spinner instant /> : 'Create Flow'}
               </Button>
-           
-            </Inline>
-            
+            </div>
           </form>
   
         </div>
@@ -745,6 +787,13 @@ export const PreviewAndSubmit = ({
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
   padding: '$4',
+  width: '100%',
+  maxWidth: '1200px',
+  margin: '0 auto',
+  
+  '@media (max-width: 768px)': {
+    padding: '$2',
+  },
 })
 
 export function Row({ children }) {
@@ -773,13 +822,14 @@ export const StyledInput = styled('input', {
 
 
 const StyledPNG = styled('img', {
-
-  maxWidth: '200px',
-  maxHeight: '400px',
+  maxWidth: '100%',
+  height: 'auto',
   zIndex: '$1',
-  paddingRight: '$8',
-  marginRight: '$8',
   userSelect: 'none',
   userDrag: 'none',
   display: 'block',
+  margin: '0 auto',
+  '@media (min-width: 480px)': {
+    margin: '0',
+  },
 })

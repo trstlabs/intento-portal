@@ -14,7 +14,7 @@ import { queryClient } from 'services/queryClient'
 let ibcAssetList = [];
 try {
   const assetList = require('public/ibc_assets.json');
-  console.log('Successfully loaded ibc_assets.json:', assetList);
+
   ibcAssetList = assetList;
 } catch (error) {
   console.error('Failed to load ibc_assets.json:', error);
@@ -59,12 +59,9 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
 
 
 
-  console.log('App mounting, dataPushed:', dataPushed, 'ibcAssetList:', ibcAssetList, 'length:', ibcAssetList?.length);
-
+  
   useEffect(() => {
-    console.log('Effect running. dataPushed:', dataPushed, 'ibcAssetList exists:', !!ibcAssetList, 'length:', ibcAssetList?.length);
     if (!dataPushed && ibcAssetList && ibcAssetList.length > 0) {
-      console.log('Adding chains and assets...');
       // Push your data to assets and chains arrays here
       assets.push({
         chain_name: 'intentotestnet',
