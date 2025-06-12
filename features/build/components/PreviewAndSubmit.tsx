@@ -14,7 +14,7 @@ import {
   useMedia,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 
 import {
   useSubmitFlow,
@@ -35,6 +35,8 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 // import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
+import { useIBCAssetInfo } from 'hooks/useIBCAssetInfo'
+import { useChainInfoByChainID } from 'hooks/useChainList'
 import { FlowInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { GearIcon } from '../../../icons'
@@ -73,7 +75,15 @@ export const PreviewAndSubmit = ({
   const [useMsgExec, _setUseMsgExec] = useState(false)
   const [calculatedFee, setCalculatedFee] = useState('0')
   const [feeSymbol, setFeeSymbol] = useState('INTO')
-
+  
+  // Cache for resolved IBC denoms to prevent unnecessary API calls
+  const resolvedDenomsCache = useRef<Record<string, string>>({})
+  
+  // Get IBC asset info for the current chain
+  const chainInfo = useChainInfoByChainID(initialChainId || '')
+  // Get the base denom from chain info or use an empty string
+  const baseDenom = chainInfo?.denom || chainInfo?.denom_local || ''
+  const ibcAssetInfo = useIBCAssetInfo(baseDenom)
 
   // Theme controller
   const themeController = useControlTheme()
@@ -84,10 +94,86 @@ export const PreviewAndSubmit = ({
   const internalIsMobile = useMedia('sm')
   const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
 
+  // Format denom by removing 'u' prefix and capitalizing, and resolve IBC denoms
+  const formatDenom = (denom: string): string => {
+    // For non-IBC denoms, handle the 'u' prefix if it exists
+    if (/^u[a-z]+$/.test(denom)) {
+      return denom.slice(1).toUpperCase()
+    }
+    return denom.toUpperCase()
+  }
+
+  // Memoized function to resolve denom with multiple fallback strategies
+  const resolveDenom = useCallback(async (denom: string): Promise<string> => {
+    const lowerDenom = denom.toLowerCase()
+    
+    // Return cached result if available
+    if (resolvedDenomsCache.current[lowerDenom]) {
+      return resolvedDenomsCache.current[lowerDenom]
+    }
+    
+    // For non-IBC denoms, just format and return
+    if (!lowerDenom.startsWith('ibc/')) {
+      const formatted = formatDenom(denom)
+      resolvedDenomsCache.current[lowerDenom] = formatted
+      return formatted
+    }
+    
+    // Try to use IBC asset info if available
+    if (ibcAssetInfo?.symbol) {
+      const formatted = ibcAssetInfo.symbol.toUpperCase()
+      resolvedDenomsCache.current[lowerDenom] = formatted
+      return formatted
+    }
+    
+    // Then try to use chain info symbol if available
+    if (chainInfo?.symbol) {
+      const formatted = chainInfo.symbol.toUpperCase()
+      resolvedDenomsCache.current[lowerDenom] = formatted
+      return formatted
+    }
+
+    // As a last resort, try the API
+    try {
+      const apiBase = process.env.NEXT_PUBLIC_INTO_API
+      if (!apiBase) {
+        console.warn('NEXT_PUBLIC_INTO_API is not defined')
+        return denom.toUpperCase()
+      }
+
+      const hash = denom.split('/')[1]
+      const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`
+      
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Failed to fetch denom trace')
+      
+      const data = await res.json()
+      const baseDenom = data?.denom_trace?.base_denom || denom
+      
+      // Format and cache the result
+      const formatted = formatDenom(baseDenom)
+      resolvedDenomsCache.current[lowerDenom] = formatted
+      return formatted
+    } catch (err) {
+      console.warn(`Failed to resolve IBC denom ${denom}:`, err)
+      // Cache the original denom to prevent repeated failed requests
+      const fallback = denom.toUpperCase()
+      resolvedDenomsCache.current[lowerDenom] = fallback
+      return fallback
+    }
+  }, [chainInfo, ibcAssetInfo])
+
   // Handler for fee calculation updates from SchedulingSection
-  const handleFeeCalculated = (fee: string, symbol: string) => {
+  const handleFeeCalculated = async (fee: string, symbol: string) => {
     setCalculatedFee(fee)
-    setFeeSymbol(symbol)
+    
+    try {
+      const resolvedSymbol = await resolveDenom(symbol)
+      setFeeSymbol(resolvedSymbol)
+    } catch (error) {
+      console.warn('Error resolving denom, falling back to basic formatting:', error)
+      setFeeSymbol(formatDenom(symbol))
+    }
   }
 
   const [prefix, setPrefix] = useState('into')
