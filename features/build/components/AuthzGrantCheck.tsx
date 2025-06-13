@@ -156,19 +156,22 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
             </Text>
           )}
 
-          <Button
-            variant="secondary"
-            size="small"
-            css={{ marginTop: '$2', alignSelf: 'flex-end' }}
-            disabled={isExecutingAuthzGrant}
-            onClick={() => handleCreateAuthzGrant()}
-          >
-            {isExecutingAuthzGrant ? (
-              <Spinner size={16} />
-            ) : (
-              `Create ${missingGrants.length + expiredGrants.length} Authorization${missingGrants.length + expiredGrants.length > 1 ? 's' : ''}`
-            )}
-          </Button>
+          {/* Hide create authz grant button if fee denom starts with 'ibc' */}
+          {!flowInput.hostedIcaConfig?.feeCoinLimit?.denom?.toLowerCase().startsWith('ibc') && (
+            <Button
+              variant="secondary"
+              size="small"
+              css={{ marginTop: '$2', alignSelf: 'flex-end' }}
+              disabled={isExecutingAuthzGrant}
+              onClick={() => handleCreateAuthzGrant()}
+            >
+              {isExecutingAuthzGrant ? (
+                <Spinner size={16} />
+              ) : (
+                `Create ${missingGrants.length + expiredGrants.length} Authorization${missingGrants.length + expiredGrants.length > 1 ? 's' : ''}`
+              )}
+            </Button>
+          )}
         </Column>
       )}
     </Column>

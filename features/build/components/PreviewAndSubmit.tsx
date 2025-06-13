@@ -14,7 +14,7 @@ import {
   useMedia,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 
 import { useSubmitFlow, useRegisterAccount, useSendFundsOnHost, useSubmitTx } from '../hooks'
 import { useGrantValidation } from '../hooks/useGrantValidation'
@@ -24,14 +24,12 @@ import { ChainSelector } from './ChainSelector/ChainSelector'
 import {
   useGetHostedICAByHostedAddress, useGetHostICAAddress,
   useGetICA,
-  useICATokenBalance,
   useAuthZMsgGrantInfoForUser,
 } from '../../../hooks/useICA'
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
-import { IcaCard } from './IcaCard'
-// import { JsonFormWrapper } from './Editor/JsonFormWrapper'
+
 import { sleep } from '../../../localtrst/utils'
 import { useIBCAssetInfoByChainID } from 'hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from 'hooks/useChainList'
@@ -42,7 +40,7 @@ import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
 import { convertDenomToMicroDenom } from '../../../util/conversion'
-import { HostedAccountCard } from './HostedAccountCard'
+
 import { SchedulingSection } from './SchedulingSection'
 import TinyJsonViewer from './Editor/TinyJsonViewer'
 
@@ -107,8 +105,8 @@ export const PreviewAndSubmit = ({
     // Return cached result if available
     const cached = resolvedDenomsCache.current[lowerDenom];
     if (cached) {
-      return typeof cached === 'string' 
-        ? { symbol: cached, denom } 
+      return typeof cached === 'string'
+        ? { symbol: cached, denom }
         : cached;
     }
 
@@ -167,10 +165,10 @@ export const PreviewAndSubmit = ({
   }, [chainInfo, ibcAssetInfo])
 
   // State to store fee details
-  const [feeDetails, setFeeDetails] = useState<{amount: string; microAmount: string; denom: string}>({ 
+  const [feeDetails, setFeeDetails] = useState<{ amount: string; microAmount: string; denom: string }>({
     amount: '0',
     microAmount: '0',
-    denom: 'uinto' 
+    denom: 'uinto'
   })
 
   // Memoize the fee calculation handler to prevent unnecessary re-renders
@@ -178,17 +176,17 @@ export const PreviewAndSubmit = ({
     try {
       // Resolve the denom to get both symbol and denom
       const { symbol: displaySymbol, denom: resolvedDenom } = await resolveDenom(denom);
-      
+
       // Convert fee to micro units if not provided
       const feeMicroAmount = microAmount || (parseFloat(fee) * 1000000).toString();
-      
+
       // Update fee details with the resolved denom and micro amount
       setFeeDetails(prev => {
         if (prev.amount === fee && prev.microAmount === feeMicroAmount && prev.denom === resolvedDenom) return prev;
-        return { 
-          amount: fee, 
-          microAmount: feeMicroAmount, 
-          denom: resolvedDenom 
+        return {
+          amount: fee,
+          microAmount: feeMicroAmount,
+          denom: resolvedDenom
         };
       });
 
@@ -204,11 +202,11 @@ export const PreviewAndSubmit = ({
         amount: fee,
         microAmount: fallbackMicroAmount,
         denom: denom,
-        ...(prev.amount === fee && prev.microAmount === fallbackMicroAmount && prev.denom === denom 
-          ? {} 
+        ...(prev.amount === fee && prev.microAmount === fallbackMicroAmount && prev.denom === denom
+          ? {}
           : { amount: fee, microAmount: fallbackMicroAmount, denom })
       }));
-      
+
       const formattedSymbol = formatDenom(symbol);
       if (feeSymbol !== formattedSymbol) {
         setFeeSymbol(formattedSymbol);
@@ -219,11 +217,10 @@ export const PreviewAndSubmit = ({
 
   const [prefix, setPrefix] = useState('into')
   const [denom, setDenom] = useState('uinto')
-  const [chainName, setChainName] = useState('')
 
   const [chainSymbol, setChainSymbol] = useState('INTO')
   const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAINID || "")
-  const [chainIsConnected, setChainIsConnected] = useState(false)
+
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
 
 
@@ -262,13 +259,8 @@ export const PreviewAndSubmit = ({
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
   const [requestedRegisterICA, setRequestedRegisterICA] = useState(false)
 
-  const [icaAddress, isIcaLoading] = useGetICA(flowInput.connectionId, '')
+  const [icaAddress, _isIcaLoading] = useGetICA(flowInput.connectionId, '')
 
-  const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
-    chainId,
-    icaAddress,
-    chainIsConnected
-  )
   const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByHostedAddress(flowInput.hostedIcaConfig.hostedAddress || "")
   const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId || "")
 
@@ -353,10 +345,6 @@ export const PreviewAndSubmit = ({
     [isExecutingSchedule, requestedSubmitFlow, handleSubmitFlow]
   )
 
-  const handleSendFundsOnHostClick = () => {
-    connectExternalWallet(null)
-    return setRequestedSendFunds(true)
-  }
 
   const { mutate: handleSubmitTx, isLoading: isExecutingSubmitTx } =
     useSubmitTx({ flowInput })
@@ -382,7 +370,7 @@ export const PreviewAndSubmit = ({
   )
 
 
-  const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
+  const [feeFundsHostChain, _setFeeFundsHostChain] = useState('0.00')
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
 
   const {
@@ -406,14 +394,6 @@ export const PreviewAndSubmit = ({
     [isExecutingSendFundsOnHost, requestedSendFunds, handleSendFundsOnHost]
   )
 
-  const shouldDisableSendHostChainFundsButton = useMemo(
-    () =>
-      !icaAddress ||
-      (flowInput.msgs && flowInput.msgs.length === 0) ||
-      Number(feeFundsHostChain) === 0,
-    [icaAddress, flowInput.msgs, feeFundsHostChain]
-  )
-
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
@@ -424,7 +404,6 @@ export const PreviewAndSubmit = ({
     hostConnectionId: string,
     newPrefix: string,
     newDenom: string,
-    name: string,
     chainSymbol: string
   ) {
     // alert(denom + newDenom)
@@ -447,18 +426,13 @@ export const PreviewAndSubmit = ({
 
     onFlowChange(updatedFlowInput)
     setDenom(newDenom)
-    setChainName(name)
+
     setChainSymbol(chainSymbol)
     setChainId(chainId)
     setPrefix(newPrefix)
-    let chainIsConnected = connectionId != undefined && connectionId != ''
-    setChainIsConnected(chainIsConnected)
+
     setChainHasIAModule(chainId === 'INTO')
 
-
-    if (!chainIsConnected) {
-      return
-    }
     await sleep(200)
     connectExternalWallet(null)
   }
@@ -561,7 +535,6 @@ export const PreviewAndSubmit = ({
                         update.hostConnectionId,
                         update.prefix,
                         update.denom,
-                        update.name,
                         update.symbol
                       )
                     }}
@@ -569,43 +542,6 @@ export const PreviewAndSubmit = ({
                   />
 
                 </Row>
-                {chainName &&
-                  chainIsConnected &&
-                  (isIcaLoading ? (
-                    <Spinner size={18} style={{ margin: 0 }} />
-                  ) : (
-                    <>
-                      {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
-                        hostedAccount={hostedAccount}
-                        hostedICAAddress={hostedICA}
-                        chainId={chainId}
-                        flowInput={flowInput}
-                      />}
-                        {/* <Text variant="caption">
-                      No Self-hosted Interchain Account for selected chain: {chainName}.
-                    </Text> */}</>
-                      ) : (
-                        <IcaCard
-                          icaAddress={icaAddress}
-                          chainSymbol={chainSymbol}
-                          feeFundsHostChain={feeFundsHostChain}
-                          icaBalance={icaBalance}
-                          isIcaBalanceLoading={isIcaBalanceLoading}
-                          shouldDisableSendHostChainFundsButton={
-                            shouldDisableSendHostChainFundsButton
-                          }
-                          hostDenom={denom}
-                          chainId={chainId}
-                          flowInput={flowInput}
-                          isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-                          setFeeFundsHostChain={(fees) =>
-                            setFeeFundsHostChain(fees)
-                          }
-                          handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-                        />
-                      )}
-                    </>
-                  ))}
               </Column>
             </CardContent>
           </Card>

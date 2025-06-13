@@ -190,7 +190,7 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
               <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Stop when execution times out</Text>
             )}
             {configuration.fallbackToOwnerBalance && (
-              <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Use owner balance as fallback for local fees</Text>
+              <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Use owner balance as fallback for Intento fees</Text>
             )}
           </Column>
         </Column>
