@@ -156,7 +156,7 @@ export default function Home() {
             <Inline gap={4} align="flex-start" css={{ alignItems: 'flex-start', width: '100%' }}>
               <Text css={{ color: '$colors$primary' }}>💡</Text>
               <Text variant="caption" css={{ color: '$textColors$secondary', lineHeight: 1.6 }}>
-                Tip: Browse around and hit 'Copy and Create' to quickly set up common flows like staking rewards,
+                Tip: Browse around and hit &apos;Copy and Create&apos; to quickly set up common flows like staking rewards,
                 liquidity provision, or cross-chain swaps with just a few clicks.
               </Text>
             </Inline>
