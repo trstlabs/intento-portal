@@ -54,6 +54,37 @@ export const useSubmitFlowOnHost = ({
   const [_, popConfetti] = useRecoilState(particleState)
   const refetchQueries = useRefetchQueries([`ibcTokenBalance/${ibcAssetInfo?.chain_id}/${address}`])
 
+  // Helper function to process values and replace placeholders
+  const processValue = (value: any): any => {
+    if (value === 'Your Intento Address') {
+      if (!intoWallet?.address) {
+        throw new Error('Your Intento Address placeholder found but no owner address provided');
+      }
+      return intoWallet.address;
+    }
+    
+    if (value === 'Your Address') {
+      if (!address) {
+        throw new Error('Your Address placeholder found but no IBC wallet connected');
+      }
+      return address;
+    }
+    
+    if (Array.isArray(value)) {
+      return value.map(processValue);
+    }
+    
+    if (value !== null && typeof value === 'object') {
+      const result: Record<string, any> = {};
+      for (const [key, val] of Object.entries(value)) {
+        result[key] = processValue(val);
+      }
+      return result;
+    }
+    
+    return value;
+  };
+
   return useMutation(
     'submitFlowOnHost',
     async () => {
@@ -64,7 +95,6 @@ export const useSubmitFlowOnHost = ({
       if (!intoWallet?.address) {
         throw new Error('Please connect your INTO wallet.')
       }
-
 
       if (!client) {
         throw new Error('Wallet client is not available')
@@ -78,10 +108,10 @@ export const useSubmitFlowOnHost = ({
       if (requiredGrants?.length > 0) {
         // Calculate expiration based on flow's start time and duration
         const now = Math.floor(Date.now() / 1000);
-        const flowStartTime = flowInput.startTime || now;
-        const flowDuration = flowInput.duration || 0;
-        // Set expiration to flow end time + 1 day buffer (in seconds)
-        const expirationTime = flowStartTime + flowDuration + 86400;
+        const flowStartTime = flowInput.startTime ? Math.floor(flowInput.startTime / 1000) : now;
+        const flowDuration = flowInput.duration ? Math.ceil(flowInput.duration / 1000) : 0;
+        // Set expiration to flow end time + 1 days buffer (in seconds)
+        const expirationTime = flowStartTime + flowDuration + ( 24 * 60 * 60);
 
         // Determine grantee address - use propGrantee if provided, otherwise fall back to flowInput values
         const granteeAddress = propGrantee ||
@@ -139,17 +169,32 @@ export const useSubmitFlowOnHost = ({
               return {
                 '@type': msg.typeUrl,
                 ...msg.value,
-                msgs: msg.value.msgs.map((nestedMsg: any) => ({
-                  '@type': nestedMsg.typeUrl,
-                  ...nestedMsg.value
-                }))
+                msgs: transformMessages(msg.value.msgs),
               };
             }
             
-            // Handle regular messages
+            // Process the message to replace any placeholders
+            const processedMsg = processValue(msg);
+            
+            // If the message is already in the correct format, return it as is
+            if (processedMsg['@type'] || processedMsg.typeUrl) {
+              // Ensure typeUrl is replaced with @type if needed
+              if (processedMsg.typeUrl && !processedMsg['@type']) {
+                const { typeUrl, value, ...rest } = processedMsg;
+                return {
+                  '@type': typeUrl,
+                  ...value,
+                  ...rest
+                };
+              }
+              return processedMsg;
+            }
+
+            // Otherwise, transform it from the old format
+            const { typeUrl, value } = processedMsg;
             return {
-              '@type': msg.typeUrl,
-              ...(msg.value || {})
+              '@type': typeUrl,
+              ...value
             };
           } catch (e) {
             console.error('Error parsing message:', e);
@@ -162,18 +207,21 @@ export const useSubmitFlowOnHost = ({
         flow: {
           owner: intoWallet.address,
           msgs: transformMessages(flowInput.msgs),
-          duration: flowInput.duration,
-          interval: flowInput.interval,
+          duration: flowInput.duration ? `${Math.ceil(flowInput.duration / 1000)}s` : '0',
+          start_at: flowInput.startTime && flowInput.startTime > 0
+            ? Math.floor((Date.now() + flowInput.startTime) / 1000)
+            : "0",
+          interval: flowInput.interval ? `${Math.ceil(flowInput.interval / 1000)}s` : '0',
           hosted_account: flowInput.hostedIcaConfig?.hostedAddress || "",
           cid: flowInput.connectionId || "",
           stop_on_fail: flowInput.configuration.stopOnFailure.toString(),
           stop_on_timeout: flowInput.configuration.stopOnTimeout.toString(),
           stop_on_success: flowInput.configuration.stopOnSuccess.toString(),
           fallback: flowInput.configuration.fallbackToOwnerBalance.toString(),
-          updating_disabled: flowInput.configuration.updatingDisabled.toString(),
+          update_disabled: flowInput.configuration.updatingDisabled.toString(),
           save_responses: flowInput.configuration.saveResponses.toString(),
           conditions: flowInput.conditions,
-          hosted_fee_limit: flowInput.hostedIcaConfig?.feeCoinLimit,
+          hosted_fee_limit: flowInput.hostedIcaConfig?.feeCoinLimit.amount+"uinto",//flowInput.hostedIcaConfig?.feeCoinLimit.denom,
           label: flowInput.label,
         },
       })
