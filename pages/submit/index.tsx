@@ -49,7 +49,7 @@ export default function Submit() {
   }, [router.query.theme, theme])
 
   // Check if on mobile
-  const isMobile = useMedia('sm')
+  const isMobile = useMedia('sm') || useMedia('md')
 
   // Wallet connection state and functions
   const [{ status }, setWalletState] = useRecoilState(walletState)
@@ -258,8 +258,8 @@ export default function Submit() {
                     <img
                       src={imageUrl}
                       alt="Logo"
-                      width={180}
-                      height={100}
+                      width={240}
+                      height={120}
                       onError={(e) => {
                         console.error('Image failed to load:', imageUrl);
                         e.currentTarget.src = "https://intento.zone/assets/images/intento_tiny.png";

@@ -32,7 +32,7 @@ import { wallets as leapWallets } from '@cosmos-kit/leap'
 
 import { assets, chains } from 'chain-registry'
 import {
-  getIntentoSigningClientOptions, getSigningCosmosClientOptions
+  getIntentoSigningClientOptions
 } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
@@ -59,7 +59,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
 
 
 
-  
+
   useEffect(() => {
     if (!dataPushed && ibcAssetList && ibcAssetList.length > 0) {
       // Push your data to assets and chains arrays here
@@ -139,12 +139,9 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
   }, [dataPushed])
 
   const signerOptions: SignerOptions = {
-    signingStargate: (chain: any) => {
-      if (chain.chain_name == 'intentotestnet') {
-        return getIntentoSigningClientOptions({ defaultTypes })
-      } else {
-        return getSigningCosmosClientOptions()
-      }
+    signingStargate: (_chain: any) => {
+
+      return getIntentoSigningClientOptions({ defaultTypes })
     },
     preferredSignType: (_chain: any) => {
       // `preferredSignType` determines which signer is preferred for `getOfflineSigner` method. By default `amino`. It might affect the `OfflineSigner` used in `signingStargateClient` and `signingCosmwasmClient`. But if only one signer is provided, `getOfflineSigner` will always return this signer, `preferredSignType` won't affect anything.
