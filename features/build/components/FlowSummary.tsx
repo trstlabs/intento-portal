@@ -11,23 +11,30 @@ import React from 'react'
 import { FlowInput } from '../../../types/trstTypes'
 import { ConditionsSummary } from './Conditions/ConditionsSummary'
 import { AuthzGrantCheck } from './AuthzGrantCheck'
+import { GrantResponse } from '../../../services/build'
 
 interface FlowSummaryProps {
     flowInput: FlowInput
-    displaySymbol: string
-    expectedFee: string
+    displaySymbol?: string
+    expectedFee?: string
     useMsgExec?: boolean
     chainId?: string
     grantee?: string
+    authzGrants?: GrantResponse[]
+    isAuthzGrantsLoading?: boolean
+    refetchAuthzGrants?: () => void
 }
 
 export const FlowSummary: React.FC<FlowSummaryProps> = ({
     flowInput,
-    displaySymbol,
-    expectedFee,
-    useMsgExec,
+    displaySymbol = 'INTO',
+    expectedFee = '0',
+    useMsgExec = false,
     chainId,
     grantee,
+    authzGrants,
+    isAuthzGrantsLoading = false,
+    refetchAuthzGrants = () => {},
 }) => {
     // Calculate scheduling info (all values are in milliseconds)
     const interval = flowInput.interval || 0
@@ -133,6 +140,9 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                             flowInput={flowInput}
                             chainId={chainId}
                             grantee={grantee}
+                            authzGrants={authzGrants}
+                            isAuthzGrantsLoading={isAuthzGrantsLoading}
+                            refetchAuthzGrants={refetchAuthzGrants}
                         />
                     )}
 

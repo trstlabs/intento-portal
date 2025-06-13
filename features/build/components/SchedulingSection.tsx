@@ -22,8 +22,7 @@ interface SchedulingSectionProps {
   flowInput: FlowInput
   chainSymbol?: string
   onFlowChange: (flowInput: FlowInput) => void
-  //icaAddress?: string
-  onFeeCalculated?: (fee: string, symbol: string) => void
+  onFeeCalculated?: (fee: string, symbol: string, denom: string, microAmount?: string) => void
   useMsgExec?: boolean
   //setUseMsgExec?: (value: boolean) => void
 }
@@ -125,17 +124,25 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     interval
   )
 
-  // Format the fee with 2 decimal places and determine the display symbol
-  const expectedFee = typeof expectedFeeAmount === 'number' ? expectedFeeAmount.toFixed(2) : '0.00'
   // Always use the symbol from the fee calculation, defaulting to 'INTO' if not available
-  const displaySymbol = feeDenom === 'uinto' ? 'INTO' : (feeDenom ? feeDenom.toUpperCase().replace('U', '') : 'INTO')
+  const displaySymbol = feeDenom === 'uinto' ? 'INTO' : (feeDenom ? feeDenom.toUpperCase().replace('U', '') : feeDenom)
+
+  // Calculate the micro amount (convert to base units)
+  const microAmount = typeof expectedFeeAmount === 'number' 
+    ? Math.round(expectedFeeAmount * 1000000).toString() 
+    : '0';
 
   // Notify parent component about fee calculation
   useEffect(() => {
     if (onFeeCalculated) {
-      onFeeCalculated(expectedFee, displaySymbol)
+      onFeeCalculated(
+        expectedFeeAmount.toString(), 
+        displaySymbol, 
+        denomLocal,
+        microAmount
+      )
     }
-  }, [expectedFee, displaySymbol, onFeeCalculated])
+  }, [expectedFeeAmount, displaySymbol, denomLocal, onFeeCalculated, microAmount])
 
   // Update flowInput when scheduling parameters change
   useEffect(() => {

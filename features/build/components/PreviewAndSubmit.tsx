@@ -16,18 +16,16 @@ import {
 import { toast } from 'react-hot-toast'
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 
-import {
-  useSubmitFlow,
-  useRegisterAccount,
-  useSendFundsOnHost,
-  useSubmitTx,
-} from '../hooks'
+import { useSubmitFlow, useRegisterAccount, useSendFundsOnHost, useSubmitTx } from '../hooks'
+import { useGrantValidation } from '../hooks/useGrantValidation'
+import { useSubmitFlowOnHost } from '../hooks/useSubmitFlowOnHost'
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
   useGetHostedICAByHostedAddress, useGetHostICAAddress,
   useGetICA,
   useICATokenBalance,
+  useAuthZMsgGrantInfoForUser,
 } from '../../../hooks/useICA'
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -35,12 +33,11 @@ import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 // import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
-import { useIBCAssetInfo } from 'hooks/useIBCAssetInfo'
+import { useIBCAssetInfoByChainID } from 'hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from 'hooks/useChainList'
 import { FlowInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 import { GearIcon } from '../../../icons'
-import { SubmitFlowDialog } from './SubmitFlowDialog'
 import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
@@ -51,8 +48,7 @@ import TinyJsonViewer from './Editor/TinyJsonViewer'
 
 import { FlowSummary } from './FlowSummary'
 
-
-
+//////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 
 type FlowsInputProps = {
@@ -73,17 +69,16 @@ export const PreviewAndSubmit = ({
   const inputRef = useRef<HTMLInputElement>()
 
   const [useMsgExec, _setUseMsgExec] = useState(false)
-  const [calculatedFee, setCalculatedFee] = useState('0')
   const [feeSymbol, setFeeSymbol] = useState('INTO')
-  
+
   // Cache for resolved IBC denoms to prevent unnecessary API calls
-  const resolvedDenomsCache = useRef<Record<string, string>>({})
-  
+  const resolvedDenomsCache = useRef<Record<string, { symbol: string; denom: string } | string>>({})
+
   // Get IBC asset info for the current chain
   const chainInfo = useChainInfoByChainID(initialChainId || '')
   // Get the base denom from chain info or use an empty string
-  const baseDenom = chainInfo?.denom || chainInfo?.denom_local || ''
-  const ibcAssetInfo = useIBCAssetInfo(baseDenom)
+  // const baseDenom = chainInfo?.denom || chainInfo?.denom_local || ''
+  const ibcAssetInfo = useIBCAssetInfoByChainID(initialChainId || '')
 
   // Theme controller
   const themeController = useControlTheme()
@@ -94,7 +89,7 @@ export const PreviewAndSubmit = ({
   const internalIsMobile = useMedia('sm')
   const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
 
-  // Format denom by removing 'u' prefix and capitalizing, and resolve IBC denoms
+  // Format denom by removing 'u' prefix and capitalizing
   const formatDenom = (denom: string): string => {
     // For non-IBC denoms, handle the 'u' prefix if it exists
     if (/^u[a-z]+$/.test(denom)) {
@@ -104,33 +99,41 @@ export const PreviewAndSubmit = ({
   }
 
   // Memoized function to resolve denom with multiple fallback strategies
-  const resolveDenom = useCallback(async (denom: string): Promise<string> => {
+  // Returns an object with both the display symbol and the original denom
+  const resolveDenom = useCallback(async (denom: string): Promise<{ symbol: string; denom: string }> => {
     const lowerDenom = denom.toLowerCase()
-    
+    const defaultReturn = { symbol: denom.toUpperCase(), denom };
+
     // Return cached result if available
-    if (resolvedDenomsCache.current[lowerDenom]) {
-      return resolvedDenomsCache.current[lowerDenom]
+    const cached = resolvedDenomsCache.current[lowerDenom];
+    if (cached) {
+      return typeof cached === 'string' 
+        ? { symbol: cached, denom } 
+        : cached;
     }
-    
+
     // For non-IBC denoms, just format and return
     if (!lowerDenom.startsWith('ibc/')) {
       const formatted = formatDenom(denom)
-      resolvedDenomsCache.current[lowerDenom] = formatted
-      return formatted
+      const result = { symbol: formatted, denom }
+      resolvedDenomsCache.current[lowerDenom] = result
+      return result
     }
-    
+
     // Try to use IBC asset info if available
     if (ibcAssetInfo?.symbol) {
       const formatted = ibcAssetInfo.symbol.toUpperCase()
-      resolvedDenomsCache.current[lowerDenom] = formatted
-      return formatted
+      const result = { symbol: formatted, denom: ibcAssetInfo.denom || denom }
+      resolvedDenomsCache.current[lowerDenom] = result
+      return result
     }
-    
+
     // Then try to use chain info symbol if available
     if (chainInfo?.symbol) {
       const formatted = chainInfo.symbol.toUpperCase()
-      resolvedDenomsCache.current[lowerDenom] = formatted
-      return formatted
+      const result = { symbol: formatted, denom: chainInfo.denom || denom }
+      resolvedDenomsCache.current[lowerDenom] = result
+      return result
     }
 
     // As a last resort, try the API
@@ -138,43 +141,81 @@ export const PreviewAndSubmit = ({
       const apiBase = process.env.NEXT_PUBLIC_INTO_API
       if (!apiBase) {
         console.warn('NEXT_PUBLIC_INTO_API is not defined')
-        return denom.toUpperCase()
+        return defaultReturn
       }
 
       const hash = denom.split('/')[1]
       const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`
-      
+
       const res = await fetch(url)
       if (!res.ok) throw new Error('Failed to fetch denom trace')
-      
+
       const data = await res.json()
       const baseDenom = data?.denom_trace?.base_denom || denom
-      
+
       // Format and cache the result
-      const formatted = formatDenom(baseDenom)
-      resolvedDenomsCache.current[lowerDenom] = formatted
-      return formatted
+      const symbol = formatDenom(baseDenom)
+      const result = { symbol, denom: baseDenom }
+      resolvedDenomsCache.current[lowerDenom] = result
+      return result
     } catch (err) {
       console.warn(`Failed to resolve IBC denom ${denom}:`, err)
       // Cache the original denom to prevent repeated failed requests
-      const fallback = denom.toUpperCase()
-      resolvedDenomsCache.current[lowerDenom] = fallback
-      return fallback
+      resolvedDenomsCache.current[lowerDenom] = defaultReturn
+      return defaultReturn
     }
   }, [chainInfo, ibcAssetInfo])
 
-  // Handler for fee calculation updates from SchedulingSection
-  const handleFeeCalculated = async (fee: string, symbol: string) => {
-    setCalculatedFee(fee)
-    
+  // State to store fee details
+  const [feeDetails, setFeeDetails] = useState<{amount: string; microAmount: string; denom: string}>({ 
+    amount: '0',
+    microAmount: '0',
+    denom: 'uinto' 
+  })
+
+  // Memoize the fee calculation handler to prevent unnecessary re-renders
+  const handleFeeCalculated = useCallback(async (fee: string, symbol: string, denom: string, microAmount?: string) => {
     try {
-      const resolvedSymbol = await resolveDenom(symbol)
-      setFeeSymbol(resolvedSymbol)
+      // Resolve the denom to get both symbol and denom
+      const { symbol: displaySymbol, denom: resolvedDenom } = await resolveDenom(denom);
+      
+      // Convert fee to micro units if not provided
+      const feeMicroAmount = microAmount || (parseFloat(fee) * 1000000).toString();
+      
+      // Update fee details with the resolved denom and micro amount
+      setFeeDetails(prev => {
+        if (prev.amount === fee && prev.microAmount === feeMicroAmount && prev.denom === resolvedDenom) return prev;
+        return { 
+          amount: fee, 
+          microAmount: feeMicroAmount, 
+          denom: resolvedDenom 
+        };
+      });
+
+      // Update the display symbol if needed
+      if (feeSymbol !== displaySymbol) {
+        setFeeSymbol(displaySymbol);
+      }
     } catch (error) {
-      console.warn('Error resolving denom, falling back to basic formatting:', error)
-      setFeeSymbol(formatDenom(symbol))
+      console.warn('Error resolving denom, using fallback values:', error);
+      // Fallback to the provided values if resolution fails
+      const fallbackMicroAmount = microAmount || (parseFloat(fee) * 1000000).toString();
+      setFeeDetails(prev => ({
+        amount: fee,
+        microAmount: fallbackMicroAmount,
+        denom: denom,
+        ...(prev.amount === fee && prev.microAmount === fallbackMicroAmount && prev.denom === denom 
+          ? {} 
+          : { amount: fee, microAmount: fallbackMicroAmount, denom })
+      }));
+      
+      const formattedSymbol = formatDenom(symbol);
+      if (feeSymbol !== formattedSymbol) {
+        setFeeSymbol(formattedSymbol);
+      }
     }
-  }
+  }, [feeSymbol, resolveDenom]);
+
 
   const [prefix, setPrefix] = useState('into')
   const [denom, setDenom] = useState('uinto')
@@ -185,6 +226,26 @@ export const PreviewAndSubmit = ({
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
 
+
+  // Get the ICA address from the flow input
+  //const icaAddressForGrants = flowInput.icaAddressForAuthZ;
+
+
+  // Get authorization grants for the user
+
+  const handleSubmitFlowOnHost = async () => {
+    if (!flowInput.hostedIcaConfig?.feeCoinLimit?.denom) {
+      toast.error('Host chain fee configuration is missing')
+      return
+    }
+
+    try {
+      await submitFlowOnHost()
+    } catch (error) {
+      console.error('Error submitting flow on host chain:', error)
+      // Error is handled by the mutation
+    }
+  }
 
   // Initialize connectionId if not set
   useEffect(() => {
@@ -210,6 +271,30 @@ export const PreviewAndSubmit = ({
   )
   const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByHostedAddress(flowInput.hostedIcaConfig.hostedAddress || "")
   const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId || "")
+
+  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+    chainId,
+    hostedICA || icaAddress,
+    flowInput
+  )
+
+  // Use the shared grant validation hook to identify missing/expired grants
+  const { invalidGrants } = useGrantValidation(
+    authzGrants || [],
+    { startTime: flowInput.startTime, duration: flowInput.duration }
+  )
+
+  const granteeAddress = hostedICA || icaAddress;
+  const { mutate: submitFlowOnHost, isLoading: isSubmittingOnHost } = useSubmitFlowOnHost({
+    flowInput,
+    ibcAssetInfo,
+    requiredGrants: invalidGrants || [],
+    grantee: granteeAddress,
+    fee: {
+      denom: feeDetails.denom,
+      amount: feeDetails.microAmount
+    }
+  })
 
   // Log with proper null check to avoid undefined issues
   // useEffect(() => {
@@ -330,14 +415,6 @@ export const PreviewAndSubmit = ({
   )
 
 
-  const shouldDisableAuthzGrantButton = !hostedICA || flowInput.msgs.includes("authz.v1beta1.MsgExec")
-
-
-  const handleSubmitFlowClick = (flowInput: FlowInput) => {
-    onFlowChange(flowInput)
-    return setRequestedSubmitFlow(true)
-  }
-
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
 
@@ -437,18 +514,8 @@ export const PreviewAndSubmit = ({
     onFlowChange(updatedFlowInput)
   }
 
-  const [
-    { isShowing: isSubmitFlowDialogShowing },
-    setSubmitFlowDialogState,
-  ] = useState({ isShowing: false })
 
-  const shouldDisableSubmitButton =
-    (flowInput.msgs[0] &&
-      flowInput.msgs[0].length == 0 &&
-      JSON.parse(flowInput.msgs[0])['typeUrl'].length < 5)
 
-  const shouldDisableBuildButton =
-    shouldDisableSubmitButton
 
   return (
     <StyledDivForContainer>
@@ -572,30 +639,7 @@ export const PreviewAndSubmit = ({
               </Card>
             </>
           )}
-          <SubmitFlowDialog
-            chainSymbol={chainSymbol}
-            icaBalance={icaBalance}
-            icaAddress={icaAddress}
-            flowInput={flowInput}
-            isDialogShowing={isSubmitFlowDialogShowing}
-            onRequestClose={() =>
-              setSubmitFlowDialogState({
-                isShowing: false,
-              })
-            }
-            shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
-            isLoading={isExecutingSchedule}
-            feeFundsHostChain={feeFundsHostChain}
-            shouldDisableSendHostChainFundsButton={
-              shouldDisableSendHostChainFundsButton
-            }
-            isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-            setFeeFundsHostChain={setFeeFundsHostChain}
-            handleSubmitFlow={(flowInput) =>
-              handleSubmitFlowClick(flowInput)
-            }
-            handleSendFundsOnHostClick={handleSendFundsOnHostClick}
-          />
+
           <Column>
             <Inline css={{ margin: '$6', marginTop: '$16' }}>
               <StepIcon step={3} />
@@ -703,10 +747,13 @@ export const PreviewAndSubmit = ({
             <FlowSummary
               flowInput={flowInput}
               displaySymbol={feeSymbol}
-              expectedFee={calculatedFee}
+              expectedFee={feeDetails.amount}
               useMsgExec={useMsgExec}
               chainId={chainId}
               grantee={hostedICA || icaAddress}
+              authzGrants={authzGrants}
+              isAuthzGrantsLoading={isAuthzGrantsLoading}
+              refetchAuthzGrants={refetchAuthzGrants}
             />
           </Column>
 
@@ -788,53 +835,50 @@ export const PreviewAndSubmit = ({
           </Card>
 
           {/* Create Button */}
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              onFlowChange(flowInput);
-
-              // Remind user about email subscription if not provided
-              if (!flowInput.email) {
-                toast.custom((t) => (
-                  <Toast
-                    icon={<IconWrapper icon={<InfoIcon />} color="secondary" />}
-                    title="Email Notification Reminder"
-                    body="You haven't provided an email for notifications. You can still Create the flow, but you won't receive alerts about its execution."
-                    onClose={() => toast.dismiss(t.id)}
-                  />
-                ), { duration: 5000 })
-              }
-
-              handleSubmitFlow();
-            }}
-
-          >
-            <div>
-              <StyledPNG src="./img/poweredbyintento.png" css={{
-                maxWidth: '180px',
-                '@media (min-width: 480px)': {
-                  maxWidth: '200px',
-                },
-              }} />
+          <div>
+            <StyledPNG src="./img/poweredbyintento.png" css={{
+              maxWidth: '180px',
+              '@media (min-width: 480px)': {
+                maxWidth: '200px',
+              },
+            }} />
+            {flowInput.hostedIcaConfig?.feeCoinLimit?.denom ? (
               <Button
-                type="submit"
-                css={{
-                  width: '100%',
-                  maxWidth: '300px',
-                  '@media (min-width: 480px)': {
-                    width: 'auto',
-                    padding: '0 $12',
-                  },
-                }}
-                variant="branded"
+                variant="primary"
                 size="large"
-                disabled={shouldDisableBuildButton}
-                iconLeft={<GearIcon />}
+                onClick={handleSubmitFlowOnHost}
+                disabled={isSubmittingOnHost}
+                css={{ width: '100%', marginTop: '$4' }}
               >
-                {isExecutingSchedule ? <Spinner instant /> : 'Create Flow'}
+                {isSubmittingOnHost ? <Spinner instant /> : 'Submit Flow on ' + chainInfo.name}
               </Button>
-            </div>
-          </form>
+            ) : (
+              <Button
+                variant="primary"
+                size="large"
+                iconLeft={<GearIcon />}
+                onClick={() => {
+                  onFlowChange(flowInput);
+                  // Remind user about email subscription if not provided
+                  if (!flowInput.email) {
+                    toast.custom((t) => (
+                      <Toast
+                        icon={<IconWrapper icon={<InfoIcon />} color="secondary" />}
+                        title="Email Notification Reminder"
+                        body="You haven't provided an email for notifications. You can still Create the flow, but you won't receive alerts about its execution."
+                        onClose={() => toast.dismiss(t.id)}
+                      />
+                    ), { duration: 5000 });
+                  }
+                  handleSubmitFlow();
+                }}
+                disabled={isExecutingSchedule || isExecutingRegisterICA || isExecutingSubmitTx || isExecutingSendFundsOnHost}
+                css={{ width: '100%', marginTop: '$4' }}
+              >
+                {(isExecutingSchedule || isExecutingRegisterICA || isExecutingSubmitTx || isExecutingSendFundsOnHost) ? <Spinner instant /> : 'Submit Flow'}
+              </Button>
+            )}
+          </div>
 
         </div>
       </div>

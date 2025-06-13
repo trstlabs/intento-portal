@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React from 'react'
 import {
   Text,
   Column,
@@ -12,21 +12,29 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { FlowInput } from '../../../types/trstTypes'
 import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
+import { useGrantValidation } from '../hooks/useGrantValidation'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import { Coin } from '@cosmjs/stargate'
 import toast from 'react-hot-toast'
+import { GrantResponse } from '../../../services/build'
 
 interface AuthzGrantCheckProps {
   flowInput: FlowInput
   chainId: string
   grantee: string
+  authzGrants?: GrantResponse[]
+  isAuthzGrantsLoading: boolean
+  refetchAuthzGrants: () => void
 }
 
 export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   flowInput,
   chainId,
-  grantee
+  grantee,
+  authzGrants: propAuthzGrants,
+  isAuthzGrantsLoading: propIsAuthzGrantsLoading,
+  refetchAuthzGrants: propRefetchAuthzGrants
 }) => {
   // Get wallet state and connection
   const [ibcState, _setIbcState] = useRecoilState(ibcWalletState)
@@ -40,55 +48,31 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
       },
       onError: (error) => {
         console.error('Failed to connect wallet:', error)
-        toast.error('Failed to connect wallet')
       },
     }
   )
 
 
 
-  // Get authorization grants
-  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch } = useAuthZMsgGrantInfoForUser(
-    chainId,
-    grantee,
-    flowInput
+  // Use props if provided, otherwise fall back to hook
+  const { grants: authzGrants = [], isLoading: isAuthzGrantsLoading, refetch } = propAuthzGrants !== undefined ? 
+    { grants: propAuthzGrants || [], isLoading: propIsAuthzGrantsLoading, refetch: propRefetchAuthzGrants } :
+    useAuthZMsgGrantInfoForUser(chainId, grantee, flowInput);
+
+  // Use the shared grant validation hook
+  const { allGrantsValid, expiredGrants, missingGrants } = useGrantValidation(
+    authzGrants,
+    { startTime: flowInput.startTime, duration: flowInput.duration }
   )
-
-
-  // Check if all required grants are present and not expired
-  const { allGrantsValid, expiredGrants, missingGrants } = useMemo(() => {
-    if (!authzGrants) {
-      return {
-        allGrantsValid: false,
-        expiredGrants: [],
-        missingGrants: []
-      }
-    }
-
-    const flowEndTime = (flowInput.startTime || Math.floor(Date.now() / 1000)) + (flowInput.duration || 0)
-
-    const missing = authzGrants.filter(grant => !grant.hasGrant)
-    const expired = authzGrants.filter(grant => {
-      if (!grant.expiration) return false
-      const expirationTime = Math.floor(new Date(grant.expiration).getTime() / 1000)
-      return grant.hasGrant && expirationTime < flowEndTime
-    })
-
-    return {
-      allGrantsValid: missing.length === 0 && expired.length === 0,
-      expiredGrants: expired,
-      missingGrants: missing
-    }
-  }, [authzGrants, flowInput])
 
   // Setup the mutation for creating grants
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } = useCreateAuthzGrant({
     grantee,
-    grantInfos: [...missingGrants, ...expiredGrants],
-    expirationDurationMs: (flowInput.duration || 0)  + 86400000, // Add 1 day buffer
+    grantInfos: [...(missingGrants || []), ...(expiredGrants || [])],
+    expirationDurationMs: (flowInput.duration || 0) + 86400000, // Add 1 day buffer
     coin: { denom: 'uinto', amount: '0' } as Coin,
     onSuccess: () => {
-      refetch()
+      refetch?.()
     },
   })
 
