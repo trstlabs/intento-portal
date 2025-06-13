@@ -1,4 +1,4 @@
-import { AppLayout, PageHeader } from 'components'
+import { AppLayout } from 'components'
 import {
   ButtonWithDropdownForSorting,
   SortDirections,
@@ -14,8 +14,10 @@ import {
   Spinner,
   styled,
   Text,
+  Card,
+  CardContent,
 } from 'junoblocks'
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
 import { FlowCard } from '../features/flows/components/FlowCard'
@@ -77,11 +79,91 @@ export default function Home() {
   const hasNextPage = Boolean(allFlows?.pagination?.nextKey)
   const hasPrevPage = paginationHistory.length > 0
 
+  const FeatureBadge = styled('div', {
+    padding: '6px 12px',
+    borderRadius: '20px',
+    fontSize: '14px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px',
+    backdropFilter: 'blur(10px)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    variants: {
+      variant: {
+        primary: {
+          backgroundColor: 'rgba(111, 168, 220, 0.2)',
+          color: '#0369a1',
+          '&:hover': {
+            backgroundColor: 'rgba(111, 168, 220, 0.3)'
+          }
+        },
+        success: {
+          backgroundColor: 'rgba(147, 196, 125, 0.2)',
+          color: '#166534',
+          '&:hover': {
+            backgroundColor: 'rgba(147, 196, 125, 0.3)'
+          }
+        },
+        info: {
+          backgroundColor: 'rgba(142, 124, 195, 0.2)',
+          color: '#1e40af',
+          '&:hover': {
+            backgroundColor: 'rgba(142, 124, 195, 0.3)'
+          }
+        }
+      }
+    },
+    defaultVariants: {
+      variant: 'primary'
+    },
+    transition: 'all 0.2s ease-in-out'
+  })
+
   const pageHeaderContents = (
-    <PageHeader
-      title="Dashboard"
-      subtitle="🌟 Explore, view, manage and monitor interchain flows on the Intento blockchain 🌟"
-    />
+    <Card variant="secondary" disabled css={{ padding: '$8', marginBottom: '$10' }}>
+      <CardContent>
+        <Text
+          variant="header">
+          Welcome to the Intento Portal
+        </Text>
+
+        <Text variant="body" css={{ marginBottom: '$8', color: '$textColors$secondary' }}>
+          The most powerful platform for cross-chain automation for blockchains. Create, manage, and monitor self-custodial
+          actions across any IBC-enabled blockchain with ease.
+        </Text>
+
+        <Inline gap={4} css={{ marginBottom: 32 }}>
+          <FeatureBadge variant="primary">
+            <span>✨</span> No-Code Automation
+          </FeatureBadge>
+          <FeatureBadge variant="success">
+            <span>🔔</span> Email Alerts
+          </FeatureBadge>
+          <FeatureBadge variant="info">
+            <span>🛡️</span> Self-Custodial
+          </FeatureBadge>
+          <FeatureBadge variant="primary">
+            <span>🦾</span> AI-Ready
+          </FeatureBadge>
+        </Inline>
+
+        <Card variant="secondary" disabled css={{
+          backgroundColor: '$colors$dark10',
+          borderLeft: '4px solid $colors$primary',
+          marginTop: '$6'
+        }}>
+          <CardContent>
+            <Inline gap={4} align="flex-start" css={{ alignItems: 'flex-start', width: '100%' }}>
+              <Text css={{ color: '$colors$primary' }}>💡</Text>
+              <Text variant="caption" css={{ color: '$textColors$secondary', lineHeight: 1.6 }}>
+                Tip: Browse around and hit 'Copy and Create' to quickly set up common flows like staking rewards,
+                liquidity provision, or cross-chain swaps with just a few clicks.
+              </Text>
+            </Inline>
+          </CardContent>
+        </Card>
+      </CardContent>
+    </Card>
   )
 
   return (
@@ -175,7 +257,7 @@ export default function Home() {
       }
       <Column gap={4}>
 
-      {(hasPrevPage || hasNextPage) && (
+        {(hasPrevPage || hasNextPage) && (
           <Inline >
 
             <Button
@@ -297,32 +379,32 @@ const StyledDivForFlowsGrid = styled('div', {
   maxWidth: '100%',
   padding: '0 $6 $12 $6',
   boxSizing: 'border-box',
-  
+
   // Default mobile styles (applies to all screen sizes unless overridden)
   '@media (max-width: 639px)': {
     gridTemplateColumns: '1fr',
     gap: '$8',
   },
-  
+
   // Small screens (mobile) - adjust padding only
   '@media (min-width: 640px) and (max-width: 767px)': {
     padding: '0 $8 $12 $8',
     gridTemplateColumns: '1fr',
     gap: '$8',
   },
-  
+
   // Medium screens (tablets) - 2 columns
   '@media (min-width: 768px) and (max-width: 1023px)': {
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: '$8',
   },
-  
+
   // Large screens (desktops) - 3 columns
   '@media (min-width: 1024px) and (max-width: 1279px)': {
     gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '$10',
   },
-  
+
   // Extra large screens - 4 columns
   '@media (min-width: 1280px)': {
     gridTemplateColumns: 'repeat(4, 1fr)',

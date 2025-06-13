@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import { Column, styled, Text, useControlTheme, useMedia } from 'junoblocks'
+import { Column, styled, Text, useControlTheme } from 'junoblocks'
 import { useChain } from '@cosmos-kit/react'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
@@ -48,8 +48,25 @@ export default function Submit() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.theme, theme])
 
-  // Check if on mobile
-  const isMobile = useMedia('sm') || useMedia('md')
+  // Check screen size
+  const [isSmallOrMediumScreen, setIsSmallOrMediumScreen] = useState(false)
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      // Tailwind's 'sm' breakpoint is 640px, 'md' is 768px
+      const isSmall = window.matchMedia('(max-width: 1070px)').matches
+      setIsSmallOrMediumScreen(isSmall)
+    }
+    
+    // Initial check
+    checkScreenSize()
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', checkScreenSize)
+    
+    // Clean up
+    return () => window.removeEventListener('resize', checkScreenSize)
+  }, [])
 
   // Wallet connection state and functions
   const [{ status }, setWalletState] = useRecoilState(walletState)
@@ -241,15 +258,15 @@ export default function Submit() {
       <Column align="center" justifyContent="center" style={{ width: '100%', maxWidth: '1200px', margin: '0 auto', overflow: 'hidden' }}>
         <div style={{
           display: 'flex',
-          flexDirection: isMobile ? 'column' : 'row',
+          flexDirection: isSmallOrMediumScreen ? 'column' : 'row',
           justifyContent: 'space-between',
-          alignItems: isMobile ? 'center' : 'flex-start',
+          alignItems: isSmallOrMediumScreen ? 'center' : 'flex-start',
           width: '100%',
           marginBottom: '24px',
           marginTop: '24px'
         }}>
 
-          <div style={{ textAlign: 'center', flex: 1, marginBottom: isMobile ? '20px' : '0' }}>
+          <div style={{ textAlign: 'center', flex: 1, marginBottom: isSmallOrMediumScreen ? '20px' : '0' }}>
             {imageUrl && (
               <div style={{ position: 'relative', margin: '0 auto' }}>
                 {imageUrl && (
@@ -302,7 +319,7 @@ export default function Submit() {
           </div>
 
           {/* Wallet Button */}
-          <div style={{ width: isMobile ? '100%' : '300px', marginLeft: isMobile ? '0' : '20px' }}>
+          <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
             <WalletButton
               onClick={openView}
               connected={walletStatusesConnected && isClientConnected}
@@ -329,7 +346,7 @@ export default function Submit() {
               flowInput={flowInput}
               onFlowChange={setFlowInput}
               initialChainId={chainId}
-              isMobile={isMobile}
+              isMobile={isSmallOrMediumScreen}
               bgColor={bgColor}
             />
           ) : (
