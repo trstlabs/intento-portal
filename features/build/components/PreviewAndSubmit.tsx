@@ -69,6 +69,15 @@ export const PreviewAndSubmit = ({
   const [useMsgExec, _setUseMsgExec] = useState(false)
   const [feeSymbol, setFeeSymbol] = useState('INTO')
 
+  // Track step numbers based on conditions
+  const hasConditions = flowInput.conditions &&
+    (flowInput.conditions.comparisons?.length > 0 ||
+      flowInput.conditions.feedbackLoops?.length > 0 ||
+      flowInput.conditions.stopOnSuccessOf?.length > 0 ||
+      flowInput.conditions.stopOnFailureOf?.length > 0 ||
+      flowInput.conditions.skipOnSuccessOf?.length > 0 ||
+      flowInput.conditions.skipOnFailureOf?.length > 0)
+
   // Cache for resolved IBC denoms to prevent unnecessary API calls
   const resolvedDenomsCache = useRef<Record<string, { symbol: string; denom: string } | string>>({})
 
@@ -223,7 +232,7 @@ export const PreviewAndSubmit = ({
 
   const [_chainHasIAModule, setChainHasIAModule] = useState(true)
 
-
+  const shouldTransferFromHost = flowInput.hostedIcaConfig?.feeCoinLimit?.denom != 'uinto'
   // Get the ICA address from the flow input
   //const icaAddressForGrants = flowInput.icaAddressForAuthZ;
 
@@ -231,7 +240,7 @@ export const PreviewAndSubmit = ({
   // Get authorization grants for the user
 
   const handleSubmitFlowOnHost = async () => {
-    if (!flowInput.hostedIcaConfig?.feeCoinLimit?.denom) {
+    if (!shouldTransferFromHost) {
       toast.error('Host chain fee configuration is missing')
       return
     }
@@ -599,7 +608,7 @@ export const PreviewAndSubmit = ({
             />
           </Column>
 
-          {flowInput.conditions && (
+          {hasConditions && (
             <Column>
               <Inline css={{ margin: '$6', marginTop: '$16' }}>
                 <StepIcon step={4} />
@@ -620,11 +629,11 @@ export const PreviewAndSubmit = ({
             </Column>
           )}
 
-          {/* Only show configuration in first column on mobile */}
-          {isMobile && flowInput.configuration && (
+          {/* Show configuration in first column when no conditions or on mobile */}
+          {((!hasConditions && flowInput.configuration) || (isMobile && flowInput.configuration)) && (
             <Column>
-              <Inline css={{ margin: '$6', marginTop: '$16' }}>
-                <StepIcon step={5} />
+              <Inline css={{ margin: '$6', marginTop: hasConditions ? '$16' : '$16' }}>
+                <StepIcon step={hasConditions ? 5 : 4} />
                 <Text
                   align="center"
                   variant="body"
@@ -645,11 +654,11 @@ export const PreviewAndSubmit = ({
 
         {/* Right column - Flow summary, notifications and submit button */}
         <div style={{ flex: isMobile ? '1' : '2' }}>
-          {/* Configuration in second column for non-mobile */}
-          {!isMobile && flowInput.configuration && (
+          {/* Configuration in second column for non-mobile when there are conditions */}
+          {!isMobile && hasConditions && flowInput.configuration && (
             <Column>
               <Inline css={{ margin: '$6', marginTop: '$12' }}>
-                <StepIcon step={5} />
+                <StepIcon step={hasConditions ? 5 : 4} />
                 <Text
                   align="center"
                   variant="body"
@@ -670,7 +679,7 @@ export const PreviewAndSubmit = ({
           {/* Summary of conditions, configuration and scheduling */}
           <Column>
             <Inline css={{ margin: '$4', marginTop: isMobile ? '$16' : '$12' }}>
-              <StepIcon step={6} />
+              <StepIcon step={hasConditions ? 6 : 5} />
               <Text
                 align="center"
                 variant="body"
@@ -778,7 +787,7 @@ export const PreviewAndSubmit = ({
                 maxWidth: '200px',
               },
             }} />
-            {flowInput.hostedIcaConfig?.feeCoinLimit?.denom ? (
+            {shouldTransferFromHost ? (
               <Button
                 variant="primary"
                 size="large"
@@ -824,10 +833,10 @@ export const PreviewAndSubmit = ({
 
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
-  padding: '$4',
-  width: '100%',
-  maxWidth: '1200px',
+  padding: '0',
+  maxWidth: '1000px',
   margin: '0 auto',
+  display: 'block',
 
   '@media (max-width: 768px)': {
     padding: '$2',
@@ -866,7 +875,8 @@ const StyledPNG = styled('img', {
   userSelect: 'none',
   userDrag: 'none',
   display: 'block',
-  margin: '0 auto',
+  padding: '$2',
+  margin: '$2',
   '@media (min-width: 480px)': {
     margin: '0',
   },
