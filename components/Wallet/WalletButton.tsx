@@ -51,7 +51,7 @@ export const WalletButton = ({
     return (
       <Column css={{ paddingBottom: '$6' }}>
         <Button onClick={onConnect} size="large" variant="secondary" {...props}>
-          Connect Wallet
+          Connect Intento Wallet
         </Button>
       </Column>
     )

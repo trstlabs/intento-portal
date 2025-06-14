@@ -41,7 +41,7 @@ const SkeletonLoader = styled('div', {
 export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
   if (!flowInfo) {
     return (
-      <Card variant="secondary" css={{ minHeight: '320px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Card variant="secondary" css={{ minHeight: '320px', height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '$colors$dark5', }}>
         <CardContent size="medium" css={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Column align="center" gap={6} css={{ flex: 1, justifyContent: 'center' }}>
             <SkeletonLoader size="circle" css={{ marginTop: '$12' }} />

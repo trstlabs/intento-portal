@@ -130,13 +130,13 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
           {allGrantsValid ? (
             <Inline css={{ gap: '$2' }}>
               <CheckCircle size={16} color="#00C851" />
-              <Text variant="body" color="valid" css={{ fontSize: '12px' }}>All authorizations valid</Text>
+              <Text variant="body" color="valid" css={{ fontSize: '12px' }}>All valid</Text>
             </Inline>
           ) : (
             <Inline css={{ gap: '$2' }}>
               <AlertTriangle size={16} color="#FFD700" />
               <Text variant="body" color="error" css={{ fontSize: '12px' }}>
-                {missingGrants.length > 0 ? 'Missing authorizations' : 'Expiring authorizations'}
+                {missingGrants.length > 0 ? 'Missing' : 'Expiring'}
               </Text>
             </Inline>
           )}

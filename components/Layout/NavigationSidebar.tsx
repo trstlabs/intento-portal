@@ -304,11 +304,11 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Column gap={6}>
           <Inline
             align="center"
-            justifyContent="center"
+            justifyContent="space-between"
+            css={{ padding: '0 $12' }}
           >
             <Link href="/" passHref>
               <StyledDivForLogo as="a">
-                {/*  <Logo data-logo="" width="37px" height="47px" /> */}
                 <StyledPNG
                   css={{ maxWidth: '100px' }}
                   src={logoSrc}
@@ -360,7 +360,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       <Column>
 
         <StyledDivForLogo>
-          <StyledPNG src="/img/poweredbyintento.png" alt="Powered by Intento" />
+          {/* <StyledPNG src="/img/poweredbyintento.png" alt="Powered by Intento" /> */}
         </StyledDivForLogo>
         <Inline css={{ display: 'grid' }}>
           <Button

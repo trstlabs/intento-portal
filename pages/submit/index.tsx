@@ -12,8 +12,30 @@ import { FlowInput as FlowInputType } from '../../types/trstTypes'
 
 const StyledWrapper = styled('div', {
   minHeight: '100vh',
-  padding: '16px',
-  transition: 'background-color 0.3s ease',
+  width: '100%',
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  '& > div': {
+    zoom: 0.7,
+    width: '100%',
+    maxWidth: '1200px',
+    margin: '0 auto',
+    padding: '20px',
+    boxSizing: 'border-box',
+    '@media (max-width: 992px)': {
+      zoom: 0.8,
+      padding: '15px',
+    },
+    '@media (max-width: 768px)': {
+      padding: '10px',
+    },
+    '@media (max-width: 480px)': {
+      padding: '5px',
+    }
+  }
 })
 
 export default function Submit() {
@@ -33,7 +55,7 @@ export default function Submit() {
   useEffect(() => {
     const urlTheme = router.query.theme as string | undefined
     const isLightTheme = urlTheme === 'light'
-    
+
     // Only update if there's a change
     if ((isLightTheme && theme !== 'light') || (!isLightTheme && theme !== 'dark')) {
       if (isLightTheme) {
@@ -54,16 +76,16 @@ export default function Submit() {
   useEffect(() => {
     const checkScreenSize = () => {
       // Tailwind's 'sm' breakpoint is 640px, 'md' is 768px
-      const isSmall = window.matchMedia('(max-width: 1070px)').matches
+      const isSmall = window.matchMedia('(max-width: 900px)').matches
       setIsSmallOrMediumScreen(isSmall)
     }
-    
+
     // Initial check
     checkScreenSize()
-    
+
     // Add event listener for window resize
     window.addEventListener('resize', checkScreenSize)
-    
+
     // Clean up
     return () => window.removeEventListener('resize', checkScreenSize)
   }, [])
@@ -319,7 +341,7 @@ export default function Submit() {
           </div>
 
           {/* Wallet Button */}
-          <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
+          {!flowInput?.hostedIcaConfig || flowInput?.hostedIcaConfig?.feeCoinLimit?.denom == 'uinto' && <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
             <WalletButton
               onClick={openView}
               connected={walletStatusesConnected && isClientConnected}
@@ -328,7 +350,7 @@ export default function Submit() {
               onConnect={connectWallet}
               onDisconnect={resetWalletConnection}
             />
-          </div>
+          </div>}
         </div>
 
         {/* Main content - Flow submission */}

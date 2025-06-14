@@ -16,6 +16,7 @@ import {
   Text,
   Card,
   CardContent,
+  useMedia,
 } from 'junoblocks'
 import { useCallback, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
@@ -34,7 +35,7 @@ export default function Home() {
   const [flows, isMyFlowsLoading] = useFlowInfosByOwner(Number(flowsPerPage), undefined)
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } = useSortControllers()
   const [isRefreshing, setIsRefreshing] = useState(false)
-
+  const isMobile = useMedia('sm')
   // Handle pagination
   const handleNextPage = useCallback(() => {
     if (allFlows?.pagination?.nextKey) {
@@ -120,7 +121,9 @@ export default function Home() {
   })
 
   const pageHeaderContents = (
-    <Card variant="secondary" disabled css={{ padding: '$8', marginBottom: '$10' }}>
+    <Card css={{
+      padding: '$8', marginBottom: '$10'
+    }} variant="secondary" disabled >
       <CardContent>
         <Text
           variant="header">
@@ -142,13 +145,13 @@ export default function Home() {
           <FeatureBadge variant="info">
             <span>🛡️</span> Self-Custodial
           </FeatureBadge>
-          <FeatureBadge variant="primary">
+          {!isMobile && <FeatureBadge variant="primary">
             <span>🦾</span> AI-Ready
-          </FeatureBadge>
+          </FeatureBadge>}
         </Inline>
 
         <Card variant="secondary" disabled css={{
-          backgroundColor: '$colors$dark10',
+          backgroundColor: '$colors$dark5',
           borderLeft: '4px solid $colors$primary',
           marginTop: '$6'
         }}>
