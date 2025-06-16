@@ -7907,10 +7907,10 @@ inline-style-prefixer@^7.0.0:
     css-in-js-utils "^3.1.0"
     fast-loops "^1.1.3"
 
-intentojs@0.9.4-r2:
-  version "0.9.4-r2"
-  resolved "https://registry.yarnpkg.com/intentojs/-/intentojs-0.9.4-r2.tgz#495119252ceb4166c210bee692ed98057c609f0b"
-  integrity sha512-nPz29fk3AVOhzvDOzkk+F7gQUNatug63pyQNofdlSJ+OTMNeEFH5AsXykYepNMfVl/Aiok//eGu3zSgp5vKatg==
+intentojs@0.9.4-r2.2:
+  version "0.9.4-r2.2"
+  resolved "https://registry.yarnpkg.com/intentojs/-/intentojs-0.9.4-r2.2.tgz#b4ed0cd3622935fea8bd0ed7b04501c6441e93c4"
+  integrity sha512-Ptq6TnoBqPxgJuTq4eIXt7hHgHYX9202oGhRejs6Z7LcV9CwL/KCKOLbxoP4u/K60sD6Sh3Gm9pXXKO6BFspRg==
   dependencies:
     "@cosmjs/amino" "^0.32.4"
     "@cosmjs/proto-signing" "^0.32.4"
