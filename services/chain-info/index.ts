@@ -143,7 +143,8 @@ export const getExpectedFlowFee = (
   gasUsed: number,
   lenMsgs: number,
   recurrences: number,
-  denom: string
+  denom: string,
+  hostedAccount?: any
 ) => {
 
   // Step 1: Base gas fee units (like the 'gasFeeAmount' in Go)
@@ -172,10 +173,25 @@ export const getExpectedFlowFee = (
   // Step 4: Multiply by recurrences
   totalFlowFeeInMicro *= recurrences
 
-  // Step 5: Convert to denom units (1e6 micro = 1 denom)
+  // Step 5: Add hosted account fee if available
+  if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
+    const hostedFeeCoin = hostedAccount.hostFeeConfig.feeCoinsSuported.find(
+      (coin) => coin.denom === denom
+    )
+
+    if (hostedFeeCoin) {
+      const hostedFeeAmount = parseInt(hostedFeeCoin.amount || '0', 10) || 0
+      console.log(`Adding hosted account fee: ${hostedFeeAmount}${denom} per recurrence`)
+      totalFlowFeeInMicro += hostedFeeAmount * recurrences // Convert to micro units
+    } else {
+      console.log(`No hosted fee found for denom: ${denom}`)
+    }
+  }
+
+  // Step 6: Convert to denom units (1e6 micro = 1 denom)
   const flowFeeInDenom = totalFlowFeeInMicro / 1e6
 
-  return Number(flowFeeInDenom.toFixed(6)) // Show up to 6 decimals for clarity
+  return Number(flowFeeInDenom.toFixed(4)) // Show up to 6 decimals for clarity
 }
 
 function blockInfoAndCalculateApr(
