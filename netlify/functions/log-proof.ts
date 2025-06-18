@@ -17,10 +17,11 @@ async function storeProof(address: string, proof: Proof) {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${CF_API_TOKEN}`,
-      'Content-Type': 'application/json',
+      'Content-Type': 'text/plain', // or omit, Cloudflare will accept raw
     },
-    body: JSON.stringify(proof),
+    body: JSON.stringify(proof), // actual raw value
   })
+
   const json = await res.json()
   console.log('Cloudflare KV store response:', json)
 }
