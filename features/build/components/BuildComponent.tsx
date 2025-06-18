@@ -514,6 +514,7 @@ export const BuildComponent = ({
           handleSubmitFlowClick(flowInput)
         }
         handleSendFundsOnHostClick={handleSendFundsOnHostClick}
+        hostedAccount={hostedAccount}
       />
       <Column>
         <Inline css={{ margin: '$6', marginTop: '$16' }}>

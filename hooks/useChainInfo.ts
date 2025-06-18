@@ -61,7 +61,8 @@ export const useGetExpectedFlowFee = (
   flowInput: FlowInput,
   _isDialogShowing: boolean, // Prefixed with underscore to indicate it's unused
   denom: string,
-  intervalSeconds?: number
+  intervalSeconds?: number,
+  hostedAccount?: any // Add hostedAccount parameter
 ) => {
   let [intentModuleParams, setTriggerModuleData] = useRecoilState(
     intentModuleParamsAtom
@@ -77,9 +78,10 @@ export const useGetExpectedFlowFee = (
     intervalSeconds,
     denom,
     flowInput.msgs?.length || 0,
-    JSON.stringify(flowInput.msgs)
+    JSON.stringify(flowInput.msgs),
+    hostedAccount?.address // Include hosted account address in query key
   ]
-
+    
   const { data, isLoading } = useQuery(
     queryKey,
     async () => {
@@ -128,6 +130,7 @@ export const useGetExpectedFlowFee = (
           denom,
           recurrences,
           lenMsgs: flowInput.msgs.length,
+          hostedAccount
         })
 
         // First try with the actual denom (denom_local)
@@ -136,16 +139,18 @@ export const useGetExpectedFlowFee = (
           200000, // Default gas used
           flowInput.msgs.length,
           recurrences,
-          denom
+          denom,
+          hostedAccount // Pass hosted account for fee calculation
         )
 
-        // Always calculate the fee in uinto for comparison and fallback
+        // Always calculate the fee in uinto for comparison
         const intoFee = getExpectedFlowFee(
           intentModuleParams,
           200000, // Default gas used
           flowInput.msgs.length,
           recurrences,
-          'uinto' // Use the native token for comparison
+          'uinto', // Use the native token for comparison
+          hostedAccount // Pass hosted account for fee calculation
         )
 
         console.log(`Fee in denom: ${fee}, Fee in INTO: ${intoFee}`)
@@ -156,8 +161,9 @@ export const useGetExpectedFlowFee = (
           console.log(`No fee found for ${denom}, using INTO fee instead:`, intoFee)
           fee = intoFee
           denom = 'uinto'
-          return { fee, symbol: denom }
         }
+ 
+        // Hosted account fee is now handled in getExpectedFlowFee
 
         return { fee, denom }
       } catch (error) {

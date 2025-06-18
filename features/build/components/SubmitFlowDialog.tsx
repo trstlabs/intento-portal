@@ -19,12 +19,14 @@ import {
   convertDenomToMicroDenom,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { Chip, ChipSelected } from '../../../components/Layout/Chip'
 import { TokenSelector } from '../../send/components/TokenSelector'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
+import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
+
 
 type SubmitFlowDialogProps = {
   isDialogShowing: boolean
@@ -44,6 +46,7 @@ type SubmitFlowDialogProps = {
   handleCreateAuthzGrantClick?: (withFunds: boolean) => void
   handleSendFundsOnHostClick?: () => void
   setFeeFundsHostChain?: (data: string) => void
+  hostedAccount?: HostedAccount
 }
 //todo clean up all authz and host fund logic
 export const SubmitFlowDialog = ({
@@ -64,6 +67,7 @@ export const SubmitFlowDialog = ({
   handleSubmitFlow,
   handleCreateAuthzGrantClick,
   handleSendFundsOnHostClick,
+  hostedAccount,
 }: SubmitFlowDialogProps) => {
 
   const [startTime, setStartTime] = useState(0)
@@ -76,6 +80,15 @@ export const SubmitFlowDialog = ({
 
   const { denom_local } =
     useIBCAssetInfo(feeFundsSymbol) || {}
+
+  // Update fee denom from hosted account's fee config
+  useEffect(() => {
+    if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
+      const feeDenom = hostedAccount.hostFeeConfig.feeCoinsSuported[0].denom;
+      const feeSymbol = feeDenom.startsWith('u') ? feeDenom.substring(1).toUpperCase() : feeDenom.toUpperCase();
+      setFeeFundsSymbol(feeSymbol);
+    }
+  }, [hostedAccount?.hostFeeConfig?.feeCoinsSuported]);
 
   const [displayInterval, setDisplayInterval] = useState('1 day')
   const [editInterval, setEditInterval] = useState(false)
@@ -211,6 +224,7 @@ export const SubmitFlowDialog = ({
     isDialogShowing,
     denom_local,
     interval / 1000,
+    hostedAccount
   );
 
   const canSchedule = duration > 0 && interval > 0
