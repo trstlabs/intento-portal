@@ -99,7 +99,7 @@ export const executeSubmitFlow = async ({
 
   // 🧠 Prepare and send proof
   const proof = {
-    address: toInjectiveAddress(owner),
+    address: toQuestAddress(owner),
     txHash: result.transactionHash,
     flowLabel: flowInput.label,
     timestamp: Math.floor(Date.now() / 1000),
@@ -251,7 +251,7 @@ export function transformAndEncodeMsgs({
 }
 
 
-function toInjectiveAddress(address: string): string {
+function toQuestAddress(address: string): string {
   const { data } = fromBech32(address)
-  return toBech32('inj', data)
+  return toBech32('archway', data)
 }
