@@ -63,65 +63,59 @@ export const FlowTransformButton = ({ flowInfo }) => {
 
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
 };
-
-const cleanMessageObject = (obj: any, seen = new WeakSet(), isMsgField = false): any => {
-    // Handle primitives and null
-    if (obj === null || typeof obj !== 'object') {
-        return obj;
-    }
-
-    // Handle circular references
-    if (seen.has(obj)) {
-        return undefined;
-    }
+const cleanMessageObject = (
+    obj: any,
+    seen = new WeakSet(),
+    isInsideMsg = false
+  ): any => {
+    if (obj === null || typeof obj !== "object") return obj;
+  
+    if (seen.has(obj)) return undefined;
     seen.add(obj);
-
-    // Handle arrays
+  
     if (Array.isArray(obj)) {
-        return obj.map(item => cleanMessageObject(item, seen, isMsgField));
+      return obj
+        .map((item) => cleanMessageObject(item, seen, isInsideMsg))
+        .filter((v) => v !== undefined);
     }
-
-    // For objects with typeUrl and value, keep them as is
-    if (obj.typeUrl && 'value' in obj) {
-        return {
-            typeUrl: obj.typeUrl,
-            value: cleanMessageObject(obj.value, seen, isMsgField)
-        };
+  
+    // Preserve protobuf-style object with typeUrl/value
+    if (obj.typeUrl && "value" in obj) {
+      return {
+        typeUrl: obj.typeUrl,
+        value: cleanMessageObject(obj.value, seen, isInsideMsg),
+      };
     }
-
-    // Special handling for the msg field
-    if (isMsgField && obj.value && typeof obj.value === 'object') {
-        // Unwrap the value property and process its contents
-        return cleanMessageObject(obj.value, seen, false);
-    }
-
-    // Process regular objects
+  
     const result: any = {};
     for (const [key, value] of Object.entries(obj)) {
-        // Skip null/undefined values
-        if (value === null || value === undefined) {
-            continue;
-        }
-
-        // Convert streamId to stream_id
-        const newKey = toSnakeCase(key);
-
-        // If the value is an object with a value property, unwrap it
-        if (value && typeof value === 'object' && 'value' in value) {
-            const cleaned = cleanMessageObject((value as { value: any }).value, seen, newKey === 'msg');
-            if (cleaned !== undefined) {
-                result[newKey] = cleaned;
-            }
-        } else {
-            const cleanedValue = cleanMessageObject(value, seen, newKey === 'msg');
-            if (cleanedValue !== undefined) {
-                result[newKey] = cleanedValue;
-            }
-        }
+      if (value === null || value === undefined) continue;
+  
+      const isMsgKey = key === "msg";
+      const recurseInsideMsg = isInsideMsg || isMsgKey;
+      const newKey = recurseInsideMsg ? toSnakeCase(key) : key;
+  
+      if (
+        value &&
+        typeof value === "object" &&
+        "value" in value &&
+        Object.keys(value).length === 1
+      ) {
+        // Unwrap single-value object (likely protobuf-style)
+        const cleaned = cleanMessageObject(
+          value.value,
+          seen,
+          recurseInsideMsg
+        );
+        if (cleaned !== undefined) result[newKey] = cleaned;
+      } else {
+        const cleaned = cleanMessageObject(value, seen, recurseInsideMsg);
+        if (cleaned !== undefined) result[newKey] = cleaned;
+      }
     }
+  
     return result;
-};
-
+  };
 export async function transformFlowMsgs(info) {
     let msgs: string[] = [];
 
