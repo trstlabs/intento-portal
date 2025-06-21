@@ -140,8 +140,8 @@ export async function transformFlowMsgs(info) {
 
                     // Clean and transform the message object
                     msgObj = cleanMessageObject(msgObj);
-
-                    // Handle MsgExecuteContract with base64 encoded msg
+                    
+// Handle MsgExecuteContract with base64 encoded msg
                     if (msgObj.typeUrl?.includes("MsgExecuteContract") &&
                         msgObj.msg && typeof msgObj.msg === 'string') {
                         try {

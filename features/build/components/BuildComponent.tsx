@@ -505,6 +505,7 @@ export const BuildComponent = ({
             isShowing: false,
           })
         }
+        customLabel={flowInput?.label}
         shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
         isLoading={isExecutingSchedule}
         feeFundsHostChain={feeFundsHostChain}

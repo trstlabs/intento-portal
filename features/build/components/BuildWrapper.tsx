@@ -1,8 +1,9 @@
 import { styled } from 'junoblocks'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { BuildComponent } from './BuildComponent'
 import { generalExamples } from './ExampleMsgs'
 import { FlowInput } from '../../../types/trstTypes'
+import { processFlowInput } from '../utils/addressUtils';
 import { useRouter } from 'next/router'
 
 type BuildWrapperProps = {
@@ -16,6 +17,7 @@ export const BuildWrapper = ({
   initialExample,
   initialMessage,
 }: BuildWrapperProps) => {
+  useRouter() // For router functionality
   let initialFlowInput = new FlowInput()
   initialFlowInput.duration = 14 * 86400000
   initialFlowInput.interval = 86400000
@@ -51,22 +53,28 @@ export const BuildWrapper = ({
         const parsed = JSON.parse(flowInput);
         // If we have an initialChainId from URL but not in the flowInput, update it
         if (urlChainId && parsed.connectionId !== urlChainId) {
-          return [{
+          const updatedFlow = {
             ...parsed,
             connectionId: urlChainId,
             hostedIcaConfig: parsed.hostedIcaConfig ? {
               ...parsed.hostedIcaConfig,
               connectionId: urlChainId
             } : undefined
-          }];
+          };
+          return [processFlowInput(updatedFlow)];
         }
-        return [parsed];
+        return [processFlowInput(parsed)];
       }
     } catch (e) {
       console.error('Failed to parse flowInput from URL', e);
     }
     return [initialFlowInput];
   });
+
+  // Process flow input when it changes
+  const processedFlowInputs = useMemo(() => {
+    return flowInputs.map(flowInput => processFlowInput(flowInput));
+  }, [flowInputs]);
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
@@ -98,10 +106,13 @@ export const BuildWrapper = ({
   // Get the initialChainId from URL or from the first flow input
   const effectiveInitialChainId = urlChainId || flowInputs[0]?.connectionId || '';
 
+  // Use processedFlowInputs for display, but maintain original flowInputs in state
+  const displayFlowInput = processedFlowInputs[0] || flowInputs[0];
+
   return (
     <StyledDivForWrapper>
       <BuildComponent
-        flowInput={flowInputs[0]}
+        flowInput={displayFlowInput}
         onFlowChange={(flow) => setFlowInputs([flow])}
         initialChainId={effectiveInitialChainId}
       />

@@ -75,7 +75,8 @@ export const SubmitFlowDialog = ({
 
   const [interval, setInterval] = useState(86400000)
   const [feeFunds, setFeeAmount] = useState(0)
-  const [txLabel, setLabel] = useState(customLabel)
+
+  const [flowLabel, setLabel] = useState(customLabel)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
 
   const { denom_local } =
@@ -255,7 +256,7 @@ export const SubmitFlowDialog = ({
       feeFunds: {
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
-      label: txLabel,
+      label: flowLabel,
     });
   }
   return (
@@ -683,7 +684,7 @@ export const SubmitFlowDialog = ({
                     <Text>
                       <StyledInputWithBorder /* step=".01" */
                         placeholder="My trigger" /* type="number" */
-                        value={txLabel}
+                        value={flowLabel}
                         onChange={({ target: { value } }) => setLabel(value)}
                       />{' '}
                     </Text>
