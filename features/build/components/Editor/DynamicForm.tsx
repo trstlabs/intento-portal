@@ -313,9 +313,17 @@ const StyledFormWrapper = styled('div', {
 });
 
 function formatMainTitle(title) {
-    let formattedTitle = title.replace(/([A-Z])/g, ' $1').trim();
-    formattedTitle = formattedTitle.charAt(0).toUpperCase() + formattedTitle.slice(1).toLowerCase();
-    formattedTitle = formattedTitle.replace(/\s[a-z]/g, (match) => match.toUpperCase());
+    // First handle snake_case by replacing underscores with spaces
+    let formattedTitle = title.replace(/_/g, ' ');
+    
+    // Then handle camelCase by adding spaces before capital letters
+    formattedTitle = formattedTitle.replace(/([A-Z])/g, ' $1').trim();
+    
+    // Capitalize the first letter of each word
+    formattedTitle = formattedTitle.split(' ')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ');
+        
     return formattedTitle;
 }
 
