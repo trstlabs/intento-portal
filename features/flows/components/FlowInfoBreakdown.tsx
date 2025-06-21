@@ -395,7 +395,7 @@ export const FlowInfoBreakdown = ({
             variant="secondary"
             target="__blank"
             rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flowInfo.id}`} >Alerts</Button>
-          <FlowTransformButton flowInfo={flowInfo} />
+          <FlowTransformButton flowInfo={flowInfo} initialChainID={chainId}/>
         </Inline>
         <Row>
           <Inline

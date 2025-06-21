@@ -5,7 +5,12 @@ import { Button, CopyIcon } from 'junoblocks';
 import { fetchFlowMsgs } from '../../../hooks/useGetMsgsFromAPI';
 
 
-export const FlowTransformButton = ({ flowInfo }) => {
+type FlowTransformButtonProps = {
+  flowInfo: any
+  initialChainID?: string
+}
+
+export const FlowTransformButton = ({ flowInfo, initialChainID }: FlowTransformButtonProps) => {
     const router = useRouter();
     const convertBigIntToString = (obj) => {
         if (typeof obj !== 'object' || obj === null) {
@@ -57,7 +62,10 @@ export const FlowTransformButton = ({ flowInfo }) => {
         flowInput = convertBigIntToString(flowInput);
         router.push({
             pathname: '/build',
-            query: { flowInput: JSON.stringify(flowInput) }
+            query: { 
+                flowInput: JSON.stringify(flowInput),
+                ...(initialChainID && { initialChainId: initialChainID })
+            }
         });
     };
 

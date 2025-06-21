@@ -42,10 +42,31 @@ export const BuildWrapper = ({
 
 
   const router = useRouter();
-  const { flowInput } = router.query;
+  const { flowInput, initialChainId: urlChainId } = router.query;
 
-  //works faster than without array for some reason
-  const [flowInputs, setFlowInputs] = useState([initialFlowInput])
+  // Initialize with default flow input or from URL
+  const [flowInputs, setFlowInputs] = useState(() => {
+    try {
+      if (flowInput && typeof flowInput === 'string') {
+        const parsed = JSON.parse(flowInput);
+        // If we have an initialChainId from URL but not in the flowInput, update it
+        if (urlChainId && parsed.connectionId !== urlChainId) {
+          return [{
+            ...parsed,
+            connectionId: urlChainId,
+            hostedIcaConfig: parsed.hostedIcaConfig ? {
+              ...parsed.hostedIcaConfig,
+              connectionId: urlChainId
+            } : undefined
+          }];
+        }
+        return [parsed];
+      }
+    } catch (e) {
+      console.error('Failed to parse flowInput from URL', e);
+    }
+    return [initialFlowInput];
+  });
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
@@ -74,11 +95,15 @@ export const BuildWrapper = ({
     }
   }, [flowInput]);
 
+  // Get the initialChainId from URL or from the first flow input
+  const effectiveInitialChainId = urlChainId || flowInputs[0]?.connectionId || '';
+
   return (
     <StyledDivForWrapper>
       <BuildComponent
         flowInput={flowInputs[0]}
         onFlowChange={(flow) => setFlowInputs([flow])}
+        initialChainId={effectiveInitialChainId}
       />
     </StyledDivForWrapper>
   )

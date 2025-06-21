@@ -46,11 +46,13 @@ import { HostedAccountCard } from './HostedAccountCard'
 type FlowsInputProps = {
   flowInput: FlowInput
   onFlowChange: (flowInput: FlowInput) => void
+  initialChainId?: string
 } & HTMLProps<HTMLInputElement>
 
 export const BuildComponent = ({
   flowInput,
   onFlowChange,
+  initialChainId,
 }: FlowsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
@@ -376,6 +378,7 @@ export const BuildComponent = ({
                 Chain
               </Text>{' '}
               <ChainSelector
+                initialChainId={initialChainId}
                 onChange={(update) => {
                   handleChainChange(
                     update.chainId,
