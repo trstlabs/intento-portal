@@ -11,17 +11,30 @@ const transporter = nodemailer.createTransport({
 
 export const handler: Handler = async (event, _context) => {
   try {
-    const body = JSON.parse(event.body)
-    const rawData = body.messages?.[0]?.data
-
-    if (!rawData) {
+    let rawData
+    try {
+      const bodyParsed = JSON.parse(event.body)
+      rawData =
+        bodyParsed?.messages?.[0]?.data || bodyParsed?.data || event.body
+    } catch (e) {
+      console.warn('Failed to parse event body as JSON:', event.body)
       return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Invalid event structure' }),
+        body: JSON.stringify({ message: 'Invalid JSON' }),
       }
     }
 
-    const parsedData = JSON.parse(rawData)
+    let parsedData
+    try {
+      parsedData = typeof rawData === 'string' ? JSON.parse(rawData) : rawData
+    } catch (e) {
+      console.warn('Failed to parse rawData:', rawData)
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: 'Invalid message data' }),
+      }
+    }
+
     const flowID = parsedData?.flowID
     const emails = parsedData?.emails
     const owner = parsedData?.owner || 'Unknown'
@@ -42,8 +55,13 @@ export const handler: Handler = async (event, _context) => {
     )
       .then((res) => res.json())
       .catch(() => null)
+    const totalExecutions = flowHistory?.history?.length || 0
 
-    const lastExecution = flowHistory?.history?.[flowHistory.history.length - 1]
+    let lastExecution = null
+    if (flowHistory && Array.isArray(flowHistory.history)) {
+      lastExecution = flowHistory.history[flowHistory.history.length - 1]
+    }
+
     const feeAmount =
       parseFloat(lastExecution.exec_fee?.amount || '0') / 1_000_000
     const feeDenom = await resolveDenom(
@@ -51,7 +69,7 @@ export const handler: Handler = async (event, _context) => {
     )
     const img =
       feeDenom == 'ELYS'
-        ? 'https://github.com/cosmos/chain-registry/blob/master/elys/images/elys.png'
+        ? 'https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png'
         : 'https://intento.zone/assets/images/intento_tiny.png'
     const formattedHistory = lastExecution
       ? `
@@ -77,7 +95,7 @@ export const handler: Handler = async (event, _context) => {
             'None'
           }</li>
           ${
-            lastExecution.errors.length > 0
+            Array.isArray(lastExecution?.errors) && lastExecution.errors.length > 0
               ? `<li><strong>Errors:</strong> ${lastExecution.errors.join(
                   ', '
                 )}</li>`
@@ -112,6 +130,7 @@ export const handler: Handler = async (event, _context) => {
             <h2>New <span style="color:rgb(35, 74, 153);">${eventType}</span> event on Flow ID <strong>${flowID}</strong></h2>
             <p><strong>Owner:</strong> ${owner}</p>
             <p><a href="${flowUrl}" style="display:inline-block;margin:10px 0;padding:8px 16px;background:#0055ff;color:white;text-decoration:none;border-radius:4px;">🔎 View Flow</a></p>
+            <p><strong>Total Executions:</strong> ${totalExecutions}</p>
             ${formattedHistory}
             <hr style="margin: 30px 0;" />
             <p style="font-size: 0.9em;">
