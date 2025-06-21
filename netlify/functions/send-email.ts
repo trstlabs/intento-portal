@@ -63,10 +63,11 @@ export const handler: Handler = async (event, _context) => {
     }
 
     const feeAmount =
-      parseFloat(lastExecution.exec_fee?.amount || '0') / 1_000_000
+      parseFloat(lastExecution?.exec_fee?.amount || '0') / 1_000_000
     const feeDenom = await resolveDenom(
-      lastExecution.exec_fee?.denom || 'unknown'
+      lastExecution?.exec_fee?.denom || 'unknown'
     )
+
     const img =
       feeDenom == 'ELYS'
         ? 'https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png'
@@ -95,7 +96,8 @@ export const handler: Handler = async (event, _context) => {
             'None'
           }</li>
           ${
-            Array.isArray(lastExecution?.errors) && lastExecution.errors.length > 0
+            Array.isArray(lastExecution?.errors) &&
+            lastExecution.errors.length > 0
               ? `<li><strong>Errors:</strong> ${lastExecution.errors.join(
                   ', '
                 )}</li>`
