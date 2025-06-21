@@ -92,7 +92,7 @@ export const handler: Handler = async (event, _context) => {
           <li><strong>Exec Fee Amount:</strong> ${feeAmount}</li>
           <li><strong>Exec Fee Denom:</strong> ${feeDenom}</li>
           <li><strong>Message Responses:</strong> ${
-            lastExecution.msg_responses.map((msg) => msg['@type']).join(', ') ||
+            (lastExecution?.msg_responses || []).map((msg) => msg['@type']).join(', ') ||
             'None'
           }</li>
           ${
