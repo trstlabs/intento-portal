@@ -10,7 +10,7 @@ export const replaceAddressFields = (obj: any): any => {
     const result = { ...obj };
     
     // Check for address fields and replace them
-    const addressFields = ['sender', 'owner', 'fromAddr', 'from_address', 'from', 'signer'];
+    const addressFields = ['sender', 'owner', 'fromAddress', 'from_address', 'from', 'signer'];
     addressFields.forEach(field => {
         if (result[field] && typeof result[field] === 'string') {
             result[field] = 'Your Address';
