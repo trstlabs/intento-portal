@@ -33,7 +33,7 @@ import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
 import { FlowInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
-import { GearIcon, TransferIcon } from '../../../icons'
+import { GearIcon } from '../../../icons'
 import { SubmitFlowDialog } from './SubmitFlowDialog'
 import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
@@ -147,11 +147,6 @@ export const BuildComponent = ({
       ),
     [isExecutingSubmitTx, requestedSubmitTx, handleSubmitTx]
   )
-
-  const handleSubmitTxClick = () => {
-    connectExternalWallet(null)
-    return setRequestedSubmitTx(true)
-  }
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
@@ -562,7 +557,7 @@ export const BuildComponent = ({
           justifyContent: 'end',
         }}
       >
-        <Button
+        {/* <Button
           css={{ margin: '$4', columnGap: '$4' }}
           variant="primary"
           size="large"
@@ -571,7 +566,7 @@ export const BuildComponent = ({
           iconLeft={<TransferIcon />}
         >
           {isExecutingSchedule ? <Spinner instant /> : 'Send messages now'}
-        </Button>
+        </Button> */}
         <Button
           css={{ margin: '$4', columnGap: '$4' }}
           variant="primary"
