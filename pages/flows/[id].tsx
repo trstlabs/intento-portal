@@ -65,7 +65,7 @@ export default function Flow() {
         {APP_NAME && flowInfo != undefined && (
           <Head>
             <title>
-              {APP_NAME} — Flow {flowInfo.id}
+              {APP_NAME} — Flow {flowInfo.label || flowInfo.id}
             </title>
           </Head>
         )}
