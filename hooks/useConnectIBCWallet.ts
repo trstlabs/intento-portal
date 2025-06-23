@@ -4,7 +4,7 @@ import { ibcWalletState, walletState, WalletStatusType } from 'state/atoms/walle
 import { useIBCAssetInfoByChainID } from './useIBCAssetInfo'
 import { useChain } from '@cosmos-kit/react'
 import { useChainInfoByChainID } from './useChainList'
-import toast from 'react-hot-toast'
+// import toast from 'react-hot-toast'
 import { ChainInfo } from '@keplr-wallet/types'
 import { useEffect } from 'react'
 
@@ -13,7 +13,7 @@ export const useConnectIBCWallet = (
   mutationOptions,
   fromRegistry = false
 ) => {
-  const [_, setWalletState] = useRecoilState(ibcWalletState)
+  const [ibcWallet, setWalletState] = useRecoilState(ibcWalletState)
   const queryClient = useQueryClient()
   const mainWallet = useRecoilValue(walletState)
 
@@ -21,7 +21,7 @@ export const useConnectIBCWallet = (
 
   // Effect to handle main wallet changes
   useEffect(() => {
-    if (mainWallet.status === WalletStatusType.connected && mainWallet.address) {
+    if (mainWallet.status === WalletStatusType.connected && mainWallet.address && chainId != ibcWallet.chainId) {
       // When main wallet changes, reset IBC wallet if it was connected
       setWalletState(prev => ({
         ...prev,
@@ -126,7 +126,7 @@ export const useConnectIBCWallet = (
         },
         features: [],
       };
-
+      console.log(chainInfoForKeplr)
       await keplr.experimentalSuggestChain(chainInfoForKeplr);
       return true;
     } catch (error) {
@@ -138,7 +138,7 @@ export const useConnectIBCWallet = (
   const mutation = useMutation(async () => {
     console.log('useConnectIBCWallet: Starting wallet connection...');
 
-    if (!assetInfo) {
+    if (!assetInfo && !registryInfo) {
       const error = new Error('Asset info for the provided `tokenSymbol` was not found.');
       console.error(error.message);
       throw error;
@@ -252,7 +252,7 @@ export const useConnectIBCWallet = (
         status: WalletStatusType.connected,
       });
     } catch (error) {
-      toast.error('Failed to connect IBC wallet')
+      console.error('Failed to connect IBC wallet')
 
       setWalletState({
         address: '',

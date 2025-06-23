@@ -1,10 +1,8 @@
-import {
-  Button,
-  IconWrapper,
-  styled,
-  Union,
-} from 'junoblocks'
+import { Button, IconWrapper, styled, Union } from 'junoblocks'
 import React, { useRef, useState, useEffect, forwardRef } from 'react'
+import { useRecoilValue } from 'recoil'
+import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
+import { useConnectIBCWallet } from '../../../../hooks/useConnectIBCWallet'
 
 import { ChainSelectorToggle } from './ChainSelectorToggle'
 import { ChainSelectorDialog } from './ChainSelectorDialog'
@@ -16,6 +14,7 @@ type ChainSelectorProps = {
   disabled?: boolean
   onChange: (ChainInfo: ChainInfo) => void
   initialChainId?: string
+  chainId?: string
 }
 
 export const ChainSelector = forwardRef<HTMLDivElement, ChainSelectorProps>((
@@ -25,44 +24,42 @@ export const ChainSelector = forwardRef<HTMLDivElement, ChainSelectorProps>((
     initialChainId,
   }, ref
 ) => {
-  const wrapperRef = useRef()
+  const ibcWallet = useRecoilValue(ibcWalletState)
+
   const [isChainListShowing, setChainListShowing] = useState(false)
-  // const ibcInfo = useIBCAssetInfoFromConnection(connectionID)
-  const [selectedChain, setSelectedChain] = useState({ logoURI: undefined, name: undefined })
+  const [selectedChain, setSelectedChain] = useState(new ChainInfo())
+  const { mutate: connectExternalWallet } = useConnectIBCWallet(selectedChain?.chainId, {})
+  const wrapperRef = useRef()
 
-  // In ChainSelector.tsx
-const [icaAssetList] = useIBCAssetList() // This uses ibc_assets.json
+  const [icaAssetList] = useIBCAssetList() // This uses ibc_assets.json
 
-// Replace the chainRegistryList with icaAssetList for the initial selection
-useEffect(() => {
-  if (initialChainId && !selectedChain.logoURI && icaAssetList.length > 0) {
-    const matchingChain = icaAssetList.find(
-      chain => chain.chain_id === initialChainId
-    )
+  // Replace the chainRegistryList with icaAssetList for the initial selection
+  useEffect(() => {
+    if (initialChainId && !selectedChain.logoURI && icaAssetList.length > 0) {
+      const matchingChain = icaAssetList.find(
+        chain => chain.chain_id === initialChainId
+      )
 
-    if (matchingChain) {
-      const chainInfo = new ChainInfo()
-      chainInfo.chainId = matchingChain.chain_id
-      chainInfo.connectionId = matchingChain.connection_id || ''
-      chainInfo.hostConnectionId =/*  matchingChain.host_connection_id ||  */''
-      chainInfo.name = matchingChain.name
-      chainInfo.logoURI = matchingChain.logo_uri
-      chainInfo.denom = matchingChain.denom
-      chainInfo.symbol = matchingChain.symbol
-      chainInfo.prefix = matchingChain.prefix
-      chainInfo.trstDenom = matchingChain.denom_local || ''
-      
-      setSelectedChain({ 
-        logoURI: chainInfo.logoURI, 
-        name: chainInfo.name 
-      })
-      onChange(chainInfo)
+      if (matchingChain) {
+        const chainInfo = new ChainInfo()
+        chainInfo.chainId = matchingChain.chain_id
+        chainInfo.connectionId = matchingChain.connection_id || ''
+        chainInfo.hostConnectionId =/*  matchingChain.host_connection_id ||  */''
+        chainInfo.name = matchingChain.name
+        chainInfo.logoURI = matchingChain.logo_uri
+        chainInfo.denom = matchingChain.denom
+        chainInfo.symbol = matchingChain.symbol
+        chainInfo.prefix = matchingChain.prefix
+        chainInfo.trstDenom = matchingChain.denom_local || ''
+
+        setSelectedChain(chainInfo)
+        onChange(chainInfo)
+      }
     }
-  }
-}, [initialChainId, icaAssetList, onChange])
+  }, [initialChainId, icaAssetList, onChange])
 
   const handleSelectChain = (chainInfo: ChainInfo) => {
-    setSelectedChain({ logoURI: chainInfo.logoURI, name: chainInfo.name })
+    setSelectedChain(chainInfo)
     onChange(chainInfo)
     setChainListShowing(false)
   }
@@ -71,21 +68,35 @@ useEffect(() => {
     if (!disabled) setChainListShowing(!isChainListShowing)
   }
 
+  // Show connect button if there's an error with the IBC wallet
+  if (ibcWallet.status === WalletStatusType.error && ibcWallet.chainId) {
+    return (
+      <StyledDivForContainer ref={ref || wrapperRef}>
+        <Button
+          variant="ghost"
+          size="large"
+          onClick={() => connectExternalWallet()}
+          css={{ width: '100%' }}
+        >
+          Connect to {selectedChain.name || 'Chain'}
+        </Button>
+      </StyledDivForContainer>
+    )
+  }
+
   return (
     <StyledDivForContainer ref={ref || wrapperRef}>
       <StyledDivForWrapper>
         <StyledDivForSelector>
           {!isChainListShowing && (
             <ChainSelectorToggle
-              // chainLogoURI={selectedChain.logoURI != undefined ? selectedChain.logoURI : ibcInfo.logo_uri}
-              // chainName={selectedChain.name ? selectedChain.name : ibcInfo.name}
               chainLogoURI={selectedChain.logoURI}
               chainName={selectedChain.name}
               isSelecting={isChainListShowing}
               onToggle={toggleChainList}
             />
           )}
-        </StyledDivForSelector>{' '}
+        </StyledDivForSelector>
         <StyledDivForButton>
           {isChainListShowing && (
             <Button
