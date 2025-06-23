@@ -124,7 +124,7 @@ export const useConnectIBCWallet = (
           coinMinimalDenom: chainInfo.denom,
           coinDecimals: chainInfo.decimals || 6,
         },
-        features: ['stargate', 'ibc-transfer', 'no-legacy-stdTx'],
+        features: [],
       };
 
       await keplr.experimentalSuggestChain(chainInfoForKeplr);
@@ -159,7 +159,7 @@ export const useConnectIBCWallet = (
       console.log('Ensuring correct chain is selected in Keplr...');
 
       // Always try to add/suggest the chain to Keplr for local/dev environments
-      if (process.env.NODE_ENV === 'development' || !['cosmoshub', 'osmosis', 'juno', 'stargaze', 'osmo', 'stars'].some(
+      if (process.env.NODE_ENV === 'development' || ['cosmostest'].some(
         chain => (assetInfo.registry_name || '').toLowerCase().includes(chain)
       )) {
         console.log('Adding/suggesting chain to Keplr...');
