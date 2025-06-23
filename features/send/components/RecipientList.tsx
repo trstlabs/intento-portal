@@ -122,10 +122,15 @@ export const RecipientList = ({
   const handleScheduleClick = (flowInput: FlowInput) => {
     if (status === WalletStatusType.connected) {
       let msgs = []
+      // Calculate timeout timestamp as 1 day after (startTime + duration)
+      const startTime = flowInput.startTime || 0;
+      const duration = flowInput.duration || 0;
+      const oneDayInMs = 24 * 60 * 60 * 1000; // 1 day in milliseconds
+      const timeoutTimestamp = Math.floor((Date.now() + startTime + duration + oneDayInMs) / 1000) * 1000000000;
+      
       for (let recipient of recipients) {
         let sendMsg
         if (recipient.channelID) {
-
           sendMsg = transferObject
           sendMsg.value.token = {
             amount: convertDenomToMicroDenom(recipient.amount, 6).toString(),
@@ -134,9 +139,7 @@ export const RecipientList = ({
           sendMsg.value.sender = address
           sendMsg.value.receiver = recipient.recipient
           sendMsg.value.sourceChannel = recipient.channelID
-          sendMsg.value.timeoutTimestamp = Math.floor(
-            new Date().getTime() + 60 * 1000
-          ).toString()
+          sendMsg.value.timeoutTimestamp = timeoutTimestamp
         } else {
           sendMsg = sendObject
           sendMsg.value.fromAddress = address
