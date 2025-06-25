@@ -7,7 +7,7 @@ const StyledDatePicker = styled(DatePicker, {
   width: '200px',
   padding: '8px 12px',
   borderRadius: '4px',
-  border: '1px solid $borderColors$inactive',
+  border: '1px solid $borderColors$selected',
   fontSize: '14px',
   color: '$colors$dark',
   backgroundColor: '$colors$light10',
@@ -157,7 +157,7 @@ export function EditExecutionSection({
     <StyledDiv>
       <StyledGrid>
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '100px' }}>Start Time</Text>
+          <Text variant="caption" style={{ minWidth: '50px' }}>Start</Text>
           <Inline gap={2}>
             <StyledDatePicker
               selected={startAt}
@@ -174,6 +174,9 @@ export function EditExecutionSection({
 
             />
             <Button
+              style={
+                { marginLeft: '8px' }
+              }
               variant="secondary"
               onClick={handleRightAwayClick}
               disabled={isRightAway}
@@ -184,7 +187,7 @@ export function EditExecutionSection({
         </Inline>
 
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '100px' }}>Interval</Text>
+          <Text variant="caption" style={{ minWidth: '50px' }}>Interval</Text>
           <select
             value={interval}
             onChange={e => {
@@ -214,7 +217,7 @@ export function EditExecutionSection({
         </Inline>
 
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '100px' }}>End Time</Text>
+          <Text variant="caption" style={{ minWidth: '50px' }}>End</Text>
           <StyledDatePicker
             selected={endTime}
             onChange={handleEndTimeChange}
@@ -231,11 +234,11 @@ export function EditExecutionSection({
               handleEndTimeIntervalChange(value);
             }}
             style={{
-              width: '60px',
-              padding: '8px 12px',
+              width: '80px',
+              padding: '8px',
               borderRadius: '4px',
               border: endTime === new Date(startAt?.getTime() + endTimeInterval) ? '2px solid $borderColors$selected' : '0.5px solid $borderColors$inactive',
-              fontSize: '14px',
+              fontSize: '12px',
               color: themeController?.theme.name === 'dark' ? 'white' : 'black',
               backgroundColor: 'var(--input-background-color)',
               marginLeft: '8px'

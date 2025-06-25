@@ -120,7 +120,6 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
         [`authz.v1beta1.MsgExec${flowInput.msgs[0]}`] :
         flowInput.msgs
     },
-    true, // isDialogShowing
     denomLocal,
     interval,
     hostedAccount

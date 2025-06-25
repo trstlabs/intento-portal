@@ -28,7 +28,7 @@ import {
   paramsStateAtom,
   intentModuleParamsAtom,
 } from '../state/atoms/moduleParamsAtoms'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { FlowInput } from '../types/trstTypes'
 
 const chainInfoQueryKey = '@chain-info'
@@ -59,7 +59,6 @@ export const useIBCChainInfo = (chainId: string) => {
 export const useGetExpectedFlowFee = (
   durationSeconds: number,
   flowInput: FlowInput,
-  _isDialogShowing: boolean, // Prefixed with underscore to indicate it's unused
   denom: string,
   intervalSeconds?: number,
   hostedAccount?: any // Add hostedAccount parameter
@@ -67,23 +66,23 @@ export const useGetExpectedFlowFee = (
   let [intentModuleParams, setTriggerModuleData] = useRecoilState(
     intentModuleParamsAtom
   )
-
+  // Calculate recurrences based on interval and duration
+  const recurrences =
+    intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
+      ? Math.floor(durationSeconds / intervalSeconds)
+      : 1
   const client = useIntentoRpcClient()
 
-  // Create a stable query key that includes all relevant parameters
-  // Use JSON.stringify for the flowInput.msgs to ensure it's properly compared
-  const queryKey = [
+  const stableQueryKey = useMemo(() => [
     'expectedFlowFee',
-    durationSeconds,
-    intervalSeconds,
+    recurrences,
     denom,
     flowInput.msgs?.length || 0,
-    JSON.stringify(flowInput.msgs),
-    hostedAccount?.address // Include hosted account address in query key
-  ]
-    
+    hostedAccount?.address ?? null
+  ], [recurrences, denom, flowInput.msgs, hostedAccount?.address])
+  console.log(stableQueryKey)
   const { data, isLoading } = useQuery(
-    queryKey,
+    stableQueryKey,
     async () => {
       // Make sure client exists and has the intento property before proceeding
       if (!client || !client.intento) {
@@ -107,11 +106,7 @@ export const useGetExpectedFlowFee = (
         return { fee: 0, symbol: denom }
       }
 
-      // Calculate recurrences based on interval and duration
-      const recurrences =
-        intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
-          ? Math.floor(durationSeconds / intervalSeconds)
-          : 1
+
 
       try {
         // Ensure we have valid parameters before calling getExpectedFlowFee
@@ -162,7 +157,7 @@ export const useGetExpectedFlowFee = (
           fee = intoFee
           denom = 'uinto'
         }
- 
+
         // Hosted account fee is now handled in getExpectedFlowFee
 
         return { fee, denom }
@@ -172,7 +167,7 @@ export const useGetExpectedFlowFee = (
       }
     },
     {
-      enabled: Boolean(durationSeconds && flowInput.msgs && denom && client),
+      enabled: Boolean(durationSeconds && flowInput.msgs && flowInput.msgs.length > 0 && denom && client),
       refetchOnMount: true,
       staleTime: 10000, // Consider data stale after 10 seconds
       cacheTime: 30000, // Keep in cache for 30 seconds

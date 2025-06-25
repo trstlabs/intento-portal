@@ -18,7 +18,7 @@ import {
   convertDenomToMicroDenom,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useEffect, useState } from 'react'
+import {  useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { AuthzGrantCheck } from './AuthzGrantCheck'
@@ -76,17 +76,17 @@ export const SubmitFlowDialog = ({
   const [flowLabel, setLabel] = useState(customLabel)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
 
-  const { denom_local } =
-    useIBCAssetInfo(feeFundsSymbol) || {}
+  const denom_local =
+    useIBCAssetInfo(feeFundsSymbol)?.denom_local || "uinto"
 
   // Update fee denom from hosted account's fee config
-  useEffect(() => {
-    if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
-      const feeDenom = hostedAccount.hostFeeConfig.feeCoinsSuported[0].denom;
-      const feeSymbol = feeDenom.startsWith('u') ? feeDenom.substring(1).toUpperCase() : feeDenom.toUpperCase();
-      setFeeFundsSymbol(feeSymbol);
-    }
-  }, [hostedAccount?.hostFeeConfig?.feeCoinsSuported]);
+  // useEffect(() => {
+  //   if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
+  //     const feeDenom = hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === denom_local).denom;
+  //     const feeSymbol = feeDenom.startsWith('u') ? feeDenom.substring(1).toUpperCase() : feeDenom.toUpperCase();
+  //     setFeeFundsSymbol(feeSymbol);
+  //   }
+  // }, [hostedAccount?.hostFeeConfig?.feeCoinsSuported]);
 
   // Helper for overview display
   const duration = executionParams.startAt > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - Date.now()
@@ -105,8 +105,7 @@ export const SubmitFlowDialog = ({
   const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedFlowFee(
     duration / 1000,
     flowInput,
-    isDialogShowing,
-    denom_local,
+    "uinto",//denom_local,
     interval / 1000,
     hostedAccount
   );
@@ -133,6 +132,7 @@ export const SubmitFlowDialog = ({
       ))
       return
     }
+
     handleSubmitFlow({
       ...flowInput,
       startTime: startAt,
@@ -141,6 +141,9 @@ export const SubmitFlowDialog = ({
       icaAddressForAuthZ,
       feeFunds: {
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
+      },
+      hostedIcaConfig: {
+        hostedAddress: icaAddress, feeCoinLimit: hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === 'uinto')
       },
       label: flowLabel,
     });

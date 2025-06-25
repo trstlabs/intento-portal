@@ -408,6 +408,7 @@ export const RecipientList = ({
         // label="Recurring Send"
         flowInput={flowInput}
         isDialogShowing={isScheduleDialogShowing}
+        customLabel='Send Flow'
         /* initialFlowType={flowType} */
         chainId={"intento-ics-test-1"}  
         onRequestClose={() =>
