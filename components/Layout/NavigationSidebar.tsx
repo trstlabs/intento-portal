@@ -226,7 +226,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Link>
         </>
       )}
-      {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' && (
+      {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' ? (
         <Link href="/claim" passHref>
           <Button
             as="a"
@@ -238,7 +238,16 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             <Inline css={{ paddingLeft: '$4' }}> Airdrop </Inline>
           </Button>
         </Link>
-      )}
+      ) :  <Link href="https://discord.com/channels/1096435382096244756/1096442171659390986" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<PoolsIcon />}
+        >
+          <Inline css={{ paddingLeft: '$4' }}> Faucet </Inline>
+        </Button>
+      </Link>}
       {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"
