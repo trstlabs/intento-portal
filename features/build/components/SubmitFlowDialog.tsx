@@ -118,6 +118,21 @@ export const SubmitFlowDialog = ({
   const handleData = (icaAddressForAuthZ: string) => {
     const { startAt, interval, endTime } = executionParams
     const duration = startAt > 0 ? endTime - startAt : endTime - Date.now()
+
+    // Check if start time is in the past
+    if (startAt > 0 && startAt < Date.now()) {
+      toast.custom((t) => (
+        <Toast
+          icon={<IconWrapper icon={<Error />} color="error" />}
+          title={
+            'Start time cannot be in the past. Please select a future time.'
+          }
+          onClose={() => toast.dismiss(t.id)}
+        />
+      ))
+      return
+    }
+
     if (duration < interval || startAt > endTime) {
       toast.custom((t) => (
         <Toast
