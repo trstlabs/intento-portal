@@ -409,7 +409,7 @@ export const RecipientList = ({
         flowInput={flowInput}
         isDialogShowing={isScheduleDialogShowing}
         /* initialFlowType={flowType} */
-        chainSymbol={'INTO'}
+        chainId={"intento-ics-test-1"}  
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,

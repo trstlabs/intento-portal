@@ -198,12 +198,11 @@ export const useICATokenBalance = (
 }
 
 export const useAuthZMsgGrantInfoForUser = (
-  chainId: string,
   grantee: string,
   flowInput?: FlowInput
 ) => {
   const ibcState = useRecoilValue(ibcWalletState)
-  const chain = useChainInfoByChainID(chainId)
+  const chain = useChainInfoByChainID(ibcState.chainId)
   const prevAddressRef = useRef(ibcState.address)
   const queryClient = useQueryClient()
   
@@ -272,7 +271,6 @@ export const useAuthZMsgGrantInfoForUser = (
         ibcState.status === WalletStatusType.connected &&
         ibcState.address &&
         grantee &&
-        chainId &&
         flowInput?.connectionId
       ),
       refetchOnMount: 'always',

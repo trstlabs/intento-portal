@@ -274,7 +274,6 @@ import {
     const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId || "")
   
     const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
-      chainId,
       hostedICA || icaAddress,
       flowInput
     )

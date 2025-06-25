@@ -65,7 +65,6 @@ export const IcaCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] = useState(false)
   const { grants: icaAuthzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
-    chainId,
     icaAddress,
     flowInput
   )

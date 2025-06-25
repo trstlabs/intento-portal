@@ -192,13 +192,9 @@ export const BuildComponent = ({
     [icaAddress, flowInput.msgs, feeFundsHostChain]
   )
 
-
-  const shouldDisableAuthzGrantButton = !hostedICA || flowInput.msgs.includes("authz.v1beta1.MsgExec")
-
-
-  const handleRegisterAccountClick = () => {
-    return setRequestedRegisterICA(true)
-  }
+  // const handleRegisterAccountClick = () => {
+  //   return setRequestedRegisterICA(true)
+  // }
 
   const handleSubmitFlowClick = (flowInput: FlowInput) => {
     onFlowChange(flowInput)
@@ -386,8 +382,8 @@ export const BuildComponent = ({
                   )
                 }}
               />{' '}
-              {
-                /* !icaActive && !isIcaActiveLoading &&  */ !icaAddress &&
+              {/* {
+               !icaAddress &&
                 chainIsConnected &&
                 !isIcaLoading &&
                 flowInput.connectionId != '' && (
@@ -410,7 +406,7 @@ export const BuildComponent = ({
                     </Button>
                   </>
                 )
-              }
+              } */}
             </Row>
             {chainName &&
               chainIsConnected &&
@@ -490,9 +486,7 @@ export const BuildComponent = ({
         }
       </Card>
       <SubmitFlowDialog
-        chainSymbol={chainSymbol}
-        icaBalance={icaBalance}
-        icaAddress={icaAddress}
+        icaAddress={icaAddress || hostedICA}
         flowInput={flowInput}
         isDialogShowing={isSubmitFlowDialogShowing}
         onRequestClose={() =>
@@ -501,19 +495,12 @@ export const BuildComponent = ({
           })
         }
         customLabel={flowInput?.label}
-        shouldDisableAuthzGrantButton={shouldDisableAuthzGrantButton}
         isLoading={isExecutingSchedule}
-        feeFundsHostChain={feeFundsHostChain}
-        shouldDisableSendHostChainFundsButton={
-          shouldDisableSendHostChainFundsButton
-        }
-        isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
-        setFeeFundsHostChain={setFeeFundsHostChain}
         handleSubmitFlow={(flowInput) =>
           handleSubmitFlowClick(flowInput)
         }
-        handleSendFundsOnHostClick={handleSendFundsOnHostClick}
         hostedAccount={hostedAccount}
+        chainId={chainId}
       />
       <Column>
         <Inline css={{ margin: '$6', marginTop: '$16' }}>

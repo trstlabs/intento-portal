@@ -14,68 +14,65 @@ import {
   styled,
   Text,
   Tooltip,
-  Union,
-  Chevron,
+
   convertDenomToMicroDenom,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useEffect, useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
-import { Chip, ChipSelected } from '../../../components/Layout/Chip'
+import { AuthzGrantCheck } from './AuthzGrantCheck'
+import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
+
 import { TokenSelector } from '../../send/components/TokenSelector'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
+import { EditExecutionSection } from '../../flows/components/EditExecutionSection'
 
-
-type SubmitFlowDialogProps = {
+interface SubmitFlowDialogProps {
   isDialogShowing: boolean
-  flowInput: FlowInput
-  chainSymbol?: string
   icaAddress?: string
-  icaBalance?: number
-  customLabel?: string
-  feeFundsHostChain?: string
+  customLabel: string
+  flowInput: FlowInput
   isLoading: boolean
-  isExecutingAuthzGrant?: boolean
-  isExecutingSendFundsOnHost?: boolean
-  shouldDisableAuthzGrantButton?: boolean
-  shouldDisableSendHostChainFundsButton?: boolean
   onRequestClose: () => void
   handleSubmitFlow: (data: FlowInput) => void
-  handleCreateAuthzGrantClick?: (withFunds: boolean) => void
-  handleSendFundsOnHostClick?: () => void
-  setFeeFundsHostChain?: (data: string) => void
   hostedAccount?: HostedAccount
+  chainId: string
 }
-//todo clean up all authz and host fund logic
+
+// Only executionParams and setUpdateExecutionParams are used for interval/startAt/duration
 export const SubmitFlowDialog = ({
+  chainId,
   isDialogShowing,
   icaAddress,
-  icaBalance,
   customLabel,
-  chainSymbol,
   flowInput,
-  feeFundsHostChain,
-  isExecutingAuthzGrant,
-  isExecutingSendFundsOnHost,
   isLoading,
-  shouldDisableAuthzGrantButton,
-  shouldDisableSendHostChainFundsButton,
   onRequestClose,
-  setFeeFundsHostChain,
   handleSubmitFlow,
-  handleCreateAuthzGrantClick,
-  handleSendFundsOnHostClick,
   hostedAccount,
 }: SubmitFlowDialogProps) => {
+  // Get authz grant info
+  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+    icaAddress,
+    flowInput
+  )
 
-  const [startTime, setStartTime] = useState(0)
-  const [duration, setDuration] = useState(30 * 86400000)
+  // Single source of truth for execution params
+  const [executionParams, setExecutionParams] = useState({
+    startAt: 0,
+    interval: 86400000, // 1 day in ms
+    endTime: Date.now() + 30 * 86400000, // 30 days from now
+  })
 
-  const [interval, setInterval] = useState(86400000)
+  function setUpdateExecutionParams(field: string, value: any) {
+    setExecutionParams((prev) => ({ ...prev, [field]: value }))
+  }
+
+
+
   const [feeFunds, setFeeAmount] = useState(0)
-
   const [flowLabel, setLabel] = useState(customLabel)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
 
@@ -91,126 +88,12 @@ export const SubmitFlowDialog = ({
     }
   }, [hostedAccount?.hostFeeConfig?.feeCoinsSuported]);
 
-  const [displayInterval, setDisplayInterval] = useState('1 day')
-  const [editInterval, setEditInterval] = useState(false)
-  const [editIntervalValue, setEditIntervalValue] = useState('1 hour')
-  const [displayDuration, setDisplayDuration] = useState('30 days')
-  const [editDuration, setEditDuration] = useState(false)
-  const [editDurationValue, setEditDurationValue] = useState('2 hours')
-  const [displayStartTime, setDisplayStartTime] = useState('Right Away')
-  const [editStartTime, setEditStartTime] = useState(false)
-  const [editStartTimeValue, setEditStartTimeValue] = useState('1 hour')
-
-  const timeLabels = [
-    'None',
-    '1 week',
-    '1 day',
-    '5 days',
-    '1 hour',
-    '2 hours',
-    '30 min',
-    '2 weeks',
-    '30 days',
-    '60 days',
-    '90 days',
-    '1 year',
-  ]
-  const timeSecondValues = [
-    0,
-    3600000 * 24 * 7,
-    3600000 * 24,
-    3600000 * 24 * 5,
-    3600000,
-    3600000 * 2,
-    3600000 / 2,
-    3600000 * 24 * 14,
-    3600000 * 24 * 30,
-    3600000 * 24 * 60,
-    3600000 * 24 * 90,
-    3600000 * 24 * 365,
-  ]
-
-  function handleInterval(label, value: number) {
-    console.log("value", value, "duration", duration)
-    if (value > duration) {
-      toast.custom((t) => (
-        <Toast
-          icon={<IconWrapper icon={<Error />} color="error" />}
-          title={
-            "Can't set interval longer than the duration of " +
-            displayDuration
-          }
-          onClose={() => toast.dismiss(t.id)}
-        />
-      ))
-      return
-    }
-    setInterval(value)
-    setDisplayInterval(label)
-  }
-  function handleRemoveInterval() {
-    setInterval(0)
-    setDisplayInterval('None Selected')
-  }
-  function handleDuration(label: string, value) {
-    if (value >= interval || interval == 0) {
-      setDuration(value)
-      setDisplayDuration(label)
-      return
-    }
-    // if (interval > 0) {
-    toast.custom((t) => (
-      <Toast
-        icon={<IconWrapper icon={<Error />} color="error" />}
-        title={
-          "Can't select a lower duration than the interval of " +
-          displayInterval
-        }
-        onClose={() => toast.dismiss(t.id)}
-      />
-    ))
-    // }
-  }
-  function handleRemoveDuration() {
-    setDuration(0)
-    setDisplayDuration('None Selected')
-  }
-  function handleStartTime(label: string, value: number) {
-    if (value == undefined) {
-      return
-    }
-    setStartTime(value)
-    setDisplayStartTime(label)
-  }
-  function handleRemoveStartTime() {
-    setStartTime(0)
-    setDisplayStartTime(displayInterval)
-  }
-
-  const editLabel = 'days(s), hour(s), minute(s) or weeks(s)'
-  function convertTime(input: string) {
-    if (input.includes('hour')) {
-      const hours = Number(input.match(/\d/g).join(''))
-      return hours * 3600000
-    } else if (input.includes('day')) {
-      const days = Number(input.match(/\d/g).join(''))
-      return days * 3600000 * 24
-    } else if (input.includes('minute')) {
-      const minutes = Number(input.match(/\d/g).join(''))
-      return minutes * 60000
-    } else if (input.includes('week')) {
-      const weeks = Number(input.match(/\d/g).join(''))
-      return weeks * 3600000 * 24 * 7
-    }
-    toast.custom((t) => (
-      <Toast
-        icon={<IconWrapper icon={<Error />} color="error" />}
-        title={"Can't use your input as a time value " + input}
-        onClose={() => toast.dismiss(t.id)}
-      />
-    ))
-  }
-
+  // Helper for overview display
+  const duration = executionParams.startAt > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - Date.now()
+  const interval = executionParams.interval
+  const displayStartTime = executionParams.startAt === 0 ? 'Right Away' : new Date(executionParams.startAt).toLocaleString()
+  const displayDuration = duration > 0 ? msToHuman(duration) : 'None Selected'
+  const displayInterval = interval > 0 ? msToHuman(interval) : 'None Selected'
 
   //true = deduct fees from local acc
   const [checkedFeeAcc, setCheckedFeeAcc] = useState(true)
@@ -230,26 +113,29 @@ export const SubmitFlowDialog = ({
 
   const canSchedule = duration > 0 && interval > 0
 
+  // Use executionParams for handleData
   const handleData = (icaAddressForAuthZ: string) => {
-    if (duration < interval || startTime > duration) {
+    const { startAt, interval, endTime } = executionParams
+    const duration = startAt > 0 ? endTime - startAt : endTime - Date.now()
+    if (duration < interval || startAt > endTime) {
       toast.custom((t) => (
         <Toast
           icon={<IconWrapper icon={<Error />} color="error" />}
           title={
             'Cannot execute specified recurrences with the selected duration: ' +
             duration +
-            's, interval: ' +
+            'ms, interval: ' +
             interval +
-            's'
+            'ms'
           }
           onClose={() => toast.dismiss(t.id)}
         />
       ))
+      return
     }
-    console.log({ startTime, duration, interval })
     handleSubmitFlow({
-      ...flowInput, // Spread first
-      startTime,
+      ...flowInput,
+      startTime: startAt,
       duration,
       interval,
       icaAddressForAuthZ,
@@ -259,6 +145,7 @@ export const SubmitFlowDialog = ({
       label: flowLabel,
     });
   }
+
   return (
     <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
       <DialogHeader paddingBottom={canSchedule ? '$4' : '6'}>
@@ -271,248 +158,14 @@ export const SubmitFlowDialog = ({
             justifyContent="space-between"
             css={{ padding: '$2 $4', width: '100%' }}
           >
-            <Inline justifyContent={'space-between'} align="center">
-              <div className="chips">
-                <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Interval
-                </Text>
-                <ChipSelected
-                  label={displayInterval}
-                  onClick={() => handleRemoveInterval()}
-                />
-                {timeLabels.map((time, index) => (
-                  <span key={index}>
-                    {displayInterval != time && (
-                      <Chip
-                        label={time}
-                        onClick={() =>
-                          handleInterval(time, timeSecondValues[index])
-                        }
-                      />
-                    )}
-                  </span>
-                ))}
-              </div>
-              <Button
-                css={{ justifyContent: 'flex-end !important' }}
-                variant="ghost"
-                onClick={() => setEditInterval(!editInterval)}
-                icon={
-                  <IconWrapper
-                    size="medium"
-                    rotation="-90deg"
-                    color="tertiary"
-                    icon={editInterval ? <Union /> : <Chevron />}
-                  />
-                }
-              />
-              {editInterval && (
-                <Inline>
-                  <Column
-                    gap={8}
-                    align="flex-start"
-                    justifyContent="flex-start"
-                  >
-                    <Tooltip label={editLabel} aria-label="edit interval time">
-                      <Text variant="legend">
-                        Interval
-                        <StyledInput
-                          placeholder={displayInterval}
-                          value={editIntervalValue}
-                          onChange={({ target: { value } }) =>
-                            setEditIntervalValue(value)
-                          }
-                        />
-                      </Text>
-                    </Tooltip>
-                    <Button
-                      variant="primary"
-                      size="small"
-                      onClick={() =>
-                        handleInterval(
-                          cleanCustomInputForDisplay(editIntervalValue),
-                          convertTime(editIntervalValue)
-                        )
-                      }
-                    >
-                      {'Edit'}
-                    </Button>
-                  </Column>
-                </Inline>
-              )}
-            </Inline>
-            <Inline justifyContent={'space-between'} align="center">
-              <div className="chips">
-                <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Duration
-                </Text>
-                {startTime != 0 ? (
-                  <ChipSelected
-                    label={displayDuration + ' after ' + displayStartTime}
-                    onClick={() => handleRemoveDuration()}
-                  />
-                ) : (
-                  <ChipSelected
-                    label={displayDuration}
-                    onClick={() => handleRemoveDuration()}
-                  />
-                )}
-                {timeLabels.map((time, index) => (
-                  <span key={'b' + index}>
-                    {displayDuration != time && (
-                      <Chip
-                        label={time}
-                        onClick={() =>
-                          handleDuration(time, timeSecondValues[index])
-                        }
-                      />
-                    )}
-                  </span>
-                ))}
-              </div>
-              <Button
-                css={{ justifyContent: 'flex-end !important' }}
-                variant="ghost"
-                onClick={() => setEditDuration(!editDuration)}
-                icon={
-                  <IconWrapper
-                    size="medium"
-                    rotation="-90deg"
-                    color="tertiary"
-                    icon={editDuration ? <Union /> : <Chevron />}
-                  />
-                }
-              />
-              {editDuration && (
-                <Inline>
-                  <Column
-                    gap={8}
-                    align="flex-start"
-                    justifyContent="flex-start"
-                  >
-                    <Tooltip label={editLabel} aria-label="edit duration time">
-                      <Text variant="legend">
-                        Duration
-                        <StyledInput
-                          placeholder={displayDuration}
-                          value={editDurationValue}
-                          onChange={({ target: { value } }) =>
-                            setEditDurationValue(value)
-                          }
-                        />
-                      </Text>
-                    </Tooltip>
-                    <Button
-                      variant="primary"
-                      size="small"
-                      onClick={() =>
-                        handleDuration(
-                          cleanCustomInputForDisplay(editDurationValue),
-                          convertTime(editDurationValue)
-                        )
-                      }
-                    >
-                      {'Edit'}
-                    </Button>
-                  </Column>
-                </Inline>
-              )}
-            </Inline>
-
-            <Inline justifyContent={'space-between'} align="center">
-              <div className="chips">
-                <Text align="center" variant="caption" css={{ margin: '$6' }}>
-                  Start Time
-                </Text>
-                <ChipSelected
-                  label={
-                    displayStartTime == 'Right Away'
-                      ? displayStartTime
-                      : 'In ' + displayStartTime
-                  }
-                  onClick={() => handleRemoveStartTime()}
-                />
-                {timeLabels.map((time, index) => (
-                  <span key={'c' + index}>
-                    {displayStartTime != time && (
-                      <>
-                        {displayStartTime != 'Right Away' && index == 0 && (
-                          <Chip
-                            label={'Right Away'}
-                            onClick={() =>
-                              handleStartTime(
-                                'Right Away',
-                                timeSecondValues[index]
-                              )
-                            }
-                          />
-                        )}
-                        {index > 0 && index <= 6 && (
-                          <Chip
-                            label={'In ' + time}
-                            onClick={() =>
-                              handleStartTime(time, timeSecondValues[index])
-                            }
-                          />
-                        )}
-                      </>
-                    )}
-                  </span>
-                ))}
-              </div>
-              <Button
-                css={{ justifyContent: 'flex-end !important' }}
-                variant="ghost"
-                onClick={() => setEditStartTime(!editStartTime)}
-                icon={
-                  <IconWrapper
-                    size="medium"
-                    rotation="-90deg"
-                    color="tertiary"
-                    icon={editStartTime ? <Union /> : <Chevron />}
-                  />
-                }
-              />
-
-              {editStartTime && (
-                <Inline>
-                  <Column
-                    gap={8}
-                    align="flex-start"
-                    justifyContent="flex-start"
-                  >
-                    <Tooltip label={editLabel} aria-label="edit start time">
-                      <Text variant="legend">
-                        Start In
-                        <StyledInput
-                          placeholder={displayStartTime}
-                          value={editStartTimeValue}
-                          onChange={({ target: { value } }) =>
-                            setEditStartTimeValue(value)
-                          }
-                        />
-                      </Text>
-                    </Tooltip>
-                    <Button
-                      variant="primary"
-                      size="small"
-                      onClick={() =>
-                        handleStartTime(
-                          cleanCustomInputForDisplay(editStartTimeValue),
-                          convertTime(editStartTimeValue)
-                        )
-                      }
-                    >
-                      {'Edit'}
-                    </Button>
-                  </Column>
-                </Inline>
-              )}
-            </Inline>
+            <EditExecutionSection
+              updatedFlowParams={executionParams}
+              setUpdateFlowInfo={setUpdateExecutionParams}
+            />
             <Column css={{ padding: '$6 0' }}>
               <DialogDivider offsetBottom="$4" />
 
-              {chainSymbol != 'INTO' && (
+              {/* {chainSymbol != 'INTO'  && (
                 <>
                   <Text align="center" css={{ margin: '$4' }} variant="legend">
                     ICA Balance
@@ -524,7 +177,7 @@ export const SubmitFlowDialog = ({
                     >
 
                       <Text variant="caption" color="disabled">
-                       {icaBalance} {chainSymbol}
+                        {icaBalance} {chainSymbol}
                       </Text>
 
                     </Tooltip>
@@ -542,7 +195,7 @@ export const SubmitFlowDialog = ({
                     </Text>
 
                   </Inline>
-                  {/*  {icaAuthzGrants && icaAuthzGrants.length > 0 && (<Text>Currenct grants: {icaAuthzGrants}</Text>)} */}
+                
                   {!isExecutingAuthzGrant && (
                     <Inline justifyContent={'space-between'} align="center">
                       {feeFundsHostChain != '0.00' &&
@@ -579,7 +232,7 @@ export const SubmitFlowDialog = ({
                     </Inline>
                   )}
                 </>
-              )}
+              )} */}
               <Tooltip
                 label="Funds to set aside for execution. Remaining funds are returned after commision fee."
                 aria-label="Fund Flow - Intento (Optional)"
@@ -682,8 +335,8 @@ export const SubmitFlowDialog = ({
                       </Text>
                     </Tooltip>
                     <Text>
-                      <StyledInputWithBorder /* step=".01" */
-                        placeholder="My trigger" /* type="number" */
+                      <StyledInputWithBorder
+                        placeholder="My flow"
                         value={flowLabel}
                         onChange={({ target: { value } }) => setLabel(value)}
                       />{' '}
@@ -692,17 +345,25 @@ export const SubmitFlowDialog = ({
                 </>
               )}
             </Column>
+            <Column css={{ padding: '$6 $6' }}>
+              {flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
+                <AuthzGrantCheck
+                  flowInput={flowInput}
+                  chainId={chainId}
+                  grantee={icaAddress}
+                  authzGrants={authzGrants}
+                  isAuthzGrantsLoading={isAuthzGrantsLoading}
+                  refetchAuthzGrants={refetchAuthzGrants}
+                />
+              )}
+            </Column>
           </Column>
         </StyledDivForInputs>
       </DialogContent>
 
-      {
-        shouldDisableAuthzGrantButton && <Inline justifyContent={'space-between'} align="center">
-          <Text color="disabled" variant="caption" css={{ padding: '$6' }}>
-            Tip: to make the ICA execute on your behalf, create any missing grants and submit it wrapped as a MsgExec
-          </Text></Inline>
-      }
+
       <DialogDivider offsetTop="$4" offsetBottom="$2" />
+
       <DialogButtons
         cancellationButton={
           <Button variant="ghost" onClick={onRequestClose}>
@@ -711,7 +372,7 @@ export const SubmitFlowDialog = ({
         }
         confirmationButton={
           <Button
-            disabled={false}
+            disabled={isLoading}
             variant="secondary"
             onClick={() => (isLoading ? undefined : handleData(''))}
           >
@@ -721,9 +382,14 @@ export const SubmitFlowDialog = ({
       >
         {flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
           <Button
-            disabled={shouldDisableAuthzGrantButton}
+            disabled={isLoading}
             variant="secondary"
-            onClick={() => (isLoading ? undefined : handleData(icaAddress))}
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+              e.preventDefault()
+              if (!isLoading) {
+                handleData(icaAddress)
+              }
+            }}
           >
             {isLoading ? (
               <Spinner instant={true} size={16} />
@@ -737,31 +403,13 @@ export const SubmitFlowDialog = ({
   )
 }
 
-// helper function to clean users input for display (e.g. mistyping minute for minutex)
-function cleanCustomInputForDisplay(input: string) {
-  const number = Number(input.match(/\d+/g))
-  const isOne = number == 1
-  if (input.includes('hour')) {
-    if (isOne) {
-      return number + ' hour'
-    }
-    return number + ' hours'
-  } else if (input.includes('day')) {
-    if (isOne) {
-      return number + ' day'
-    }
-    return number + ' days'
-  } else if (input.includes('minute')) {
-    if (isOne) {
-      return number + ' minute'
-    }
-    return number + ' minutes'
-  } else if (input.includes('week')) {
-    if (isOne) {
-      return number + ' week'
-    }
-    return number + ' weeks'
-  }
+// Helper to convert ms to human readable string
+function msToHuman(ms: number) {
+  if (ms < 60000) return `${Math.floor(ms / 1000)} seconds`
+  if (ms < 3600000) return `${Math.floor(ms / 60000)} minutes`
+  if (ms < 86400000) return `${Math.floor(ms / 3600000)} hours`
+  if (ms < 604800000) return `${Math.floor(ms / 86400000)} days`
+  return `${Math.floor(ms / 604800000)} weeks`
 }
 
 const StyledDivForInputs = styled('div', {
@@ -780,7 +428,6 @@ const StyledInputWithBorder = styled('input', {
   color: 'inherit',
   borderRadius: '$2',
   border: '2px solid $borderColors$inactive',
-  // fontSize: `20px`,
   padding: '$3',
   margin: '$2',
 })

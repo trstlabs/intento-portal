@@ -16,7 +16,6 @@ import {
   IconWrapper,
   Chevron,
   Union,
-  useControlTheme,
 } from 'junoblocks'
 import Link from 'next/link'
 import React from 'react'
@@ -44,6 +43,7 @@ import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
+import { EditExecutionSection } from './EditExecutionSection'
 
 
 type FlowInfoBreakdownProps = {
@@ -58,7 +58,7 @@ export const FlowInfoBreakdown = ({
   FlowInfoBreakdownProps) => {
 
   const [icaAddress, _] = useGetICA(flowInfo.icaConfig?.connectionId, flowInfo.owner)
-  const themeController = useControlTheme()
+
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
   const [showICAHostButtons, setShowICAHostButtons] = useState(false)
@@ -151,7 +151,7 @@ export const FlowInfoBreakdown = ({
       setEditorIndex(index)
       if (transformedMsgs.length) {
         setEditMsgs(transformedMsgs)
-      }else{
+      } else {
         setEditMsgs(["{}"])
       }
 
@@ -190,7 +190,7 @@ export const FlowInfoBreakdown = ({
     };
 
     console.log('Updating flow with params:', updatedParams);
-    
+
     // Update the state and trigger the update
     setUpdatedFlowParams(updatedParams);
     setRequestedUpdateFlow(true);
@@ -240,7 +240,7 @@ export const FlowInfoBreakdown = ({
 
   // Debounce timer reference
   const debounceTimerRef = React.useRef<NodeJS.Timeout>();
-  
+
   // Handle message changes in the editor with debouncing
   const handleChangeMsg = (index: number) => {
     return (msg: string) => {
@@ -252,17 +252,17 @@ export const FlowInfoBreakdown = ({
       // Update local state immediately for responsive UI
       setEditMsgs(prevMsgs => {
         const newMsgs = [...prevMsgs];
-        
+
         // Ensure we have enough slots in the array
         while (newMsgs.length <= index) {
           newMsgs.push('{}');
         }
-        
+
         // Only update if the message has actually changed
         if (newMsgs[index] !== msg) {
           newMsgs[index] = msg;
         }
-        
+
         return newMsgs;
       });
 
@@ -299,7 +299,7 @@ export const FlowInfoBreakdown = ({
       }, 500); // 500ms debounce
     };
   };
-  
+
   // Clean up timer on unmount
   React.useEffect(() => {
     return () => {
@@ -395,7 +395,7 @@ export const FlowInfoBreakdown = ({
             variant="secondary"
             target="__blank"
             rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flowInfo.id}`} >Alerts</Button>
-          <FlowTransformButton flowInfo={flowInfo} initialChainID={chainId}/>
+          <FlowTransformButton flowInfo={flowInfo} initialChainID={chainId} />
         </Inline>
         <Row>
           <Inline
@@ -749,58 +749,13 @@ export const FlowInfoBreakdown = ({
                 )}
               </>}
               {editExecution && (
-                <Text>
-                  <Column gap={8} align="flex-start" justifyContent="flex-start">
-                    <Text>Start Time UTC</Text>
-                    <input style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
-                      type="datetime-local"
-                      value={updatedFlowParams.startAt ? new Date(updatedFlowParams.startAt).toISOString().slice(0, -8) : ''}
-                      onChange={(e) => setUpdateFlowInfo('startAt', new Date(e.target.value))}
-                    />
-                    <Text>Interval</Text>
-                    <select
-                      style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
-                      value={updatedFlowParams.interval} // Use flowInfo.interval as the default
-                      onChange={(e) => setUpdateFlowInfo('interval', Number(e.target.value))}
-                    >
-                      <option value={300}>5 minutes</option>
-                      <option value={600}>10 minutes</option>
-                      <option value={600 * 3}>30 minutes</option>
-                      <option value={3600}>1 hour</option>
-                      <option value={3600 * 2}>2 hours</option>
-                      <option value={3600 * 4}>4 hours</option>
-                      <option value={3600 * 12}>12 hours</option>
-                      <option value={86400}>1 day</option>
-                      <option value={86400}>3 days</option>
-                      <option value={604800}>1 week</option>
-                      <option value={604800 * 4}>4 weeks</option>
-                      <option value={2592000}>1 month</option>
-                    </select>
-
-                    <Text>End Time UTC</Text>
-                    <input style={{ colorScheme: themeController.theme.name === 'dark' ? 'dark' : 'light' }}
-                      type="datetime-local"
-                      value={updatedFlowParams.endTime ? new Date(updatedFlowParams.endTime).toISOString().slice(0, -8) : ''}
-
-                      onChange={(e) => setUpdateFlowInfo('endTime', new Date(e.target.value))}
-                    />
-                    <button onClick={() => setUpdateFlowInfo('endTime', flowInfo.execTime)}>
-                      Set End Time to Next Execution
-                    </button>
-                    <Button
-                      css={{ marginTop: '$8', margin: '$2' }}
-                      variant="secondary"
-                      size="small"
-                      disabled={false}
-                      onClick={handleUpdateFlowClick}
-                    >
-                      {isExecutingUpdateFlow && <Spinner instant />}{' '}
-                      {'Update Message'}
-                    </Button>
-                  </Column>
-                </Text>
-
+                <EditExecutionSection
+                  updatedFlowParams={updatedFlowParams}
+                  setUpdateFlowInfo={setUpdateFlowInfo}
+                  updateOnButtonClick={true}
+                />
               )}
+
 
 
 

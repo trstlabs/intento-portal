@@ -51,7 +51,6 @@ export const HostedAccountCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] = useState(false)
   const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
-    chainId,
     hostedICAAddress,
     flowInput
   )
