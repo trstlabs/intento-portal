@@ -80,7 +80,7 @@ export const useGetExpectedFlowFee = (
     flowInput.msgs?.length || 0,
     hostedAccount?.address ?? null
   ], [recurrences, denom, flowInput.msgs, hostedAccount?.address])
-  console.log(stableQueryKey)
+
   const { data, isLoading } = useQuery(
     stableQueryKey,
     async () => {

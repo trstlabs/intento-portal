@@ -18,7 +18,7 @@ import {
   convertDenomToMicroDenom,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import {  useState } from 'react'
+import { useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { AuthzGrantCheck } from './AuthzGrantCheck'
@@ -102,10 +102,12 @@ export const SubmitFlowDialog = ({
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
-  const [suggestedFunds, isSuggestedFundsLoading] = useGetExpectedFlowFee(
+  const feeDenom = checkedFeeAcc ? "uinto" : denom_local
+
+  const [suggestedFunds, _isSuggestedFundsLoading] = useGetExpectedFlowFee(
     duration / 1000,
     flowInput,
-    "uinto",//denom_local,
+    feeDenom,
     interval / 1000,
     hostedAccount
   );
@@ -132,7 +134,7 @@ export const SubmitFlowDialog = ({
       ))
       return
     }
-
+    alert("You are submitting your flow now where the hosted address needs AuthZ permission to execute. Make sure the permissions are in place")
     handleSubmitFlow({
       ...flowInput,
       startTime: startAt,
@@ -143,7 +145,7 @@ export const SubmitFlowDialog = ({
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
       hostedIcaConfig: {
-        hostedAddress: icaAddress, feeCoinLimit: hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === 'uinto')
+        hostedAddress: icaAddress, feeCoinLimit: hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === feeDenom)
       },
       label: flowLabel,
     });
@@ -282,7 +284,7 @@ export const SubmitFlowDialog = ({
                   </Inline>
                 </>
               )}
-              {!isSuggestedFundsLoading && (
+              {
                 suggestedFunds ? <Text
                   align="center"
                   color="disabled"
@@ -296,9 +298,9 @@ export const SubmitFlowDialog = ({
                   wrap={false}
                   variant="caption"
                 >
-                  Coin Currently Not Supported
+                  Coin Not Found
                 </Text>
-              )}
+              }
               <DialogDivider offsetY="$10" />
               {duration && (
                 <>
