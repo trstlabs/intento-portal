@@ -25,7 +25,7 @@ export const BuildWrapper = ({
   const initConfig = {
     saveResponses: true,
     updatingDisabled: false,
-    stopOnFailure: false,
+    stopOnFailure: true,
     stopOnSuccess: false,
     stopOnTimeout: false,
     fallbackToOwnerBalance: true,
@@ -41,7 +41,8 @@ export const BuildWrapper = ({
     useAndForComparisons: false,
   }
   initialFlowInput.conditions = initConditions
-
+  initialFlowInput.label = "Beta Flow"
+  
 
   const router = useRouter();
   const { flowInput, initialChainId: urlChainId } = router.query;
