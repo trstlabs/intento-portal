@@ -134,7 +134,9 @@ export const SubmitFlowDialog = ({
       ))
       return
     }
-    alert("You are submitting your flow now where the hosted address needs AuthZ permission to execute. Make sure the permissions are in place")
+    if (authzGrants && authzGrants.find(grant => !grant.hasGrant)) {
+      alert("You are submitting your flow now where the hosted address needs AuthZ permission to execute. Make sure the permissions are in place.")
+    }
     handleSubmitFlow({
       ...flowInput,
       startTime: startAt,
