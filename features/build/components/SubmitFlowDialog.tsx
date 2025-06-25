@@ -63,7 +63,7 @@ export const SubmitFlowDialog = ({
   const [executionParams, setExecutionParams] = useState({
     startAt: 0,
     interval: 86400000, // 1 day in ms
-    endTime: Date.now() + 30 * 86400000, // 30 days from now
+    endTime: Date.now() + 7 * 86400000, // 7 days from now
   })
 
   function setUpdateExecutionParams(field: string, value: any) {
