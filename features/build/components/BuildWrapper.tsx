@@ -42,7 +42,7 @@ export const BuildWrapper = ({
   }
   initialFlowInput.conditions = initConditions
   initialFlowInput.label = "Beta Flow"
-  
+
 
   const router = useRouter();
   const { flowInput, initialChainId: urlChainId } = router.query;
@@ -57,10 +57,7 @@ export const BuildWrapper = ({
           const updatedFlow = {
             ...parsed,
             connectionId: urlChainId,
-            hostedIcaConfig: parsed.hostedIcaConfig ? {
-              ...parsed.hostedIcaConfig,
-              connectionId: urlChainId
-            } : undefined
+            hostedIcaConfig: parsed.hostedIcaConfig ? parsed.hostedIcaConfig : {}
           };
           return [processFlowInput(updatedFlow)];
         }
