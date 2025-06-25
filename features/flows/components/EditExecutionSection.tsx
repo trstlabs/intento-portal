@@ -119,12 +119,15 @@ export function EditExecutionSection({
   }
 
   const handleEndTimeIntervalChange = (value: number) => {
+
     setEndTimeInterval(value)
-    if (startAt) {
-      const newEndTime = new Date(startAt.getTime() + value)
-      setEndTime(newEndTime)
-      updateField('endTime', newEndTime)
-    }
+
+    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + 900000 //+15min
+
+    const newEndTime = new Date(start + value)
+    setEndTime(newEndTime)
+    updateField('endTime', newEndTime)
+
   }
   const [isRightAway, setIsRightAway] = useState<boolean>(false)
 
