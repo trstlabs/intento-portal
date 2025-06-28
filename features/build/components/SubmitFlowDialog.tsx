@@ -162,7 +162,7 @@ export const SubmitFlowDialog = ({
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
       hostedIcaConfig: {
-        hostedAddress: icaAddress, feeCoinLimit: hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === feeDenom)
+        hostedAddress: hostedAccount.hostedAddress, feeCoinLimit: hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === feeDenom)
       },
       label: flowLabel,
     });
