@@ -157,13 +157,19 @@ export const FlowHistory = ({
                         ))}
                       </Column>
 
-                      {errors.map((err, _) => (
-                        <Column>
-                          <Text variant="legend">
-                            🔴 {err}
-                          </Text>
-                        </Column>
-                      ))}
+                      {errors.map((err, _) => {
+                        // Check for AuthZ permission errors
+                        const isAuthZError = err.includes('error handling packet on host chain') && 
+                          (err.includes('ABCI code: 5') || err.includes('ABCI code: 2'));
+                        
+                        return (
+                          <Column>
+                            <Text variant="legend">
+                              🔴 {isAuthZError ? 'AuthZ permission lacking' : err}
+                            </Text>
+                          </Column>
+                        );
+                      })}
 
                       <Column>
                         <Text variant="legend">
