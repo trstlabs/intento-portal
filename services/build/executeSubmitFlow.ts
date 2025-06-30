@@ -62,9 +62,9 @@ export const executeSubmitFlow = async ({
   if (Number(flowInput.feeFunds?.amount) > 0) {
     feeFunds = [flowInput.feeFunds]
   }
-  if (flowInput.connectionId && flowInput.hostConnectionId) {
-    flowInput.hostedIcaConfig = undefined
-  }
+  // if (flowInput.connectionId && flowInput.hostConnectionId) {
+  //   flowInput.hostedIcaConfig = undefined
+  // }
   const msgSubmitFlow =
     intento.intent.v1beta1.MessageComposer.withTypeUrl.submitFlow({
       owner,
@@ -73,7 +73,7 @@ export const executeSubmitFlow = async ({
       duration,
       interval,
       startAt,
-      connectionId: flowInput.connectionId ? flowInput.connectionId : '',
+      connectionId: /* flowInput.connectionId ? flowInput.connectionId :  */'',
       configuration: flowInput.configuration
         ? flowInput.configuration
         : {
