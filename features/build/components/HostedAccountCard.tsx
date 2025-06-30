@@ -1,6 +1,6 @@
 import {
   Spinner,
-  Tooltip,
+  // Tooltip,
   Button,
   Text,
   Chevron,
@@ -8,13 +8,13 @@ import {
   useMedia,
   Divider,
 } from 'junoblocks'
-import React, { useEffect, useMemo, useState } from 'react'
-import { Row } from './BuildComponent'
+import React, { useEffect, useState } from 'react'
+// import { Row } from './BuildComponent'
 import { convertFromMicroDenom } from '../../../util/conversion'
 import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
 import { FlowInput } from '../../../types/trstTypes'
-import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
+// import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 
 interface HostedAccountCardProps {
@@ -34,22 +34,22 @@ export const HostedAccountCard = ({
   const isMobile = useMedia('sm')
 
 
+  console.log(chainId)
 
-
-  // ICA funds
-  const { mutate: connectExternalWallet = () => { }
-  } = useConnectIBCWallet(
-    chainId,
-    {
-      onError(error) {
-        console.log(error)
-      },
-    },
-    false
-  ) || {};
+  // // ICA funds
+  // const { mutate: connectExternalWallet = () => { }
+  // } = useConnectIBCWallet(
+  //   chainId,
+  //   {
+  //     onError(error) {
+  //       console.log(error)
+  //     },
+  //   },
+  //   false
+  // ) || {};
 
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
-  const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] = useState(false)
+  //const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] = useState(false)
   const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
     hostedICAAddress,
     flowInput
@@ -77,25 +77,25 @@ export const HostedAccountCard = ({
         !isExecutingAuthzGrant && requestedAuthzGrant,
         handleCreateAuthzGrant,
         () => {
-          setRequestedSendAndAuthzGrant(false)
+        //  setRequestedSendAndAuthzGrant(false)
           setRequestedCreateAuthzGrant(false)
         }
       ),
     [isExecutingAuthzGrant, requestedAuthzGrant, handleCreateAuthzGrant]
   )
 
-  const handleCreateAuthzGrantClick = (withFunds: boolean) => {
-    connectExternalWallet(null)
-    setRequestedCreateAuthzGrant(true)
-    if (withFunds) {
-      setRequestedSendAndAuthzGrant(true)
-    }
-  }
+  // const handleCreateAuthzGrantClick = (withFunds: boolean) => {
+  //   connectExternalWallet(null)
+  //   setRequestedCreateAuthzGrant(true)
+  //   if (withFunds) {
+  //     setRequestedSendAndAuthzGrant(true)
+  //   }
+  // }
 
-  const shouldDisableAuthzGrantButton = useMemo(
-    () => authzGrants?.every((grant) => grant.hasGrant),
-    [authzGrants]
-  )
+  // const shouldDisableAuthzGrantButton = useMemo(
+  //   () => authzGrants?.every((grant) => grant.hasGrant),
+  //   [authzGrants]
+  // )
 
   return (
     <>
@@ -233,7 +233,7 @@ export const HostedAccountCard = ({
                   </Row>
                 </CardContent>
               </Card> */}
-              <Row>
+             {/*  <Row>
                 {authzGrants && (
                   <>
                     <Tooltip
@@ -257,7 +257,7 @@ export const HostedAccountCard = ({
                     </Tooltip>
                   </>
                 )}
-              </Row>
+              </Row> */}
             </>
           )}
         </>

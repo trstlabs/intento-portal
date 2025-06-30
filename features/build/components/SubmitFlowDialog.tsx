@@ -162,7 +162,7 @@ export const SubmitFlowDialog = ({
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
       hostedIcaConfig: {
-        hostedAddress: hostedAccount.hostedAddress, feeCoinLimit: hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === feeDenom)
+        hostedAddress: hostedAccount?.hostedAddress, feeCoinLimit: hostedAccount?.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === feeDenom)
       },
       label: flowLabel,
     });
@@ -341,7 +341,7 @@ export const SubmitFlowDialog = ({
                           Interval is {displayInterval}
                         </Text>
                         <Text css={{ padding: '$4' }} variant="caption">
-                          {Math.floor(duration / interval)}{' '}
+                          {executionParams.startAt > 0 ? Math.floor(duration / interval) + 1 : Math.floor(duration / interval)}{' '}
                           recurrences
                         </Text>
                       </>

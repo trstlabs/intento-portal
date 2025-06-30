@@ -67,10 +67,15 @@ export const useGetExpectedFlowFee = (
     intentModuleParamsAtom
   )
   // Calculate recurrences based on interval and duration
-  const recurrences =
+  let recurrences =
     intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
       ? Math.floor(durationSeconds / intervalSeconds)
       : 1
+  
+  // Add extra recurrence if there's a startTime
+  if (flowInput.startTime && flowInput.startTime > 0) {
+    recurrences++
+  }
   const client = useIntentoRpcClient()
 
   const stableQueryKey = useMemo(() => [

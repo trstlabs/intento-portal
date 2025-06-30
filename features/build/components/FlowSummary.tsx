@@ -34,13 +34,16 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     grantee,
     authzGrants,
     isAuthzGrantsLoading = false,
-    refetchAuthzGrants = () => {},
+    refetchAuthzGrants = () => { },
 }) => {
     // Calculate scheduling info (all values are in milliseconds)
     const interval = flowInput.interval || 0
     const duration = flowInput.duration || 0
     const startTime = flowInput.startTime || 0
-    const recurrences = interval > 0 ? Math.floor(duration / interval) : 1
+    let recurrences = interval > 0 ? Math.floor(duration / interval) : 1
+    if (startTime > 0) {
+        recurrences++
+    }
 
     // Format time display
     const formatTimeDisplay = (ms: number): string => {
