@@ -1,7 +1,7 @@
 import { AppLayout, PageHeader } from 'components'
-
 import { styled } from 'junoblocks'
 import React from 'react'
+import { Text } from 'junoblocks'
 import { BuildWrapper } from '../../features/build'
 
 const StyledContainer = styled('div', {
@@ -27,7 +27,14 @@ export default function Build() {
       <StyledContainer>
         <PageHeader
           title="Build"
-          subtitle={`Create flows on connected chains and submit messages for execution as Intento Flows with condition-based logic. `}
+          subtitle={
+            <>
+              Create flows on connected chains and submit messages for execution as Intento Flows with condition-based logic.{' '}
+              <Text as="a" href="https://docs.intento.zone/using-flows/intento-portal" target="_blank" variant="body">
+                Learn more in the docs
+              </Text>
+            </>
+          }
         />
         <BuildWrapper
           initialExample={getInitialExampleFromSearchParams()}
