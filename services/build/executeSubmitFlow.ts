@@ -28,7 +28,8 @@ export const executeSubmitFlow = async ({
     startAtInt = Math.floor(Date.now() / 1000) + flowInput.startTime / 1000
   }
 
-  let startAt = startAtInt != 0 ? BigInt(startAtInt) : BigInt('0') //BigInt(startAtInt)
+  // Convert to integer before creating BigInt
+  let startAt = startAtInt != 0 ? BigInt(Math.floor(startAtInt)) : BigInt('0')
   console.log('startAt (s)', startAtInt / 1000)
   console.log('duration (s)', flowInput.duration / 1000)
   console.log('interval (s)', flowInput.interval / 1000)
