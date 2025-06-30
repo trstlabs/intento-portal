@@ -14,13 +14,24 @@ export const useGrantValidation = (authzGrants: GrantResponse[], flowInput: { st
       return emptyResult
     }
 
-    const flowEndTime = (flowInput.startTime || Math.floor(Date.now() / 1000)) + (flowInput.duration || 0)
+    // Convert all times to milliseconds for consistent comparison
+    const nowInMilliseconds = Date.now()
+    const flowStartTime = flowInput.startTime || nowInMilliseconds
+    const flowDuration = flowInput.duration || 0
+    const flowEndTime = flowStartTime + flowDuration
 
     const missingGrants = authzGrants.filter((grant) => !grant.hasGrant)
     const expiredGrants = authzGrants.filter((grant) => {
       if (!grant.expiration) return false
-      const expirationTime = Math.floor(new Date(grant.expiration).getTime() / 1000)
-      return grant.hasGrant && expirationTime < flowEndTime
+      const expirationTimeInMilliseconds = Math.floor(new Date(grant.expiration).getTime())
+      
+      // Check if grant is expired relative to current time
+      const isExpiredNow = expirationTimeInMilliseconds < nowInMilliseconds
+      
+      // Check if grant will expire before flow starts or ends
+      const willExpireDuringFlow = expirationTimeInMilliseconds < flowEndTime
+      
+      return grant.hasGrant && (isExpiredNow || willExpireDuringFlow)
     })
 
     const invalidGrants = [...missingGrants, ...expiredGrants]
@@ -31,5 +42,5 @@ export const useGrantValidation = (authzGrants: GrantResponse[], flowInput: { st
       missingGrants,
       invalidGrants
     }
-  }, [authzGrants, flowInput])
+  }, [authzGrants, flowInput?.startTime, flowInput?.duration])
 }
