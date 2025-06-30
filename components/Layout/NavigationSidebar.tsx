@@ -238,7 +238,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             <Inline css={{ paddingLeft: '$4' }}> Airdrop </Inline>
           </Button>
         </Link>
-      ) :  <Link href="https://discord.gg/RscEvdP5" passHref>
+      ) :  <Link href="https://discord.gg/ME76AXcsMm" passHref>
         <Button
           as="a"
           variant="menu"
