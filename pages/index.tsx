@@ -25,6 +25,8 @@ import { FlowCard } from '../features/flows/components/FlowCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { APP_NAME } from '../util/constants'
+import Head from 'next/head'
 
 export default function Home() {
   const { address } = useChain('intentotestnet')
@@ -125,6 +127,13 @@ export default function Home() {
       padding: '$8', marginBottom: '$10'
     }} variant="secondary" disabled >
       <CardContent>
+        {APP_NAME && (
+          <Head>
+            <title>
+              {APP_NAME} - Dashboard
+            </title>
+          </Head>
+        )}
         <Text
           variant="header">
           Welcome to the Intento Portal
