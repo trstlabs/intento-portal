@@ -91,9 +91,9 @@ export const FlowInfoBreakdown = ({
   })
 
   useEffect(() => {
-    const shouldTriggerSendFunds =
+    const shouldflowSendFunds =
       !isExecutingSendFundsOnHost && requestedSendFunds
-    if (shouldTriggerSendFunds) {
+    if (shouldflowSendFunds) {
       handleSendFundsOnHost(undefined, {
         onSettled: () => setRequestedSendFunds(false),
       })
@@ -164,9 +164,9 @@ export const FlowInfoBreakdown = ({
   const { mutate: handleUpdateFlow, isLoading: isExecutingUpdateFlow } =
     useUpdateFlow({ flowParams: updatedFlowParams }) || {};
   useEffect(() => {
-    const shouldTriggerUpdateFlow =
+    const shouldflowUpdateFlow =
       !isExecutingUpdateFlow && requestedUpdateFlow
-    if (shouldTriggerUpdateFlow) {
+    if (shouldflowUpdateFlow) {
       handleUpdateFlow(undefined, {
         onSettled: () => setRequestedUpdateFlow(false),
       })
@@ -191,7 +191,7 @@ export const FlowInfoBreakdown = ({
 
     console.log('Updating flow with params:', updatedParams);
 
-    // Update the state and trigger the update
+    // Update the state and flow the update
     setUpdatedFlowParams(updatedParams);
     setRequestedUpdateFlow(true);
   }
@@ -686,7 +686,7 @@ export const FlowInfoBreakdown = ({
                 <>
                   <Tooltip
                     label={
-                      'Start time is the time the trigger was started. Execution starts at start time when a custom start time in the future is provided at trigger submission'
+                      'Start time is the time the flow starts. Execution starts at start time when a custom start time in the future is provided at submission'
                     }
                   >
                     <Text variant="legend" color="secondary" align="left">
@@ -702,7 +702,7 @@ export const FlowInfoBreakdown = ({
               )}
                 <Tooltip
                   label={
-                    'Execution time is the time the next execution takes place. In case a trigger has ended, the execution time is the time of the last execution'
+                    'Execution time is the time the next execution takes place. In case a flow has ended, the execution time is the time of the last execution'
                   }
                 >
                   <Text variant="legend" color="secondary" align="left">
@@ -734,7 +734,7 @@ export const FlowInfoBreakdown = ({
                 {flowInfo.endTime.getTime() && (
                   <>
                     <Tooltip
-                      label={'End time is the time last time execution can place'}
+                      label={'End time is the time execution ends'}
                     >
                       <Text variant="legend" color="secondary" align="left">
                         End time
