@@ -1,5 +1,5 @@
 import { styled } from 'junoblocks'
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { BuildComponent } from './BuildComponent'
 import { generalExamples } from './ExampleMsgs'
 import { FlowInput } from '../../../types/trstTypes'
@@ -53,15 +53,15 @@ export const BuildWrapper = ({
       if (flowInput && typeof flowInput === 'string') {
         const parsed = JSON.parse(flowInput);
         // If we have an initialChainId from URL but not in the flowInput, update it
-        if (urlChainId && parsed.connectionId !== urlChainId) {
+        if (urlChainId) {
           const updatedFlow = {
             ...parsed,
             connectionId: urlChainId,
             hostedIcaConfig: parsed.hostedIcaConfig ? parsed.hostedIcaConfig : {}
           };
-          return [processFlowInput(updatedFlow)];
+          return [processFlowInput(updatedFlow, false)];
         }
-        return [processFlowInput(parsed)];
+        return [processFlowInput(parsed, true)];
       }
     } catch (e) {
       console.error('Failed to parse flowInput from URL', e);
@@ -69,10 +69,6 @@ export const BuildWrapper = ({
     return [initialFlowInput];
   });
 
-  // Process flow input when it changes
-  const processedFlowInputs = useMemo(() => {
-    return flowInputs.map(flowInput => processFlowInput(flowInput));
-  }, [flowInputs]);
 
   const initialMessageValue = useRef(initialMessage).current
   const initialExampleValue = useRef(initialExample).current
@@ -104,8 +100,7 @@ export const BuildWrapper = ({
   // Get the initialChainId from URL or from the first flow input
   const effectiveInitialChainId = typeof urlChainId === 'string' ? urlChainId : '';
 
-  // Use processedFlowInputs for display, but maintain original flowInputs in state
-  const displayFlowInput = processedFlowInputs[0] || flowInputs[0];
+  const displayFlowInput = flowInputs[0];
 
   return (
     <StyledDivForWrapper>

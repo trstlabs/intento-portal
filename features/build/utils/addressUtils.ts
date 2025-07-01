@@ -35,12 +35,8 @@ export const replaceAddressFields = (obj: any, isLocal: boolean): any => {
 };
 
 // Function to process flow input messages
-export const processFlowInput = (flowInput: FlowInput) => {
+export const processFlowInput = (flowInput: FlowInput, isLocal: boolean) => {
     if (!flowInput?.msgs) return flowInput;
-    let isLocal = false
-    if (!flowInput.hostedIcaConfig?.hostedAddress && !flowInput.connectionId) {
-        isLocal = true
-    }
     return {
         ...flowInput,
         msgs: flowInput.msgs.map((msg: string) => {
@@ -50,7 +46,6 @@ export const processFlowInput = (flowInput: FlowInput) => {
                 const processedMsg = replaceAddressFields(parsedMsg, isLocal);
                 return JSON.stringify(processedMsg, null, 2);
 
-                return msg;
             } catch (e) {
                 console.error('Failed to process message:', e);
                 return msg; // Return original if parsing/processing fails

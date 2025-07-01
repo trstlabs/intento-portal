@@ -40,6 +40,7 @@ import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
 import { convertDenomToMicroDenom } from '../../../util/conversion'
 import { HostedAccountCard } from './HostedAccountCard'
+import { processFlowInput } from '../utils/addressUtils'
 
 
 
@@ -233,11 +234,16 @@ export const BuildComponent = ({
         )
 
       }
+      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
+        updatedFlowInput = processFlowInput(updatedFlowInput, true)
+      } else {
+        updatedFlowInput = processFlowInput(updatedFlowInput, false)
+      }
       updatedFlowInput.msgs[editIndex] = updatedFlowInput.msgs[
         editIndex
       ].replaceAll(denom, newDenom)
     })
-
+    console.log(updatedFlowInput)
     onFlowChange(updatedFlowInput)
     setDenom(newDenom)
     setChainName(name)
@@ -246,7 +252,7 @@ export const BuildComponent = ({
     setPrefix(newPrefix)
     let chainIsConnected = connectionId != undefined && connectionId != ''
     setChainIsConnected(chainIsConnected)
-    setChainHasIAModule(chainId === 'INTO')
+    setChainHasIAModule(chainId === process.env.NEXT_PUBLIC_INTO_CHAINID)
 
 
     if (!chainIsConnected) {
@@ -281,6 +287,13 @@ export const BuildComponent = ({
       const msg = JSON.stringify(msgObject, null, '\t')
       let newMsg = msg.replaceAll('uinto', denom)
       newMsg = newMsg.replaceAll('into', prefix)
+      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
+        const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, true)
+        newMsg = newInput.msgs[index]
+      } else {
+        const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, false)
+        newMsg = newInput.msgs[index]
+      }
 
       let updatedFlowInput = flowInput
       updatedFlowInput.msgs[index] = newMsg
