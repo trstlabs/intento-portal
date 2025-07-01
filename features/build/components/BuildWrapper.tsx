@@ -102,7 +102,7 @@ export const BuildWrapper = ({
   }, [flowInput]);
 
   // Get the initialChainId from URL or from the first flow input
-  const effectiveInitialChainId = urlChainId || flowInputs[0]?.connectionId || '';
+  const effectiveInitialChainId = typeof urlChainId === 'string' ? urlChainId : '';
 
   // Use processedFlowInputs for display, but maintain original flowInputs in state
   const displayFlowInput = processedFlowInputs[0] || flowInputs[0];

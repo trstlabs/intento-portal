@@ -417,7 +417,6 @@ export const BuildComponent = ({
                   {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
                     hostedAccount={hostedAccount}
                     hostedICAAddress={hostedICA}
-                    chainId={chainId}
                     flowInput={flowInput}
                   />}
                     {/* <Text variant="caption">
