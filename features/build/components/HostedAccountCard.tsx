@@ -20,21 +20,16 @@ import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hos
 interface HostedAccountCardProps {
   hostedAccount: HostedAccount
   hostedICAAddress: string
-  chainId: string
   flowInput: FlowInput
 }
 
 export const HostedAccountCard = ({
   hostedAccount,
   hostedICAAddress,
-  chainId,
   flowInput
 }: HostedAccountCardProps) => {
   const [showICAInfo, setShowICAInfo] = useState(false)
   const isMobile = useMedia('sm')
-
-
-  console.log(chainId)
 
   // // ICA funds
   // const { mutate: connectExternalWallet = () => { }
