@@ -66,8 +66,8 @@ export const SubmitFlowDialog = ({
     endTime: Date.now() + 7 * 86400000, // 7 days from now
   })
 
-  function setUpdateExecutionParams(field: string, value: any) {
-    setExecutionParams((prev) => ({ ...prev, [field]: value }))
+  function setUpdateExecutionParams(params: { startAt?: number; interval?: number; endTime?: number }) {
+    setExecutionParams((prev) => ({ ...prev, ...params }))
   }
 
 
@@ -95,6 +95,7 @@ export const SubmitFlowDialog = ({
   const displayDuration = duration > 0 ? msToHuman(duration) : 'None Selected'
   const displayInterval = interval > 0 ? msToHuman(interval) : 'None Selected'
 
+  const needsToBeWrappedInMsgExec = flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec")
   //true = deduct fees from local acc
   const [checkedFeeAcc, setCheckedFeeAcc] = useState(true)
   const handleChangeFeeAcc = () => {
@@ -368,7 +369,7 @@ export const SubmitFlowDialog = ({
               )}
             </Column>
             <Column css={{ padding: '$6 $6' }}>
-              {flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
+              {flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec") || needsToBeWrappedInMsgExec && (
                 <AuthzGrantCheck
                   flowInput={flowInput}
                   chainId={chainId}
@@ -396,31 +397,12 @@ export const SubmitFlowDialog = ({
           <Button
             disabled={isLoading}
             variant="secondary"
-            onClick={() => (isLoading ? undefined : handleData(''))}
+            onClick={() => (isLoading ? undefined : handleData(needsToBeWrappedInMsgExec ? icaAddress : ''))}
           >
             {isLoading ? <Spinner instant={true} size={16} /> : <>Submit</>}
           </Button>
         }
-      >
-        {flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec") && (
-          <Button
-            disabled={isLoading}
-            variant="secondary"
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.preventDefault()
-              if (!isLoading) {
-                handleData(icaAddress)
-              }
-            }}
-          >
-            {isLoading ? (
-              <Spinner instant={true} size={16} />
-            ) : (
-              <>Submit as MsgExec</>
-            )}
-          </Button>
-        )}
-      </DialogButtons>
+      />
     </Dialog >
   )
 }
