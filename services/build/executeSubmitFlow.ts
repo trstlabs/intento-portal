@@ -23,9 +23,16 @@ export const executeSubmitFlow = async ({
   owner,
   ibcWalletAddress,
 }: ExecuteSubmitFlowArgs): Promise<any> => {
+  // Handle both relative (small number) and absolute (timestamp) start times
   let startAtInt = 0
-  if (flowInput.startTime && flowInput.startTime > 0) {
-    startAtInt = Math.floor(Date.now() / 1000) + flowInput.startTime / 1000
+  if (flowInput.startTime) {
+    // If startTime is less than 1000000000 (about 3 years in seconds), treat it as relative time
+    if (flowInput.startTime < 1000000000) {
+      startAtInt = Math.floor(Date.now() / 1000) + flowInput.startTime / 1000
+    } else {
+      // Otherwise, treat it as an absolute timestamp (already in milliseconds)
+      startAtInt = Math.floor(flowInput.startTime / 1000)
+    }
   }
 
   // Convert to integer before creating BigInt

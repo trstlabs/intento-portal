@@ -6,7 +6,6 @@ export const fetchFlowMsgs = async (id) => {
   const { data } = await axios.get(
     process.env.NEXT_PUBLIC_INTO_API+'/intento/intent/v1beta1/flow/' + id
   )
-  console.log(data.flow_info)
   return toCamelCaseWithValues(data.flow_info.msgs)
 }
 

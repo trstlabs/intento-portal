@@ -133,7 +133,7 @@ export async function transformFlowMsgs(info) {
         if (Array.isArray(msgsObj)) {
             msgsObj.forEach((msgObj: any, index) => {
                 try {
-                    console.log("Original message:", JSON.stringify(msgObj, null, 2));
+                   // console.log("Original message:", JSON.stringify(msgObj, null, 2));
 
                     // First normalize amount fields
                     msgObj = normalizeAmountField(msgObj);
@@ -172,7 +172,7 @@ export async function transformFlowMsgs(info) {
                         (_, value) => (typeof value === "bigint" ? value.toString() : value),
                         2
                     );
-                    console.log("Transformed message:", msg);
+                   // console.log("Transformed message:", msg);
                     msgs[index] = msg;
                 } catch (error) {
                     console.error(`Error processing message at index ${index}:`, error);

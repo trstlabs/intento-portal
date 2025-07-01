@@ -48,9 +48,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     {
       enabled: Boolean(
         connectionId != undefined &&
-          rpcClient &&
-          !!accAddr &&
-          accAddr.length > 40
+        rpcClient &&
+        !!accAddr &&
+        accAddr.length > 40
       ),
       refetchOnMount: false,
       staleTime: 60000,
@@ -145,9 +145,9 @@ export const useGetHostICAAddress = (accAddr: string, connectionId: string) => {
     {
       enabled: Boolean(
         connectionId != undefined &&
-          rpcClient &&
-          !!accAddr &&
-          accAddr.length > 40
+        rpcClient &&
+        !!accAddr &&
+        accAddr.length > 40
       ),
       refetchOnMount: false,
       staleTime: 30000,
@@ -163,12 +163,12 @@ export const useICATokenBalance = (
   ibcWalletAddress: string,
   isICAChain: boolean
 ) => {
-  const chain = useChainInfoByChainID(chainId)
 
-  const { denom, decimals } = chain
   const { data, isLoading } = useQuery(
     `icaTokenBalance/${chainId}/${ibcWalletAddress}`,
     async () => {
+      const chain = useChainInfoByChainID(chainId)
+      const { denom, decimals } = chain
       console.log(ibcWalletAddress)
       const chainClient = await StargateClient.connect(chain.rpc)
       const coin = await chainClient.getBalance(ibcWalletAddress, denom)
@@ -180,11 +180,11 @@ export const useICATokenBalance = (
     {
       enabled: Boolean(
         ibcWalletAddress &&
-          chainId &&
-          chainId != '' &&
-          ibcWalletAddress != '' &&
-          ibcWalletAddress.length != 0 &&
-          isICAChain
+        chainId &&
+        chainId != '' &&
+        ibcWalletAddress != '' &&
+        ibcWalletAddress.length != 0 &&
+        isICAChain
       ),
       refetchOnMount: 'always', // Refetch when the component mounts
       refetchInterval: 60000,
@@ -205,10 +205,10 @@ export const useAuthZMsgGrantInfoForUser = (
   const chain = useChainInfoByChainID(ibcState.chainId)
   const prevAddressRef = useRef(ibcState.address)
   const queryClient = useQueryClient()
-  
+
   // Base query key without the status to invalidate all related queries
   const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}`
-  
+
   const { data, isLoading, refetch } = useQuery(
     [baseQueryKey, ibcState.status], // Include status in the query key array
     async () => {
@@ -229,7 +229,7 @@ export const useAuthZMsgGrantInfoForUser = (
         try {
           const parsedMsg = JSON.parse(msg)
           const msgTypeUrl = parsedMsg.typeUrl
-          
+
           if (msgTypeUrl === '/cosmos.authz.v1beta1.MsgExec') {
             // Handle nested MsgExec
             const execMsgs = parsedMsg.value?.msgs || []
@@ -263,7 +263,7 @@ export const useAuthZMsgGrantInfoForUser = (
           console.error('Error processing message:', msg, error)
         }
       }
-      
+
       return grants
     },
     {
@@ -320,9 +320,9 @@ export const useFeeGrantAllowanceForUser = (granter: string) => {
     {
       enabled: Boolean(
         granter != '' &&
-          status === WalletStatusType.connected &&
-          client &&
-          address
+        status === WalletStatusType.connected &&
+        client &&
+        address
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
