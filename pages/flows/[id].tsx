@@ -16,6 +16,7 @@ import React from 'react'
 import { APP_NAME } from 'util/constants'
 import { useFlowInfo } from '../../hooks/useFlowInfo'
 import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
+import { useGetHostedICAByHostedAddress } from '../../hooks/useICA'
 
 export default function Flow() {
   const {
@@ -25,7 +26,10 @@ export default function Flow() {
   const isMobile = useMedia('sm')
 
   const [flowInfo, isLoading] = useFlowInfo(id)
-  const connectionId = flowInfo && flowInfo.icaConfig ? flowInfo.icaConfig.connectionId : /* TODO use a mapping (flowInfo.hostedIcaConfig ? flowInfo.hostedIcaConfig.hostedAddress : '') */''
+  const [hostedICA, _isHostedICALoading] = useGetHostedICAByHostedAddress(flowInfo?.hostedIcaConfig?.hostedAddress)
+
+  const connectionId = flowInfo ? (flowInfo.icaConfig && flowInfo.icaConfig.connectionId != '' ? flowInfo.icaConfig.connectionId : flowInfo.hostedIcaConfig ? hostedICA.icaConfig?.connectionId : '') : ''
+
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   if (!id) {
