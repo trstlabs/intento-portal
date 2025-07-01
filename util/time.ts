@@ -21,27 +21,21 @@ export const getRelativeTime = (miliseconds: number) => {
 
     const now = dayjs();
 
-    const hoursLeft = date.diff(now, 'hours');
-
-    /* more than a day */
-    if (hoursLeft > 24) {
-        const daysLeft = date.diff(now, 'days');
-        const hoursLeftAfterDays = Math.round(24 * ((hoursLeft / 24) % 1));
-
-        return inPrefix + `${hoursLeftAfterDays >= 0
-            ? `${maybePluralize(daysLeft, 'day')} and `
-            : ''} ${maybePluralize(hoursLeftAfterDays, 'hour')}`;
-    }
-
-    /* less than 24 hours left but not less than an hour */
-    if (hoursLeft < 24 && hoursLeft > 1) {
-        return inPrefix + maybePluralize(hoursLeft, 'hour');
-    }
-
     const minsLeft = date.diff(now, 'minutes');
 
+    if (minsLeft > 1440) { // More than 24 hours
+        const daysLeft = Math.floor(minsLeft / 1440);
+        const hoursLeft = Math.floor((minsLeft % 1440) / 60);
+        return inPrefix + `${maybePluralize(daysLeft, 'day')} and ${maybePluralize(hoursLeft, 'hour')}`;
+    }
+    
+    if (minsLeft > 60) { // More than an hour
+        const hoursLeft = Math.floor(minsLeft / 60);
+        const minsLeftAfterHours = minsLeft % 60;
+        return inPrefix + `${maybePluralize(hoursLeft, 'hour')} and ${maybePluralize(minsLeftAfterHours, 'minute')}`;
+    }
+
     if (minsLeft > 0) {
-        /* less than an hour */
         return inPrefix + maybePluralize(minsLeft, 'minute');
     }
 
