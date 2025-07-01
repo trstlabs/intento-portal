@@ -152,8 +152,9 @@ export function EditExecutionSection({
     if (!updateOnButtonClick) {
       // For immediate updates, create a params object with the single field
       const params: { startAt?: number | Date; interval?: number; endTime?: number | Date } = {
-        [field]: value
+        [field]: field === 'startAt' ? value instanceof Date ? value.getTime() : value : value
       };
+      console.log(params)
       setUpdateFlowInfo(params)
     }
   }
