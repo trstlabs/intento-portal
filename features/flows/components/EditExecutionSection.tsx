@@ -82,7 +82,7 @@ type EditExecutionSectionProps = {
   startAt?: number
   interval?: number
   endTime?: number
-  setUpdateFlowInfo: (field: string, value: any) => void
+  setUpdateFlowInfo: (params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) => void
   isExecutingUpdateFlow?: boolean
   updateOnButtonClick?: boolean
 }
@@ -150,8 +150,11 @@ export function EditExecutionSection({
 
   const updateField = (field: string, value: any) => {
     if (!updateOnButtonClick) {
-      // For immediate updates, pass the value as-is (it will be converted to timestamp in the parent)
-      setUpdateFlowInfo(field, value)
+      // For immediate updates, create a params object with the single field
+      const params: { startAt?: number | Date; interval?: number; endTime?: number | Date } = {
+        [field]: value
+      };
+      setUpdateFlowInfo(params)
     }
   }
 
@@ -256,15 +259,12 @@ export function EditExecutionSection({
 
         </Inline>
       </StyledGrid>
-      {updateOnButtonClick && (
+      {updateOnButtonClick && ( 
         <Button
           disabled={isExecutingUpdateFlow}
           onClick={() => {
-            // Update all values at once when clicking the button
-            // Pass Date objects directly, let the parent handle the conversion
-            if (startAt) setUpdateFlowInfo('startAt', startAt)
-            setUpdateFlowInfo('interval', interval)
-            if (endTime) setUpdateFlowInfo('endTime', endTime)
+            // Update all values at once using the two-argument form
+            setUpdateFlowInfo(updatedFlowParams)
           }}
         >
           Update

@@ -130,11 +130,11 @@ export const FlowInfoBreakdown = ({
   const [editConfig, setEditConfig] = useState(false)
   const [editExecution, setEditExecution] = useState(false)
   const [editMsgs, setEditMsgs] = useState([''])
-  let flowParams: MsgUpdateFlowParams = {
+  const flowParams: MsgUpdateFlowParams = {
     id: Number(flowInfo.id),
     owner: flowInfo.owner,
     endTime: flowInfo.endTime.getTime(),
-    startAt: 0,
+    startAt: flowInfo.startTime ? flowInfo.startTime.getTime() : 0,
     interval: Number(flowInfo.interval.seconds),
 
   }
@@ -207,31 +207,34 @@ export const FlowInfoBreakdown = ({
     return setRequestedUpdateFlow(true)
   }
 
-  function setUpdateFlowInfo(field: string, value: any) {
-    // Only update the specific field that changed
-    const params: MsgUpdateFlowParams = {
+  function setUpdateFlowInfo(params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) {
+    // Only update the specific fields that changed
+    let updateParams: MsgUpdateFlowParams = {
       id: Number(flowInfo.id),
       owner: flowInfo.owner,
     };
 
-    // Only include the fields that are being updated
-    if (field === 'interval') {
-      params.interval = Number(value);
+    // Copy over the fields that are being updated
+    if (params.interval !== flowParams.interval) {
+      updateParams.interval = Number(params.interval);
       // Convert interval to seconds if needed
-      if (value < 1000000000) { // Assuming if it's less than 31 years in seconds, it's in seconds
-        params.interval = Number(value);
+      if (params.interval < 1000000000) { // Assuming if it's less than 31 years in seconds, it's in seconds
+        updateParams.interval = Number(params.interval);
       }
-    } else if (field === 'endTime') {
-      params.endTime = value.getTime();
-    } else if (field === 'startAt') {
-      params.startAt = value.getTime();
-    } else {
-      // For any other field, just set it directly
-      params[field] = value;
+    }
+    if (params.endTime !== flowParams.endTime) {
+      updateParams.endTime = params.endTime instanceof Date 
+        ? params.endTime.getTime() 
+        : params.endTime;
+    }
+    if (params.startAt !== flowParams.startAt) {
+      updateParams.startAt = params.startAt instanceof Date 
+        ? params.startAt.getTime() 
+        : params.startAt;
     }
 
-    console.log('Updating flow with params:', params);
-    setUpdatedFlowParams(params);
+    console.log('Updating flow with params:', updateParams);
+    setUpdatedFlowParams(updateParams);
     setRequestedUpdateFlow(true);
   }
 
@@ -555,11 +558,11 @@ export const FlowInfoBreakdown = ({
               <>
                 <Tooltip
                   label={
-                    "Address of the Hosted Account that is used to execute flows on the target chain. A hosted account has it's own fee configuration"
+                    "Address of the Hosted Interchain Account that is used to execute flows on the target chain. A hosted account has it's own fee configuration"
                   }
                 >
                   <Text variant="legend" color="secondary" align="left">
-                    Hosted Account Address
+                    Hosted Interchain Account Address
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
@@ -737,7 +740,7 @@ export const FlowInfoBreakdown = ({
                       label={'End time is the time execution ends'}
                     >
                       <Text variant="legend" color="secondary" align="left">
-                        End time
+                        End Time
                       </Text>
                     </Tooltip>
                     <Inline gap={2}>
