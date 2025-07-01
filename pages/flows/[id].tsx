@@ -28,7 +28,13 @@ export default function Flow() {
   const [flowInfo, isLoading] = useFlowInfo(id)
   const [hostedICA, _isHostedICALoading] = useGetHostedICAByHostedAddress(flowInfo?.hostedIcaConfig?.hostedAddress)
 
-  const connectionId = flowInfo ? (flowInfo.icaConfig && flowInfo.icaConfig.connectionId != '' ? flowInfo.icaConfig.connectionId : flowInfo.hostedIcaConfig ? hostedICA.icaConfig?.connectionId : '') : ''
+  const connectionId = flowInfo ? (
+    flowInfo.icaConfig?.connectionId && flowInfo.icaConfig.connectionId !== '' 
+      ? flowInfo.icaConfig.connectionId 
+      : flowInfo.hostedIcaConfig && hostedICA?.icaConfig?.connectionId 
+      ? hostedICA.icaConfig.connectionId 
+      : ''
+  ) : ''
 
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
