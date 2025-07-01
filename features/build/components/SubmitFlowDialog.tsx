@@ -369,9 +369,14 @@ export const SubmitFlowDialog = ({
               )}
             </Column>
             <Column css={{ padding: '$6 $6' }}>
-              {flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec") || needsToBeWrappedInMsgExec && (
+              {((flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec")) || needsToBeWrappedInMsgExec) && (
                 <AuthzGrantCheck
-                  flowInput={flowInput}
+                  flowInput={{
+                    ...flowInput,
+                    startTime: executionParams.startAt,
+                    duration,
+                    interval
+                  }}
                   chainId={chainId}
                   grantee={icaAddress}
                   authzGrants={authzGrants}
