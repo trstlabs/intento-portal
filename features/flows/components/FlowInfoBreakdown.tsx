@@ -208,6 +208,7 @@ export const FlowInfoBreakdown = ({
   }
 
   function setUpdateFlowInfo(params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) {
+
     // Only update the specific fields that changed
     let updateParams: MsgUpdateFlowParams = {
       id: Number(flowInfo.id),

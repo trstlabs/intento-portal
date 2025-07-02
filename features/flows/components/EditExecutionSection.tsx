@@ -150,14 +150,13 @@ export function EditExecutionSection({
 
   const updateField = (field: string, value: any) => {
     if (!updateOnButtonClick) {
-      // For immediate updates, create a params object with the single field
-      const params: { startAt?: number | Date; interval?: number; endTime?: number | Date } = {
-        [field]: field === 'startAt' ? value instanceof Date ? value.getTime() : value : value
-      };
-      console.log(params)
-      setUpdateFlowInfo(params)
+      const params: { startAt?: number | Date; interval?: number; endTime?: number | Date } = {};
+      if (value !== undefined && value !== null) {
+        params[field] = field === 'startAt' ? (value instanceof Date ? value.getTime() : value) : value;
+      }
+      setUpdateFlowInfo(params);
     }
-  }
+  };
 
 
   return (
@@ -264,8 +263,11 @@ export function EditExecutionSection({
         <Button
           disabled={isExecutingUpdateFlow}
           onClick={() => {
-            // Update all values at once using the two-argument form
-            setUpdateFlowInfo(updatedFlowParams)
+            setUpdateFlowInfo({
+              startAt: startAt ? startAt.getTime() : undefined,
+              interval,
+              endTime: endTime ? endTime.getTime() : undefined,
+            });
           }}
         >
           Update
