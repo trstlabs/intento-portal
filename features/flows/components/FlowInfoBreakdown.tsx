@@ -183,7 +183,7 @@ export const FlowInfoBreakdown = ({
 
     // Create the updated params with the latest messages
     const updatedParams = {
-      ...flowParams,
+      // ...flowParams,
       msgs: editMsgs,
       owner: flowInfo.owner,
       id: Number(flowInfo.id)
