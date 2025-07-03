@@ -51,6 +51,7 @@ const StyledDatePicker = styled(DatePicker, {
 })
 
 const intervalOptions = [
+  { label: '30 minutes', value: 30 * 60 * 1000 },
   { label: '1 hour', value: 60 * 60 * 1000 },
   { label: '2 hours', value: 2 * 60 * 60 * 1000 },
   { label: '3 hours', value: 3 * 60 * 60 * 1000 },
