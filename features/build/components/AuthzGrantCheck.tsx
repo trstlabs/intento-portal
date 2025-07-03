@@ -26,6 +26,7 @@ interface AuthzGrantCheckProps {
   authzGrants?: GrantResponse[]
   isAuthzGrantsLoading: boolean
   refetchAuthzGrants: () => void
+  chainName?: string // Optional chain name
 }
 
 export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
@@ -34,7 +35,8 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   grantee,
   authzGrants: propAuthzGrants,
   isAuthzGrantsLoading: propIsAuthzGrantsLoading,
-  refetchAuthzGrants: propRefetchAuthzGrants
+  refetchAuthzGrants: propRefetchAuthzGrants,
+  chainName,
 }) => {
   // Get wallet state and connection
   const [ibcState, _setIbcState] = useRecoilState(ibcWalletState)
@@ -82,7 +84,9 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
       <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
         <Inline justifyContent="space-between">
           <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>
-            {ibcState.status === WalletStatusType.connecting ? 'Connecting...' : 'Connect IBC Wallet'}
+            {ibcState.status === WalletStatusType.connecting
+              ? `Connecting...`
+              : `Connect ${chainName || 'IBC'} Wallet`}
           </Text>
           {ibcState.status === WalletStatusType.connecting ? (
             <Spinner size={16} />
@@ -91,7 +95,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
           )}
         </Inline>
         <Text variant="body" color="tertiary" css={{ fontSize: '12px', paddingTop: '$2', paddingBottom: '$2' }}>
-          Please connect your IBC wallet to check or create authorizations.
+          Please connect your {chainName || 'IBC'} wallet to check or create authorizations.
         </Text>
         <Button
           variant="primary"

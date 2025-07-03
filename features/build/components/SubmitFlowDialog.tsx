@@ -26,6 +26,7 @@ import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 
 import { TokenSelector } from '../../send/components/TokenSelector'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
+import { useChainInfoByChainID } from '../../../hooks/useChainList'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 import { EditExecutionSection } from '../../flows/components/EditExecutionSection'
 
@@ -39,6 +40,7 @@ interface SubmitFlowDialogProps {
   handleSubmitFlow: (data: FlowInput) => void
   hostedAccount?: HostedAccount
   chainId: string
+  chainName?: string // Optional chain name
 }
 
 // Only executionParams and setUpdateExecutionParams are used for interval/startAt/duration
@@ -52,7 +54,12 @@ export const SubmitFlowDialog = ({
   onRequestClose,
   handleSubmitFlow,
   hostedAccount,
+  chainName: propChainName,
 }: SubmitFlowDialogProps) => {
+  // Lookup chain name if not provided
+  const chainInfo = useChainInfoByChainID(chainId)
+  const chainName = propChainName || chainInfo?.name || 'IBC' // fallback
+
   // Get authz grant info
   const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
     icaAddress,
@@ -382,6 +389,7 @@ export const SubmitFlowDialog = ({
                   authzGrants={authzGrants}
                   isAuthzGrantsLoading={isAuthzGrantsLoading}
                   refetchAuthzGrants={refetchAuthzGrants}
+                  chainName={chainName}
                 />
               )}
             </Column>

@@ -501,6 +501,7 @@ export const BuildComponent = ({
         icaAddress={icaAddress || hostedICA}
         flowInput={flowInput}
         isDialogShowing={isSubmitFlowDialogShowing}
+        chainName={chainName}
         onRequestClose={() =>
           setSubmitFlowDialogState({
             isShowing: false,
