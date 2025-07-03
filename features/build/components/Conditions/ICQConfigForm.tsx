@@ -8,7 +8,7 @@ import { useState } from "react";
 import * as bech32 from "bech32";
 import { Duration } from "intentojs/dist/codegen/google/protobuf/duration";
 import { Chip } from "../../../../components/Layout/Chip";
-
+import { fromBech32, toUtf8 } from '@cosmjs/encoding'
 
 type ICQConfigProps = {
   icqConfig?: ICQConfig;
@@ -69,6 +69,15 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
       ],
       queryKey: (data: { poolId: string; denom1: string; denom2: string }) =>
         createOsmosisTwapQueryKey(parseInt(data.poolId), data.denom1, data.denom2),
+    },
+    "CosmWasm Item Query": {
+      queryType: "store/wasm/key",
+      fields: [
+        { label: "Contract Address", key: "contractAddress" },
+        { label: "Item Key", key: "itemKey" },
+      ],
+      queryKey: (data: { contractAddress: string; itemKey: string }) =>
+        createCosmwasmItemQueryKey(data.contractAddress, data.itemKey),
     },
   };
 
@@ -179,6 +188,21 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
     }
   };
 
+
+  const createCosmwasmItemQueryKey = (contractAddr: string, itemKey: string): string => {
+    const { data: address } = fromBech32(contractAddr);
+    const prefix = Uint8Array.from([0x03]); // CosmWasm contract storage prefix
+    const addrBytes = address;
+    const keyBytes = toUtf8(itemKey);
+  
+    const fullKey = new Uint8Array(prefix.length + addrBytes.length + keyBytes.length);
+    fullKey.set(prefix, 0);
+    fullKey.set(addrBytes, 1);
+    fullKey.set(keyBytes, 1 + addrBytes.length);
+  
+    return Buffer.from(fullKey).toString("base64");
+  }
+
   return (
     <>
       <Divider offsetTop="$10" offsetBottom="$5" />
@@ -211,7 +235,7 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
           </div>
 
           {/* Dynamically render fields based on the selected query example */}
-          {selectedExample && examples[selectedExample].fields.map((field, index) => (
+          {selectedExample && examples[selectedExample]?.fields?.map((field, index) => (
             <Field
               key={index}
               label={field.label}
