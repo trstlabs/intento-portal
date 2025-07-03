@@ -10,12 +10,13 @@ import {
 } from 'junoblocks'
 import React, { useEffect, useState } from 'react'
 // import { Row } from './BuildComponent'
-import { convertFromMicroDenom } from '../../../util/conversion'
+import { convertFromMicroDenom, convertMicroDenomToDenom } from '../../../util/conversion'
 import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { useCreateAuthzGrant } from '../hooks'
 import { FlowInput } from '../../../types/trstTypes'
 // import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
+import { useIBCAssetList } from '../../../hooks/useChainList' // <-- import hook
 
 interface HostedAccountCardProps {
   hostedAccount: HostedAccount
@@ -65,14 +66,15 @@ export const HostedAccountCard = ({
       handler(undefined, { onSettled: () => resetStateSetter(false) })
     }
   }
-
+  // Get denom_local from asset list
+  const [ibcAssets] = useIBCAssetList();
   useEffect(
     () =>
       handleTriggerEffect(
         !isExecutingAuthzGrant && requestedAuthzGrant,
         handleCreateAuthzGrant,
         () => {
-        //  setRequestedSendAndAuthzGrant(false)
+          //  setRequestedSendAndAuthzGrant(false)
           setRequestedCreateAuthzGrant(false)
         }
       ),
@@ -119,23 +121,13 @@ export const HostedAccountCard = ({
       >
         <Text variant="body">
           {' '}
-          {showICAInfo ? <span>Hide</span> : <span>View</span>} Hosted Account{' '}
+          {showICAInfo ? <span>Hide</span> : <span>View</span>} Execution Details{' '}
         </Text>
       </Button>
 
       {showICAInfo && (
         <>
-          <Divider offsetY="$4" />
-          <Text variant="legend">  Current fee coins supported </Text>
-
-
-          {hostedAccount.hostFeeConfig.feeCoinsSuported.map((coin, coinIndex) => (
-            <div key={coinIndex}>
-              <Text wrap={true} css={{ padding: '$4' }} variant="caption">  <li>{/* {convertMicroDenomToDenom(coin.amount, 6)}  */} {convertFromMicroDenom(coin.denom)}  </li></Text>
-            </div>))}
-
-          <Divider offsetY="$4" />
-          <Text variant="legend"> Address </Text>
+          <Text variant="legend">Address</Text>
           {isMobile ? (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
               {hostedICAAddress.substring(0, 33) + '..'}
@@ -145,6 +137,25 @@ export const HostedAccountCard = ({
               {hostedICAAddress}
             </Text>
           )}
+          <Divider offsetY="$4" />
+          <Text variant="legend">Fee Per Execution</Text>
+
+
+          {hostedAccount.hostFeeConfig.feeCoinsSuported.map((coin, coinIndex) => {
+
+            const asset = ibcAssets.find(asset => asset.denom_local.toLowerCase() === coin.denom.toLowerCase());
+            return (
+              <span key={coinIndex}>
+                <Text wrap={true} css={{ padding: '$4' }} variant="caption">
+                  {convertMicroDenomToDenom(coin.amount, asset?.decimals)}
+                  {asset && asset.denom_local && asset.denom_local.toLowerCase() === coin.denom.toLowerCase() ? ` ${asset.symbol}` : convertFromMicroDenom(coin.denom)}
+                </Text>
+              </span>
+            );
+          })}
+
+
+
           {/*   {hostedAccountBalance &&
             (!ishostedAccountBalanceLoading ? (
               <>
@@ -158,33 +169,38 @@ export const HostedAccountCard = ({
             ) : (
               <Spinner instant />
             ))} */}
-          {authzGrants != undefined && <><Text variant="legend"> Grants</Text>
-            {isAuthzGrantsLoading && !authzGrants ? (
+          {
+            isAuthzGrantsLoading && (
               <Spinner />
-            ) : (
-              <>
-                {authzGrants && authzGrants[0] && authzGrants.map((grant, index) =>
-                  grant.hasGrant ? (
-                    <Text key={"hkey" + index} css={{ padding: '$4' }} variant="caption">
-                      {' '}
-                      ✓ Interchain Account is granted for type: {
-                        grant.msgTypeUrl
-                      }{' '}
-                      {grant.expiration && (
-                        <span> and expires on {grant.expiration.toLocaleString()}</span>
-                      )}
-                    </Text>
-                  ) : (
-                    <Text css={{ padding: '$4' }} variant="caption">
-                      {' '}
-                      ✘ Interchain Account is not granted for type:{' '}
-                      {grant.msgTypeUrl}{' '}
-                    </Text>
-                  )
-                )}
-              </>
-            )}
-          </>}
+            )
+          }
+
+          {!isAuthzGrantsLoading && authzGrants && authzGrants.length > 0 && (
+            <>
+              <Divider offsetY="$4" />
+              <Text variant="legend">Grants</Text>
+              {authzGrants.map((grant, index) =>
+                grant.hasGrant ? (
+                  <Text key={"hkey" + index} css={{ padding: '$4' }} variant="caption">
+                    {' '}
+                    ✓ Interchain Account is granted for type: {
+                      grant.msgTypeUrl
+                    }{' '}
+                    {grant.expiration && (
+                      <span> and expires on {grant.expiration.toLocaleString()}</span>
+                    )}
+                  </Text>
+                ) : (
+                  <Text css={{ padding: '$4' }} variant="caption">
+                    {' '}
+                    ✘ Interchain Account is not granted for type:{' '}
+                    {grant.msgTypeUrl}{' '}
+                  </Text>
+                )
+              )}
+            </>
+          )}
+
           {(
             <>
               {/*  <Card
@@ -228,7 +244,7 @@ export const HostedAccountCard = ({
                   </Row>
                 </CardContent>
               </Card> */}
-             {/*  <Row>
+              {/*  <Row>
                 {authzGrants && (
                   <>
                     <Tooltip
