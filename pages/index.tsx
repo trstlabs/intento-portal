@@ -17,6 +17,7 @@ import {
   Card,
   CardContent,
   useMedia,
+  useControlTheme,
 } from 'junoblocks'
 import { useCallback, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
@@ -27,7 +28,6 @@ import { useChain } from '@cosmos-kit/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { APP_NAME } from '../util/constants'
 import Head from 'next/head'
-import { useControlTheme } from 'junoblocks'
 
 export default function Home() {
   const { address } = useChain('intentotestnet')
