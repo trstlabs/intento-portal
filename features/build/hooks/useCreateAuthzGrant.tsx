@@ -85,7 +85,7 @@ export const useCreateAuthzGrant = ({
             <Toast
               icon={<ErrorIcon color="error" />}
               title="Oops creating authz grant error!"
-              body={errorMessage}
+              body={errorMessage + " .Please check you have funds on your wallet address on this chain."}
               buttons={
                 <Button
                   as="a"
