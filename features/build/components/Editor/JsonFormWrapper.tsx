@@ -38,13 +38,18 @@ export const JsonFormWrapper = ({
 }): JSX.Element => {
   const [showJsonForm, setShowJsonForm] = useState(true)
   const extractedMsgTypeUrl =
-    msg.length > 32 && msg.split('.').find((name) => name.includes('Msg'))
+    msg && msg.length > 32 && msg.split('.').find((name) => name.includes('Msg'));
   const extractedMsgPrefix =
-    msg.length > 32 && msg.split('/')[1].split('.')[0] + " "
+    msg && msg.length > 32 && msg.split('/')[1]?.split('.')[0] + " ";
   const extractedMsgModule =
-    msg.length > 32 && msg.split('.')[1] + " "
-   const msgTypeNameFile = (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown'
-  const msgTypeName = extractedMsgPrefix ? extractedMsgPrefix.charAt(0).toUpperCase() + extractedMsgPrefix.slice(1) + extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) + (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown' : 'Unknown'
+    msg && msg.length > 32 && msg.split('.')[1] + " ";
+  const msgTypeNameFile = (extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown';
+  const msgTypeName = extractedMsgPrefix
+    ? extractedMsgPrefix.charAt(0).toUpperCase() +
+      extractedMsgPrefix.slice(1) +
+      (extractedMsgModule ? extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) : '') +
+      ((extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown')
+    : 'Unknown';
   const [validationErrors, setValidationErrors] = useState([])
   const [schema, setSchema] = useState(() => {
     const initialSchema = findFileBySuffix(msgTypeNameFile)

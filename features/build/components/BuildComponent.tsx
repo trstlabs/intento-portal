@@ -287,18 +287,26 @@ export const BuildComponent = ({
       const msg = JSON.stringify(msgObject, null, '\t')
       let newMsg = msg.replaceAll('uinto', denom)
       newMsg = newMsg.replaceAll('into', prefix)
+      let processedMsg: string
+  
       if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, true)
-        newMsg = newInput.msgs[index]
+        processedMsg = newInput.msgs[0]
       } else {
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, false)
-        newMsg = newInput.msgs[index]
+        processedMsg = newInput.msgs[0]
       }
-
-      let updatedFlowInput = flowInput
-      updatedFlowInput.msgs[index] = newMsg
-      //updatedFlowInput.typeUrls[index] = JSON.parse(msg)["typeUrl"].split(".").find((data) => data.includes("Msg")).split(",")
-
+  
+      // Create a new copy of flowInput and msgs array
+      const updatedFlowInput = {
+        ...flowInput,
+        msgs: [...(flowInput.msgs || [])]
+      }
+      updatedFlowInput.msgs[index] = processedMsg
+  
+      // Remove any undefined values in msgs array
+      updatedFlowInput.msgs = updatedFlowInput.msgs.filter((msg) => msg !== undefined)
+  
       onFlowChange(updatedFlowInput)
     } catch (e) {
       alert(e)
