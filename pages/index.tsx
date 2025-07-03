@@ -27,6 +27,7 @@ import { useChain } from '@cosmos-kit/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { APP_NAME } from '../util/constants'
 import Head from 'next/head'
+import { useControlTheme } from 'junoblocks'
 
 export default function Home() {
   const { address } = useChain('intentotestnet')
@@ -82,7 +83,9 @@ export default function Home() {
   const hasNextPage = Boolean(allFlows?.pagination?.nextKey)
   const hasPrevPage = paginationHistory.length > 0
 
+
   const FeatureBadge = styled('div', {
+
     padding: '6px 12px',
     borderRadius: '20px',
     fontSize: '14px',
@@ -122,6 +125,54 @@ export default function Home() {
     transition: 'all 0.2s ease-in-out'
   })
 
+  const themeController = useControlTheme();
+  const isDark = themeController.theme.name === 'dark';
+
+  const badgeStyles = {
+    primary: {
+      light: {
+        backgroundColor: 'rgba(111, 168, 220, 0.2)',
+        color: '#0369a1',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+      dark: {
+        backgroundColor: 'rgba(30, 58, 138, 0.22)',
+        color: '#e0e7ef',
+        border: '1px solid rgba(111, 168, 220, 0.32)',
+        boxShadow: '0 2px 10px 0 rgba(30,40,70,0.13)',
+      }
+    },
+    success: {
+      light: {
+        backgroundColor: 'rgba(147, 196, 125, 0.2)',
+        color: '#166534',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+      dark: {
+        backgroundColor: 'rgba(34,197,94,0.19)',
+        color: '#d1fae5',
+        border: '1px solid rgba(147, 196, 125, 0.32)',
+        boxShadow: '0 2px 10px 0 rgba(34,197,94,0.09)',
+      }
+    },
+    info: {
+      light: {
+        backgroundColor: 'rgba(142, 124, 195, 0.2)',
+        color: '#1e40af',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+      },
+      dark: {
+        backgroundColor: 'rgba(124, 58, 237, 0.17)',
+        color: '#ede9fe',
+        border: '1px solid rgba(142, 124, 195, 0.32)',
+        boxShadow: '0 2px 10px 0 rgba(124,58,237,0.09)',
+      }
+    }
+  };
+
+  const getBadgeStyles = (variant: string) =>
+    badgeStyles[variant]?.[isDark ? 'dark' : 'light'] || {};
+
   const pageHeaderContents = (
     <Card css={{
       padding: '$8', marginBottom: '$10'
@@ -134,27 +185,25 @@ export default function Home() {
             </title>
           </Head>
         )}
-        <Text
-          variant="header">
-          Welcome to the Intento Portal
+        <Text variant="header" css={{ marginBottom: '$8', marginTop: '$8', fontSize: 24 }}>
+          Orchestrate Anything. Any Action, Anywhere, Anytime.
         </Text>
 
-        <Text variant="body" css={{ marginBottom: '$8', color: '$textColors$secondary' }}>
-          The most powerful platform for cross-chain automation for blockchains. Create, manage, and monitor self-custodial
-          actions across any IBC-enabled blockchain with ease.
+        <Text variant="body" css={{ marginBottom: '$8', fontWeight: '500', color: '$textColors$secondary', fontSize: 14 }}>
+          Supercharge your blockchain workflows with simple templates, real-time notifications, and easy integration.<br />
+          Seamlessly connect, manage, and secure actions across any IBC-enabled chain. All in one place.
         </Text>
-
         <Inline gap={4} css={{ marginBottom: 32 }}>
-          <FeatureBadge variant="primary">
+          <FeatureBadge variant="primary" style={getBadgeStyles('primary')}>
             <span>✨</span> No-Code Automation
           </FeatureBadge>
-          <FeatureBadge variant="success">
+          <FeatureBadge variant="success" style={getBadgeStyles('success')}>
             <span>🔔</span> Email Alerts
           </FeatureBadge>
-          <FeatureBadge variant="info">
+          <FeatureBadge variant="info" style={getBadgeStyles('info')}>
             <span>🛡️</span> Self-Custodial
           </FeatureBadge>
-          {!isMobile && <FeatureBadge variant="primary">
+          {!isMobile && <FeatureBadge variant="primary" style={getBadgeStyles('primary')}>
             <span>🦾</span> AI-Ready
           </FeatureBadge>}
         </Inline>
@@ -162,7 +211,8 @@ export default function Home() {
         <Card variant="secondary" disabled css={{
           backgroundColor: '$colors$dark5',
           borderLeft: '4px solid $colors$primary',
-          marginTop: '$6'
+          marginTop: '$6',
+          marginBottom: '$6'
         }}>
           <CardContent>
             <Inline gap={4} align="flex-start" css={{ alignItems: 'flex-start', width: '100%' }}>
