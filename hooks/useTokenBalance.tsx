@@ -154,7 +154,7 @@ export const useGetBalanceForAcc = (address: string) => {
       }
     },
     {
-      enabled: Boolean(client && address),
+      enabled: Boolean(client && client.cosmos && address && address.length > 40),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,
