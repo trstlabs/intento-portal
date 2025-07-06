@@ -323,7 +323,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             sender: 'Your Address',
             routes: [{ poolId: '2', tokenOutDenom: 'uelys' }],
             tokenIn: { "denom": "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349", "amount": "1" },
-            tokenOutMinAmount: '0',
+            tokenOutMinAmount: '1',
           },
         },
         {
@@ -456,10 +456,10 @@ export function ExampleChips({ chainSymbol, setExample, setAllMessages, index })
                     sender: 'Your Address',
                     routes: [{ poolId: '2', tokenOutDenom: 'uelys' }],
                     tokenIn: { "denom": "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349", "amount": "1000000" },
-                    tokenOutMinAmount: '0',
+                    tokenOutMinAmount: '1',
                   },
                 }
-              ], 'DCA 1USDC TO ELYS')}
+              ], 'DCA USDC TO ELYS')}
             />
           )}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
@@ -476,7 +476,7 @@ export function ExampleChips({ chainSymbol, setExample, setAllMessages, index })
                       sender: 'Your Address',
                       routes: [{ poolId: '308', tokenOutDenom: 'ibc/9FF2B7A5F55038A7EE61F4FD6749D9A648B48E89830F2682B67B5DC158E2753C' }],
                       tokenIn: { denom: 'uosmo', amount: '1000000' },
-                      tokenOutMinAmount: '0',
+                      tokenOutMinAmount: '1',
                     },
                   }
                 ], 'DCA INTO ATOM')}
