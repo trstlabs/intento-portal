@@ -21,7 +21,7 @@ import { toast } from 'react-hot-toast'
 import { useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
-import { AuthzGrantCheck } from './AuthzGrantCheck'
+
 import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 
 import { TokenSelector } from '../../send/components/TokenSelector'
@@ -29,11 +29,11 @@ import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from '../../../hooks/useChainList'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 import { EditExecutionSection } from '../../flows/components/EditExecutionSection'
+import { FlowSummary } from './FlowSummary'
 
 interface SubmitFlowDialogProps {
   isDialogShowing: boolean
   icaAddress?: string
-  customLabel: string
   flowInput: FlowInput
   isLoading: boolean
   onRequestClose: () => void
@@ -48,7 +48,6 @@ export const SubmitFlowDialog = ({
   chainId,
   isDialogShowing,
   icaAddress,
-  customLabel,
   flowInput,
   isLoading,
   onRequestClose,
@@ -80,7 +79,7 @@ export const SubmitFlowDialog = ({
 
 
   const [feeFunds, setFeeAmount] = useState(0)
-  const [flowLabel, setLabel] = useState(customLabel)
+  const [flowLabel, setLabel] = useState(flowInput.label)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
 
   const denom_local =
@@ -98,9 +97,9 @@ export const SubmitFlowDialog = ({
   // Helper for overview display
   const duration = executionParams.startAt > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - Date.now()
   const interval = executionParams.interval
-  const displayStartTime = executionParams.startAt === 0 ? 'Right Away' : new Date(executionParams.startAt).toLocaleString()
-  const displayDuration = duration > 0 ? msToHuman(duration) : 'None Selected'
-  const displayInterval = interval > 0 ? msToHuman(interval) : 'None Selected'
+  // const displayStartTime = executionParams.startAt === 0 ? 'Right Away' : new Date(executionParams.startAt).toLocaleString()
+  // const displayDuration = duration > 0 ? msToHuman(duration) : 'None Selected'
+  // const displayInterval = interval > 0 ? msToHuman(interval) : 'None Selected'
 
   const needsToBeWrappedInMsgExec = flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec")
   //true = deduct fees from local acc
@@ -192,87 +191,19 @@ export const SubmitFlowDialog = ({
               updatedFlowParams={executionParams}
               setUpdateFlowInfo={setUpdateExecutionParams}
             />
-            <Column css={{ padding: '$6 0' }}>
-              <DialogDivider offsetBottom="$4" />
-
-              {/* {chainSymbol != 'INTO'  && (
-                <>
-                  <Text align="center" css={{ margin: '$4' }} variant="legend">
-                    ICA Balance
-                  </Text>
-                  <Inline justifyContent={'space-between'} align="center">
-                    <Tooltip
-                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
-                      aria-label="host chain execution fee funds"
-                    >
-
-                      <Text variant="caption" color="disabled">
-                        {icaBalance} {chainSymbol}
-                      </Text>
-
-                    </Tooltip>
-                    <Text variant="caption" color="tertiary">
-                      <StyledInput
-                        step=".01"
-                        placeholder="11.11"
-                        type="number"
-                        value={feeFundsHostChain}
-                        onChange={({ target: { value } }) =>
-                          setFeeFundsHostChain(value)
-                        }
-                      />
-                      {chainSymbol}
-                    </Text>
-
-                  </Inline>
-                
-                  {!isExecutingAuthzGrant && (
-                    <Inline justifyContent={'space-between'} align="center">
-                      {feeFundsHostChain != '0.00' &&
-                        feeFundsHostChain != '0' &&
-                        feeFundsHostChain != '0.00' &&
-                        feeFundsHostChain != '0' &&
-                        feeFundsHostChain != '' && (
-                          <Button
-                            css={{ margin: '$2' }}
-                            variant="secondary"
-                            disabled={shouldDisableSendHostChainFundsButton}
-                            onClick={() => handleSendFundsOnHostClick()}
-                          >
-                            {isExecutingSendFundsOnHost && <Spinner instant />}{' '}
-                            {'Send ' + feeFundsHostChain + ' ' + chainSymbol}
-                          </Button>
-                        )}
-                      {!shouldDisableAuthzGrantButton && (
-                        <Button
-                          css={{ marginTop: '$8', margin: '$2' }}
-                          variant="secondary"
-                          onClick={() =>
-                            handleCreateAuthzGrantClick(
-                              Number(feeFundsHostChain) != 0
-                            )
-                          }
-                        >
-                          {isExecutingAuthzGrant && <Spinner instant />}{' '}
-                          {Number(feeFundsHostChain) != 0
-                            ? 'Send ' + ' + Grant'
-                            : 'Create Grant'}
-                        </Button>
-                      )}
-                    </Inline>
-                  )}
-                </>
-              )} */}
+            
+            <Column css={{ padding: '$3 0' }}>
+              <DialogDivider offsetBottom="$2" />
               <Tooltip
-                label="Funds to set aside for execution. Remaining funds are returned after commision fee."
+                label="Funds to set aside for execution to the flow account. Fee funds are returned after commision fee."
                 aria-label="Fund Flow - Intento (Optional)"
               >
-                <Text align="center" css={{ margin: '$4' }} variant="legend">
+                <Text align="center" css={{ margin: '$2' }} variant="legend">
                   Fee Funds
                 </Text>
               </Tooltip>
               <Inline justifyContent={'space-between'}>
-                <Text wrap={false} css={{ padding: '$4' }} variant="caption">
+                <Text wrap={false} css={{ padding: '$2' }} variant="caption">
                   Deduct fees from wallet balance (any token)
                 </Text>{' '}
                 <StyledInput
@@ -309,59 +240,38 @@ export const SubmitFlowDialog = ({
                   </Inline>
                 </>
               )}
-              {
-                suggestedFunds ? <Text
-                  align="center"
-                  color="disabled"
-                  wrap={false}
-                  variant="caption"
-                >
-                  Expected fees ~ {suggestedFunds} {feeFundsSymbol}
-                </Text> : <Text
-                  align="center"
-                  color="disabled"
-                  wrap={false}
-                  variant="caption"
-                >
-                  Coin Not Found
-                </Text>
-              }
-              <DialogDivider offsetY="$10" />
+
+              <DialogDivider offsetY="$4" />
               {duration && (
                 <>
-                  <Text align="center" variant="legend">
-                    Overview
-                  </Text>
-                  <Inline justifyContent={'flex-start'}>
+                  <FlowSummary
+                    flowInput={{
+                      ...flowInput, label: flowLabel, startTime: executionParams.startAt,
+                      duration,
+                      interval
+                    }}
+                    chainId={chainId}
+                    displaySymbol={feeFundsSymbol}
+                    expectedFee={suggestedFunds.toString()}
+                    useMsgExec={needsToBeWrappedInMsgExec}
+                    grantee={icaAddress}
+                    authzGrants={authzGrants}
+                    isAuthzGrantsLoading={isAuthzGrantsLoading}
+                    refetchAuthzGrants={refetchAuthzGrants}
+                    chainName={chainName}
 
-                    <Text css={{ padding: '$4' }} variant="caption">
-                      Execution Starts {displayStartTime == 'Right Away'
-                        ? displayStartTime
-                        : 'In ' + displayStartTime}
-                    </Text>
+                  />
 
-                    <Text css={{ padding: '$4' }} variant="caption">
-                      Duration is {displayDuration}
-                    </Text>
-                    {interval > 0 && (
-                      <>
-                        <Text css={{ padding: '$4' }} variant="caption">
-                          Interval is {displayInterval}
-                        </Text>
-                        <Text css={{ padding: '$4' }} variant="caption">
-                          {executionParams.startAt > 0 ? Math.floor(duration / interval) + 1 : Math.floor(duration / interval)}{' '}
-                          recurrences
-                        </Text>
-                      </>
-                    )}
-                  </Inline>
-                  <Inline justifyContent={'space-between'} align="center">
+                </>
+              )}
+            </Column>
+            <Inline justifyContent={'space-between'} align="center">
                     <Tooltip
                       label="Name your flow so you can find it back later by name"
                       aria-label="Fund Flow - INTO (Optional)"
                     >
                       <Text color="disabled" wrap={false} variant="legend">
-                        Label (optional)
+                        Label
                       </Text>
                     </Tooltip>
                     <Text>
@@ -372,33 +282,10 @@ export const SubmitFlowDialog = ({
                       />{' '}
                     </Text>
                   </Inline>
-                </>
-              )}
-            </Column>
-            <Column css={{ padding: '$6 $6' }}>
-              {((flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec")) || needsToBeWrappedInMsgExec) && (
-                <AuthzGrantCheck
-                  flowInput={{
-                    ...flowInput,
-                    startTime: executionParams.startAt,
-                    duration,
-                    interval
-                  }}
-                  chainId={chainId}
-                  grantee={icaAddress}
-                  authzGrants={authzGrants}
-                  isAuthzGrantsLoading={isAuthzGrantsLoading}
-                  refetchAuthzGrants={refetchAuthzGrants}
-                  chainName={chainName}
-                />
-              )}
-            </Column>
           </Column>
         </StyledDivForInputs>
       </DialogContent>
 
-
-      <DialogDivider offsetTop="$4" offsetBottom="$2" />
 
       <DialogButtons
         cancellationButton={
@@ -420,14 +307,6 @@ export const SubmitFlowDialog = ({
   )
 }
 
-// Helper to convert ms to human readable string
-function msToHuman(ms: number) {
-  if (ms < 60000) return `${Math.floor(ms / 1000)} seconds`
-  if (ms < 3600000) return `${Math.floor(ms / 60000)} minutes`
-  if (ms < 86400000) return `${Math.floor(ms / 3600000)} hours`
-  if (ms < 604800000) return `${Math.floor(ms / 86400000)} days`
-  return `${Math.floor(ms / 604800000)} weeks`
-}
 
 const StyledDivForInputs = styled('div', {
   display: 'flex',

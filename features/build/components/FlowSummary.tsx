@@ -4,6 +4,7 @@ import {
     Inline,
     Card,
     CardContent,
+    Tooltip,
 } from 'junoblocks'
 import React from 'react'
 // We don't directly use these types, but they're needed for the FlowInput type
@@ -23,6 +24,7 @@ interface FlowSummaryProps {
     authzGrants?: GrantResponse[]
     isAuthzGrantsLoading?: boolean
     refetchAuthzGrants?: () => void
+    chainName?: string
 }
 
 export const FlowSummary: React.FC<FlowSummaryProps> = ({
@@ -35,6 +37,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     authzGrants,
     isAuthzGrantsLoading = false,
     refetchAuthzGrants = () => { },
+    chainName
 }) => {
     // Calculate scheduling info (all values are in milliseconds)
     const interval = flowInput.interval || 0
@@ -123,10 +126,12 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                         </Inline>
 
                         {useMsgExec !== false && (
-                            <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
-                                <Text variant="body">Submit as MsgExec</Text>
-                                <Text variant="body" color="tertiary">{useMsgExec ? 'Yes' : 'No'}</Text>
-                            </Inline>
+                            <Tooltip label="Wrap the flow for the execution so the Intento Interchain Account can securely execute your message">
+                                <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
+                                    <Text variant="body">Wrap for ICA</Text>
+                                    <Text variant="body" color="tertiary">{useMsgExec ? 'Yes' : 'No'}</Text>
+                                </Inline>
+                            </Tooltip>
                         )}
 
                         {flowInput.label && (
@@ -138,7 +143,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                     </Column>
 
                     {/* Authorization Check */}
-                    {chainId && grantee && flowInput.msgs && flowInput.msgs.length > 0 && (
+                    {chainId && grantee && flowInput.msgs && flowInput.msgs.length > 0 && flowInput.connectionId && (
                         <AuthzGrantCheck
                             flowInput={flowInput}
                             chainId={chainId}
@@ -146,6 +151,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                             authzGrants={authzGrants}
                             isAuthzGrantsLoading={isAuthzGrantsLoading}
                             refetchAuthzGrants={refetchAuthzGrants}
+                            chainName={chainName}
                         />
                     )}
 
