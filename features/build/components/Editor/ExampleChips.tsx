@@ -130,14 +130,14 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
         {
           typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
           value: {
-            delegatorAddress: 'Your Address',
+            delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
             validatorAddress: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound',
           },
         },
         {
           typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
           value: {
-            delegatorAddress: 'Your Address',
+            delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
             validatorAddress: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound',
             amount: {
               denom: `u${chainSymbol.toLowerCase()}`,
@@ -146,7 +146,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           },
         },
       ],
-      `Autocompound ${chainSymbol} Rewards If More Than 1`,
+      `Autocompound If ${chainSymbol} >1`,
       {
         conditions: {
           feedbackLoops: [
@@ -173,7 +173,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
 
   return (
     <IntentTemlateChip
-      label={`Autocompound ${chainSymbol} Rewards If More Than 1`}
+      label={`Autocompound ${chainSymbol} if >1`}
       iconUrl={`https://raw.githubusercontent.com/cosmos/chain-registry/master/${chainSymbol === 'ATOM' ? 'cosmoshub' : 'osmosis'
         }/images/${chainSymbol.toLowerCase()}.svg`}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
@@ -421,7 +421,7 @@ export function ExampleChips({ chainSymbol, setExample, setAllMessages, index })
               }
             ], `Stream 1 ${chainSymbol}`)}
           />
-          {(chainSymbol === 'ATOM' || chainSymbol === 'OSMO') && (
+          {(chainSymbol === 'ATOM' || chainSymbol === 'OSMO' || chainSymbol === 'INTO') && (
             <AutoCompoundChip chainSymbol={chainSymbol} setAllMessages={setAllMessages} />
           )}
           {chainSymbol === 'ELYS' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
