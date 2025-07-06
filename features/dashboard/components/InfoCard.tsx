@@ -322,18 +322,17 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
         )}
         <SubmitFlowDialog
           isLoading={isExecutingSchedule}
-          flowInput={flowInput}
-          customLabel="Autocompound"
+          flowInput={{...flowInput, label: "Autocompound"}}
           isDialogShowing={isSubmitFlowDialogShowing}
           chainId={"intento-ics-test-1"}
           onRequestClose={() =>
             setSubmitFlowDialogState({
-              isShowing: false,
-            })
-          }
-          handleSubmitFlow={(flowInput) =>
-            handleSubmitFlowClick(flowInput)
-          }
+            isShowing: false,
+          })
+        }
+        handleSubmitFlow={(flowInput) =>
+          handleSubmitFlowClick(flowInput)
+        }
         />
       </StyledDivForInfoGrid>
     </StyledDivForContainer>

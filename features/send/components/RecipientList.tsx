@@ -127,7 +127,7 @@ export const RecipientList = ({
       const duration = flowInput.duration || 0;
       const oneDayInMs = 24 * 60 * 60 * 1000; // 1 day in milliseconds
       const timeoutTimestamp = Math.floor((Date.now() + startTime + duration + oneDayInMs) / 1000) * 1000000000;
-      
+
       for (let recipient of recipients) {
         let sendMsg
         if (recipient.channelID) {
@@ -163,7 +163,7 @@ export const RecipientList = ({
 
 
   const handleConfigClick = (config: ExecutionConfiguration) => {
-   
+
     let newData = data
     newData.configuration = config
     setflowInput(newData)
@@ -405,12 +405,9 @@ export const RecipientList = ({
       </Inline>
       <SubmitFlowDialog
         isLoading={isExecutingSchedule}
-        // label="Recurring Send"
-        flowInput={flowInput}
+        flowInput={{ ...flowInput, label: "Send Flow" }}
         isDialogShowing={isScheduleDialogShowing}
-        customLabel='Send Flow'
-        /* initialFlowType={flowType} */
-        chainId={"intento-ics-test-1"}  
+        chainId={"intento-ics-test-1"}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,
