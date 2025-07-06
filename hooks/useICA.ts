@@ -163,13 +163,12 @@ export const useICATokenBalance = (
   ibcWalletAddress: string,
   isICAChain: boolean
 ) => {
+  const chain = chainId ? useChainInfoByChainID(chainId) : null 
 
   const { data, isLoading } = useQuery(
     `icaTokenBalance/${chainId}/${ibcWalletAddress}`,
     async () => {
-      const chain = useChainInfoByChainID(chainId)
       const { denom, decimals } = chain
-      console.log(ibcWalletAddress)
       const chainClient = await StargateClient.connect(chain.rpc)
       const coin = await chainClient.getBalance(ibcWalletAddress, denom)
 
