@@ -21,7 +21,7 @@ import {
   ToggleSwitch,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 
@@ -84,7 +84,7 @@ export const SubmitFlowDialog = ({
   const [feeFunds, setFeeAmount] = useState(0)
   const [flowLabel, setLabel] = useState(flowInput.label)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
-  
+
   // Update flowLabel when flowInput.label changes
   useEffect(() => {
     setLabel(flowInput.label)
@@ -93,8 +93,10 @@ export const SubmitFlowDialog = ({
   const denom_local =
     useIBCAssetInfo(feeFundsSymbol)?.denom_local || "uinto"
 
-  // Helper for overview display
-  const duration = executionParams.startAt > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - Date.now()
+  // Calculate duration based on whether we have a future start time
+  const now = Date.now()
+  const startTime = executionParams.startAt > now ? executionParams.startAt : now
+  const duration = executionParams.endTime - startTime
   const interval = executionParams.interval
 
 
@@ -189,7 +191,7 @@ export const SubmitFlowDialog = ({
                 flowInput={{
                   ...flowInput,
                   label: flowLabel,
-                  startTime: executionParams.startAt,
+                  startTime: executionParams.startAt > now ? executionParams.startAt - now : 0,
                   duration,
                   interval
                 }}
