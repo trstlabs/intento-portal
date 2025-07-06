@@ -325,20 +325,32 @@ export const BuildComponent = ({
         msg = msg.replaceAll('into', prefix);
         return msg;
       });
+      
+      // Always ensure conditions is an object, even if empty
+      const conditions = extra?.conditions || {
+        feedbackLoops: [],
+        comparisons: [],
+        stopOnSuccessOf: [],
+        stopOnFailureOf: [],
+        skipOnSuccessOf: [],
+        skipOnFailureOf: [],
+        useAndForComparisons: false
+      };
+      
       let updatedFlowInput = {
         ...flowInput,
         msgs: processedMsgs,
+        conditions
       };
+      
       if (label) {
         updatedFlowInput.label = label;
-      }
-      if (extra?.conditions) {
-        updatedFlowInput.conditions = extra.conditions;
       }
 
       onFlowChange(updatedFlowInput);
     } catch (e) {
-      alert(e);
+      console.error('Error in setAllMessages:', e);
+      alert(`Error setting messages: ${e.message}`);
     }
   }
 
