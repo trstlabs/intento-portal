@@ -313,6 +313,35 @@ export const BuildComponent = ({
     }
   }
 
+  function setAllMessages(
+    msgObjects: any[],
+    label?: string,
+    extra?: { conditions?: ExecutionConditions }
+  ) {
+    try {
+      const processedMsgs = msgObjects.map((msgObject) => {
+        let msg = JSON.stringify(msgObject, null, '\t');
+        msg = msg.replaceAll('uinto', denom);
+        msg = msg.replaceAll('into', prefix);
+        return msg;
+      });
+      let updatedFlowInput = {
+        ...flowInput,
+        msgs: processedMsgs,
+      };
+      if (label) {
+        updatedFlowInput.label = label;
+      }
+      if (extra?.conditions) {
+        updatedFlowInput.conditions = extra.conditions;
+      }
+
+      onFlowChange(updatedFlowInput);
+    } catch (e) {
+      alert(e);
+    }
+  }
+
   function setConfig(updatedConfig: ExecutionConfiguration) {
     let updatedFlowInput = flowInput
     updatedFlowInput.configuration = updatedConfig
@@ -481,11 +510,12 @@ export const BuildComponent = ({
       </Inline>
       {flowInput.msgs.map((msg, index) => (
         <div key={index}>
-          <JsonFormWrapper
+           <JsonFormWrapper
             index={index}
             chainSymbol={chainSymbol}
             msg={msg}
             setExample={setExample}
+            setAllMessages={setAllMessages}
             handleRemoveMsg={handleRemoveMsg}
             handleChangeMsg={handleChangeMsg}
             setIsJsonValid={setIsJsonValid}
@@ -515,7 +545,6 @@ export const BuildComponent = ({
             isShowing: false,
           })
         }
-        customLabel={flowInput?.label}
         isLoading={isExecutingSchedule}
         handleSubmitFlow={(flowInput) =>
           handleSubmitFlowClick(flowInput)
