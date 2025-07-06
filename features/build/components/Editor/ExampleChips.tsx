@@ -3,6 +3,20 @@ import { Inline } from 'junoblocks'
 import { generalExamples, wasmExamples, osmoExamples, elysExamples } from '../ExampleMsgs'
 import { useValidators } from 'hooks/useValidators'
 
+// Map of chain symbols to their icon URLs
+const chainIcons = {
+  'ATOM': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg',
+  'OSMO': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg',
+  'INTO': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/intentotestnet/images/into.png',
+  'ELYS': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png',
+  'USDC': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/axelar/images/usdc.png',
+} as const
+
+// Helper function to get icon URL with fallback
+const getChainIcon = (chainSymbol: string): string => {
+  return chainIcons[chainSymbol] || 'https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg'
+}
+
 
 // IntentTemlateChip: visually distinct chip for preset flows
 function IntentTemlateChip({ label, iconUrl, gradient, onClick }) {
@@ -131,14 +145,14 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
           value: {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-            validatorAddress: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound',
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First',
           },
         },
         {
           typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
           value: {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-            validatorAddress: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound',
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First',
             amount: {
               denom: `u${chainSymbol.toLowerCase()}`,
               amount: '10', // This will be replaced by the feedback loop
@@ -146,7 +160,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           },
         },
       ],
-      `Autocompound If ${chainSymbol} >1`,
+      `Autocompound ${chainSymbol} if ${chainSymbol} >1`,
       {
         conditions: {
           feedbackLoops: [
@@ -174,8 +188,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
   return (
     <IntentTemlateChip
       label={`Autocompound ${chainSymbol} if >1`}
-      iconUrl={`https://raw.githubusercontent.com/cosmos/chain-registry/master/${chainSymbol === 'ATOM' ? 'cosmoshub' : 'osmosis'
-        }/images/${chainSymbol.toLowerCase()}.svg`}
+      iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
       onClick={handleClick}
     />
@@ -218,7 +231,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validator_address: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound'
+            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         },
         {
@@ -227,7 +240,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validator_address: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound'
+            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         }
       ],
@@ -274,7 +287,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
   return (
     <IntentTemlateChip
       label="Compound EDEN, EDEBB & Reinvest USDC Rewards"
-      iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
+      iconUrl={getChainIcon('ELYS')}
       gradient="linear-gradient(90deg, #5efce8 0%, #736efe 100%)"
       onClick={handleClick}
     />
@@ -319,7 +332,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validator_address: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound'
+            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         },
         {
@@ -328,7 +341,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validator_address: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound'
+            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         },
         {
@@ -337,7 +350,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validator_address: validatorAddress ? validatorAddress : 'Please Delegate Tokens For Autocompound'
+            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         }
       ],
@@ -405,7 +418,7 @@ export function ExampleChips({ chainSymbol, setExample, setAllMessages, index })
         <Inline css={{ marginBottom: '$4', flexWrap: 'wrap', gap: '$2' }}>
           <IntentTemlateChip
             label={`Stream 1 ${chainSymbol}`}
-            iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+            iconUrl={getChainIcon(chainSymbol)}
             gradient="linear-gradient(90deg, #7f7fd5 0%, #86a8e7 50%,rgb(176, 145, 234) 100%)"
             onClick={() => setAllMessages([
               {
