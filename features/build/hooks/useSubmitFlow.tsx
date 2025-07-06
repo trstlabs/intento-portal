@@ -91,7 +91,7 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
           <Toast
             icon={<IconWrapper icon={<Valid />} color="primary" />}
             title="Your flow is submitted!"
-            body={`An on-chain flow was created succesfully! Your unique ID is ${flowID}${flowInput.email ? ' and notifications will be sent to your email' : ''}`}
+            body={`The on-chain flow was created succesfully! The ID is ${flowID}${flowInput.email ? ' and notifications will be sent to your email' : ''}`}
             buttons={
               <Button
                 as="a"
@@ -101,7 +101,7 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
                 rel="noopener noreferrer"
                 iconRight={<UpRightArrow />}
               >
-                Go to your new trigger
+                Go to your new flow
               </Button>
             }
             onClose={() => toast.dismiss(t.id)}
