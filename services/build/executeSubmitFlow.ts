@@ -1,5 +1,6 @@
 //import { ethers } from "ethers";
-//import { Coin } from '@cosmjs/stargate'
+
+import { replacePlaceholders } from './replacePlaceholders';
 import { SigningStargateClient } from '@cosmjs/stargate'
 import { fromBech32, toBech32, toUtf8 } from '@cosmjs/encoding'
 import { intento } from 'intentojs'
@@ -53,19 +54,23 @@ export const executeSubmitFlow = async ({
     ownerAddress: owner,
     ibcWalletAddress
   });
-  console.log('Processed messages:', msgs);
 
-  if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ != '') {
-    const encodeObject2 = {
-      typeUrl: '/cosmos.authz.v1beta1.MsgExec',
-      value: {
-        msgs,
-        grantee: flowInput.icaAddressForAuthZ,
-      },
-    }
-    msgs = [client.registry.encodeAsAny(encodeObject2)]
+
+  if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ !== '') {
+    msgs = msgs.map((msg) => {
+      const execMsg = {
+        typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+        value: {
+          msgs: [msg], // wrap individually
+          grantee: flowInput.icaAddressForAuthZ,
+        },
+      };
+      return client.registry.encodeAsAny(execMsg);
+    });
   }
 
+  console.log('Processed messages:', msgs);
+  
   let feeFunds: Coin[] = []
   if (Number(flowInput.feeFunds?.amount) > 0) {
     feeFunds = [flowInput.feeFunds]
@@ -85,13 +90,13 @@ export const executeSubmitFlow = async ({
       configuration: flowInput.configuration
         ? flowInput.configuration
         : {
-            saveResponses: false,
-            updatingDisabled: false,
-            stopOnSuccess: false,
-            stopOnFailure: false,
-            stopOnTimeout: false,
-            fallbackToOwnerBalance: true,
-          },
+          saveResponses: false,
+          updatingDisabled: false,
+          stopOnSuccess: false,
+          stopOnFailure: false,
+          stopOnTimeout: false,
+          fallbackToOwnerBalance: true,
+        },
       feeFunds,
       conditions: flowInput.conditions,
       hostedIcaConfig: flowInput.hostedIcaConfig,
@@ -143,118 +148,56 @@ export function transformAndEncodeMsgs({
   ownerAddress,
   ibcWalletAddress
 }: TransformAndEncodeMsgsParams): Any[] {
-  // Helper function to recursively process message values and replace placeholders
-  const processValue = (value: any): any => {
-    if (value === 'Your Intento Address') {
-      if (!ownerAddress) {
-        throw new Error('Your Intento Address placeholder found but no owner address provided');
-      }
-      return ownerAddress;
-    }
-    
-    if (value == 'Your Address') {
-      if (!ibcWalletAddress) {
-        throw new Error('Your Address placeholder found but no IBC wallet connected');
-      }
-      return ibcWalletAddress;
-    }
-    
-    if (Array.isArray(value)) {
-      return value.map(processValue);
-    }
-    
-    if (value !== null && typeof value === 'object') {
-      const result: Record<string, any> = {};
-      for (const [key, val] of Object.entries(value)) {
-        result[key] = processValue(val);
-      }
-      return result;
-    }
-    
-    return value;
-  };
-  for (let msgJSON of flowInputMsgs) {
-    let parsedMsg = JSON.parse(msgJSON);
-    
-    // Process the message value to replace any Your Intento Address placeholders
-    let value = processValue(parsedMsg['value']);
-    let typeUrl: string = parsedMsg['typeUrl'].toString();
 
-    // Handle CosmWasm MsgExecuteContract
+  function encodeMsg(typeUrl: string, value: any): Any {
+    // CosmWasm MsgExecuteContract
     if (typeUrl === '/cosmwasm.wasm.v1.MsgExecuteContract') {
-      const msgObject = value['msg']; // The inner JSON object
+      const msgObject = value['msg'];
       const msgBytes: Uint8Array = toUtf8(JSON.stringify(msgObject));
-
       const wasmMsg = MsgExecuteContract.fromPartial({
         sender: value.sender,
         contract: value.contract,
         msg: msgBytes,
         funds: value.funds || [],
       });
-      console.log("wasmMsg", wasmMsg)
-      const anyMsg = Any.fromPartial({
+      return Any.fromPartial({
         typeUrl,
         value: MsgExecuteContract.encode(wasmMsg).finish(),
       });
-
-      msgs.push(anyMsg);
-      continue; // Skip to next message
     }
-
-    // Handle MsgExec (authz)
+    // MsgExec (authz)
     if (typeUrl === '/cosmos.authz.v1beta1.MsgExec') {
       const innerMsgs = value.msgs.map((authzMsg: any) => {
-        const innerTypeUrl = authzMsg.typeUrl;
-        const innerValue = authzMsg.value;
-
-        // If it's a CosmWasm message, handle its encoding too
-        if (innerTypeUrl === '/cosmwasm.wasm.v1.MsgExecuteContract') {
-          const innerMsgObject = innerValue.msg;
-          const innerMsgBytes: Uint8Array = toUtf8(JSON.stringify(innerMsgObject));
-
-          const innerWasmMsg = MsgExecuteContract.fromPartial({
-            sender: innerValue.sender,
-            contract: innerValue.contract,
-            msg: innerMsgBytes,
-            funds: innerValue.funds || [],
-          });
-          console.log("innerValue", innerValue)
-          return Any.fromPartial({
-            typeUrl: innerTypeUrl,
-            value: MsgExecuteContract.encode(innerWasmMsg).finish(),
-          });
-        }
-        console.log("innerValue", innerValue)
-        // Otherwise, let the registry handle it
-        return client.registry.encodeAsAny({
-          typeUrl: innerTypeUrl,
-          value: innerValue,
-        });
+        return encodeMsg(authzMsg.typeUrl, authzMsg.value);
       });
-
       const msgExec = MsgExec.fromPartial({
         grantee: value.grantee,
         msgs: innerMsgs,
       });
-
-      const anyMsgExec = Any.fromPartial({
+      return Any.fromPartial({
         typeUrl,
         value: MsgExec.encode(msgExec).finish(),
       });
-
-      msgs.push(anyMsgExec);
-      continue;
     }
 
-    // Fallback: Use registry to encode everything else
-    const encoded = client.registry.encodeAsAny({
+    // Fallback
+    return client.registry.encodeAsAny({
       typeUrl,
       value,
     });
-
-    msgs.push(encoded);
   }
-  
+
+  for (let msgJSON of flowInputMsgs) {
+    let parsedMsg = JSON.parse(msgJSON);
+    let value = replacePlaceholders({
+      value: parsedMsg['value'],
+      ownerAddress,
+      ibcWalletAddress
+    });
+    let typeUrl: string = parsedMsg['typeUrl'].toString();
+    msgs.push(encodeMsg(typeUrl, value));
+  }
+
   return msgs;
 }
 
