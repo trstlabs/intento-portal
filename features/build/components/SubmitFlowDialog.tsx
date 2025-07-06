@@ -21,7 +21,7 @@ import {
   ToggleSwitch,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 
@@ -84,6 +84,11 @@ export const SubmitFlowDialog = ({
   const [feeFunds, setFeeAmount] = useState(0)
   const [flowLabel, setLabel] = useState(flowInput.label)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
+  
+  // Update flowLabel when flowInput.label changes
+  useEffect(() => {
+    setLabel(flowInput.label)
+  }, [flowInput.label])
 
   const denom_local =
     useIBCAssetInfo(feeFundsSymbol)?.denom_local || "uinto"
