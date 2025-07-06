@@ -154,7 +154,7 @@ export const useGetBalanceForAcc = (address: string) => {
       }
     },
     {
-      enabled: Boolean(client),
+      enabled: Boolean(client && address),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_REFETCH_INTERVAL,
       refetchIntervalInBackground: false,

@@ -548,57 +548,8 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
                     </Inline>
                   )}
                 </Inline>
-
-                {/* Label Section */}
-                {/* <Inline justifyContent="space-between" align="center">
-                  <Tooltip label="Name your flow so you can find it later by name">
-                    <Text variant="body">Label (Optional)</Text>
-                  </Tooltip>
-                  <StyledInputWithBorder
-                    placeholder="My flow"
-                    value={txLabel}
-                    onChange={({ target: { value } }) => setLabel(value)}
-                  />
-                </Inline> */}
               </Column>
             </div>
-
-            {/* <DialogDivider offsetY="$10" />
-
-            <div style={{ width: '100%', background: '$backgroundColors$base', borderRadius: '8px', padding: '20px' }}>
-              <Column css={{ width: '100%' }}>
-
-                {icaAddress && flowInput.connectionId && flowInput.msgs[0] && (
-                  <Inline justifyContent="space-between" css={{ marginBottom: 8 }}>
-                    <Text variant="body">Submit as MsgExec:</Text>
-                    <Inline css={{ gap: 8 }}>
-                      {!useMsgExec ? (
-                        <ChipSelected
-                          label="No"
-                          onClick={() => setUseMsgExec(false)}
-                        />
-                      ) : (
-                        <Chip
-                          label="No"
-                          onClick={() => setUseMsgExec(false)}
-                        />
-                      )}
-                      {useMsgExec ? (
-                        <ChipSelected
-                          label="Yes"
-                          onClick={() => setUseMsgExec(true)}
-                        />
-                      ) : (
-                        <Chip
-                          label="Yes"
-                          onClick={() => setUseMsgExec(true)}
-                        />
-                      )}
-                    </Inline>
-                  </Inline>
-                )}
-              </Column>
-            </div> */}
           </Column>
         </CardContent >
       </Card >
