@@ -8,7 +8,7 @@ import {
   Error,
   DialogButtons,
   DialogContent,
-  DialogDivider,
+
   DialogHeader,
   Spinner,
   styled,
@@ -16,6 +16,9 @@ import {
   Tooltip,
 
   convertDenomToMicroDenom,
+  Card,
+  CardContent,
+  ToggleSwitch,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useState } from 'react'
@@ -85,21 +88,10 @@ export const SubmitFlowDialog = ({
   const denom_local =
     useIBCAssetInfo(feeFundsSymbol)?.denom_local || "uinto"
 
-  // Update fee denom from hosted account's fee config
-  // useEffect(() => {
-  //   if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
-  //     const feeDenom = hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === denom_local).denom;
-  //     const feeSymbol = feeDenom.startsWith('u') ? feeDenom.substring(1).toUpperCase() : feeDenom.toUpperCase();
-  //     setFeeFundsSymbol(feeSymbol);
-  //   }
-  // }, [hostedAccount?.hostFeeConfig?.feeCoinsSuported]);
-
   // Helper for overview display
   const duration = executionParams.startAt > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - Date.now()
   const interval = executionParams.interval
-  // const displayStartTime = executionParams.startAt === 0 ? 'Right Away' : new Date(executionParams.startAt).toLocaleString()
-  // const displayDuration = duration > 0 ? msToHuman(duration) : 'None Selected'
-  // const displayInterval = interval > 0 ? msToHuman(interval) : 'None Selected'
+
 
   const needsToBeWrappedInMsgExec = flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec")
   //true = deduct fees from local acc
@@ -187,101 +179,116 @@ export const SubmitFlowDialog = ({
             justifyContent="space-between"
             css={{ padding: '$2 $4', width: '100%' }}
           >
-            <EditExecutionSection
-              updatedFlowParams={executionParams}
-              setUpdateFlowInfo={setUpdateExecutionParams}
-            />
-            
-            <Column css={{ padding: '$3 0' }}>
-              <DialogDivider offsetBottom="$2" />
+            {duration && (
+              <FlowSummary
+                flowInput={{
+                  ...flowInput,
+                  label: flowLabel,
+                  startTime: executionParams.startAt,
+                  duration,
+                  interval
+                }}
+                chainId={chainId}
+                displaySymbol={feeFundsSymbol}
+                expectedFee={suggestedFunds.toString()}
+                useMsgExec={needsToBeWrappedInMsgExec}
+                grantee={icaAddress}
+                authzGrants={authzGrants}
+                isAuthzGrantsLoading={isAuthzGrantsLoading}
+                refetchAuthzGrants={refetchAuthzGrants}
+                chainName={chainName}
+              />
+            )}
+            <Card
+              css={{ margin: '$3', borderRadius: '12px' }}
+              variant="secondary" disabled
+            >
+
+              <EditExecutionSection
+                updatedFlowParams={executionParams}
+                setUpdateFlowInfo={setUpdateExecutionParams}
+              />
+
+            </Card>
+
+            <>              <CardContent size="large" css={{ padding: '$3' }}>
+
+
+              <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
+                <Tooltip
+                  label="Funds to set aside for execution to the flow account. Fee funds are returned after commission fee."
+                  aria-label="Fund Flow - Intento (Optional)"
+                >
+                  <Text align="center" variant="body" css={{ fontWeight: 'bold' }}>
+                    Fee Funds
+                  </Text>
+                </Tooltip>
+
+                <Column css={{ padding: '$2', gap: '$4' }}>
+                  <Inline justifyContent="space-between" >
+                    <Text variant="body">Deduct from wallet</Text>
+                    <ToggleSwitch
+                      id="deduct-fees"
+                      name="deduct-fees"
+                      checked={checkedFeeAcc}
+                      onChange={handleChangeFeeAcc}
+                      optionLabels={['Deduct from wallet', 'Attach to flow']}
+                    />
+                  </Inline>
+
+                  {!checkedFeeAcc && (
+                    <>
+                      <TokenSelector
+                        tokenSymbol={feeFundsSymbol}
+                        onChange={(updateToken) => {
+                          setFeeFundsSymbol(updateToken.tokenSymbol)
+                        }}
+                        disabled={false}
+                        size={'large'}
+                      />
+                      <Inline justifyContent="space-between" >
+                        <Text variant="body">Amount to attach</Text>
+                        <Inline>
+                          <Text variant="body" color="tertiary">
+                            <StyledInput
+                              step=".01"
+                              placeholder="0.00"
+                              type="number"
+                              value={feeFunds}
+                              onChange={({ target: { value } }) =>
+                                setFeeAmount(Number(value))
+                              }
+                              css={{ textAlign: 'right', width: '100px' }}
+                            />
+
+                            {feeFundsSymbol}
+                          </Text>
+                        </Inline>
+                      </Inline>
+                    </>
+                  )}
+                </Column>
+              </Column>
+            </CardContent></>
+
+
+            <Inline justifyContent="space-between" align="center">
               <Tooltip
-                label="Funds to set aside for execution to the flow account. Fee funds are returned after commision fee."
-                aria-label="Fund Flow - Intento (Optional)"
+                label="Name your flow so you can find it back later by name"
+                aria-label="Fund Flow - INTO (Optional)"
               >
-                <Text align="center" css={{ margin: '$2' }} variant="legend">
-                  Fee Funds
+                <Text color="disabled" wrap={false} variant="legend">
+                  Label
                 </Text>
               </Tooltip>
-              <Inline justifyContent={'space-between'}>
-                <Text wrap={false} css={{ padding: '$2' }} variant="caption">
-                  Deduct fees from wallet balance (any token)
-                </Text>{' '}
-                <StyledInput
-                  type="checkbox"
-                  checked={checkedFeeAcc}
-                  onChange={handleChangeFeeAcc}
+              <Text>
+                <StyledInputWithBorder
+                  placeholder="My flow"
+                  value={flowLabel}
+                  onChange={({ target: { value } }) => setLabel(value)}
                 />
-              </Inline>
-              {!checkedFeeAcc && (
-                <>  <TokenSelector
-                  tokenSymbol={feeFundsSymbol}
-                  onChange={(updateToken) => {
-                    setFeeFundsSymbol(updateToken.tokenSymbol)
-                  }}
-                  disabled={false}
-                  size={'large'}
-                />
-                  <Inline justifyContent={'space-between'}>
-                    <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                      Attatch to flow
-                    </Text>{' '}
-                    <Text variant="caption" color="tertiary">
-                      <StyledInput
-                        step=".01"
-                        placeholder="0.00"
-                        type="number"
-                        value={feeFunds}
-                        onChange={({ target: { value } }) =>
-                          setFeeAmount(Number(value))
-                        }
-                      />
-                      {feeFundsSymbol}
-                    </Text>
-                  </Inline>
-                </>
-              )}
-
-              <DialogDivider offsetY="$4" />
-              {duration && (
-                <>
-                  <FlowSummary
-                    flowInput={{
-                      ...flowInput, label: flowLabel, startTime: executionParams.startAt,
-                      duration,
-                      interval
-                    }}
-                    chainId={chainId}
-                    displaySymbol={feeFundsSymbol}
-                    expectedFee={suggestedFunds.toString()}
-                    useMsgExec={needsToBeWrappedInMsgExec}
-                    grantee={icaAddress}
-                    authzGrants={authzGrants}
-                    isAuthzGrantsLoading={isAuthzGrantsLoading}
-                    refetchAuthzGrants={refetchAuthzGrants}
-                    chainName={chainName}
-
-                  />
-
-                </>
-              )}
-            </Column>
-            <Inline justifyContent={'space-between'} align="center">
-                    <Tooltip
-                      label="Name your flow so you can find it back later by name"
-                      aria-label="Fund Flow - INTO (Optional)"
-                    >
-                      <Text color="disabled" wrap={false} variant="legend">
-                        Label
-                      </Text>
-                    </Tooltip>
-                    <Text>
-                      <StyledInputWithBorder
-                        placeholder="My flow"
-                        value={flowLabel}
-                        onChange={({ target: { value } }) => setLabel(value)}
-                      />{' '}
-                    </Text>
-                  </Inline>
+              </Text>
+            </Inline>
           </Column>
         </StyledDivForInputs>
       </DialogContent>
