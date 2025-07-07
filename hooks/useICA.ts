@@ -163,30 +163,23 @@ export const useICATokenBalance = (
   ibcWalletAddress: string,
   isICAChain: boolean
 ) => {
+  const chain = useChainInfoByChainID(chainId)
+
+  const enabled = !!ibcWalletAddress && !!chainId && !!isICAChain && !!chain?.rpc && !!chain?.denom
 
   const { data, isLoading } = useQuery(
-    `icaTokenBalance/${chainId}/${ibcWalletAddress}`,
+    [`icaTokenBalance`, chainId, ibcWalletAddress],
     async () => {
-      const chain = useChainInfoByChainID(chainId)
-      const { denom, decimals } = chain
-      console.log(ibcWalletAddress)
+      const { denom, decimals } = chain!
       const chainClient = await StargateClient.connect(chain.rpc)
       const coin = await chainClient.getBalance(ibcWalletAddress, denom)
-
       const amount = coin ? Number(coin.amount) : 0
 
       return convertMicroDenomToDenom(amount, decimals)
     },
     {
-      enabled: Boolean(
-        ibcWalletAddress &&
-        chainId &&
-        chainId != '' &&
-        ibcWalletAddress != '' &&
-        ibcWalletAddress.length != 0 &&
-        isICAChain
-      ),
-      refetchOnMount: 'always', // Refetch when the component mounts
+      enabled,
+      refetchOnMount: 'always',
       refetchInterval: 60000,
       staleTime: 30000,
       cacheTime: 1000000,
@@ -196,6 +189,7 @@ export const useICATokenBalance = (
 
   return [data, isLoading] as const
 }
+
 
 export const useAuthZMsgGrantInfoForUser = (
   grantee: string,
