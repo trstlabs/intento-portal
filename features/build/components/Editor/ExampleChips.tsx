@@ -125,18 +125,8 @@ function Chip({ label, onClick, icon }) {
 
 
 const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
-  // Only run on client-side to prevent hydration issues
-  const [isMounted, setIsMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const { validators, isLoading } = useValidators(chainSymbol)
+  const { validators } = useValidators(chainSymbol)
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
-
-  // Don't render anything during SSR or if still loading
-  if (!isMounted || isLoading) return null
 
   const handleClick = () => {
     setAllMessages(
@@ -196,18 +186,8 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
 }
 
 const ElysCompoundRewardsChip = ({ setAllMessages }) => {
-  // Only run on client-side to prevent hydration issues
-  const [isMounted, setIsMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const { validators, isLoading } = useValidators('ELYS')
+  const { validators } = useValidators('ELYS')
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
-
-  // Don't render anything during SSR or if still loading
-  if (!isMounted || isLoading) return null
 
   const handleClick = () => {
 
@@ -288,25 +268,15 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
     <IntentTemlateChip
       label="Compound EDEN, EDEBB & Reinvest USDC Rewards"
       iconUrl={getChainIcon('ELYS')}
-      gradient="linear-gradient(90deg, #5efce8 0%, #736efe 100%)"
+      gradient="linear-gradient(90deg,rgb(59, 202, 183) 0%, #736efe 100%)"
       onClick={handleClick}
     />
   )
 }
 
 const ElysAutoCompoundChip = ({ setAllMessages }) => {
-  // Only run on client-side to prevent hydration issues
-  const [isMounted, setIsMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  const { validators, isLoading } = useValidators('ELYS')
+  const { validators } = useValidators('ELYS')
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
-
-  // Don't render anything during SSR or if still loading
-  if (!isMounted || isLoading) return null
 
   const handleClick = () => {
 
@@ -405,13 +375,65 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
     <IntentTemlateChip
       label="Compound Staking Rewards"
       iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-      gradient="linear-gradient(90deg, #5efce8 0%, #736efe 100%)"
+      gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
       onClick={handleClick}
     />
   )
 }
 
-export function ExampleChips({ chainSymbol, setExample, setAllMessages, index }) {
+export function ExampleChips({ chainSymbol, setExample }) {
+  return (
+    <>
+      {setExample && (
+        <Inline css={{ display: 'inline', paddingTop: '$4' }}>
+
+          {/* ELYS examples */}
+          {chainSymbol === 'ELYS' && elysExamples.map((example, ei) => (
+            <span key={`elys-${ei}`}>
+              <Chip
+                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
+                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
+                onClick={() => setExample(0, example)}
+              />
+            </span>
+          ))}
+          {/* OSMO examples */}
+          {chainSymbol === 'OSMO' && osmoExamples.map((example, ei) => (
+            <span key={`osmo-${ei}`}>
+              <Chip
+                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
+                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                onClick={() => setExample(0, example)}
+              />
+            </span>
+          ))}
+          {/* WASM examples (INTO chain) */}
+          {chainSymbol === 'OSMO' && wasmExamples.map((example, ei) => (
+            <span key={`wasm-${ei}`}>
+              <Chip
+                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
+                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
+                onClick={() => setExample(0, example)}
+              />
+            </span>
+          ))}
+          {/* General examples always shown */}
+          {generalExamples.map((example, ei) => (
+            <span key={`general-${ei}`}>
+              <Chip
+                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
+                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                onClick={() => setExample(0, example)}
+              />
+            </span>
+          ))}
+        </Inline>
+      )}
+    </>
+  )
+}
+
+export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
   return (
     <>
       {setAllMessages && index === 0 && (
@@ -447,7 +469,7 @@ export function ExampleChips({ chainSymbol, setExample, setAllMessages, index })
             <IntentTemlateChip
               label="DCA 1 USDC TO ELYS"
               iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-              gradient="linear-gradient(90deg, #5efce8 0%, #736efe 100%)"
+              gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
               onClick={() => setAllMessages([
                 // Example: Swap, Stake, Withdraw for autocompound
                 {
@@ -516,52 +538,6 @@ export function ExampleChips({ chainSymbol, setExample, setAllMessages, index })
               />
             </>
           )}
-        </Inline>
-      )}
-
-      {setExample && (
-        <Inline css={{ display: 'inline', paddingTop: '$4' }}>
-
-          {/* ELYS examples */}
-          {chainSymbol === 'ELYS' && elysExamples.map((example, ei) => (
-            <span key={`elys-${ei}`}>
-              <Chip
-                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
-                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-                onClick={() => setExample(0, example)}
-              />
-            </span>
-          ))}
-          {/* OSMO examples */}
-          {chainSymbol === 'OSMO' && osmoExamples.map((example, ei) => (
-            <span key={`osmo-${ei}`}>
-              <Chip
-                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
-                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                onClick={() => setExample(0, example)}
-              />
-            </span>
-          ))}
-          {/* WASM examples (INTO chain) */}
-          {chainSymbol === 'OSMO' && wasmExamples.map((example, ei) => (
-            <span key={`wasm-${ei}`}>
-              <Chip
-                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
-                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
-                onClick={() => setExample(0, example)}
-              />
-            </span>
-          ))}
-          {/* General examples always shown */}
-          {generalExamples.map((example, ei) => (
-            <span key={`general-${ei}`}>
-              <Chip
-                label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
-                icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
-                onClick={() => setExample(0, example)}
-              />
-            </span>
-          ))}
         </Inline>
       )}
     </>

@@ -14,7 +14,7 @@ import React, { useEffect, useState } from 'react';
 import JsonFormEditor from './DynamicForm';
 import { JsonCodeMirrorEditor } from './CodeMirror';
 import { findFileBySuffix } from './Validation';
-import { ExampleChips } from './ExampleChips';
+import { ExampleChips, ExampleFlowChips } from './ExampleChips';
 import { MessageSelector } from './MessageSelector';
 
 export const JsonFormWrapper = ({
@@ -78,6 +78,11 @@ export const JsonFormWrapper = ({
         disabled
       >
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+        <ExampleFlowChips
+              chainSymbol={chainSymbol}
+              setAllMessages={setAllMessages}
+              index={index}
+            />
           {setExample && (
             <Inline css={{ justifyContent: 'space-between' }}>
               <MessageSelector
@@ -101,8 +106,6 @@ export const JsonFormWrapper = ({
             <ExampleChips
               chainSymbol={chainSymbol}
               setExample={setExample}
-              setAllMessages={setAllMessages}
-              index={index}
             />
             <Divider offsetY="$6" />
             <div style={{ margin: '$4', padding: '$4' }}>
