@@ -5,7 +5,6 @@ import { convertMicroDenomToDenom } from 'util/conversion'
 import { SigningStargateClient } from '@cosmjs/stargate'
 // import { CW20 } from '../services/cw20'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
-import { DEFAULT_REFETCH_INTERVAL } from '../util/constants'
 import { getIBCAssetInfoFromList, useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo, useIBCAssetList } from './useChainList'
 
@@ -144,21 +143,18 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
 
 export const useGetBalanceForAcc = (address: string) => {
   const client = useCosmosRpcClient()
+  const enabled = !!address && !!client
 
   const { data, isLoading } = useQuery(
     ['address', address],
     async () => {
       const resp = await getBalanceForAcc({ address, client })
-      if (resp && resp[0]) {
+      if (resp?.[0]) {
         return convertMicroDenomToDenom(resp[0].amount, 6)
       }
+      return null
     },
-    {
-      enabled: Boolean(client && client.cosmos && address && address.length > 40),
-      refetchOnMount: 'always',
-      refetchInterval: DEFAULT_REFETCH_INTERVAL,
-      refetchIntervalInBackground: false,
-    }
+    { enabled }
   )
 
   return [data, isLoading] as const
