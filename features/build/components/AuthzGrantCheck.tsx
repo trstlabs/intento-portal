@@ -56,6 +56,10 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
 
 
 
+  // State for manual refresh
+  const [isChecking, setIsChecking] = React.useState(false)
+  const [lastChecked, setLastChecked] = React.useState<Date | null>(null)
+
   // Use props if provided, otherwise fall back to hook
   const { grants: authzGrants = [], isLoading: isAuthzGrantsLoading, refetch } = propAuthzGrants !== undefined ? 
     { grants: propAuthzGrants || [], isLoading: propIsAuthzGrantsLoading, refetch: propRefetchAuthzGrants } :
@@ -66,6 +70,19 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
     authzGrants,
     { startTime: flowInput.startTime, duration: flowInput.duration }
   )
+
+  // Handle manual refresh of permissions
+  const handleCheckPermissions = async () => {
+    try {
+      setIsChecking(true)
+      await refetch?.()
+      setLastChecked(new Date())
+    } catch (error) {
+      console.error('Error checking permissions:', error)
+    } finally {
+      setIsChecking(false)
+    }
+  }
 
   // Setup the mutation for creating grants
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } = useCreateAuthzGrant({
@@ -129,15 +146,32 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
     <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
       <Inline justifyContent="space-between" align="center">
         <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>Authorizations</Text>
-        <Inline >
-
+        <Inline css={{ gap: '$4' }}>
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={handleCheckPermissions}
+            disabled={isChecking || isAuthzGrantsLoading}
+            css={{ padding: '4px 8px', minWidth: 'auto' }}
+          >
+            {isChecking ? (
+              <Spinner size={14} />
+            ) : (
+              <Text variant="caption" color="tertiary">
+                Check Permissions
+              </Text>
+            )}
+          </Button>
+          
           {allGrantsValid ? (
-            <Inline css={{ gap: '$2' }}>
+            <Inline css={{ gap: '$2', alignItems: 'center' }}>
               <CheckCircle size={16} color="#00C851" />
-              <Text variant="body" color="valid" css={{ fontSize: '12px' }}>All valid</Text>
+              <Text variant="body" color="valid" css={{ fontSize: '12px' }}>
+                All valid
+              </Text>
             </Inline>
           ) : (
-            <Inline css={{ gap: '$2' }}>
+            <Inline css={{ gap: '$2', alignItems: 'center' }}>
               <AlertTriangle size={16} color="#FFD700" />
               <Text variant="body" color="error" css={{ fontSize: '12px' }}>
                 {missingGrants.length > 0 ? 'Missing' : 'Expiring'}
@@ -149,6 +183,11 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
 
       {!allGrantsValid && (
         <Column css={{ gap: '$2', paddingTop: '$2' }}>
+          {lastChecked && (
+            <Text variant="caption" color="tertiary" css={{ fontSize: '10px', fontStyle: 'italic' }}>
+              Last checked: {lastChecked.toLocaleTimeString()}
+            </Text>
+          )}
           {missingGrants.length > 0 && (
             <Text variant="body" color="tertiary" css={{ fontSize: '12px', paddingLeft: '$4' }}>
               • {missingGrants.length} message type{missingGrants.length > 1 ? 's' : ''} need{missingGrants.length === 1 ? 's' : ''} authorization
