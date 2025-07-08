@@ -8,11 +8,11 @@ export const ExtensionSidebar = () => {
     <StyledDivForWrapper>
       <StyledDivForTitleWrapper>
         <ErrorIcon color="primary" size="large" />
-        <Text>This is a {__TEST_MODE__ ? 'Mainnet' : 'testnet'} version</Text>
+        <Text>This is a {__TEST_MODE__ ? 'Testnet' : 'Mainnet'} version</Text>
       </StyledDivForTitleWrapper>
       <Text css={{ padding: '$9 0 $11' }}>
         {process.env.NEXT_PUBLIC_SITE_TITLE} is currently{' '}
-        {__TEST_MODE__ ? 'operating in Mainnet mode' : 'in beta'}.
+        {__TEST_MODE__ ? 'operating in Testnet mode' : 'in Mainnet mode'}.
       </Text>
       <Button
         as="a"

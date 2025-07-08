@@ -325,7 +325,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
               </StyledDivForLogo>
             </Link>{' '}
             <Text variant="caption" color="primary" css={{ textAlign: 'end' }}>
-              {__TEST_MODE__ ? 'Mainnet' : 'Testnet'}
+              {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
             </Text>
             {triggerMenuButton}
           </Inline>
@@ -359,7 +359,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           color="primary"
           css={{ textAlign: 'center', paddingBottom: '$5' }}
         >
-          {__TEST_MODE__ ? 'Mainnet' : 'Testnet'}
+          {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
         </Text>
         {walletButton}
 
