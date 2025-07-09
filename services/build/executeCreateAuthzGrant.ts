@@ -73,5 +73,5 @@ export const executeCreateAuthzGrant = async ({
     msgObjects.push(MsgSendObject)
   }
 
-  return await client.signAndBroadcast(granter, msgObjects, { gas: msgObjects.length == 0 ? "50000" : "100000", amount: [] })
+  return await client.signAndBroadcast(granter, msgObjects, { gas: msgObjects.length == 0 ? "100000" : "150000", amount: [] })
 }

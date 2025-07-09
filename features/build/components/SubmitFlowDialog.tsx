@@ -8,7 +8,7 @@ import {
   Error,
   DialogButtons,
   DialogContent,
-  DialogDivider,
+
   DialogHeader,
   Spinner,
   styled,
@@ -16,12 +16,15 @@ import {
   Tooltip,
 
   convertDenomToMicroDenom,
+  Card,
+  CardContent,
+  ToggleSwitch,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
-import { AuthzGrantCheck } from './AuthzGrantCheck'
+
 import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 
 import { TokenSelector } from '../../send/components/TokenSelector'
@@ -29,11 +32,11 @@ import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from '../../../hooks/useChainList'
 import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
 import { EditExecutionSection } from '../../flows/components/EditExecutionSection'
+import { FlowSummary } from './FlowSummary'
 
 interface SubmitFlowDialogProps {
   isDialogShowing: boolean
   icaAddress?: string
-  customLabel: string
   flowInput: FlowInput
   isLoading: boolean
   onRequestClose: () => void
@@ -48,7 +51,6 @@ export const SubmitFlowDialog = ({
   chainId,
   isDialogShowing,
   icaAddress,
-  customLabel,
   flowInput,
   isLoading,
   onRequestClose,
@@ -80,27 +82,23 @@ export const SubmitFlowDialog = ({
 
 
   const [feeFunds, setFeeAmount] = useState(0)
-  const [flowLabel, setLabel] = useState(customLabel)
+  const [flowLabel, setLabel] = useState(flowInput.label)
   const [feeFundsSymbol, setFeeFundsSymbol] = useState('INTO')
+
+  // Update flowLabel when flowInput.label changes
+  useEffect(() => {
+    setLabel(flowInput.label)
+  }, [flowInput.label])
 
   const denom_local =
     useIBCAssetInfo(feeFundsSymbol)?.denom_local || "uinto"
 
-  // Update fee denom from hosted account's fee config
-  // useEffect(() => {
-  //   if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
-  //     const feeDenom = hostedAccount.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === denom_local).denom;
-  //     const feeSymbol = feeDenom.startsWith('u') ? feeDenom.substring(1).toUpperCase() : feeDenom.toUpperCase();
-  //     setFeeFundsSymbol(feeSymbol);
-  //   }
-  // }, [hostedAccount?.hostFeeConfig?.feeCoinsSuported]);
-
-  // Helper for overview display
-  const duration = executionParams.startAt > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - Date.now()
+  // Calculate duration based on whether we have a future start time
+  const now = Date.now()
+  const startTime = executionParams.startAt > now ? executionParams.startAt : now
+  const duration = executionParams.endTime - startTime
   const interval = executionParams.interval
-  const displayStartTime = executionParams.startAt === 0 ? 'Right Away' : new Date(executionParams.startAt).toLocaleString()
-  const displayDuration = duration > 0 ? msToHuman(duration) : 'None Selected'
-  const displayInterval = interval > 0 ? msToHuman(interval) : 'None Selected'
+
 
   const needsToBeWrappedInMsgExec = flowInput.connectionId && flowInput.msgs[0] && !flowInput.msgs[0].includes("authz.v1beta1.MsgExec")
   //true = deduct fees from local acc
@@ -188,217 +186,120 @@ export const SubmitFlowDialog = ({
             justifyContent="space-between"
             css={{ padding: '$2 $4', width: '100%' }}
           >
-            <EditExecutionSection
-              updatedFlowParams={executionParams}
-              setUpdateFlowInfo={setUpdateExecutionParams}
-            />
-            <Column css={{ padding: '$6 0' }}>
-              <DialogDivider offsetBottom="$4" />
+            {duration && (
+              <FlowSummary
+                flowInput={{
+                  ...flowInput,
+                  label: flowLabel,
+                  startTime: executionParams.startAt > now ? executionParams.startAt - now : 0,
+                  duration,
+                  interval
+                }}
+                chainId={chainId}
+                displaySymbol={feeFundsSymbol}
+                expectedFee={suggestedFunds.toString()}
+                useMsgExec={needsToBeWrappedInMsgExec}
+                grantee={icaAddress}
+                authzGrants={authzGrants}
+                isAuthzGrantsLoading={isAuthzGrantsLoading}
+                refetchAuthzGrants={refetchAuthzGrants}
+                chainName={chainName}
+              />
+            )}
+            <Card
+              css={{ margin: '$3', borderRadius: '12px' }}
+              variant="secondary" disabled
+            >
 
-              {/* {chainSymbol != 'INTO'  && (
-                <>
-                  <Text align="center" css={{ margin: '$4' }} variant="legend">
-                    ICA Balance
+              <EditExecutionSection
+                updatedFlowParams={executionParams}
+                setUpdateFlowInfo={setUpdateExecutionParams}
+              />
+
+            </Card>
+
+            <>              <CardContent size="large" css={{ padding: '$3' }}>
+
+
+              <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
+                <Tooltip
+                  label="Funds to set aside for execution to the flow account. Fee funds are returned after commission fee."
+                  aria-label="Fund Flow - Intento (Optional)"
+                >
+                  <Text align="center" variant="body" css={{ fontWeight: 'bold' }}>
+                    Fee Funds
                   </Text>
-                  <Inline justifyContent={'space-between'} align="center">
-                    <Tooltip
-                      label="Funds on the interchain account on the host chain. You may lose access to the interchain account upon execution Error."
-                      aria-label="host chain execution fee funds"
-                    >
+                </Tooltip>
 
-                      <Text variant="caption" color="disabled">
-                        {icaBalance} {chainSymbol}
-                      </Text>
-
-                    </Tooltip>
-                    <Text variant="caption" color="tertiary">
-                      <StyledInput
-                        step=".01"
-                        placeholder="11.11"
-                        type="number"
-                        value={feeFundsHostChain}
-                        onChange={({ target: { value } }) =>
-                          setFeeFundsHostChain(value)
-                        }
-                      />
-                      {chainSymbol}
-                    </Text>
-
+                <Column css={{ padding: '$2', gap: '$4' }}>
+                  <Inline justifyContent="space-between" >
+                    <Text variant="body">Deduct from wallet</Text>
+                    <ToggleSwitch
+                      id="deduct-fees"
+                      name="deduct-fees"
+                      checked={checkedFeeAcc}
+                      onChange={handleChangeFeeAcc}
+                      optionLabels={['Deduct from wallet', 'Attach to flow']}
+                    />
                   </Inline>
-                
-                  {!isExecutingAuthzGrant && (
-                    <Inline justifyContent={'space-between'} align="center">
-                      {feeFundsHostChain != '0.00' &&
-                        feeFundsHostChain != '0' &&
-                        feeFundsHostChain != '0.00' &&
-                        feeFundsHostChain != '0' &&
-                        feeFundsHostChain != '' && (
-                          <Button
-                            css={{ margin: '$2' }}
-                            variant="secondary"
-                            disabled={shouldDisableSendHostChainFundsButton}
-                            onClick={() => handleSendFundsOnHostClick()}
-                          >
-                            {isExecutingSendFundsOnHost && <Spinner instant />}{' '}
-                            {'Send ' + feeFundsHostChain + ' ' + chainSymbol}
-                          </Button>
-                        )}
-                      {!shouldDisableAuthzGrantButton && (
-                        <Button
-                          css={{ marginTop: '$8', margin: '$2' }}
-                          variant="secondary"
-                          onClick={() =>
-                            handleCreateAuthzGrantClick(
-                              Number(feeFundsHostChain) != 0
-                            )
-                          }
-                        >
-                          {isExecutingAuthzGrant && <Spinner instant />}{' '}
-                          {Number(feeFundsHostChain) != 0
-                            ? 'Send ' + ' + Grant'
-                            : 'Create Grant'}
-                        </Button>
-                      )}
-                    </Inline>
+
+                  {!checkedFeeAcc && (
+                    <>
+                      <TokenSelector
+                        tokenSymbol={feeFundsSymbol}
+                        onChange={(updateToken) => {
+                          setFeeFundsSymbol(updateToken.tokenSymbol)
+                        }}
+                        disabled={false}
+                        size={'large'}
+                      />
+                      <Inline justifyContent="space-between" >
+                        <Text variant="body">Amount to attach</Text>
+                        <Inline>
+                          <Text variant="body" color="tertiary">
+                            <StyledInput
+                              step=".01"
+                              placeholder="0.00"
+                              type="number"
+                              value={feeFunds}
+                              onChange={({ target: { value } }) =>
+                                setFeeAmount(Number(value))
+                              }
+                              css={{ textAlign: 'right', width: '100px' }}
+                            />
+
+                            {feeFundsSymbol}
+                          </Text>
+                        </Inline>
+                      </Inline>
+                    </>
                   )}
-                </>
-              )} */}
+                </Column>
+              </Column>
+            </CardContent></>
+
+
+            <Inline justifyContent="space-between" align="center">
               <Tooltip
-                label="Funds to set aside for execution. Remaining funds are returned after commision fee."
-                aria-label="Fund Flow - Intento (Optional)"
+                label="Name your flow so you can find it back later by name"
+                aria-label="Fund Flow - INTO (Optional)"
               >
-                <Text align="center" css={{ margin: '$4' }} variant="legend">
-                  Fee Funds
+                <Text color="disabled" wrap={false} variant="legend">
+                  Label
                 </Text>
               </Tooltip>
-              <Inline justifyContent={'space-between'}>
-                <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                  Deduct fees from wallet balance (any token)
-                </Text>{' '}
-                <StyledInput
-                  type="checkbox"
-                  checked={checkedFeeAcc}
-                  onChange={handleChangeFeeAcc}
+              <Text>
+                <StyledInputWithBorder
+                  placeholder="My flow"
+                  value={flowLabel}
+                  onChange={({ target: { value } }) => setLabel(value)}
                 />
-              </Inline>
-              {!checkedFeeAcc && (
-                <>  <TokenSelector
-                  tokenSymbol={feeFundsSymbol}
-                  onChange={(updateToken) => {
-                    setFeeFundsSymbol(updateToken.tokenSymbol)
-                  }}
-                  disabled={false}
-                  size={'large'}
-                />
-                  <Inline justifyContent={'space-between'}>
-                    <Text wrap={false} css={{ padding: '$4' }} variant="caption">
-                      Attatch to flow
-                    </Text>{' '}
-                    <Text variant="caption" color="tertiary">
-                      <StyledInput
-                        step=".01"
-                        placeholder="0.00"
-                        type="number"
-                        value={feeFunds}
-                        onChange={({ target: { value } }) =>
-                          setFeeAmount(Number(value))
-                        }
-                      />
-                      {feeFundsSymbol}
-                    </Text>
-                  </Inline>
-                </>
-              )}
-              {
-                suggestedFunds ? <Text
-                  align="center"
-                  color="disabled"
-                  wrap={false}
-                  variant="caption"
-                >
-                  Expected fees ~ {suggestedFunds} {feeFundsSymbol}
-                </Text> : <Text
-                  align="center"
-                  color="disabled"
-                  wrap={false}
-                  variant="caption"
-                >
-                  Coin Not Found
-                </Text>
-              }
-              <DialogDivider offsetY="$10" />
-              {duration && (
-                <>
-                  <Text align="center" variant="legend">
-                    Overview
-                  </Text>
-                  <Inline justifyContent={'flex-start'}>
-
-                    <Text css={{ padding: '$4' }} variant="caption">
-                      Execution Starts {displayStartTime == 'Right Away'
-                        ? displayStartTime
-                        : 'In ' + displayStartTime}
-                    </Text>
-
-                    <Text css={{ padding: '$4' }} variant="caption">
-                      Duration is {displayDuration}
-                    </Text>
-                    {interval > 0 && (
-                      <>
-                        <Text css={{ padding: '$4' }} variant="caption">
-                          Interval is {displayInterval}
-                        </Text>
-                        <Text css={{ padding: '$4' }} variant="caption">
-                          {executionParams.startAt > 0 ? Math.floor(duration / interval) + 1 : Math.floor(duration / interval)}{' '}
-                          recurrences
-                        </Text>
-                      </>
-                    )}
-                  </Inline>
-                  <Inline justifyContent={'space-between'} align="center">
-                    <Tooltip
-                      label="Name your flow so you can find it back later by name"
-                      aria-label="Fund Flow - INTO (Optional)"
-                    >
-                      <Text color="disabled" wrap={false} variant="legend">
-                        Label (optional)
-                      </Text>
-                    </Tooltip>
-                    <Text>
-                      <StyledInputWithBorder
-                        placeholder="My flow"
-                        value={flowLabel}
-                        onChange={({ target: { value } }) => setLabel(value)}
-                      />{' '}
-                    </Text>
-                  </Inline>
-                </>
-              )}
-            </Column>
-            <Column css={{ padding: '$6 $6' }}>
-              {((flowInput.connectionId && flowInput.msgs[0] && flowInput.msgs[0].includes("authz.v1beta1.MsgExec")) || needsToBeWrappedInMsgExec) && (
-                <AuthzGrantCheck
-                  flowInput={{
-                    ...flowInput,
-                    startTime: executionParams.startAt,
-                    duration,
-                    interval
-                  }}
-                  chainId={chainId}
-                  grantee={icaAddress}
-                  authzGrants={authzGrants}
-                  isAuthzGrantsLoading={isAuthzGrantsLoading}
-                  refetchAuthzGrants={refetchAuthzGrants}
-                  chainName={chainName}
-                />
-              )}
-            </Column>
+              </Text>
+            </Inline>
           </Column>
         </StyledDivForInputs>
       </DialogContent>
 
-
-      <DialogDivider offsetTop="$4" offsetBottom="$2" />
 
       <DialogButtons
         cancellationButton={
@@ -420,14 +321,6 @@ export const SubmitFlowDialog = ({
   )
 }
 
-// Helper to convert ms to human readable string
-function msToHuman(ms: number) {
-  if (ms < 60000) return `${Math.floor(ms / 1000)} seconds`
-  if (ms < 3600000) return `${Math.floor(ms / 60000)} minutes`
-  if (ms < 86400000) return `${Math.floor(ms / 3600000)} hours`
-  if (ms < 604800000) return `${Math.floor(ms / 86400000)} days`
-  return `${Math.floor(ms / 604800000)} weeks`
-}
 
 const StyledDivForInputs = styled('div', {
   display: 'flex',

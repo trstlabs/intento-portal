@@ -41,8 +41,8 @@ export const BuildWrapper = ({
     useAndForComparisons: false,
   }
   initialFlowInput.conditions = initConditions
-  initialFlowInput.label = "Beta Flow"
-
+  // Set a default label for new flows
+  initialFlowInput.label = "My Flow"
 
   const router = useRouter();
   const { flowInput, initialChainId: urlChainId } = router.query;
@@ -57,11 +57,18 @@ export const BuildWrapper = ({
           const updatedFlow = {
             ...parsed,
             connectionId: urlChainId,
-            hostedIcaConfig: parsed.hostedIcaConfig ? parsed.hostedIcaConfig : {}
+            hostedIcaConfig: parsed.hostedIcaConfig ? parsed.hostedIcaConfig : {},
+            // Preserve the label from the parsed flow input if it exists
+            label: parsed.label || ""
           };
           return [processFlowInput(updatedFlow, false)];
         }
-        return [processFlowInput(parsed, true)];
+        // Preserve the label from the parsed flow input if it exists
+        const flowWithLabel = {
+          ...parsed,
+          label: parsed.label || ""
+        };
+        return [processFlowInput(flowWithLabel, true)];
       }
     } catch (e) {
       console.error('Failed to parse flowInput from URL', e);

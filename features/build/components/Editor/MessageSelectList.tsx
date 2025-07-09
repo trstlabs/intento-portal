@@ -2,7 +2,7 @@ import { ButtonForWrapper, styled, Text } from 'junoblocks'
 import { ComponentPropsWithoutRef } from 'react'
 
 import { getPropsForInteractiveElement } from '../../../../util/getPropsForInteractiveElement'
-import { ListType } from './JsonFormWrapper'
+import { ListType } from './MessageSelector'
 
 const StyledDivForScrollContainer = styled('div', {
   overflowY: 'scroll',

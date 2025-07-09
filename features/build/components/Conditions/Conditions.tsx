@@ -110,7 +110,7 @@ export const Conditions = ({
     // Create a new conditions object with the updated comparisons array
     const newConditions = {
       ...conditions,
-      comparisons: [...conditions.comparisons, newValue]
+      comparisons: [...(conditions.comparisons || []), newValue]
     }
     
     onChange(newConditions)
@@ -191,7 +191,7 @@ export const Conditions = ({
             </Inline>
 
             {showComparisons && (
-              conditions.comparisons.map(((comparison, index) =>
+              conditions.comparisons?.map(((comparison, index) =>
                 <ComparisonForm
                   comparison={comparison}
                   onChange={(value) => handleChangeComparison(index, value)}

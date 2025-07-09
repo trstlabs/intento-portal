@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import * as yup from 'yup';
-import { styled, Text, Button, PlusIcon, Inline } from 'junoblocks';
+import { styled, Text,/*  Button, PlusIcon, Inline  */ } from 'junoblocks';
 import { ErrorStack } from './Validation';
 
 // Utility to create the validation schema from properties
@@ -56,10 +56,10 @@ const StyledErrorText = styled(Text, {
 
 const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValidate }) => {
     // Handle case where schema or schema.definitions is missing
-    const schemaDefinition = schema?.definitions && schema.$ref 
+    const schemaDefinition = schema?.definitions && schema.$ref
         ? schema.definitions[schema.$ref.replace('#/definitions/', '')]
         : schema; // Fall back to schema directly if no definitions or $ref
-        
+
     const properties = schemaDefinition?.properties || schema?.properties || {};
 
     // Safely parse JSON and handle potential errors
@@ -109,7 +109,7 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
 
     // Debounce timer for form updates
     const debounceTimerRef = React.useRef<NodeJS.Timeout>();
-    
+
     const handleChange = useCallback((key, value) => {
         // Update local state immediately for responsive UI
         setValues(prevValues => {
@@ -127,7 +127,7 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
                     if (!Array.isArray(current[arrKey])) {
                         current[arrKey] = [];
                     }
-                    
+
                     // Create a new array to trigger React's state update
                     current[arrKey] = [...current[arrKey]];
                     if (!current[arrKey][arrIndex]) {
@@ -148,7 +148,7 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             if (current[lastKey] === value) {
                 return prevValues; // No change needed
             }
-            
+
             current[lastKey] = value;
             return newValues;
         });
@@ -168,24 +168,24 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
                 } catch (e) {
                     currentJson = { value: {} };
                 }
-                
+
                 // Update the value while preserving other properties
-                const updatedJSON = { 
+                const updatedJSON = {
                     ...currentJson,
-                    value: currentValues 
+                    value: currentValues
                 };
-                
+
                 const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
-                
+
                 // Validate and update
                 validateValues(currentValues);
                 onChange?.(updatedJsonString);
-                
+
                 return currentValues;
             });
         }, 300); // 300ms debounce
     }, [jsonValue, onChange, validateValues]);
-    
+
     // Clean up timer on unmount
     React.useEffect(() => {
         return () => {
@@ -207,14 +207,14 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
 
     const renderField = useCallback((key, value, baseName = '') => {
         const fieldName = baseName ? `${baseName}.${key}` : key;
-        const newFieldKey = newFieldKeys[fieldName] || '';
+        // const newFieldKey = newFieldKeys[fieldName] || '';
 
         if (typeof value === 'object' && !Array.isArray(value)) {
             return (
                 <StyledField key={fieldName}>
                     <StyledObjectLabel>{formatMainTitle(key)}</StyledObjectLabel>
                     {Object.keys(value).map((subKey) => renderField(subKey, value[subKey], fieldName))}
-                    <StyledField>
+                    {/* <StyledField>
                         <Inline>
                             <StyledInput
                                 type="text"
@@ -237,7 +237,7 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
                                     Add new field
                                 </Button>}
                         </Inline>
-                    </StyledField>
+                    </StyledField> */}
                 </StyledField>
             );
         } else if (Array.isArray(value)) {
@@ -315,15 +315,15 @@ const StyledFormWrapper = styled('div', {
 function formatMainTitle(title) {
     // First handle snake_case by replacing underscores with spaces
     let formattedTitle = title.replace(/_/g, ' ');
-    
+
     // Then handle camelCase by adding spaces before capital letters
     formattedTitle = formattedTitle.replace(/([A-Z])/g, ' $1').trim();
-    
+
     // Capitalize the first letter of each word
     formattedTitle = formattedTitle.split(' ')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
-        
+
     return formattedTitle;
 }
 

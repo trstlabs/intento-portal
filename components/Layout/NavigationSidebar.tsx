@@ -25,7 +25,7 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { ReactNode, useEffect, useState, useMemo } from 'react'
+import React, { ReactNode, useEffect, useState } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__ } from 'util/constants'
 
@@ -49,17 +49,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
   const isMobile = useMedia('sm')
   const [isOpen, setOpen] = useState(false)
 
-  // Determine which logo to use based on the base URL
-  const logoSrc = useMemo(() => {
-    // Check if we're running in the browser
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname
-      if (hostname === 'portal.intento.zone') {
-        return '/img/intentoportal.png'
-      }
-    }
-    return '/img/triggerportal-text-logo-blue.png'
-  }, [])
 
   const {
     isWalletConnected,
@@ -320,12 +309,12 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
               <StyledDivForLogo as="a">
                 <StyledPNG
                   css={{ maxWidth: '100px' }}
-                  src={logoSrc}
+                  src={'/img/intentoportal.png'}
                 />
               </StyledDivForLogo>
             </Link>{' '}
             <Text variant="caption" color="primary" css={{ textAlign: 'end' }}>
-              {__TEST_MODE__ ? 'Mainnet' : 'Testnet'}
+              {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
             </Text>
             {triggerMenuButton}
           </Inline>
@@ -348,7 +337,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
           <StyledDivForLogo as="a">
             <div data-logo-label="">
-              <StyledPNG src={logoSrc} />
+              <StyledPNG src={'/img/intentoportal.png'} />
             </div>
           </StyledDivForLogo>
 
@@ -359,7 +348,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           color="primary"
           css={{ textAlign: 'center', paddingBottom: '$5' }}
         >
-          {__TEST_MODE__ ? 'Mainnet' : 'Testnet'}
+          {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
         </Text>
         {walletButton}
 

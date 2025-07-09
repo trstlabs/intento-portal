@@ -131,10 +131,10 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
 
       {/* Stoplights */}
       {conditions && (
-        (conditions.stopOnSuccessOf.length > 0 ||
-          conditions.stopOnFailureOf.length > 0 ||
-          conditions.skipOnSuccessOf.length > 0 ||
-          conditions.skipOnFailureOf.length > 0) && (
+        (conditions.stopOnSuccessOf?.length > 0 ||
+          conditions.stopOnFailureOf?.length > 0 ||
+          conditions.skipOnSuccessOf?.length > 0 ||
+          conditions.skipOnFailureOf?.length > 0) && (
           <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
             <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>Flow Dependencies</Text>
 

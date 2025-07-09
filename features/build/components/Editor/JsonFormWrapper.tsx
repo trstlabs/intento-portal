@@ -8,22 +8,21 @@ import {
   Divider,
   ToggleSwitch,
   Card,
-  CardContent, styled
-} from 'junoblocks'
-import React, { useEffect, useState } from 'react'
-import JsonFormEditor from './DynamicForm'
-
-import { elysExamples, generalExamples, osmoExamples, wasmExamples } from '../ExampleMsgs'
-
-import { MessageSelector } from './MessageSelector'
-import { JsonCodeMirrorEditor } from './CodeMirror'
-import { findFileBySuffix, validateJSON } from './Validation'
+  CardContent, 
+} from 'junoblocks';
+import React, { useEffect, useState } from 'react';
+import JsonFormEditor from './DynamicForm';
+import { JsonCodeMirrorEditor } from './CodeMirror';
+import { findFileBySuffix } from './Validation';
+import { ExampleChips, ExampleFlowChips } from './ExampleChips';
+import { MessageSelector } from './MessageSelector';
 
 export const JsonFormWrapper = ({
   index,
   chainSymbol,
   msg,
   setExample,
+  setAllMessages,
   handleRemoveMsg,
   handleChangeMsg,
   setIsJsonValid,
@@ -32,6 +31,7 @@ export const JsonFormWrapper = ({
   chainSymbol: string
   msg: string
   setExample?: (index: number, msg: any) => void
+  setAllMessages?: (msgs: any[]) => void
   handleRemoveMsg: (index: number) => void
   handleChangeMsg: (index: number) => (msg: string) => void
   setIsJsonValid: React.Dispatch<React.SetStateAction<boolean>>
@@ -50,7 +50,6 @@ export const JsonFormWrapper = ({
       (extractedMsgModule ? extractedMsgModule.charAt(0).toUpperCase() + extractedMsgModule.slice(1) : '') +
       ((extractedMsgTypeUrl && extractedMsgTypeUrl.split('"')[0]) || 'Unknown')
     : 'Unknown';
-  const [validationErrors, setValidationErrors] = useState([])
   const [schema, setSchema] = useState(() => {
     const initialSchema = findFileBySuffix(msgTypeNameFile)
     // If no schema found, return a basic schema that accepts any JSON object
@@ -62,45 +61,14 @@ export const JsonFormWrapper = ({
   })
   const [lastUpdated, setLastUpdated] = useState(Date.now())
 
-  const wasmEnabledList = JSON.parse(
-    process.env.NEXT_PUBLIC_WASM_ENABLED_LIST || '[]'
-  )
-
   // Update schema when msg changes
   useEffect(() => {
     const newSchema = findFileBySuffix(msgTypeNameFile)
     if (newSchema) {
       setSchema(newSchema)
-      // Force a re-render when schema updates
       setLastUpdated(Date.now())
     }
   }, [msg, msgTypeNameFile])
-
-  function setMsgFromExample(msg) {
-    const schema = findFileBySuffix(
-      msg.typeUrl
-        .split('.')
-        .find((data) => data.includes('Msg'))
-    )
-
-    let errors = validateJSON(msg, schema)
-    setSchema(schema || {
-      type: 'object',
-      properties: {},
-      additionalProperties: true
-    })
-    setValidationErrors([])
-    setIsJsonValid(!errors || errors.length === 0)
-    
-    if (errors) {
-      setValidationErrors(errors)
-    }
-
-    // Force update the form
-    setLastUpdated(Date.now())
-    
-    return setExample(index, msg)
-  }
 
   return (
     <Column>
@@ -110,6 +78,11 @@ export const JsonFormWrapper = ({
         disabled
       >
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
+        <ExampleFlowChips
+              chainSymbol={chainSymbol}
+              setAllMessages={setAllMessages}
+              index={index}
+            />
           {setExample && (
             <Inline css={{ justifyContent: 'space-between' }}>
               <MessageSelector
@@ -130,185 +103,69 @@ export const JsonFormWrapper = ({
             </Inline>
           )}
           <Column>
-              {setExample && <>
-                <Inline css={{ display: 'inline', paddingTop: '$4' }} >
-                  {generalExamples.map((example, ei) => (
-                    <span key={ei}>
-                      {' '}
-                      <Chip
-                        href="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
-                        label={example.typeUrl
-                          .split('.')
-                          .find((data) => data.includes('Msg'))
-                          .slice(3)
-                          .replace(/([A-Z])/g, ' $1')
-                          .trim()}
-                        onClick={() => {
-                          setMsgFromExample(example)
-                        }}
-                      />
-                    </span>
-                  ))}
-                  {wasmEnabledList.find((symbol) => symbol == chainSymbol) && (
-                    <>
-                      {wasmExamples.map((example, ei) => (
-                        <span key={ei}>
-                          {' '}
-                          <Chip
-                            href="https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
-                            label={example.typeUrl
-                              .split('.')
-                              .find((data) => data.includes('Msg'))
-                              .slice(3)
-                              .replace(/([A-Z])/g, ' $1')
-                              .trim()}
-                            onClick={() => {
-                              setMsgFromExample(example)
-                            }}
-                          />
-                        </span>
-                      ))}
-                    </>
-                  )}
-                  {chainSymbol == 'OSMO' && (
-                    <>
-                      {osmoExamples.map((example, ei) => (
-                        <span key={ei}>
-                          {' '}
-                          <Chip
-                            href="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg"
-                            label={example.typeUrl
-                              .split('.')
-                              .find((data) => data.includes('Msg'))
-                              .slice(3)
-                              .replace(/([A-Z])/g, ' $1')
-                              .trim()}
-                            onClick={() => {
-                              setMsgFromExample(example)
-                            }}
-                          />
-                        </span>
-                      ))}
-                    </>
-                  )}
-                  {chainSymbol == 'ELYS' && (
-                    <>
-                      {elysExamples.map((example, ei) => (
-                        <span key={ei}>
-                          {' '}
-                          <Chip
-                            href="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-                            label={example.typeUrl
-                              .split('.')
-                              .find((data) => data.includes('Msg'))
-                              .slice(3)
-                              .replace(/([A-Z])/g, ' $1')
-                              .trim()}
-                            onClick={() => {
-                              setMsgFromExample(example)
-                            }}
-                          />
-                        </span>
-                      ))}
-                    </>
-                  )}
-                </Inline>
-                <Divider offsetY="$6" />
-              </>
-              }
-              <div style={{ margin: '$4', padding: '$4' }}>
-                <Inline css={{ justifyContent: 'space-between' }}>
-                  <Button
-                    variant="ghost"
-                    size="large"
-                    onClick={() => setShowJsonForm((show) => !show)}
-                    css={{ columnGap: '$12' }}
-                    disabled={validationErrors.length != 0}
-                    iconRight={
-                      <ToggleSwitch
-                        id="advanced-toggle"
-                        name="advanced-mode"
-                        onChange={() => setShowJsonForm((show) => !show)}
-                        checked={!showJsonForm}
-                        optionLabels={['Advanced', 'Editor View']}
-                      />
-                    }
-                  >
-                    Advanced mode
-                  </Button>
-                  {msg && msg.length > 32 && (
-                    <div style={{ display: 'flex', justifyContent: 'end' }}>
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleRemoveMsg(index)}
-                      >
-                        <IconWrapper icon={<Union />} />
-                        Discard
-                      </Button>
-                    </div>
-                  )}
-                </Inline>
-                
-                {showJsonForm ? (
-                  <JsonFormEditor
-                    key={`json-editor-${index}-${lastUpdated}`}
-                    jsonValue={msg}
-                    schema={schema}
-                    validationErrors={validationErrors}
-                    onChange={handleChangeMsg(index)}
-                    onValidate={(isValid) => {
-                      setIsJsonValid(isValid)
-                    }}
-                  />
-                ) : (
-                  <JsonCodeMirrorEditor
-                    key={`code-editor-${index}-${lastUpdated}`}
-                    jsonValue={msg}
-                    onChange={handleChangeMsg(index)}
-                    onValidate={(isValid) => {
-                      setIsJsonValid(isValid)
-                    }}
-                  />
+            <ExampleChips
+              chainSymbol={chainSymbol}
+              setExample={setExample}
+            />
+            <Divider offsetY="$6" />
+            <div style={{ margin: '$4', padding: '$4' }}>
+              <Inline css={{ justifyContent: 'space-between' }}>
+                <Button
+                  variant="ghost"
+                  size="large"
+                  onClick={() => setShowJsonForm((show) => !show)}
+                  css={{ columnGap: '$12' }}
+                  disabled={false}
+                  iconRight={
+                    <ToggleSwitch
+                      id="advanced-toggle"
+                      name="advanced-mode"
+                      onChange={() => setShowJsonForm((show) => !show)}
+                      checked={!showJsonForm}
+                      optionLabels={['Advanced', 'Editor View']}
+                    />
+                  }
+                >
+                  Advanced mode
+                </Button>
+                {msg && msg.length > 32 && (
+                  <div style={{ display: 'flex', justifyContent: 'end' }}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleRemoveMsg(index)}
+                    >
+                      <IconWrapper icon={<Union />} />
+                      Discard
+                    </Button>
+                  </div>
                 )}
-              </div>
-            </Column>
-          </CardContent>
-        </Card>
-      </Column>
-    )
-}
-
-export type ListType = { key: string; name: string; value: any }
-
-
-export function Chip({ label, onClick, href = '' }) {
-  return (
-    <ChipContainer onClick={onClick}>
-      <Inline>
-        {href && <img src={href} alt="Icon" className="chip-icon" />}
-        {label}
-      </Inline>
-    </ChipContainer>
+              </Inline>
+              
+              {showJsonForm ? (
+                <JsonFormEditor
+                  key={`json-editor-${index}-${lastUpdated}`}
+                  jsonValue={msg}
+                  schema={schema}
+                  validationErrors={[]}
+                  onChange={handleChangeMsg(index)}
+                  onValidate={(isValid) => {
+                    setIsJsonValid(isValid)
+                  }}
+                />
+              ) : (
+                <JsonCodeMirrorEditor
+                  key={`code-editor-${index}-${lastUpdated}`}
+                  jsonValue={msg}
+                  onChange={handleChangeMsg(index)}
+                  onValidate={(isValid) => {
+                    setIsJsonValid(isValid)
+                  }}
+                />
+              )}
+            </div>
+          </Column>
+        </CardContent>
+      </Card>
+    </Column>
   )
 }
-
-const ChipContainer = styled('div', {
-  display: 'inline-block',
-  fontSize: '10px',
-  color: '$colors$dark',
-  borderRadius: '$2',
-  backgroundColor: '$colors$light95',
-  padding: '0.5em 0.75em',
-  margin: '0.3em 0.4em',
-  cursor: 'pointer',
-  border: '1px solid $colors$light95',
-  '&:hover': {
-    backgroundColor: '$colors$light60',
-    border: '1px solid $borderColors$selected',
-  },
-  '.chip-icon': {
-    marginRight: '0.9em', // Adjust the margin as needed
-    height: '2em', // Set the height of the icon as needed
-    // width: '1em',  // Set the width of the icon as needed
-  },
-})
