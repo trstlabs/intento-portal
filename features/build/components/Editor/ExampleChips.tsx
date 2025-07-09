@@ -446,8 +446,8 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               {
                 typeUrl: '/cosmos.bank.v1beta1.MsgSend',
                 value: {
-                  fromAddress: 'Your Address',
-                  toAddress: 'Your Address',
+                  fromAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
+                  toAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
                   amount: [{
                     denom: `u${chainSymbol.toLowerCase()}`,
                     amount: '1000000'
