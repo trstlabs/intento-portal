@@ -350,7 +350,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
               valueType: "sdk.Int"
             },
             {
-              responseIndex: 1,
+              responseIndex: 0,
               responseKey: "Amount.[2].Amount",
               msgsIndex: 4,
               msgKey: "Amount",
