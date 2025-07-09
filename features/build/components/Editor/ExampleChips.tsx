@@ -211,7 +211,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         },
         {
@@ -220,7 +220,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         }
       ],
@@ -302,7 +302,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         },
         {
@@ -311,7 +311,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         },
         {
@@ -320,7 +320,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validator_address: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
           }
         }
       ],
