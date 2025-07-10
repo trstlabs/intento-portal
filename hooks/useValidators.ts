@@ -14,7 +14,7 @@ export const useValidators = (chainSymbol: string) => {
 
 
     const { data, isLoading } = useQuery(
-        ['validators', chainSymbol],
+        ['validators', chainSymbol, address],
         async () => {
             if (!rpcEndpoint) {
                 console.error(`No RPC endpoint found for chain: ${chainSymbol}`)
