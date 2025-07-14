@@ -379,7 +379,7 @@ export const FlowInfoBreakdown = ({
                   {' '}
                   {
                     flowInfo.msgs[0]?.typeUrl?.split('.')
-                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0]
+                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || (transformedMsgs ? JSON.parse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
 
                   }
                 </>
