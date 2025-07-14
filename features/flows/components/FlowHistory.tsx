@@ -160,7 +160,7 @@ export const FlowHistory = ({
                       {errors.map((err, _) => {
                         // Check for AuthZ permission errors
                         const isAuthZError = err.includes('error handling packet on host chain') && 
-                          (err.includes('ABCI code: 5') || err.includes('ABCI code: 2'));
+                          (err.includes('ABCI code: 5:') || err.includes('ABCI code: 2:'));
                         
                         return (
                           <Column>

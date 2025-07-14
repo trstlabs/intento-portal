@@ -224,13 +224,13 @@ export const FlowInfoBreakdown = ({
       }
     }
     if (params.endTime !== flowParams.endTime) {
-      updateParams.endTime = params.endTime instanceof Date 
-        ? params.endTime.getTime() 
+      updateParams.endTime = params.endTime instanceof Date
+        ? params.endTime.getTime()
         : params.endTime;
     }
     if (params.startAt !== flowParams.startAt) {
-      updateParams.startAt = params.startAt instanceof Date 
-        ? params.startAt.getTime() 
+      updateParams.startAt = params.startAt instanceof Date
+        ? params.startAt.getTime()
         : params.startAt;
     }
 
@@ -378,9 +378,8 @@ export const FlowInfoBreakdown = ({
                 <>
                   {' '}
                   {
-                    flowInfo.msgs[0].typeUrl
-                      .split('.')
-                      .find((fetchedHistory) => fetchedHistory.includes('Msg')).split(',')[0]
+                    flowInfo.msgs[0]?.typeUrl?.split('.')
+                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || (transformedMsgs ? JSON.parse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
 
                   }
                 </>

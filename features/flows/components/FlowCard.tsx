@@ -129,10 +129,9 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
                         flowInfo.icaConfig.connectionId ? 'Self-Hosted' : 'Local'
                       } {' '}| {' '}
                       {
-                        flowInfo.msgs[0]?.typeUrl
-                          ?.split('.')
-                          .find((data) => data.includes('Msg'))
-                          ?.split(',')[0] || 'Custom Flow'
+                        flowInfo.msgs[0]?.typeUrl?.split('.')
+                          .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 'Unknown'
+
                       }
                     </>
                   </StyledText>

@@ -313,6 +313,47 @@ export const BuildComponent = ({
     }
   }
 
+  function setAllMessages(
+    msgObjects: any[],
+    label?: string,
+    extra?: { conditions?: ExecutionConditions }
+  ) {
+    try {
+      const processedMsgs = msgObjects.map((msgObject) => {
+        let msg = JSON.stringify(msgObject, null, '\t');
+        msg = msg.replaceAll('uinto', denom);
+        msg = msg.replaceAll('into', prefix);
+        return msg;
+      });
+      
+      // Always ensure conditions is an object, even if empty
+      const conditions = extra?.conditions || {
+        feedbackLoops: [],
+        comparisons: [],
+        stopOnSuccessOf: [],
+        stopOnFailureOf: [],
+        skipOnSuccessOf: [],
+        skipOnFailureOf: [],
+        useAndForComparisons: false
+      };
+      
+      let updatedFlowInput = {
+        ...flowInput,
+        msgs: processedMsgs,
+        conditions
+      };
+      
+      if (label) {
+        updatedFlowInput.label = label;
+      }
+
+      onFlowChange(updatedFlowInput);
+    } catch (e) {
+      console.error('Error in setAllMessages:', e);
+      alert(`Error setting messages: ${e.message}`);
+    }
+  }
+
   function setConfig(updatedConfig: ExecutionConfiguration) {
     let updatedFlowInput = flowInput
     updatedFlowInput.configuration = updatedConfig
@@ -481,11 +522,12 @@ export const BuildComponent = ({
       </Inline>
       {flowInput.msgs.map((msg, index) => (
         <div key={index}>
-          <JsonFormWrapper
+           <JsonFormWrapper
             index={index}
             chainSymbol={chainSymbol}
             msg={msg}
             setExample={setExample}
+            setAllMessages={setAllMessages}
             handleRemoveMsg={handleRemoveMsg}
             handleChangeMsg={handleChangeMsg}
             setIsJsonValid={setIsJsonValid}
@@ -515,7 +557,6 @@ export const BuildComponent = ({
             isShowing: false,
           })
         }
-        customLabel={flowInput?.label}
         isLoading={isExecutingSchedule}
         handleSubmitFlow={(flowInput) =>
           handleSubmitFlowClick(flowInput)
