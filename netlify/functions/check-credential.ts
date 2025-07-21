@@ -2,7 +2,9 @@ import { Handler } from '@netlify/functions'
 
 const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID
 const CF_API_TOKEN = process.env.CF_API_TOKEN
-const CF_NAMESPACE_ID = process.env.CF_NAMESPACE_ID
+
+const CF_NAMESPACE_ID_TRIGGERPORTAL = process.env.CF_NAMESPACE_ID
+const CF_NAMESPACE_ID_TOKENSTREAM = process.env.CF_NAMESPACE_ID_TOKENSTREAM
 
 const allowedOrigins = [
   'https://galxe.com',
@@ -23,8 +25,18 @@ function getCorsHeaders(origin?: string) {
   return headers
 }
 
-async function getProof(address: string): Promise<Record<string, any> | null> {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${CF_NAMESPACE_ID}/values/${address.toLowerCase()}`
+function getNamespaceId(quest?: string) {
+  switch (quest) {
+    case 'tokenstream':
+      return CF_NAMESPACE_ID_TOKENSTREAM
+    default:
+      return CF_NAMESPACE_ID_TRIGGERPORTAL
+  }
+}
+
+async function getProof(address: string, quest?: string): Promise<Record<string, any> | null> {
+  const namespaceId = getNamespaceId(quest)
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${address.toLowerCase()}`
 
   const res = await fetch(url, {
     headers: {
@@ -60,7 +72,7 @@ const handler: Handler = async (event) => {
     }
   }
 
-  const address = event.queryStringParameters?.address
+  const { address, quest } = event.queryStringParameters || {}
 
   if (!address) {
     return {
@@ -70,7 +82,7 @@ const handler: Handler = async (event) => {
     }
   }
 
-  const proof = await getProof(address)
+  const proof = await getProof(address, quest)
 
   return {
     statusCode: 200,

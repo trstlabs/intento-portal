@@ -5,25 +5,38 @@ interface Proof {
   txHash: string
   flowLabel: string
   timestamp: number
+  quest?: string
 }
 
 const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID
 const CF_API_TOKEN = process.env.CF_API_TOKEN
-const CF_NAMESPACE_ID = process.env.CF_NAMESPACE_ID
+const CF_NAMESPACE_ID_TRIGGERPORTAL = process.env.CF_NAMESPACE_ID
+const CF_NAMESPACE_ID_TOKENSTREAM = process.env.CF_NAMESPACE_ID_TOKENSTREAM
 
-async function storeProof(address: string, proof: Proof) {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${CF_NAMESPACE_ID}/values/${address.toLowerCase()}`
+function getNamespaceId(quest?: string) {
+  switch (quest) {
+    case 'tokenstream':
+      return CF_NAMESPACE_ID_TOKENSTREAM
+    default:
+      return CF_NAMESPACE_ID_TRIGGERPORTAL
+  }
+}
+
+async function storeProof(address: string, proof: Proof, quest?: string) {
+  const namespaceId = getNamespaceId(quest)
+  const url = `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/storage/kv/namespaces/${namespaceId}/values/${address.toLowerCase()}`
+
   const res = await fetch(url, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${CF_API_TOKEN}`,
-      'Content-Type': 'text/plain', // or omit, Cloudflare will accept raw
+      'Content-Type': 'text/plain',
     },
-    body: JSON.stringify(proof), // actual raw value
+    body: JSON.stringify(proof),
   })
 
   const json = await res.json()
-  console.log('Cloudflare KV store response:', json)
+  console.log(`[${quest || 'triggerportal'}] KV response:`, json)
 }
 
 const handler: Handler = async (event) => {
@@ -34,15 +47,14 @@ const handler: Handler = async (event) => {
     }
   }
 
-  const incomingSecret =
-    event.headers['x-api-key'] || event.headers['X-Api-Key']
+  const incomingSecret = event.headers['x-api-key'] || event.headers['X-Api-Key']
   const expectedSecret = process.env.TRIGGERPORTAL_SECRET
 
   const isBackendRequest = incomingSecret && incomingSecret === expectedSecret
 
   if (!isBackendRequest) {
     const origin = event.headers.origin || ''
-    const allowedOrigins = ['https://triggerportal.zone', 'https://portal.intento.zone', ]
+    const allowedOrigins = ['https://triggerportal.zone', 'https://portal.intento.zone', 'https://tokenstream.fun']
 
     if (!allowedOrigins.includes(origin)) {
       console.warn('Blocked frontend attempt from', origin)
@@ -68,7 +80,7 @@ const handler: Handler = async (event) => {
       body.timestamp = Date.now()
     }
 
-    await storeProof(body.address, body)
+    await storeProof(body.address, body, body.quest)
 
     return {
       statusCode: 200,
