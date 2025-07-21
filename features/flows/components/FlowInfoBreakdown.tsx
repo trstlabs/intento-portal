@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Button,
   ChevronIcon,
@@ -113,6 +113,17 @@ export const FlowInfoBreakdown = ({
 
 
   const [transformedMsgs, setTransformedMsgs] = useState<string[]>([])
+
+  // Safely parse JSON with error handling
+  const safeJsonParse = useCallback((jsonString: string | undefined) => {
+    if (!jsonString) return null;
+    try {
+      return JSON.parse(jsonString);
+    } catch (e) {
+      console.warn('Failed to parse JSON:', e);
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchMsgs() {
@@ -379,7 +390,8 @@ export const FlowInfoBreakdown = ({
                   {' '}
                   {
                     flowInfo.msgs[0]?.typeUrl?.split('.')
-                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || (transformedMsgs ? JSON.parse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
+                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 
+                      (transformedMsgs?.length > 0 ? safeJsonParse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
 
                   }
                 </>
@@ -588,7 +600,7 @@ export const FlowInfoBreakdown = ({
                   Message {msgIndex + 1} Type
                 </Text>
                 <Inline gap={2}>
-                  <Text variant="body">{transformedMsgs[msgIndex] ? JSON.parse(transformedMsgs[msgIndex])?.typeUrl : msg.typeUrl} </Text>
+                  <Text variant="body">{transformedMsgs[msgIndex] ? safeJsonParse(transformedMsgs[msgIndex])?.typeUrl : msg.typeUrl} </Text>
                 </Inline>
 
                 <>
@@ -619,7 +631,7 @@ export const FlowInfoBreakdown = ({
                   </Inline>
                   <Inline gap={2}>
                     <Text css={{ wordBreak: 'break-word' }} variant="body">
-                      <JsonViewer jsonValue={transformedMsgs[msgIndex] ? JSON.parse(transformedMsgs[msgIndex])?.value : msg.valueDecoded} />
+                      <JsonViewer jsonValue={transformedMsgs[msgIndex] ? safeJsonParse(transformedMsgs[msgIndex])?.value : msg.valueDecoded} />
                       {/* <pre
                         style={{
                           display: 'inline-block',
