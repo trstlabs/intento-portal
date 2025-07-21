@@ -300,7 +300,8 @@ export const BuildComponent = ({
       // Create a new copy of flowInput and msgs array
       const updatedFlowInput = {
         ...flowInput,
-        msgs: [...(flowInput.msgs || [])]
+        msgs: [...(flowInput.msgs || [])],
+        label: '' // Clear the label when selecting an example
       }
       updatedFlowInput.msgs[index] = processedMsg
   
