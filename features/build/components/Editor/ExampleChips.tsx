@@ -454,7 +454,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                   }]
                 }
               }
-            ], `Stream 1 ${chainSymbol}`)}
+            ], `Stream ${chainSymbol}`)}
           />
           {(chainSymbol === 'ATOM' || chainSymbol === 'OSMO' || chainSymbol === 'INTO') && (
             <AutoCompoundChip chainSymbol={chainSymbol} setAllMessages={setAllMessages} />
@@ -467,7 +467,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           )}
           {chainSymbol === 'ELYS' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
             <IntentTemlateChip
-              label="DCA 1 USDC TO ELYS"
+              label="DCA 1 USDC to ELYS"
               iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
               gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
               onClick={() => setAllMessages([
@@ -481,13 +481,13 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     tokenOutMinAmount: '1',
                   },
                 }
-              ], 'DCA USDC TO ELYS')}
+              ], 'DCA into ELYS')}
             />
           )}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
             <>
               <IntentTemlateChip
-                label="DCA 1 OSMO TO ATOM"
+                label="DCA 1 OSMO to ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
                 onClick={() => setAllMessages([
@@ -501,10 +501,10 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                       tokenOutMinAmount: '1',
                     },
                   }
-                ], 'DCA INTO ATOM')}
+                ], 'DCA into ATOM')}
               />
               <IntentTemlateChip
-                label="Subscribe to StreamSwap 48"
+                label="Subscribe to StreamSwap ssINJTEST"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
                 onClick={() => setAllMessages([
