@@ -199,7 +199,7 @@ export const ChainSelectorList = ({
             </StyledButtonForRow>
           )
         })}
-        <Text variant="legend">
+        {/* <Text variant="legend">
           Other chains - send messages directly only
         </Text>{' '}
         {filteredChainList.map((chainInfo) => {
@@ -228,7 +228,7 @@ export const ChainSelectorList = ({
               </StyledDivForColumn>
             </StyledButtonForRow>
           )
-        })}
+        })} */}
         {(filteredChainList?.length || filteredChainList?.length) === 0 && (
           <Inline gap={6} css={{ padding: '$5 $6' }}>
             <ImageForTokenLogo size="big">
