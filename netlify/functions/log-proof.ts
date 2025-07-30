@@ -40,6 +40,24 @@ async function storeProof(address: string, proof: Proof, quest?: string) {
 }
 
 const handler: Handler = async (event) => {
+  const origin = event.headers.origin || ''
+  const allowedOrigins = ['https://triggerportal.zone', 'https://portal.intento.zone', 'https://tokenstream.fun']
+  const isAllowedOrigin = allowedOrigins.includes(origin)
+
+  // Handle preflight request
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': isAllowedOrigin ? origin : '',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, x-api-key',
+        'Access-Control-Max-Age': '86400', // 24 hours
+      },
+      body: '',
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
@@ -53,9 +71,6 @@ const handler: Handler = async (event) => {
   const isBackendRequest = incomingSecret && incomingSecret === expectedSecret
 
   if (!isBackendRequest) {
-    const origin = event.headers.origin || ''
-    const allowedOrigins = ['https://triggerportal.zone', 'https://portal.intento.zone', 'https://tokenstream.fun']
-
     if (!allowedOrigins.includes(origin)) {
       console.warn('Blocked frontend attempt from', origin)
       return {
