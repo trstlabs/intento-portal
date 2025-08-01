@@ -1,17 +1,21 @@
 import { Button, Dialog, DialogContent, DialogHeader, Text } from 'junoblocks'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { APP_NAME } from '../util/constants'
 
 export const TestnetDialog = () => {
-  // let isShowing = localStorage.getItem("demoMode") !== "false"
+  const [isShowing, setShowing] = useState(false)
 
-  // const requestClose = () => {
-  //   localStorage.setItem("demoMode", "false")
-  //   isShowing = false
-  // }
-  const [isShowing, setShowing] = useState(true)
+  useEffect(() => {
+    const hasSeenDemo = localStorage.getItem('hasSeenDemo')
+    if (hasSeenDemo !== 'true') {
+      setShowing(true)
+    }
+  }, [])
 
-  const requestClose = () => setShowing(false)
+  const requestClose = () => {
+    localStorage.setItem('hasSeenDemo', 'true')
+    setShowing(false)
+  }
 
   return (
     <Dialog isShowing={isShowing} onRequestClose={requestClose}>
