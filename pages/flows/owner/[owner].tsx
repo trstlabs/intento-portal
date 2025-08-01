@@ -1,18 +1,36 @@
 import { AppLayout } from 'components'
 import { Button, Column, IconWrapper, Inline, media, Spinner, styled, Text } from 'junoblocks'
-import { useCallback, useState } from 'react'
+import { useRouter } from 'next/router'
+import { useCallback, useEffect, useState } from 'react'
 import { useFlowInfos } from 'hooks/useFlowInfo'
-import { FlowCard } from '../../features/flows/components/FlowCard'
+import { FlowCard } from '../../../features/flows/components/FlowCard'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
 
-export default function Flows() {
-  const flowsPerPage = 20;
+export default function FlowsByOwner() {
+  const router = useRouter()
+  const { owner } = router.query
+  const flowsPerPage = 20
   const [paginationKey, setPaginationKey] = useState<Uint8Array | undefined>(undefined)
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
-  const [allFlows, isLoading] = useFlowInfos(flowsPerPage, paginationKey)
   const [isRefreshing, setIsRefreshing] = useState(false)
-
-  const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flowInfos.length
+  
+  const [allFlows, isLoading] = useFlowInfos(flowsPerPage, paginationKey)
+  const [filteredFlows, setFilteredFlows] = useState<Array<FlowInfo>>([])
+  
+  useEffect(() => {
+    if (allFlows?.flowInfos) {
+      setFilteredFlows(
+        allFlows.flowInfos.filter(
+          (flow) => flow.owner === owner
+        )
+      )
+    }
+  }, [allFlows, owner])
+  
+  const shouldShowFetchingState = (isLoading || isRefreshing) && filteredFlows.length === 0
+  const hasNextPage = Boolean(allFlows?.pagination?.nextKey && allFlows.pagination.nextKey.length > 0)
+  const hasPrevPage = paginationHistory.length > 0
 
   // Handle pagination
   const handleNextPage = useCallback(() => {
@@ -33,24 +51,19 @@ export default function Flows() {
 
   const handleRefresh = useCallback(() => {
     setIsRefreshing(true)
-    // Clear pagination to go back to first page
     setPaginationKey(undefined)
     setPaginationHistory([])
-    // Small delay to show loading state
     setTimeout(() => setIsRefreshing(false), 1000)
   }, [])
-
-  const hasNextPage = Boolean(allFlows?.pagination?.nextKey)
-  const hasPrevPage = paginationHistory.length > 0
 
   return (
     <AppLayout>
       <Column css={{ paddingBottom: '$16' }}>
         <Text variant="header" css={{ marginBottom: '$8', fontSize: 24 }}>
-          Recent Flows
+          Flows by {typeof owner === 'string' ? `${owner.substring(0, 10)}...${owner.slice(-4)}` : '...'}
         </Text>
         <Text variant="body" css={{ marginBottom: '$12', color: '$textColors$secondary' }}>
-          View all flows on the Intento blockchain
+          Viewing all flows created by this address
         </Text>
       </Column>
 
@@ -110,25 +123,22 @@ export default function Flows() {
 
           <StyledDivForFlowsGrid>
             {isLoading || isRefreshing ? (
-              // Show placeholders while loading
               Array(8).fill(0).map((_, index) => (
                 <FlowCard
                   key={`placeholder-${index}`}
                   flowInfo={null}
                 />
               ))
-            ) : allFlows?.flowInfos?.length > 0 ? (
-              // Show actual flows when loaded
-              allFlows.flowInfos.map((flowInfo, index) => (
+            ) : filteredFlows.length > 0 ? (
+              filteredFlows.map((flowInfo, index) => (
                 <FlowCard
                   key={`${flowInfo.id}-${index}`}
-                  flowInfo={structuredClone(flowInfo)}
+                  flowInfo={flowInfo}
                 />
               ))
             ) : (
-              // Show message when no flows found
               <Column css={{ gridColumn: '1 / -1', textAlign: 'center', padding: '$12 $6' }}>
-                <Text variant="secondary">No flows found</Text>
+                <Text variant="secondary">No flows found for this address</Text>
               </Column>
             )}
           </StyledDivForFlowsGrid>
@@ -137,6 +147,7 @@ export default function Flows() {
     </AppLayout>
   )
 }
+
 const StyledDivForFlowsGrid = styled('div', {
   display: 'grid',
   gridTemplateColumns: 'repeat(auto-fill, minmax(400px, 1fr))',

@@ -1,4 +1,5 @@
 import { PoolsIcon, GearIcon } from 'icons'
+import { FlowWaveIcon } from '../../icons/FlowWaveIcon'
 import {
   Button,
   ChevronIcon,
@@ -139,6 +140,20 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           <Inline css={{ paddingLeft: '$4' }}>Dashboard</Inline>
         </Button>
       </Link>
+
+      {address && (
+        <Link href={`/flows/owner/${address}`} passHref>
+          <Button
+            as="a"
+            variant="menu"
+            size="large"
+            iconLeft={<FlowWaveIcon />}
+            selected={getIsLinkActive(`/flows/owner/${address}`)}
+          >
+            <Inline css={{ paddingLeft: '$4' }}>My Flows</Inline>
+          </Button>
+        </Link>
+      )}
 
       {/*  <Link href="/transfer" passHref>
         <Button
