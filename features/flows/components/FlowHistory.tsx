@@ -13,19 +13,25 @@ import React from 'react'
 import { GlobalDecoderRegistry } from 'intentojs'
 import { convertMicroDenomToDenom } from 'util/conversion'
 import { useFlowHistory } from '../../../hooks/useFlowInfo'
-
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
+
+import { __TEST_MODE__ } from '../../../util/constants'
+
 
 
 type FlowHistoryProps = {
   id: string
+  transformedMsgs?: string[]
 }
 
 export const FlowHistory = ({
   id,
-}: //size = 'large',
-  FlowHistoryProps) => {
+  transformedMsgs
+}: FlowHistoryProps) => {
+
+
+
 
   const [flowHistory, setFlowHistory] = useState([]);
   const [historyLimit] = useState(5);
@@ -38,7 +44,6 @@ export const FlowHistory = ({
   useEffect(() => {
     if (paginationKey == undefined) {
       setFlowHistory([]);
-      // setPaginationKey(undefined);
     }
   }, [fetchedHistory]);
 
@@ -116,6 +121,7 @@ export const FlowHistory = ({
                   },
                   index
                 ) => (
+
                   <div key={index}>
                     <Column
                       gap={2}
@@ -140,7 +146,7 @@ export const FlowHistory = ({
                             </Column>
                           )} */}
                       <Column>
-                        <Text variant="legend">
+                        <Text variant="caption">
                           Exec Fee:{' '}
                           {convertMicroDenomToDenom(execFee.amount, 6)} INTO
                         </Text>
@@ -150,31 +156,17 @@ export const FlowHistory = ({
 
                         {queryResponses.map((queryResponse) => (
                           <Column>
-                            <Text variant="legend">
+                            <Text variant="caption">
                               Query Response:  {queryResponse}
                             </Text>
                           </Column>
                         ))}
                       </Column>
 
-                      {errors.map((err, _) => {
-                        // Check for AuthZ permission errors
-                        const isAuthZError = err.includes('error handling packet on host chain') && 
-                          (err.includes('ABCI code: 5:') || err.includes('ABCI code: 2:'));
-                        
-                        return (
-                          <Column>
-                            <Text variant="legend">
-                              🔴 {isAuthZError ? 'AuthZ permission lacking' : err}
-                            </Text>
-                          </Column>
-                        );
-                      })}
 
                       <Column>
-                        <Text variant="legend">
-                          Executed: {executed && <>🟢</>}{' '}
-                          {!executed &&
+                        <Text variant="caption">
+                          Executed: {executed || errors.find((error) => error.includes('unknown message type: failed unmarshal proto any')) && __TEST_MODE__ === true ? <>🟢</> :
                             (Date.now() - actualExecTime.valueOf() >
                               60000 && !timedOut ? (
                                 <>🔴</>
@@ -183,6 +175,22 @@ export const FlowHistory = ({
                             ))}
                         </Text>
 
+                        {errors.map((err, _) => {
+                          // Check for AuthZ permission errors
+                          const isAuthZError = err.includes('error handling packet on host chain') &&
+                            (err.includes('ABCI code: 2:'));
+                          const isWasmError = err.includes('error handling packet on host chain') && transformedMsgs?.find((msg) => msg.includes('.wasm.')) &&
+                            (err.includes('ABCI code: 5:'));
+                          const isTestnetError = err.includes('unknown message type: failed unmarshal proto any') && __TEST_MODE__ === true;
+                          if (!isTestnetError) return (
+                            <Column>
+                              <Text variant="legend" style={{ paddingTop: '4px' }}>
+                                {isAuthZError ? 'AuthZ permission lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesfull result' : err}
+                              </Text>
+
+                            </Column>
+                          );
+                        })}
                         {timedOut && (
                           <Text variant="legend">
                             Timed out relaying IBC packets for this execution

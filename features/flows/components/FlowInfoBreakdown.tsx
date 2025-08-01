@@ -986,7 +986,10 @@ export const FlowInfoBreakdown = ({
             </>
           )
         }
-        <FlowHistory id={flowInfo.id.toString()} />
+        <FlowHistory 
+          id={flowInfo.id.toString()} 
+          transformedMsgs={transformedMsgs}
+        />
 
 
       </>
