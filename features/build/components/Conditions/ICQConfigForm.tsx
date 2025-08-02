@@ -79,8 +79,17 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
       queryKey: (data: { contractAddress: string; itemKey: string }) =>
         createCosmwasmItemQueryKey(data.contractAddress, data.itemKey),
     },
+    "CosmWasm Map Query": {
+      queryType: "store/wasm/key",
+      fields: [
+        { label: "Contract Address", key: "contractAddress" },
+        { label: "Map Prefix", key: "mapPrefix" },
+        { label: "Map Key", key: "mapKey" },
+      ],
+      queryKey: (data: { contractAddress: string; mapPrefix: string; mapKey: string }) =>
+        createCosmwasmMapQueryKey(data.contractAddress, data.mapPrefix, Number(data.mapKey)),
+    },
   };
-
   const handleExampleSelect = (example: string) => {
     const exampleConfig = examples[example];
     if (exampleConfig) {
@@ -187,22 +196,70 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
       return "";
     }
   };
-
+  const WASM_STORE_PREFIX = Uint8Array.from([0x03]);
 
   const createCosmwasmItemQueryKey = (contractAddr: string, itemKey: string): string => {
     const { data: address } = fromBech32(contractAddr);
-    const prefix = Uint8Array.from([0x03]); // CosmWasm contract storage prefix
+
     const addrBytes = address;
     const keyBytes = toUtf8(itemKey);
-  
-    const fullKey = new Uint8Array(prefix.length + addrBytes.length + keyBytes.length);
-    fullKey.set(prefix, 0);
-    fullKey.set(addrBytes, 1);
-    fullKey.set(keyBytes, 1 + addrBytes.length);
-  
+
+    const fullKey = new Uint8Array(WASM_STORE_PREFIX.length + addrBytes.length + keyBytes.length);
+    fullKey.set(WASM_STORE_PREFIX, 0);
+    fullKey.set(addrBytes, WASM_STORE_PREFIX.length);
+    fullKey.set(keyBytes, WASM_STORE_PREFIX.length + addrBytes.length);
+
     return Buffer.from(fullKey).toString("base64");
   }
 
+
+
+function createCosmwasmMapQueryKey(
+  contractAddr: string,
+  namespace: string,
+  key: number | bigint
+): string {
+  const { data: addrBytes } = fromBech32(contractAddr);
+  const mapKey = createMapKey(namespace, key);
+
+  const fullKey = new Uint8Array(WASM_STORE_PREFIX.length + addrBytes.length + mapKey.length);
+  fullKey.set(WASM_STORE_PREFIX, 0);
+  fullKey.set(addrBytes, WASM_STORE_PREFIX.length);
+  fullKey.set(mapKey, WASM_STORE_PREFIX.length + addrBytes.length);
+
+  return addBase64Padding(Buffer.from(fullKey).toString("base64"));
+}
+
+
+
+function encodeU64BE(value: number | bigint): Uint8Array {
+  const buf = Buffer.alloc(8);
+  buf.writeBigUInt64BE(BigInt(value));
+  return new Uint8Array(buf);
+}
+
+function createMapKey(namespace: string, key: number | bigint): Uint8Array {
+  const nsBytes = toUtf8(namespace);
+  if (nsBytes.length > 255) throw new Error("Namespace too long");
+
+  // 0x00 + len + ns + u64 BE
+  const out = new Uint8Array(1 + 1 + nsBytes.length + 8);
+  out[0] = 0x00; // hardcoded prefix used by cw-storage-plus
+  out[1] = nsBytes.length;
+  out.set(nsBytes, 2);
+  out.set(encodeU64BE(key), 2 + nsBytes.length);
+
+  return out
+}
+
+function addBase64Padding(str: string): string {
+  while (str.length % 4 !== 0) {
+    str += "=";
+  }
+  return str;
+}
+
+  
   return (
     <>
       <Divider offsetTop="$10" offsetBottom="$5" />
