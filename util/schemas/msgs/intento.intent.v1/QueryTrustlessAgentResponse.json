@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryTrustlessAgentResponse",
+    "definitions": {
+        "QueryTrustlessAgentResponse": {
+            "properties": {
+                "trustless_agent": {
+                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgent",
+                    "additionalProperties": false,
+                    "description": "TrustlessAgent"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Trustless Agent Response",
+            "description": "QueryTrustlessAgentResponse is the response type for the Query/TrustlessAgent RPC method."
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "intento.intent.v1.ICAConfig": {
+            "properties": {
+                "port_id": {
+                    "type": "string"
+                },
+                "connection_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "ICA Config",
+            "description": "base config for ICA"
+        },
+        "intento.intent.v1.TrustlessAgent": {
+            "properties": {
+                "agent_address": {
+                    "type": "string"
+                },
+                "ica_config": {
+                    "$ref": "#/definitions/intento.intent.v1.ICAConfig",
+                    "additionalProperties": false
+                },
+                "fee_config": {
+                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgentFeeConfig",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Trustless Agent"
+        },
+        "intento.intent.v1.TrustlessAgentFeeConfig": {
+            "properties": {
+                "fee_admin": {
+                    "type": "string"
+                },
+                "fee_coins_supported": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Trustless Agent Fee Config"
+        }
+    }
+}

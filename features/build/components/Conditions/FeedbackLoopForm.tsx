@@ -1,6 +1,6 @@
 import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper } from "junoblocks"
 import { Field } from "./Fields"
-import { FeedbackLoop } from "intentojs/dist/codegen/intento/intent/v1beta1/flow"
+import { FeedbackLoop } from "intentojs/dist/codegen/intento/intent/v1/flow"
 import ConditionDropdown from "./ConditionDropdown"
 import { useState } from "react"
 import { ICQConfigForm } from "./ICQConfigForm"

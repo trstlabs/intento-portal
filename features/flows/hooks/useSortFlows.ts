@@ -1,6 +1,6 @@
 // import { FlowInfo } from 'queries/useQueryFlows'
 import { useMemo } from 'react'
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 export type SortParameters =
   | 'end_time'

@@ -1,0 +1,25 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyPool",
+    "definitions": {
+        "LegacyPool": {
+            "properties": {
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "health": {
+                    "type": "string"
+                },
+                "leveraged_lp_amount": {
+                    "type": "string"
+                },
+                "leverage_max": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Pool"
+        }
+    }
+}

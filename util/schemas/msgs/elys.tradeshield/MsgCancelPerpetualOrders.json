@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgCancelPerpetualOrders",
+    "definitions": {
+        "MsgCancelPerpetualOrders": {
+            "properties": {
+                "owner_address": {
+                    "type": "string"
+                },
+                "order_ids": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Cancel Perpetual Orders"
+        }
+    }
+}

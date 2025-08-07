@@ -1,0 +1,106 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyPool",
+    "definitions": {
+        "LegacyPool": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "pool_params": {
+                    "$ref": "#/definitions/elys.amm.LegacyPoolParams",
+                    "additionalProperties": false
+                },
+                "total_shares": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "pool_assets": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.PoolAsset"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "total_weight": {
+                    "type": "string"
+                },
+                "rebalance_treasury": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Pool"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.amm.LegacyPoolParams": {
+            "properties": {
+                "swap_fee": {
+                    "type": "string"
+                },
+                "exit_fee": {
+                    "type": "string"
+                },
+                "use_oracle": {
+                    "type": "boolean"
+                },
+                "weight_breaking_fee_multiplier": {
+                    "type": "string"
+                },
+                "weight_breaking_fee_exponent": {
+                    "type": "string"
+                },
+                "weight_recovery_fee_portion": {
+                    "type": "string"
+                },
+                "threshold_weight_difference": {
+                    "type": "string"
+                },
+                "weight_breaking_fee_portion": {
+                    "type": "string"
+                },
+                "fee_denom": {
+                    "type": "string",
+                    "description": "denom for fee collection"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Pool Params"
+        },
+        "elys.amm.PoolAsset": {
+            "properties": {
+                "token": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "weight": {
+                    "type": "string"
+                },
+                "external_liquidity_ratio": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Asset"
+        }
+    }
+}

@@ -1,0 +1,13 @@
+syntax = "proto3";
+package intento.alloc.v1;
+
+import "gogoproto/gogo.proto";
+import "intento/alloc/v1/params.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/trstlabs/intento/x/alloc/types";
+
+// GenesisState defines the alloc module's genesis state.
+message GenesisState {
+  Params params = 1 [ (gogoproto.nullable) = false ];
+}

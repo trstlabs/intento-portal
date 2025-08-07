@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdatePoolMultipliersResponse",
+    "definitions": {
+        "MsgUpdatePoolMultipliersResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Pool Multipliers Response"
+        }
+    }
+}

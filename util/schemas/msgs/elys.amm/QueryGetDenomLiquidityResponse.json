@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryGetDenomLiquidityResponse",
+    "definitions": {
+        "QueryGetDenomLiquidityResponse": {
+            "properties": {
+                "denom_liquidity": {
+                    "$ref": "#/definitions/elys.amm.DenomLiquidity",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Get Denom Liquidity Response"
+        },
+        "elys.amm.DenomLiquidity": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "liquidity": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Denom Liquidity"
+        }
+    }
+}

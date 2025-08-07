@@ -1,0 +1,97 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MTP",
+    "definitions": {
+        "MTP": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "collateral_asset": {
+                    "type": "string"
+                },
+                "trading_asset": {
+                    "type": "string"
+                },
+                "liabilities_asset": {
+                    "type": "string"
+                },
+                "custody_asset": {
+                    "type": "string"
+                },
+                "collateral": {
+                    "type": "string"
+                },
+                "liabilities": {
+                    "type": "string"
+                },
+                "borrow_interest_paid_custody": {
+                    "type": "string"
+                },
+                "borrow_interest_unpaid_liability": {
+                    "type": "string"
+                },
+                "custody": {
+                    "type": "string"
+                },
+                "take_profit_liabilities": {
+                    "type": "string"
+                },
+                "take_profit_custody": {
+                    "type": "string"
+                },
+                "mtp_health": {
+                    "type": "string"
+                },
+                "position": {
+                    "enum": [
+                        "UNSPECIFIED",
+                        "LONG",
+                        "SHORT"
+                    ],
+                    "type": "string",
+                    "title": "Position"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "take_profit_price": {
+                    "type": "string"
+                },
+                "take_profit_borrow_factor": {
+                    "type": "string"
+                },
+                "funding_fee_paid_custody": {
+                    "type": "string"
+                },
+                "funding_fee_received_custody": {
+                    "type": "string"
+                },
+                "open_price": {
+                    "type": "string"
+                },
+                "stop_loss_price": {
+                    "type": "string"
+                },
+                "last_interest_calc_time": {
+                    "type": "string"
+                },
+                "last_interest_calc_block": {
+                    "type": "string"
+                },
+                "last_funding_calc_time": {
+                    "type": "string"
+                },
+                "last_funding_calc_block": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "MTP"
+        }
+    }
+}

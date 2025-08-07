@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryParamsResponse",
+    "definitions": {
+        "QueryParamsResponse": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/intento.mint.v1.Params",
+                    "additionalProperties": false,
+                    "description": "params defines the parameters of the module."
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Params Response",
+            "description": "QueryParamsResponse is the response type for the Query/Params RPC method."
+        },
+        "intento.mint.v1.Params": {
+            "properties": {
+                "mint_denom": {
+                    "type": "string",
+                    "description": "type of coin to mint"
+                },
+                "start_time": {
+                    "type": "string",
+                    "description": "the time the chain starts",
+                    "format": "date-time"
+                },
+                "initial_annual_provisions": {
+                    "type": "string",
+                    "description": "initial annual provisions"
+                },
+                "reduction_factor": {
+                    "type": "string",
+                    "description": "factor to reduce inflation by each year"
+                },
+                "blocks_per_year": {
+                    "type": "string",
+                    "description": "expected blocks per year"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params holds parameters for the mint module."
+        }
+    }
+}

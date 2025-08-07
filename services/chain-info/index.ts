@@ -1,17 +1,16 @@
 import { protoDecimalToJson } from '@cosmjs/stargate/build/modules/staking/aminomessages'
 import { StargateClient } from '@cosmjs/stargate'
 
-import { Params } from 'intentojs/dist/codegen/intento/intent/v1beta1/params'
-import { Params as DistrModuleParams } from 'intentojs/dist/codegen/cosmos/distribution/v1beta1/distribution'
-import { Params as MintModuleParams } from 'intentojs/dist/codegen/intento/mint/v1beta1/mint'
-import { Params as AllocModuleParams } from 'intentojs/dist/codegen/intento/alloc/v1beta1/params'
+import { Params } from 'intentojs/dist/codegen/intento/intent/v1/params'
+import { Params as MintModuleParams } from 'intentojs/dist/codegen/intento/mint/v1/mint'
+import { Params as AllocModuleParams } from 'intentojs/dist/codegen/intento/alloc/v1/params'
 import { Params as StakingModuleParams } from 'intentojs/dist/codegen/cosmos/staking/v1beta1/staking'
 
 import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 
-import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/codegen/intento/alloc/v1beta1/query'
-import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
-import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1beta1/query'
+import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/codegen/intento/alloc/v1/query'
+import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1/query'
+import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1/query'
 
 export interface BaseQueryInput {
   client: any
@@ -119,14 +118,13 @@ export const getModuleParams = async (cosmosClient: any, trstClient: any) => {
       trstClient
     )
 
-    const distrModuleParams: DistrModuleParams = (
-      await getDistributionParams(cosmosClient)
-    ).params.params
+    // const distrModuleParams: DistrModuleParams = (
+    //   await getDistributionParams(cosmosClient)
+    // ).params.params
 
     const stakingProvision = await getStakeProvisionPercent(trstClient)
 
     return {
-      distrModuleParams,
       mintModuleParams,
       stakingModuleParams,
       allocModuleParams,
@@ -269,7 +267,7 @@ async function getStakingParams(client: any) {
 
 async function getAllocParams(client: any) {
   try {
-    const alloc = await client.intento.alloc.v1beta1.params({})
+    const alloc = await client.intento.alloc.v1.params({})
 
     return alloc.params
   } catch (e) {
@@ -287,22 +285,9 @@ async function getBondedTokens(client: any) {
   }
 }
 
-export async function getDistributionParams(client: any) {
-  try {
-    const distribution = await client.cosmos.distribution.v1beta1.params({})
-    //   const communityTax = parseFloat(distribution.params.community_tax)
-    return {
-      communityTax: distribution.params.communityTax,
-      params: distribution,
-    }
-  } catch (e) {
-    console.error('err(getDistributionParams):', e)
-  }
-}
-
 async function getMintParams(client: any) {
   try {
-    const mint = await client.intento.mint.v1beta1.params({})
+    const mint = await client.intento.mint.v1.params({})
     //   const communityTax = parseFloat(distribution.params.community_tax)
     return { params: mint.params }
   } catch (e) {
@@ -313,7 +298,7 @@ async function getMintParams(client: any) {
 async function getAnnualProvisions(client: any) {
   try {
     const annualProvisions: QueryAnnualProvisionsResponse =
-      await client.intento.mint.v1beta1.annualProvisions({})
+      await client.intento.mint.v1.annualProvisions({})
     console.log('annualProvisions', annualProvisions)
     // decode the protobuf-encoded bytes into a string
     const decString = new TextDecoder().decode(
@@ -328,14 +313,14 @@ async function getAnnualProvisions(client: any) {
 
 export async function getFlowParams(client: any) {
   const resp: QueryFlowParamsResponse =
-    await client.intento.intent.v1beta1.params({})
+    await client.intento.intent.v1.params({})
   return resp.params
 }
 
 async function getStakeProvisionPercent(client: any) {
   try {
     const resp: QueryAllocParamsResponse =
-      await client.intento.alloc.v1beta1.params({})
+      await client.intento.alloc.v1.params({})
     console.log(resp.params.distributionProportions)
     const stakeProvision =
       1 -

@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryWeightAndSlippageFeeRequest",
+    "definitions": {
+        "QueryWeightAndSlippageFeeRequest": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Weight And Slippage Fee Request"
+        }
+    }
+}

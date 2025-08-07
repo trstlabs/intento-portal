@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgExitSwapShareAmountIn",
+    "definitions": {
+        "MsgExitSwapShareAmountIn": {
+            "properties": {
+                "sender": {
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                },
+                "token_out_denom": {
+                    "type": "string"
+                },
+                "share_in_amount": {
+                    "type": "string"
+                },
+                "token_out_min_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Exit Swap Share Amount In",
+            "description": "===================== MsgExitSwapShareAmountIn"
+        }
+    }
+}

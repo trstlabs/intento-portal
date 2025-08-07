@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgRemovePool",
+    "definitions": {
+        "MsgRemovePool": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Remove Pool"
+        }
+    }
+}

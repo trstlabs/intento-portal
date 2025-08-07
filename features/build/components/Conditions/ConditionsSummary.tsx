@@ -4,7 +4,7 @@ import {
   Inline,
 } from 'junoblocks'
 import React from 'react'
-import { ExecutionConditions, ExecutionConfiguration, Comparison, FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration, Comparison, FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 interface ConditionsSummaryProps {
   conditions?: ExecutionConditions

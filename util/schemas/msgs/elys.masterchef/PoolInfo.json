@@ -1,0 +1,51 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/PoolInfo",
+    "definitions": {
+        "PoolInfo": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "reward_wallet": {
+                    "type": "string",
+                    "description": "reward wallet address"
+                },
+                "multiplier": {
+                    "type": "string",
+                    "description": "multiplier for lp rewards"
+                },
+                "eden_apr": {
+                    "type": "string",
+                    "description": "Eden APR, updated at every distribution"
+                },
+                "dex_apr": {
+                    "type": "string",
+                    "description": "Dex APR, updated based on 24hr accumulation"
+                },
+                "gas_apr": {
+                    "type": "string",
+                    "description": "Gas APR, updated based on 24hr accumulation"
+                },
+                "external_incentive_apr": {
+                    "type": "string",
+                    "description": "External Incentive APR, updated at every distribution"
+                },
+                "external_reward_denoms": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "external reward denoms on the pool"
+                },
+                "enable_eden_rewards": {
+                    "type": "boolean",
+                    "description": "Enable or disable eden rewards"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Info"
+        }
+    }
+}

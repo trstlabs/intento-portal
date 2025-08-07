@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateTrustlessAgentFeeConfig",
+    "definitions": {
+        "MsgUpdateTrustlessAgentFeeConfig": {
+            "properties": {
+                "fee_admin": {
+                    "type": "string"
+                },
+                "agent_address": {
+                    "type": "string"
+                },
+                "fee_config": {
+                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgentFeeConfig",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Trustless Agent Fee Config"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "intento.intent.v1.TrustlessAgentFeeConfig": {
+            "properties": {
+                "fee_admin": {
+                    "type": "string"
+                },
+                "fee_coins_supported": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Trustless Agent Fee Config"
+        }
+    }
+}

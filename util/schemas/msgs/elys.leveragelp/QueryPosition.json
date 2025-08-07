@@ -1,0 +1,73 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryPosition",
+    "definitions": {
+        "QueryPosition": {
+            "properties": {
+                "position": {
+                    "$ref": "#/definitions/elys.leveragelp.Position",
+                    "additionalProperties": false
+                },
+                "updated_leverage": {
+                    "type": "string"
+                },
+                "position_usd_value": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Position"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.leveragelp.Position": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "collateral": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "liabilities": {
+                    "type": "string",
+                    "description": "For recording"
+                },
+                "leveraged_lp_amount": {
+                    "type": "string"
+                },
+                "position_health": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "stop_loss_price": {
+                    "type": "string"
+                },
+                "borrow_pool_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Position"
+        }
+    }
+}

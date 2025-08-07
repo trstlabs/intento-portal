@@ -51,7 +51,7 @@ export const handler: Handler = async (event, _context) => {
     const apiBase = process.env.NEXT_PUBLIC_INTO_API
 
     const flowHistory = await fetch(
-      `${apiBase}/intento/intent/v1beta1/flow-history/${flowID}`
+      `${apiBase}/intento/intent/v1/flow-history/${flowID}`
     )
       .then((res) => res.json())
       .catch(() => null)

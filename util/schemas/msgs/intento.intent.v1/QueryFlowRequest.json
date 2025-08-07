@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryFlowRequest",
+    "definitions": {
+        "QueryFlowRequest": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Flow Request",
+            "description": "QueryFlowRequest is the request type for the Query/FlowRequest RPC"
+        }
+    }
+}

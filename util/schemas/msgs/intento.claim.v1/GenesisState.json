@@ -1,0 +1,131 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/GenesisState",
+    "definitions": {
+        "GenesisState": {
+            "properties": {
+                "module_account_balance": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false,
+                    "description": "balance of the claim module's account"
+                },
+                "params": {
+                    "$ref": "#/definitions/intento.claim.v1.Params",
+                    "additionalProperties": false,
+                    "description": "params defines all the parameters of the module."
+                },
+                "claim_records": {
+                    "items": {
+                        "$ref": "#/definitions/intento.claim.v1.ClaimRecord"
+                    },
+                    "additionalProperties": false,
+                    "type": "array",
+                    "description": "list of claim records, one for every airdrop recipient"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Genesis State",
+            "description": "GenesisState defines the claim module's genesis state."
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "intento.claim.v1.ClaimRecord": {
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "description": "address of recipient"
+                },
+                "maximum_claimable_amount": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false,
+                    "description": "maximum claimable amount for the address"
+                },
+                "status": {
+                    "items": {
+                        "$ref": "#/definitions/intento.claim.v1.Status"
+                    },
+                    "additionalProperties": false,
+                    "type": "array",
+                    "description": "index of status array refers to action enum #"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Claim Record",
+            "description": "A Claim Records is the metadata of claim data per address"
+        },
+        "intento.claim.v1.Params": {
+            "properties": {
+                "airdrop_start_time": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "duration_until_decay": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "duration_of_decay": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "claim_denom": {
+                    "type": "string",
+                    "description": "denom of claimable asset"
+                },
+                "duration_vesting_periods": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "format": "regex"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the claim module's parameters."
+        },
+        "intento.claim.v1.Status": {
+            "properties": {
+                "action_completed": {
+                    "type": "boolean",
+                    "description": "true if action is completed"
+                },
+                "vesting_periods_completed": {
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "type": "array",
+                    "description": "true if action is completed index refers to the 4 vesting periods for the given action"
+                },
+                "vesting_periods_claimed": {
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "type": "array",
+                    "description": "true if action is completed index refers to the 4 vesting periods for the given action"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Status",
+            "description": "Status contains for an action if it is completed and claimed"
+        }
+    }
+}

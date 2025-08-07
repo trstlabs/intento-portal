@@ -25,9 +25,7 @@ export const executeDirectSend = async ({
           sourcePort: 'transfer',
           sourceChannel: recipientInfos[0].channelID,
           sender: senderAddress,
-          timeoutTimestamp: BigInt(
-            Math.floor(new Date().getTime() / 1000) + 600
-          ),
+          timeoutTimestamp: BigInt(Math.floor(Date.now() / 1000) + 600) * BigInt(1000000000),
           receiver: recipientInfos[0].recipient,
           token: { denom, amount: recipientInfos[0].amount.toString() },
           timeoutHeight: undefined,
@@ -65,9 +63,7 @@ export const executeDirectSend = async ({
           sourcePort: 'transfer',
           sourceChannel: recipient.channelID,
           sender: senderAddress,
-          timeoutTimestamp: BigInt(
-            Math.floor(new Date().getTime() + 60 * 1000)
-          ),
+          timeoutTimestamp: BigInt(Math.floor(Date.now() / 1000) + 600) * BigInt(1000000000),
           timeoutHeight: undefined,
           receiver: recipient.recipient,
           token: { denom, amount: recipient.amount.toString() },

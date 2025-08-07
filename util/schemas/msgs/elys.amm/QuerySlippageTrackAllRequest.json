@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QuerySlippageTrackAllRequest",
+    "definitions": {
+        "QuerySlippageTrackAllRequest": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Slippage Track All Request"
+        }
+    }
+}

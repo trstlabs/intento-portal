@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateSpotOrder",
+    "definitions": {
+        "MsgUpdateSpotOrder": {
+            "properties": {
+                "owner_address": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "legacy_order_price_v1": {
+                    "$ref": "#/definitions/elys.tradeshield.LegacyOrderPriceV1",
+                    "additionalProperties": false
+                },
+                "order_price": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Spot Order"
+        },
+        "elys.tradeshield.LegacyOrderPriceV1": {
+            "properties": {
+                "base_denom": {
+                    "type": "string"
+                },
+                "quote_denom": {
+                    "type": "string"
+                },
+                "rate": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Order Price V 1"
+        }
+    }
+}

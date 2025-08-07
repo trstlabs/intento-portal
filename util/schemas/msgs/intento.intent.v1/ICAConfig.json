@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/ICAConfig",
+    "definitions": {
+        "ICAConfig": {
+            "properties": {
+                "port_id": {
+                    "type": "string"
+                },
+                "connection_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "ICA Config",
+            "description": "base config for ICA"
+        }
+    }
+}

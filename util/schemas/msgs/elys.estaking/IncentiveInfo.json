@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/IncentiveInfo",
+    "definitions": {
+        "IncentiveInfo": {
+            "properties": {
+                "eden_amount_per_year": {
+                    "type": "string",
+                    "description": "reward amount in eden for 1 year"
+                },
+                "blocks_distributed": {
+                    "type": "string",
+                    "description": "blocks distributed"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Incentive Info"
+        }
+    }
+}

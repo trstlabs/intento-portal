@@ -6,7 +6,7 @@ import {
   Tooltip,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 type ConfigurationProps = {
   config: ExecutionConfiguration

@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryExitPoolEstimationRequest",
+    "definitions": {
+        "QueryExitPoolEstimationRequest": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "share_amount_in": {
+                    "type": "string"
+                },
+                "token_out_denom": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Exit Pool Estimation Request"
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateEnabledPools",
+    "definitions": {
+        "MsgUpdateEnabledPools": {
+            "properties": {
+                "authority": {
+                    "type": "string",
+                    "description": "authority is the address that controls the module (defaults to x/gov unless overwritten)."
+                },
+                "enabled_pools": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Enabled Pools"
+        }
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgOpen",
+    "definitions": {
+        "MsgOpen": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "position": {
+                    "enum": [
+                        "UNSPECIFIED",
+                        "LONG",
+                        "SHORT"
+                    ],
+                    "type": "string",
+                    "title": "Position"
+                },
+                "leverage": {
+                    "type": "string"
+                },
+                "trading_asset": {
+                    "type": "string"
+                },
+                "collateral": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "take_profit_price": {
+                    "type": "string"
+                },
+                "stop_loss_price": {
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Open"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        }
+    }
+}

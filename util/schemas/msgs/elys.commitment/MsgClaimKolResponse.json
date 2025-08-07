@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgClaimKolResponse",
+    "definitions": {
+        "MsgClaimKolResponse": {
+            "properties": {
+                "elys_amount": {
+                    "type": "string"
+                },
+                "vested_elys_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Claim Kol Response"
+        }
+    }
+}

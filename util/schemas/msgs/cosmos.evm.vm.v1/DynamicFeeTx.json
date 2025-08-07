@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/DynamicFeeTx",
+    "definitions": {
+        "DynamicFeeTx": {
+            "properties": {
+                "chain_id": {
+                    "type": "string",
+                    "description": "chain_id of the destination EVM chain"
+                },
+                "nonce": {
+                    "type": "string",
+                    "description": "nonce corresponds to the account nonce (transaction sequence)."
+                },
+                "gas_tip_cap": {
+                    "type": "string",
+                    "description": "gas_tip_cap defines the max value for the gas tip"
+                },
+                "gas_fee_cap": {
+                    "type": "string",
+                    "description": "gas_fee_cap defines the max value for the gas fee"
+                },
+                "gas": {
+                    "type": "string",
+                    "description": "gas defines the gas limit defined for the transaction."
+                },
+                "to": {
+                    "type": "string",
+                    "description": "to is the hex formatted address of the recipient"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "value defines the transaction amount."
+                },
+                "data": {
+                    "type": "string",
+                    "description": "data is the data payload bytes of the transaction.",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "accesses": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.evm.vm.v1.AccessTuple"
+                    },
+                    "additionalProperties": false,
+                    "type": "array",
+                    "description": "accesses is an array of access tuples"
+                },
+                "v": {
+                    "type": "string",
+                    "description": "v defines the signature value",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "r": {
+                    "type": "string",
+                    "description": "r defines the signature value",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "s": {
+                    "type": "string",
+                    "description": "s define the signature value",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Dynamic Fee Tx",
+            "description": "DynamicFeeTx is the data of EIP-1559 dynamic fee transactions."
+        },
+        "cosmos.evm.vm.v1.AccessTuple": {
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "description": "address is a hex formatted ethereum address"
+                },
+                "storage_keys": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "storage_keys are hex formatted hashes of the storage keys"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Access Tuple",
+            "description": "AccessTuple is the element type of an access list."
+        }
+    }
+}

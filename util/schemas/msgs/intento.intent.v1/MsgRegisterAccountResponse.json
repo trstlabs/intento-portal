@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgRegisterAccountResponse",
+    "definitions": {
+        "MsgRegisterAccountResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Register Account Response",
+            "description": "MsgRegisterAccountResponse is the response type for Msg/RegisterAccount"
+        }
+    }
+}

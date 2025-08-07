@@ -1,0 +1,190 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/ExecutionConditions",
+    "definitions": {
+        "ExecutionConditions": {
+            "properties": {
+                "feedback_loops": {
+                    "items": {
+                        "$ref": "#/definitions/intento.intent.v1.FeedbackLoop"
+                    },
+                    "additionalProperties": false,
+                    "type": "array",
+                    "description": "Replace value with value from message or response from another flow’s latest output"
+                },
+                "comparisons": {
+                    "items": {
+                        "$ref": "#/definitions/intento.intent.v1.Comparison"
+                    },
+                    "additionalProperties": false,
+                    "type": "array",
+                    "description": "Comparison with response response value"
+                },
+                "stop_on_success_of": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "optional array of dependent intents that when executing succesfully, stops execution"
+                },
+                "stop_on_failure_of": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "optional array of dependent intents that when not executing succesfully, stops execution"
+                },
+                "skip_on_failure_of": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "optional array of dependent intents that should be executed succesfully after their latest call before execution is allowed"
+                },
+                "skip_on_success_of": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "optional array of dependent intents that should fail after their latest call before execution is allowed"
+                },
+                "use_and_for_comparisons": {
+                    "type": "boolean",
+                    "description": "True: Use AND for combining comparisons. False: Use OR for combining comparisons."
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Execution Conditions",
+            "description": "ExecutionConditions provides execution conditions for the flow"
+        },
+        "intento.intent.v1.Comparison": {
+            "properties": {
+                "flow_id": {
+                    "type": "string",
+                    "description": "get the latest response value from other flow, optional"
+                },
+                "response_index": {
+                    "type": "integer",
+                    "description": "index of the message response, optional"
+                },
+                "response_key": {
+                    "type": "string",
+                    "description": "e.g. Amount[0].Amount, FromAddress, optional"
+                },
+                "value_type": {
+                    "type": "string",
+                    "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+                },
+                "operator": {
+                    "enum": [
+                        "EQUAL",
+                        "CONTAINS",
+                        "NOT_CONTAINS",
+                        "SMALLER_THAN",
+                        "LARGER_THAN",
+                        "GREATER_EQUAL",
+                        "LESS_EQUAL",
+                        "STARTS_WITH",
+                        "ENDS_WITH",
+                        "NOT_EQUAL"
+                    ],
+                    "type": "string",
+                    "title": "enum AfterGetValueOperator {\n   PARSE = 0;\n   MULITPLY = 1;\n   DIVIDE = 2;\n   SUBSTRACT = 3;\n   ADD = 4;\n }",
+                    "description": "enum AfterGetValueOperator {   PARSE = 0;   MULITPLY = 1;   DIVIDE = 2;   SUBSTRACT = 3;   ADD = 4; }  Comparison operators that can be used for various types."
+                },
+                "operand": {
+                    "type": "string"
+                },
+                "icq_config": {
+                    "$ref": "#/definitions/intento.intent.v1.ICQConfig",
+                    "additionalProperties": false,
+                    "description": "bool calculate_difference = 7; //True: Calculate the difference with the previous value.  config of ICQ to perform"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Comparison",
+            "description": "Comparison is checked on the response in JSON before execution of flow and outputs true or false"
+        },
+        "intento.intent.v1.FeedbackLoop": {
+            "properties": {
+                "flow_id": {
+                    "type": "string",
+                    "description": "flow to get the latest response value from, optional"
+                },
+                "response_index": {
+                    "type": "integer",
+                    "description": "index of the responses"
+                },
+                "response_key": {
+                    "type": "string",
+                    "description": "for example \"Amount\""
+                },
+                "msgs_index": {
+                    "type": "integer",
+                    "description": "index of the msg to replace"
+                },
+                "msg_key": {
+                    "type": "string",
+                    "description": "key of the message to replace (e.g. Amount[0].Amount, FromAddress)"
+                },
+                "value_type": {
+                    "type": "string",
+                    "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+                },
+                "icq_config": {
+                    "$ref": "#/definitions/intento.intent.v1.ICQConfig",
+                    "additionalProperties": false,
+                    "description": "bool calculate_difference = 7; //True: calculate the difference with the previous value instead of using the value directly.  config of ICQ to perform"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Feedback Loop",
+            "description": "Replace value with value from message or response from another flow’s latest output before execution"
+        },
+        "intento.intent.v1.ICQConfig": {
+            "properties": {
+                "connection_id": {
+                    "type": "string"
+                },
+                "chain_id": {
+                    "type": "string"
+                },
+                "timeout_policy": {
+                    "enum": [
+                        "REJECT_QUERY_RESPONSE",
+                        "RETRY_QUERY_REQUEST",
+                        "EXECUTE_QUERY_CALLBACK"
+                    ],
+                    "type": "string",
+                    "title": "Timeout Policy"
+                },
+                "timeout_duration": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "query_type": {
+                    "type": "string",
+                    "description": "e.g. store/bank/key store/staking/key"
+                },
+                "query_key": {
+                    "type": "string",
+                    "description": "key in the store that stores the query e.g. stakingtypes.GetValidatorKey(validatorAddressBz)"
+                },
+                "response": {
+                    "type": "string",
+                    "description": "should be reset after execution",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "ICQ Config",
+            "description": "config for using interchain queries"
+        }
+    }
+}

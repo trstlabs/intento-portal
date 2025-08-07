@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgWithdrawAllRewards",
+    "definitions": {
+        "MsgWithdrawAllRewards": {
+            "properties": {
+                "delegator_address": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Withdraw All Rewards",
+            "description": "MsgWithdrawAllRewards represents delegation withdrawal to a delegator from all the validators and Eden/EdenB commitment."
+        }
+    }
+}

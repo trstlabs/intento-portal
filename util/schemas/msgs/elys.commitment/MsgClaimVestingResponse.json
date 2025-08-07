@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgClaimVestingResponse",
+    "definitions": {
+        "MsgClaimVestingResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Claim Vesting Response"
+        }
+    }
+}

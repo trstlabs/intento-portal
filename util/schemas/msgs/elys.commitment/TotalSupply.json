@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/TotalSupply",
+    "definitions": {
+        "TotalSupply": {
+            "properties": {
+                "total_eden_supply": {
+                    "type": "string"
+                },
+                "total_edenb_supply": {
+                    "type": "string"
+                },
+                "total_eden_vested": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Total Supply"
+        }
+    }
+}

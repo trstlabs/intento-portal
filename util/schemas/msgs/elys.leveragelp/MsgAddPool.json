@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgAddPool",
+    "definitions": {
+        "MsgAddPool": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "pool": {
+                    "$ref": "#/definitions/elys.leveragelp.AddPool",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Add Pool"
+        },
+        "elys.leveragelp.AddPool": {
+            "properties": {
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "leverage_max": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Add Pool"
+        }
+    }
+}

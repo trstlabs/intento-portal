@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/PoolExtraInfo",
+    "definitions": {
+        "PoolExtraInfo": {
+            "properties": {
+                "tvl": {
+                    "type": "string"
+                },
+                "lp_token_price": {
+                    "type": "string"
+                },
+                "lp_saved_apr": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Extra Info"
+        }
+    }
+}

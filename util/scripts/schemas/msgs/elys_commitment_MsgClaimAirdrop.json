@@ -1,0 +1,15 @@
+{
+  "$ref": "#/definitions/MsgClaimAirdrop",
+  "definitions": {
+    "MsgClaimAirdrop": {
+      "properties": {
+        "claimAddress": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Claim Airdrop"
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/ExtensionOptionsEthereumTx",
+    "definitions": {
+        "ExtensionOptionsEthereumTx": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Extension Options Ethereum Tx",
+            "description": "ExtensionOptionsEthereumTx is an extension option for ethereum transactions"
+        }
+    }
+}

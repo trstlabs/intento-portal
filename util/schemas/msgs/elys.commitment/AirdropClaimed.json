@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/AirdropClaimed",
+    "definitions": {
+        "AirdropClaimed": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "claimed": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Airdrop Claimed"
+        }
+    }
+}

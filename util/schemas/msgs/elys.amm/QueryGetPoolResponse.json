@@ -1,0 +1,119 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryGetPoolResponse",
+    "definitions": {
+        "QueryGetPoolResponse": {
+            "properties": {
+                "pool": {
+                    "$ref": "#/definitions/elys.amm.Pool",
+                    "additionalProperties": false
+                },
+                "extra_info": {
+                    "$ref": "#/definitions/elys.amm.PoolExtraInfo",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Get Pool Response"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.amm.Pool": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                },
+                "pool_params": {
+                    "$ref": "#/definitions/elys.amm.PoolParams",
+                    "additionalProperties": false
+                },
+                "total_shares": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "pool_assets": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.PoolAsset"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "total_weight": {
+                    "type": "string"
+                },
+                "rebalance_treasury": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool"
+        },
+        "elys.amm.PoolAsset": {
+            "properties": {
+                "token": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "weight": {
+                    "type": "string"
+                },
+                "external_liquidity_ratio": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Asset"
+        },
+        "elys.amm.PoolExtraInfo": {
+            "properties": {
+                "tvl": {
+                    "type": "string"
+                },
+                "lp_token_price": {
+                    "type": "string"
+                },
+                "lp_saved_apr": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Extra Info"
+        },
+        "elys.amm.PoolParams": {
+            "properties": {
+                "swap_fee": {
+                    "type": "string"
+                },
+                "use_oracle": {
+                    "type": "boolean"
+                },
+                "fee_denom": {
+                    "type": "string",
+                    "description": "denom for fee collection"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Params"
+        }
+    }
+}

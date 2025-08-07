@@ -21,7 +21,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
-  useGetHostedICAByConnectionID, useGetHostICAAddress,
+  useGetTrustlessAgentICAByConnectionID, useGetHostICAAddress,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -32,14 +32,14 @@ import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
 import { sleep } from '../../../localtrst/utils'
 import { FlowInput } from '../../../types/trstTypes'
-import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { GearIcon } from '../../../icons'
 import { SubmitFlowDialog } from './SubmitFlowDialog'
 import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
 import { convertDenomToMicroDenom } from '../../../util/conversion'
-import { HostedAccountCard } from './HostedAccountCard'
+import { TrustlessAgentCard } from './TrustlessAgentCard'
 import { processFlowInput } from '../utils/addressUtils'
 
 
@@ -78,13 +78,13 @@ export const BuildComponent = ({
     icaAddress,
     chainIsConnected
   )
-  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByConnectionID(flowInput.connectionId)
-  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId)
+  const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByConnectionID(flowInput.connectionId)
+  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId)
 
-  const refetchHostedICA = useRefetchQueries([
-    `hostInterchainAccount/${hostedAccount?.hostedAddress || ""}/${flowInput.connectionId}`,
+  const refetchTrustlessAgentICA = useRefetchQueries([
+    `hostInterchainAccount/${trustlessAgent?.agentAddress || ""}/${flowInput.connectionId}`,
   ])
-  const refetchAuthZForHostedICA = useRefetchQueries(
+  const refetchAuthZForTrustlessAgentICA = useRefetchQueries(
     `userAuthZGrants / ${hostedICA}`
   )
   const refetchICA = useRefetchQueries([
@@ -269,15 +269,15 @@ export const BuildComponent = ({
   }, [denom, icaAddress]);
 
   useEffect(() => {
-    if ((hostedAccount) && chainId) {
-      refetchHostedICA();
+    if ((trustlessAgent) && chainId) {
+      refetchTrustlessAgentICA();
     }
 
-  }, [chainId, hostedAccount]);
+  }, [chainId, trustlessAgent]);
 
   useEffect(() => {
     if (hostedICA) {
-      refetchAuthZForHostedICA()
+      refetchAuthZForTrustlessAgentICA()
     }
 
   }, [hostedICA]);
@@ -477,8 +477,8 @@ export const BuildComponent = ({
                 <Spinner size={18} style={{ margin: 0 }} />
               ) : (
                 <>
-                  {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
-                    hostedAccount={hostedAccount}
+                  {!icaAddress ? (<>  {trustlessAgent && <TrustlessAgentCard
+                    trustlessAgent={trustlessAgent}
                     hostedICAAddress={hostedICA}
                     flowInput={flowInput}
                   />}
@@ -562,7 +562,7 @@ export const BuildComponent = ({
         handleSubmitFlow={(flowInput) =>
           handleSubmitFlowClick(flowInput)
         }
-        hostedAccount={hostedAccount}
+        trustlessAgent={trustlessAgent}
         chainId={chainId}
       />
       <Column>

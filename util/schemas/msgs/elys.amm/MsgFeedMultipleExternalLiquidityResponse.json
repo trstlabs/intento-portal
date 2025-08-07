@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgFeedMultipleExternalLiquidityResponse",
+    "definitions": {
+        "MsgFeedMultipleExternalLiquidityResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Feed Multiple External Liquidity Response"
+        }
+    }
+}

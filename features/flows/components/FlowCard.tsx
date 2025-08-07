@@ -10,7 +10,7 @@ import {
 import Link from 'next/link'
 
 
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
 import { useGetConnectionIDFromHostAddress } from '../../../hooks/useICA'
 
@@ -55,8 +55,8 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
     )
   }
   //const flowInfoAmino = FlowInfo.toAmino(flowInfo)
-  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.hostedIcaConfig?.hostedAddress)
-  const ibcInfo = useIBCAssetInfoFromConnection(flowInfo.icaConfig.connectionId || hostedConnectionID)
+  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.trustlessAgentConfig?.agentAddress)
+  const ibcInfo = useIBCAssetInfoFromConnection(flowInfo.selfHostedIcaConfig.connectionId || hostedConnectionID)
 
   const now = Date.now()
   const endTime = flowInfo.endTime?.getTime()
@@ -125,8 +125,8 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
                 <Column align="center" gap={2}>
                   <StyledText variant="caption" css={{ padding: '$2 0' }}>
                     <>
-                      {flowInfo.hostedIcaConfig.hostedAddress ? 'Hosted' :
-                        flowInfo.icaConfig.connectionId ? 'Self-Hosted' : 'Local'
+                      {flowInfo.trustlessAgentConfig?.agentAddress ? 'Hosted' :
+                        flowInfo.selfHostedIcaConfig?.connectionId ? 'Self-Hosted' : 'Local'
                       } {' '}| {' '}
                       {
                         flowInfo.msgs[0]?.typeUrl?.split('.')

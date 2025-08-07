@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateParams",
+    "definitions": {
+        "MsgUpdateParams": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "params": {
+                    "$ref": "#/definitions/intento.claim.v1.Params",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Params",
+            "description": "MsgUpdateParams is the request type for updating claim module's params."
+        },
+        "intento.claim.v1.Params": {
+            "properties": {
+                "airdrop_start_time": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "duration_until_decay": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "duration_of_decay": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "claim_denom": {
+                    "type": "string",
+                    "description": "denom of claimable asset"
+                },
+                "duration_vesting_periods": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "format": "regex"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the claim module's parameters."
+        }
+    }
+}

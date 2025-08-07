@@ -16,7 +16,7 @@ import React from 'react'
 import { APP_NAME } from 'util/constants'
 import { useFlowInfo } from '../../hooks/useFlowInfo'
 import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
-import { useGetHostedICAByHostedAddress } from '../../hooks/useICA'
+import { useGetTrustlessAgentICAByTrustlessAgentAddress } from '../../hooks/useICA'
 
 export default function Flow() {
   const {
@@ -26,12 +26,12 @@ export default function Flow() {
   const isMobile = useMedia('sm')
 
   const [flowInfo, isLoading] = useFlowInfo(id)
-  const [hostedICA, _isHostedICALoading] = useGetHostedICAByHostedAddress(flowInfo?.hostedIcaConfig?.hostedAddress)
+  const [hostedICA, _isTrustlessAgentICALoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInfo?.trustlessAgentConfig?.agentAddress)
 
   const connectionId = flowInfo ? (
-    flowInfo.icaConfig?.connectionId && flowInfo.icaConfig.connectionId !== '' 
-      ? flowInfo.icaConfig.connectionId 
-      : flowInfo.hostedIcaConfig && hostedICA?.icaConfig?.connectionId 
+    flowInfo.selfHostedIcaConfig?.connectionId && flowInfo.selfHostedIcaConfig.connectionId !== '' 
+      ? flowInfo.selfHostedIcaConfig.connectionId 
+      : flowInfo.trustlessAgentConfig && hostedICA?.icaConfig?.connectionId 
       ? hostedICA.icaConfig.connectionId 
       : ''
   ) : ''

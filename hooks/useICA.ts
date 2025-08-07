@@ -13,8 +13,8 @@ import {
   getAuthZGrantsForGrantee,
   getFeeGrantAllowance,
   GrantResponse,
-  getHostedAccounts,
-  getHostedAccount,
+  getTrustlessAgents,
+  getTrustlessAgent,
 } from '../services/build'
 
 import { StargateClient } from '@cosmjs/stargate'
@@ -61,12 +61,12 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
   return [ica, isLoading] as const
 }
 
-export const useGetHostedICAByConnectionID = (connectionId: string) => {
+export const useGetTrustlessAgentICAByConnectionID = (connectionId: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `hostedAccount/${connectionId}`,
     async () => {
-      const hostedAccs = await getHostedAccounts({ rpcClient })
+      const hostedAccs = await getTrustlessAgents({ rpcClient })
       const hostedAcc = hostedAccs?.find(
         (account) => account.icaConfig.connectionId == connectionId
       )
@@ -85,14 +85,14 @@ export const useGetHostedICAByConnectionID = (connectionId: string) => {
 }
 
 
-export const useGetHostedICAByHostedAddress = (address: string) => {
+export const useGetTrustlessAgentICAByTrustlessAgentAddress = (address: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `hostedAccountByAddress/${address}`,
     async () => {
-      const hostedAccs = await getHostedAccounts({ rpcClient })
+      const hostedAccs = await getTrustlessAgents({ rpcClient })
       const hostedAcc = hostedAccs?.find(
-        (account) => account.hostedAddress == address
+        (account) => account.agentAddress == address
       )
 
       return hostedAcc
@@ -114,9 +114,9 @@ export const useGetConnectionIDFromHostAddress = (address: string) => {
   const { data: connectionID, isLoading } = useQuery(
     `connectionIDFromHostAddress/${address}`,
     async () => {
-      const resp = await getHostedAccount({ rpcClient, address })
+      const resp = await getTrustlessAgent({ rpcClient, address })
 
-      return resp.hostedAccount.icaConfig.connectionId
+      return resp.trustlessAgent.icaConfig.connectionId
     },
     {
       enabled: Boolean(rpcClient && !!address && address.length > 40),

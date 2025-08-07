@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdatePerpetualOrder",
+    "definitions": {
+        "MsgUpdatePerpetualOrder": {
+            "properties": {
+                "owner_address": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "legacy_trigger_price_v1": {
+                    "$ref": "#/definitions/elys.tradeshield.LegacyTriggerPriceV1",
+                    "additionalProperties": false
+                },
+                "trigger_price": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Perpetual Order"
+        },
+        "elys.tradeshield.LegacyTriggerPriceV1": {
+            "properties": {
+                "trading_asset_denom": {
+                    "type": "string"
+                },
+                "rate": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Trigger Price V 1"
+        }
+    }
+}

@@ -1,0 +1,66 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyParams",
+    "definitions": {
+        "LegacyParams": {
+            "properties": {
+                "stake_incentives": {
+                    "$ref": "#/definitions/elys.estaking.IncentiveInfo",
+                    "additionalProperties": false
+                },
+                "eden_commit_val": {
+                    "type": "string"
+                },
+                "edenb_commit_val": {
+                    "type": "string"
+                },
+                "max_eden_reward_apr_stakers": {
+                    "type": "string",
+                    "description": "Maximum eden reward apr for stakers - [0 - 0.3]"
+                },
+                "eden_boost_apr": {
+                    "type": "string"
+                },
+                "dex_rewards_stakers": {
+                    "$ref": "#/definitions/elys.estaking.DexRewardsTracker",
+                    "additionalProperties": false,
+                    "description": "Tracking dex rewards given to stakers"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Params"
+        },
+        "elys.estaking.DexRewardsTracker": {
+            "properties": {
+                "num_blocks": {
+                    "type": "string",
+                    "description": "Number of blocks since start of epoch (distribution epoch)"
+                },
+                "amount": {
+                    "type": "string",
+                    "description": "Accumulated amount at distribution epoch - recalculated at every distribution epoch"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Dex Rewards Tracker",
+            "description": "DexRewardsTracker is used for tracking rewards for stakers and LPs, all amount here is in USDC"
+        },
+        "elys.estaking.IncentiveInfo": {
+            "properties": {
+                "eden_amount_per_year": {
+                    "type": "string",
+                    "description": "reward amount in eden for 1 year"
+                },
+                "blocks_distributed": {
+                    "type": "string",
+                    "description": "blocks distributed"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Incentive Info"
+        }
+    }
+}

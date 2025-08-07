@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/AssetLeverageAmount",
+    "definitions": {
+        "AssetLeverageAmount": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "leveraged_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Asset Leverage Amount"
+        }
+    }
+}

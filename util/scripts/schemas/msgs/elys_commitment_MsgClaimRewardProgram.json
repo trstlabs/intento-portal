@@ -1,0 +1,15 @@
+{
+  "$ref": "#/definitions/MsgClaimRewardProgram",
+  "definitions": {
+    "MsgClaimRewardProgram": {
+      "properties": {
+        "claimAddress": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Claim Reward Program"
+    }
+  }
+}

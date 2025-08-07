@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/PoolRewardsAccum",
+    "definitions": {
+        "PoolRewardsAccum": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "block_height": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "dex_reward": {
+                    "type": "string"
+                },
+                "gas_reward": {
+                    "type": "string"
+                },
+                "eden_reward": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Rewards Accum"
+        }
+    }
+}

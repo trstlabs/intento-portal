@@ -1,0 +1,92 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Pool",
+    "definitions": {
+        "Pool": {
+            "properties": {
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "health": {
+                    "type": "string"
+                },
+                "borrow_interest_rate": {
+                    "type": "string"
+                },
+                "pool_assets_long": {
+                    "items": {
+                        "$ref": "#/definitions/elys.perpetual.PoolAsset"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "pool_assets_short": {
+                    "items": {
+                        "$ref": "#/definitions/elys.perpetual.PoolAsset"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "last_height_borrow_interest_rate_computed": {
+                    "type": "string"
+                },
+                "funding_rate": {
+                    "type": "string",
+                    "description": "funding rate, if positive longs pay shorts, if negative shorts pay longs"
+                },
+                "fees_collected": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "leverage_max": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.perpetual.PoolAsset": {
+            "properties": {
+                "liabilities": {
+                    "type": "string"
+                },
+                "custody": {
+                    "type": "string"
+                },
+                "take_profit_liabilities": {
+                    "type": "string"
+                },
+                "take_profit_custody": {
+                    "type": "string"
+                },
+                "asset_denom": {
+                    "type": "string"
+                },
+                "collateral": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Asset"
+        }
+    }
+}

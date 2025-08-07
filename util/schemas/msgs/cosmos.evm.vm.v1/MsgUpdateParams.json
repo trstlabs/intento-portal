@@ -1,0 +1,108 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateParams",
+    "definitions": {
+        "MsgUpdateParams": {
+            "properties": {
+                "authority": {
+                    "type": "string",
+                    "description": "authority is the address of the governance account."
+                },
+                "params": {
+                    "$ref": "#/definitions/cosmos.evm.vm.v1.Params",
+                    "additionalProperties": false,
+                    "description": "params defines the x/vm parameters to update. NOTE: All parameters must be supplied."
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Params",
+            "description": "MsgUpdateParams defines a Msg for updating the x/vm module parameters."
+        },
+        "cosmos.evm.vm.v1.AccessControl": {
+            "properties": {
+                "create": {
+                    "$ref": "#/definitions/cosmos.evm.vm.v1.AccessControlType",
+                    "additionalProperties": false,
+                    "description": "create defines the permission policy for creating contracts"
+                },
+                "call": {
+                    "$ref": "#/definitions/cosmos.evm.vm.v1.AccessControlType",
+                    "additionalProperties": false,
+                    "description": "call defines the permission policy for calling contracts"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Access Control",
+            "description": "AccessControl defines the permission policy of the EVM for creating and calling contracts"
+        },
+        "cosmos.evm.vm.v1.AccessControlType": {
+            "properties": {
+                "access_type": {
+                    "enum": [
+                        "ACCESS_TYPE_PERMISSIONLESS",
+                        "ACCESS_TYPE_RESTRICTED",
+                        "ACCESS_TYPE_PERMISSIONED"
+                    ],
+                    "type": "string",
+                    "title": "Access Type",
+                    "description": "AccessType defines the types of permissions for the operations"
+                },
+                "access_control_list": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "access_control_list defines defines different things depending on the AccessType: - ACCESS_TYPE_PERMISSIONLESS: list of addresses that are blocked from performing the operation - ACCESS_TYPE_RESTRICTED: ignored - ACCESS_TYPE_PERMISSIONED: list of addresses that are allowed to perform the operation"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Access Control Type",
+            "description": "AccessControlType defines the permission type for policies"
+        },
+        "cosmos.evm.vm.v1.Params": {
+            "properties": {
+                "evm_denom": {
+                    "type": "string",
+                    "description": "evm_denom represents the token denomination used to run the EVM state transitions."
+                },
+                "extra_eips": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "extra_eips defines the additional EIPs for the vm.Config"
+                },
+                "allow_unprotected_txs": {
+                    "type": "boolean",
+                    "description": "allow_unprotected_txs defines if replay-protected (i.e non EIP155 signed) transactions can be executed on the state machine."
+                },
+                "evm_channels": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "evm_channels is the list of channel identifiers from EVM compatible chains"
+                },
+                "access_control": {
+                    "$ref": "#/definitions/cosmos.evm.vm.v1.AccessControl",
+                    "additionalProperties": false,
+                    "description": "access_control defines the permission policy of the EVM"
+                },
+                "active_static_precompiles": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "active_static_precompiles defines the slice of hex addresses of the precompiled contracts that are active"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the EVM module parameters"
+        }
+    }
+}

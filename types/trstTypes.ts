@@ -2,8 +2,8 @@ import { Coin } from '@cosmjs/stargate'
 import {
   ExecutionConditions,
   ExecutionConfiguration,
-  HostedICAConfig,
-} from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+  TrustlessAgentExecutionConfig,
+} from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 export class FlowInput {
@@ -15,7 +15,7 @@ export class FlowInput {
   feeFunds?: Coin
   configuration?: ExecutionConfiguration
   conditions?: ExecutionConditions
-  hostedIcaConfig?: HostedICAConfig
+  trustlessAgentExecutionConfig?: TrustlessAgentExecutionConfig
   icaAddressForAuthZ?: string
   connectionId?: string
   hostConnectionId?: string

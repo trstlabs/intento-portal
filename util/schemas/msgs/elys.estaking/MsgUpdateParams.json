@@ -1,0 +1,67 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateParams",
+    "definitions": {
+        "MsgUpdateParams": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "params": {
+                    "$ref": "#/definitions/elys.estaking.Params",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Params",
+            "description": "MsgUpdateParams is the Msg/UpdateParams request type."
+        },
+        "elys.estaking.IncentiveInfo": {
+            "properties": {
+                "eden_amount_per_year": {
+                    "type": "string",
+                    "description": "reward amount in eden for 1 year"
+                },
+                "blocks_distributed": {
+                    "type": "string",
+                    "description": "blocks distributed"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Incentive Info"
+        },
+        "elys.estaking.Params": {
+            "properties": {
+                "stake_incentives": {
+                    "$ref": "#/definitions/elys.estaking.IncentiveInfo",
+                    "additionalProperties": false
+                },
+                "eden_commit_val": {
+                    "type": "string"
+                },
+                "edenb_commit_val": {
+                    "type": "string"
+                },
+                "max_eden_reward_apr_stakers": {
+                    "type": "string",
+                    "description": "Maximum eden reward apr for stakers - [0 - 0.3]"
+                },
+                "eden_boost_apr": {
+                    "type": "string"
+                },
+                "provider_vesting_epoch_identifier": {
+                    "type": "string"
+                },
+                "provider_staking_rewards_portion": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the parameters for the module."
+        }
+    }
+}

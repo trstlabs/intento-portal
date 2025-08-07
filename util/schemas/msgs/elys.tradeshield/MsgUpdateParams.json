@@ -1,0 +1,67 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateParams",
+    "definitions": {
+        "MsgUpdateParams": {
+            "properties": {
+                "authority": {
+                    "type": "string",
+                    "description": "authority is the address that controls the module (defaults to x/gov unless overwritten)."
+                },
+                "params": {
+                    "$ref": "#/definitions/elys.tradeshield.Params",
+                    "additionalProperties": false,
+                    "description": "NOTE: All parameters must be supplied."
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Params"
+        },
+        "elys.tradeshield.Params": {
+            "properties": {
+                "market_order_enabled": {
+                    "type": "boolean"
+                },
+                "stake_enabled": {
+                    "type": "boolean"
+                },
+                "process_orders_enabled": {
+                    "type": "boolean"
+                },
+                "swap_enabled": {
+                    "type": "boolean"
+                },
+                "perpetual_enabled": {
+                    "type": "boolean"
+                },
+                "reward_enabled": {
+                    "type": "boolean"
+                },
+                "leverage_enabled": {
+                    "type": "boolean"
+                },
+                "limit_process_order": {
+                    "type": "string"
+                },
+                "reward_percentage": {
+                    "type": "string",
+                    "description": "For incentive system v2"
+                },
+                "margin_error": {
+                    "type": "string"
+                },
+                "minimum_deposit": {
+                    "type": "string"
+                },
+                "tolerance": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the parameters for the module."
+        }
+    }
+}

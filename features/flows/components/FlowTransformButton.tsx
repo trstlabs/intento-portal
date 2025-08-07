@@ -1,4 +1,4 @@
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow';
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow';
 import { useRouter } from 'next/router';
 import { FlowInput } from '../../../types/trstTypes';
 import { Button, CopyIcon } from 'junoblocks';
@@ -47,8 +47,8 @@ export const FlowTransformButton = ({ flowInfo, initialChainID }: FlowTransformB
             msgs: msgs,
             conditions: info.conditions,
             configuration: info.configuration,
-            connectionId: info.icaConfig.connectionId,
-            hostedIcaConfig: info.hostedIcaConfig,
+            connectionId: info.selfHostedIcaConfig.connectionId,
+            trustlessAgentExecutionConfig: info.trustlessAgentConfig,
             label: info.label
 
         };

@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgCommitClaimedRewardsResponse",
+    "definitions": {
+        "MsgCommitClaimedRewardsResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Commit Claimed Rewards Response"
+        }
+    }
+}

@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryAnnualProvisionsResponse",
+    "definitions": {
+        "QueryAnnualProvisionsResponse": {
+            "properties": {
+                "annual_provisions": {
+                    "type": "string",
+                    "description": "annual_provisions is the current minting annual provisions value.",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Annual Provisions Response",
+            "description": "QueryAnnualProvisionsResponse is the response type for the Query/AnnualProvisions RPC method."
+        }
+    }
+}

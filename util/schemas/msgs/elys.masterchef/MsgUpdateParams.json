@@ -1,0 +1,81 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateParams",
+    "definitions": {
+        "MsgUpdateParams": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "params": {
+                    "$ref": "#/definitions/elys.masterchef.Params",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Params"
+        },
+        "elys.masterchef.IncentiveInfo": {
+            "properties": {
+                "eden_amount_per_year": {
+                    "type": "string",
+                    "description": "reward amount in eden for 1 year"
+                },
+                "blocks_distributed": {
+                    "type": "string",
+                    "description": "blocks distributed"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Incentive Info"
+        },
+        "elys.masterchef.Params": {
+            "properties": {
+                "lp_incentives": {
+                    "$ref": "#/definitions/elys.masterchef.IncentiveInfo",
+                    "additionalProperties": false
+                },
+                "reward_portion_for_lps": {
+                    "type": "string",
+                    "description": "gas fees and swap fees portion for lps, `100 - reward_portion_for_lps - reward_portion_for_stakers = revenue percent for protocol`."
+                },
+                "reward_portion_for_stakers": {
+                    "type": "string",
+                    "description": "gas fees and swap fees portion for stakers, `100 - reward_portion_for_lps - reward_portion_for_stakers = revenue percent for protocol`."
+                },
+                "max_eden_reward_apr_lps": {
+                    "type": "string",
+                    "description": "Maximum eden reward apr for lps - [0 - 0.3]"
+                },
+                "supported_reward_denoms": {
+                    "items": {
+                        "$ref": "#/definitions/elys.masterchef.SupportedRewardDenom"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "protocol_revenue_address": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params"
+        },
+        "elys.masterchef.SupportedRewardDenom": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "min_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Supported Reward Denom"
+        }
+    }
+}

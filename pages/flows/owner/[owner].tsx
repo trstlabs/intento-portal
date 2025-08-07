@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useFlowInfos } from 'hooks/useFlowInfo'
 import { FlowCard } from '../../../features/flows/components/FlowCard'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 export default function FlowsByOwner() {
   const router = useRouter()

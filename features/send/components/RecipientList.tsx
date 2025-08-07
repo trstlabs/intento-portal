@@ -28,7 +28,7 @@ import { useSubmitFlow } from '../../build/hooks'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { Configuration } from '../../build/components/Conditions/Configuration'
-import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 export class RecipientInfo {

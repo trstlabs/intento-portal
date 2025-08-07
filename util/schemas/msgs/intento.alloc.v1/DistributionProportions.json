@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/DistributionProportions",
+    "definitions": {
+        "DistributionProportions": {
+            "properties": {
+                "developer_rewards": {
+                    "type": "string"
+                },
+                "community_pool": {
+                    "type": "string"
+                },
+                "relayer_incentives": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Distribution Proportions",
+            "description": "DistributionProportions defines the proportion that each bucket  receives."
+        }
+    }
+}

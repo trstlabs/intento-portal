@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/SupportedRewardDenom",
+    "definitions": {
+        "SupportedRewardDenom": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "min_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Supported Reward Denom"
+        }
+    }
+}

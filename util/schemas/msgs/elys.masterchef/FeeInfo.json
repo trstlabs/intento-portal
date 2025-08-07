@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/FeeInfo",
+    "definitions": {
+        "FeeInfo": {
+            "properties": {
+                "gas_lp": {
+                    "type": "string"
+                },
+                "gas_stakers": {
+                    "type": "string"
+                },
+                "gas_protocol": {
+                    "type": "string"
+                },
+                "dex_lp": {
+                    "type": "string"
+                },
+                "dex_stakers": {
+                    "type": "string"
+                },
+                "dex_protocol": {
+                    "type": "string"
+                },
+                "perp_lp": {
+                    "type": "string"
+                },
+                "perp_stakers": {
+                    "type": "string"
+                },
+                "perp_protocol": {
+                    "type": "string"
+                },
+                "eden_lp": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Fee Info"
+        }
+    }
+}

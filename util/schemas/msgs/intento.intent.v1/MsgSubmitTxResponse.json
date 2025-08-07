@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgSubmitTxResponse",
+    "definitions": {
+        "MsgSubmitTxResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Submit Tx Response",
+            "description": "MsgSubmitTxResponse defines the MsgSubmitTx response type"
+        }
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/SwapAmountOutRoute",
+    "definitions": {
+        "SwapAmountOutRoute": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "token_in_denom": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Swap Amount Out Route"
+        }
+    }
+}

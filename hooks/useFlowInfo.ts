@@ -5,7 +5,7 @@ import {
   DEFAULT_LONG_REFETCH_INTERVAL,
 } from '../util/constants'
 import { useIntentoRpcClient } from './useRPCClient'
-import { QueryFlowsResponse } from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+import { QueryFlowsResponse } from 'intentojs/dist/codegen/intento/intent/v1/query'
 import { GlobalDecoderRegistry } from 'intentojs'
 import { PageRequest } from 'intentojs/dist/codegen/cosmos/base/query/v1beta1/pagination'
 import { useRecoilValue } from 'recoil'
@@ -23,7 +23,7 @@ export const useFlowInfos = (limit: number, key: any) => {
         reverse: true,
         countTotal: true,
       })
-      let resp: QueryFlowsResponse = await client.intento.intent.v1beta1.flows({
+      let resp: QueryFlowsResponse = await client.intento.intent.v1.flows({
         pagination: pageRequest,
       })
 
@@ -33,12 +33,23 @@ export const useFlowInfos = (limit: number, key: any) => {
           ...flowInfo,
           msgs: flowInfo.msgs.map((msg) => {
             //GlobalDecoderRegistry.unwrapAny(msg.value)
+            // let wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
+            // wrappedMsg.typeUrl =
+            //   wrappedMsg.typeUrl ==
+            //     '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+            //     ? '/cosmos.authz.v1beta1.MsgExec'
+            //     : wrappedMsg.typeUrl
+
+            // wrappedMsg.typeUrl = wrappedMsg.typeUrl == '/cosmos.distribution.v1beta1.QueryValidatorOutstandingRewardsRequest' ? 'Delegate'
+            //   : wrappedMsg.typeUrl
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
               wrappedMsg.typeUrl ==
               '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
                 ? '/cosmos.authz.v1beta1.MsgExec'
                 : wrappedMsg.typeUrl
+
+
             return {
               value: msg.value,
               valueDecoded: msg,
@@ -77,7 +88,7 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
       })
 
       let resp: QueryFlowsResponse =
-        await client.intento.intent.v1beta1.flowsForOwner({
+        await client.intento.intent.v1.flowsForOwner({
           owner: address,
           pagination: pageRequest,
         })
@@ -91,7 +102,7 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
               wrappedMsg.typeUrl ==
-              '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+                '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
                 ? '/cosmos.authz.v1beta1.MsgExec'
                 : wrappedMsg.typeUrl
             return {
@@ -124,7 +135,7 @@ export const useFlowInfo = (id) => {
       if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
       }
-      const flowInfo = (await client.intento.intent.v1beta1.flow({ id }))
+      const flowInfo = (await client.intento.intent.v1.flow({ id }))
         .flowInfo
       return {
         ...flowInfo,
@@ -132,13 +143,13 @@ export const useFlowInfo = (id) => {
           const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
           wrappedMsg.typeUrl =
             wrappedMsg.typeUrl ==
-            '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+              '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
               ? '/cosmos.authz.v1beta1.MsgExec'
               : wrappedMsg.typeUrl
           return {
             value: wrappedMsg.value,
             valueDecoded: msg,
-            typeUrl: wrappedMsg.typeUrl,
+            typeUrl: /* msg.typeUrl ||  */wrappedMsg.typeUrl,
           }
         }),
       }
@@ -170,7 +181,7 @@ export const useFlowHistory = (id, limit: number, key: Uint8Array) => {
       })
 
       const flowHistoryResponse =
-        await client.intento.intent.v1beta1.flowHistory({
+        await client.intento.intent.v1.flowHistory({
           id: id,
           pagination: pageRequest,
         })

@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgCreatePool",
+    "definitions": {
+        "MsgCreatePool": {
+            "properties": {
+                "sender": {
+                    "type": "string"
+                },
+                "pool_params": {
+                    "$ref": "#/definitions/elys.amm.PoolParams",
+                    "additionalProperties": false
+                },
+                "pool_assets": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.PoolAsset"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Create Pool"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.amm.PoolAsset": {
+            "properties": {
+                "token": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "weight": {
+                    "type": "string"
+                },
+                "external_liquidity_ratio": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Asset"
+        },
+        "elys.amm.PoolParams": {
+            "properties": {
+                "swap_fee": {
+                    "type": "string"
+                },
+                "use_oracle": {
+                    "type": "boolean"
+                },
+                "fee_denom": {
+                    "type": "string",
+                    "description": "denom for fee collection"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Params"
+        }
+    }
+}

@@ -200,7 +200,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
           )}
 
           {/* Hide create authz grant button if fee denom starts with 'ibc' */}
-          {!flowInput.hostedIcaConfig?.feeCoinLimit?.denom?.toLowerCase().startsWith('ibc') && (
+          {!flowInput.trustlessAgentExecutionConfig?.feeCoinLimit?.denom?.toLowerCase().startsWith('ibc') && (
             <Button
               variant="secondary"
               size="small"

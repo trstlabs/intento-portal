@@ -1,0 +1,128 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/PerpetualOrderExtraInfo",
+    "definitions": {
+        "PerpetualOrderExtraInfo": {
+            "properties": {
+                "perpetual_order": {
+                    "$ref": "#/definitions/elys.tradeshield.PerpetualOrder",
+                    "additionalProperties": false
+                },
+                "position_size": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "liquidation_price": {
+                    "type": "string"
+                },
+                "funding_rate": {
+                    "type": "string"
+                },
+                "borrow_interest_rate": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Perpetual Order Extra Info"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.tradeshield.LegacyTriggerPriceV1": {
+            "properties": {
+                "trading_asset_denom": {
+                    "type": "string"
+                },
+                "rate": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Trigger Price V 1"
+        },
+        "elys.tradeshield.PerpetualOrder": {
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "owner_address": {
+                    "type": "string"
+                },
+                "perpetual_order_type": {
+                    "enum": [
+                        "LIMITOPEN",
+                        "LIMITCLOSE",
+                        "STOPLOSSPERP"
+                    ],
+                    "type": "string",
+                    "title": "Perpetual Order Type",
+                    "description": "Perpetual Order"
+                },
+                "position": {
+                    "enum": [
+                        "UNSPECIFIED",
+                        "LONG",
+                        "SHORT"
+                    ],
+                    "type": "string",
+                    "title": "Perpetual Position"
+                },
+                "legacy_trigger_price_v1": {
+                    "$ref": "#/definitions/elys.tradeshield.LegacyTriggerPriceV1",
+                    "additionalProperties": false
+                },
+                "trigger_price": {
+                    "type": "string"
+                },
+                "collateral": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "trading_asset": {
+                    "type": "string"
+                },
+                "leverage": {
+                    "type": "string"
+                },
+                "take_profit_price": {
+                    "type": "string"
+                },
+                "position_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "enum": [
+                        "PENDING",
+                        "EXECUTED",
+                        "CANCELED",
+                        "ALL"
+                    ],
+                    "type": "string",
+                    "title": "Status"
+                },
+                "stop_loss_price": {
+                    "type": "string"
+                },
+                "poolId": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Perpetual Order"
+        }
+    }
+}

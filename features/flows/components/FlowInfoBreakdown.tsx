@@ -21,7 +21,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateFlowParams } from '../../../types/trstTypes'
-import { FlowInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { FlowInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -57,7 +57,7 @@ export const FlowInfoBreakdown = ({
 }: //size = 'large',
   FlowInfoBreakdownProps) => {
 
-  const [icaAddress, _] = useGetICA(flowInfo.icaConfig?.connectionId, flowInfo.owner)
+  const [icaAddress, _] = useGetICA(flowInfo.selfHostedIcaConfig?.connectionId, flowInfo.owner)
 
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
@@ -430,7 +430,7 @@ export const FlowInfoBreakdown = ({
 
               <Text variant="body">{flowInfo.owner} </Text>
             </Column>
-            {flowInfo.icaConfig.portId && (
+            {flowInfo.selfHostedIcaConfig.portId && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <Column
                 css={{ padding: '$3' }}
@@ -442,14 +442,14 @@ export const FlowInfoBreakdown = ({
                   IBC Port
                 </Text>
 
-                <Text variant="body">{flowInfo.icaConfig.portId} </Text>
+                <Text variant="body">{flowInfo.selfHostedIcaConfig.portId} </Text>
               </Column>
             )}
 
           </Inline>
         </Row>
 
-        {icaAddress && icaBalance && flowInfo.icaConfig && (
+        {icaAddress && icaBalance && flowInfo.selfHostedIcaConfig && (
           <Row>
             <Column
               style={{
@@ -565,7 +565,7 @@ export const FlowInfoBreakdown = ({
               </Text>
             )}
 
-            {flowInfo.hostedIcaConfig.hostedAddress && (
+            {flowInfo.trustlessAgentConfig.agentAddress && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <>
                 <Tooltip
@@ -578,9 +578,9 @@ export const FlowInfoBreakdown = ({
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
-                  {flowInfo.hostedIcaConfig.hostedAddress}{' '}<a
+                  {flowInfo.trustlessAgentConfig.agentAddress}{' '}<a
                     target={'_blank'}
-                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1beta1/hosted-account/${flowInfo.hostedIcaConfig.hostedAddress}`}
+                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/hosted-account/${flowInfo.trustlessAgentConfig.agentAddress}`}
                     rel="noopener noreferrer"
                   >
                     <b>View</b>
