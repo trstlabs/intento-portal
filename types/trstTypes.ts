@@ -2,7 +2,7 @@ import { Coin } from '@cosmjs/stargate'
 import {
   ExecutionConditions,
   ExecutionConfiguration,
-  TrustlessAgentExecutionConfig,
+  TrustlessAgentConfig,
 } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
@@ -15,7 +15,7 @@ export class FlowInput {
   feeFunds?: Coin
   configuration?: ExecutionConfiguration
   conditions?: ExecutionConditions
-  trustlessAgentExecutionConfig?: TrustlessAgentExecutionConfig
+  TrustlessAgentConfig?: TrustlessAgentConfig
   icaAddressForAuthZ?: string
   connectionId?: string
   hostConnectionId?: string

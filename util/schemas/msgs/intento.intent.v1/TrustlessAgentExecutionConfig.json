@@ -1,8 +1,8 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "$ref": "#/definitions/TrustlessAgentExecutionConfig",
+    "$ref": "#/definitions/TrustlessAgentConfig",
     "definitions": {
-        "TrustlessAgentExecutionConfig": {
+        "TrustlessAgentConfig": {
             "properties": {
                 "agent_address": {
                     "type": "string"

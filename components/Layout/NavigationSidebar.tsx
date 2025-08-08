@@ -59,7 +59,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     username,
     address,
     openView
-  } = useChain('intentotestnet')
+  } = useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
 
 
   // Watch for address changes and trigger the mutation
@@ -242,7 +242,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             <Inline css={{ paddingLeft: '$4' }}> Airdrop </Inline>
           </Button>
         </Link>
-      ) :  <Link href="https://discord.gg/ME76AXcsMm" passHref>
+      ) : <Link href="https://discord.gg/ME76AXcsMm" passHref>
         <Button
           as="a"
           variant="menu"

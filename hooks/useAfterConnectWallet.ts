@@ -3,11 +3,12 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
+// import { addLocalChainToKeplr } from './useConnectIBCWallet'
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2],
 ) => {
   let { connect, getSigningStargateClient, address, username } =
-    useChain('intentotestnet')
+    useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
 
   const [{ status }, setWalletState] = useRecoilState(walletState)
   const mutation = useMutation(async () => {
@@ -19,7 +20,6 @@ export const useAfterConnectWallet = (
     try {
       if (address) {
         const chainClient = await getSigningStargateClient()
-
         if (chainClient) {
           setWalletState({
             key: username,
@@ -52,7 +52,7 @@ export const useAfterConnectWallet = (
         connect()
         mutation.mutate(null)
       }
-    }, 
+    },
     [status]
   )
 

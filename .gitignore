@@ -16,6 +16,9 @@
 # production
 /build
 
+# IBC assets (generated from environment variables)
+public/ibc_assets.json
+
 # misc
 .DS_Store
 *.pem

@@ -56,7 +56,7 @@
           "type": "string"
         },
         "trustlessAgentConfig": {
-          "$ref": "#/definitions/intento.intent.v1.TrustlessAgentExecutionConfig",
+          "$ref": "#/definitions/intento.intent.v1.TrustlessAgentConfig",
           "additionalProperties": false
         },
         "conditions": {
@@ -299,12 +299,12 @@
       "title": "ICQ Config",
       "description": "config for using interchain queries"
     },
-    "intento.intent.v1.TrustlessAgentExecutionConfig": {
+    "intento.intent.v1.TrustlessAgentConfig": {
       "properties": {
         "agentAddress": {
           "type": "string"
         },
-        "feeCoinLimit": {
+        "feeLimit": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
           "additionalProperties": false
         }

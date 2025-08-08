@@ -61,7 +61,7 @@ export const useGetExpectedFlowFee = (
   flowInput: FlowInput,
   denom: string,
   intervalSeconds?: number,
-  hostedAccount?: any // Add hostedAccount parameter
+  trustlessAgent?: any // Add trustlessAgent parameter
 ) => {
   let [intentModuleParams, setTriggerModuleData] = useRecoilState(
     intentModuleParamsAtom
@@ -83,8 +83,8 @@ export const useGetExpectedFlowFee = (
     recurrences,
     denom,
     flowInput.msgs?.length || 0,
-    hostedAccount?.address ?? null
-  ], [recurrences, denom, flowInput.msgs, hostedAccount?.address])
+    trustlessAgent?.address ?? null
+  ], [recurrences, denom, flowInput.msgs, trustlessAgent?.address])
 
   const { data, isLoading } = useQuery(
     stableQueryKey,
@@ -130,7 +130,7 @@ export const useGetExpectedFlowFee = (
           denom,
           recurrences,
           lenMsgs: flowInput.msgs.length,
-          hostedAccount
+          trustlessAgent
         })
 
         // First try with the actual denom (denom_local)
@@ -140,7 +140,7 @@ export const useGetExpectedFlowFee = (
           flowInput.msgs.length,
           recurrences,
           denom,
-          hostedAccount // Pass hosted account for fee calculation
+          trustlessAgent // Pass hosted account for fee calculation
         )
 
         // Always calculate the fee in uinto for comparison
@@ -150,7 +150,7 @@ export const useGetExpectedFlowFee = (
           flowInput.msgs.length,
           recurrences,
           'uinto', // Use the native token for comparison
-          hostedAccount // Pass hosted account for fee calculation
+          trustlessAgent // Pass hosted account for fee calculation
         )
 
         console.log(`Fee in denom: ${fee}, Fee in INTO: ${intoFee}`)

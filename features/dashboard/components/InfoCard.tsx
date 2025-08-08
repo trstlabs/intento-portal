@@ -324,7 +324,7 @@ export const InfoCard = ({ shouldShowAutoCompound }: InfoCardProps) => {
           isLoading={isExecutingSchedule}
           flowInput={{...flowInput, label: "Autocompound"}}
           isDialogShowing={isSubmitFlowDialogShowing}
-          chainId={"intento-ics-test-1"}
+          chainId={process.env.NEXT_PUBLIC_INTO_CHAIN_ID}
           onRequestClose={() =>
             setSubmitFlowDialogState({
             isShowing: false,

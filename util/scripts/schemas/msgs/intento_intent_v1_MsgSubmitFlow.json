@@ -55,7 +55,7 @@
           "description": "optional connection ID interchain account"
         },
         "trustlessAgentConfig": {
-          "$ref": "#/definitions/intento.intent.v1.TrustlessAgentExecutionConfig",
+          "$ref": "#/definitions/intento.intent.v1.TrustlessAgentConfig",
           "additionalProperties": false,
           "description": "optional use of a trustless excution agent"
         },
@@ -299,12 +299,12 @@
       "title": "ICQ Config",
       "description": "config for using interchain queries"
     },
-    "intento.intent.v1.TrustlessAgentExecutionConfig": {
+    "intento.intent.v1.TrustlessAgentConfig": {
       "properties": {
         "agentAddress": {
           "type": "string"
         },
-        "feeCoinLimit": {
+        "feeLimit": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
           "additionalProperties": false
         }

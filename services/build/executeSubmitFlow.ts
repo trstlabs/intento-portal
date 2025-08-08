@@ -76,7 +76,7 @@ export const executeSubmitFlow = async ({
     feeFunds = [flowInput.feeFunds]
   }
   // if (flowInput.connectionId && flowInput.hostConnectionId) {
-  //   flowInput.trustlessAgentExecutionConfig = undefined
+  //   flowInput.TrustlessAgentConfig = undefined
   // }
   const msgSubmitFlow =
     intento.intent.v1.MessageComposer.withTypeUrl.submitFlow({
@@ -99,7 +99,7 @@ export const executeSubmitFlow = async ({
         },
       feeFunds,
       conditions: flowInput.conditions,
-      trustlessAgentConfig: flowInput.trustlessAgentExecutionConfig ? flowInput.trustlessAgentExecutionConfig : undefined,
+      trustlessAgentConfig: flowInput.TrustlessAgentConfig,
     })
   console.log('Submitting msgSubmitFlow ⬇')
   console.log(msgSubmitFlow)

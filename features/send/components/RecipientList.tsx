@@ -407,7 +407,7 @@ export const RecipientList = ({
         isLoading={isExecutingSchedule}
         flowInput={{ ...flowInput, label: "Send Flow" }}
         isDialogShowing={isScheduleDialogShowing}
-        chainId={"intento-ics-test-1"}
+        chainId={process.env.NEXT_PUBLIC_INTO_CHAIN_ID}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,

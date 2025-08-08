@@ -81,7 +81,7 @@ export const useIBCAssetList = () => {
 export const useConnectChains = (chains: IBCAssetInfo[]) => {
   const chainList = chains[0]
     ? chains.map((chain) => chain.registry_name)
-    : ['intentotestnet']
+    : ['intentodevnet']
   useChains(chainList)
 }
 

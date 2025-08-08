@@ -293,7 +293,7 @@
                     "additionalProperties": false
                 },
                 "trustless_agent_config": {
-                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgentExecutionConfig",
+                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgentConfig",
                     "additionalProperties": false
                 },
                 "configuration": {
@@ -366,7 +366,7 @@
             "title": "ICQ Config",
             "description": "config for using interchain queries"
         },
-        "intento.intent.v1.TrustlessAgentExecutionConfig": {
+        "intento.intent.v1.TrustlessAgentConfig": {
             "properties": {
                 "agent_address": {
                     "type": "string"

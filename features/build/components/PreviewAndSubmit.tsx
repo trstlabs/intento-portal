@@ -228,11 +228,11 @@ import {
     const [denom, setDenom] = useState('uinto')
   
     const [chainSymbol, setChainSymbol] = useState('INTO')
-    const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAINID || "")
+    const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAIN_ID || "")
   
     const [_chainHasIAModule, setChainHasIAModule] = useState(true)
   
-    const shouldTransferFromHost = flowInput.trustlessAgentExecutionConfig?.feeCoinLimit?.denom != 'uinto'
+    const shouldTransferFromHost = flowInput.TrustlessAgentConfig?.feeLimit?.[0]?.denom != 'uinto'
     // Get the ICA address from the flow input
     //const icaAddressForGrants = flowInput.icaAddressForAuthZ;
   
@@ -270,8 +270,8 @@ import {
   
     const [icaAddress, _isIcaLoading] = useGetICA(flowInput.connectionId, '')
   
-    const [hostedAccount, _ishostedAccountLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.trustlessAgentExecutionConfig.agentAddress || "")
-    const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.agentAddress || "", flowInput.connectionId || "")
+    const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.TrustlessAgentConfig.agentAddress || "")
+    const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId || "")
   
     const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
       hostedICA || icaAddress,
@@ -301,7 +301,7 @@ import {
     //   console.log("hostedICA", hostedICA, "flowInput.connectionId", flowInput.connectionId || "<not set>")
     // }, [hostedICA, flowInput.connectionId]) 
     const refetchTrustlessAgentICA = useRefetchQueries([
-      `hostInterchainAccount/${hostedAccount?.agentAddress || ""}/${flowInput.connectionId || ""}`,
+      `hostInterchainAccount/${trustlessAgent?.agentAddress || ""}/${flowInput.connectionId || ""}`,
     ])
     const refetchAuthZForTrustlessAgentICA = useRefetchQueries(
       `userAuthZGrants / ${hostedICA}`
@@ -452,11 +452,11 @@ import {
     }, [denom, icaAddress]);
   
     useEffect(() => {
-      if ((hostedAccount) && chainId) {
+      if ((trustlessAgent) && chainId) {
         refetchTrustlessAgentICA();
       }
   
-    }, [chainId, hostedAccount]);
+    }, [chainId, trustlessAgent]);
   
     useEffect(() => {
       if (hostedICA) {
@@ -603,7 +603,7 @@ import {
                 //icaAddress={icaAddress}
                 onFeeCalculated={handleFeeCalculated}
                 useMsgExec={useMsgExec}
-                hostedAccount={hostedAccount}
+                trustlessAgent={trustlessAgent}
               //setUseMsgExec={setUseMsgExec}
               />
             </Column>

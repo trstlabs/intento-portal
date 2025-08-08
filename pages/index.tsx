@@ -30,7 +30,7 @@ import { APP_NAME } from '../util/constants'
 import Head from 'next/head'
 
 export default function Home() {
-  const { address } = useChain('intentotestnet')
+  const { address } = useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
   const flowsPerPage = 20;
   const [paginationKey, setPaginationKey] = useState<Uint8Array | undefined>(undefined)
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])

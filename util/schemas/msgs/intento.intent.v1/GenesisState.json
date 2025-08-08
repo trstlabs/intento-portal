@@ -287,7 +287,7 @@
                     "additionalProperties": false
                 },
                 "trustless_agent_config": {
-                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgentExecutionConfig",
+                    "$ref": "#/definitions/intento.intent.v1.TrustlessAgentConfig",
                     "additionalProperties": false
                 },
                 "configuration": {
@@ -429,7 +429,7 @@
             "title": "Sequence",
             "description": "Sequence id and value of a counter"
         },
-        "intento.intent.v1.TrustlessAgentExecutionConfig": {
+        "intento.intent.v1.TrustlessAgentConfig": {
             "properties": {
                 "agent_address": {
                     "type": "string"

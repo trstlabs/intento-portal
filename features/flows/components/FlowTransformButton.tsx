@@ -48,7 +48,7 @@ export const FlowTransformButton = ({ flowInfo, initialChainID }: FlowTransformB
             conditions: info.conditions,
             configuration: info.configuration,
             connectionId: info.selfHostedIcaConfig.connectionId,
-            trustlessAgentExecutionConfig: info.trustlessAgentConfig,
+            TrustlessAgentConfig: info.trustlessAgentConfig,
             label: info.label
 
         };

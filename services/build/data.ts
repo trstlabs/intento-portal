@@ -37,7 +37,7 @@ export const getICA = async ({
 export const getTrustlessAgents = async ({ rpcClient }) => {
   try {
     const response: QueryTrustlessAgentsResponse =
-      await rpcClient.intento.intent.v1.hostedAccounts({})
+      await rpcClient.intento.intent.v1.trustlessAgents({})
 
     return response.trustlessAgents
   } catch (e) {
@@ -52,7 +52,7 @@ export const getTrustlessAgents = async ({ rpcClient }) => {
 export const getTrustlessAgent = async ({ rpcClient, address }) => {
   try {
     const response: QueryTrustlessAgentResponse =
-      await rpcClient.intento.intent.v1.hostedAccount({ address })
+      await rpcClient.intento.intent.v1.trustlessAgent({ address })
 
     return response
   } catch (e) {

@@ -20,9 +20,24 @@ Access the app on `http://localhost:3000/`.
 
 ## Configuration
 
-The app configuration, feature flags, etc., is located in the .env config file.
+### Environment Variables
 
-To configure the app, you will need to swap the demo example configuration set with your chain information and add your tokens and ibc assets information.
+The app uses environment variables for configuration. Copy the example environment file and update it with your values:
 
-Configure RPC and rest endpoints in public/chain_info.local.json and IBC info in public/ibc_assets.json.
+```bash
+cp scripts/example.env .env.local
+# Edit .env.local with your configuration
+```
+
+### IBC Assets Configuration
+
+The IBC assets configuration is now generated from environment variables during the build process. The configuration is generated from the `.env.local` file when you run `npm run build` or `npm run generate:ibc-assets`.
+
+### Manual Configuration (Legacy)
+
+If you need to manually configure the app, you can still edit the following files directly:
+- `public/chain_info.local.json` - RPC and REST endpoints
+- `public/ibc_assets.json` - IBC assets information (will be overwritten on build)
+
+However, it's recommended to use environment variables as described above for better maintainability and security.
 

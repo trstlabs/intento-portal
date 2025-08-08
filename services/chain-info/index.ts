@@ -142,7 +142,7 @@ export const getExpectedFlowFee = (
   lenMsgs: number,
   recurrences: number,
   denom: string,
-  hostedAccount?: any
+  trustlessAgent?: any
 ) => {
 
   // Step 1: Base gas fee units (like the 'gasFeeAmount' in Go)
@@ -172,8 +172,8 @@ export const getExpectedFlowFee = (
   totalFlowFeeInMicro *= recurrences
 
   // Step 5: Add hosted account fee if available
-  if (hostedAccount?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
-    const hostedFeeCoin = hostedAccount.hostFeeConfig.feeCoinsSuported.find(
+  if (trustlessAgent?.hostFeeConfig?.feeCoinsSuported?.length > 0) {
+    const hostedFeeCoin = trustlessAgent.hostFeeConfig.feeCoinsSuported.find(
       (coin) => coin.denom === denom
     )
 

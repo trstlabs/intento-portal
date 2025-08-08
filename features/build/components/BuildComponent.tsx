@@ -62,7 +62,7 @@ export const BuildComponent = ({
   const [chainName, setChainName] = useState('')
 
   const [chainSymbol, setChainSymbol] = useState('INTO')
-  const [chainId, setChainId] = useState(process.env.NEXT_PUBLIC_INTO_CHAINID || "")
+  const [chainId, setChainId] = useState(process.env.NEXT_PUBLIC_INTO_CHAIN_ID || "")
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
@@ -234,7 +234,7 @@ export const BuildComponent = ({
         )
 
       }
-      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
+      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
         updatedFlowInput = processFlowInput(updatedFlowInput, true)
       } else {
         updatedFlowInput = processFlowInput(updatedFlowInput, false)
@@ -252,7 +252,7 @@ export const BuildComponent = ({
     setPrefix(newPrefix)
     let chainIsConnected = connectionId != undefined && connectionId != ''
     setChainIsConnected(chainIsConnected)
-    setChainHasIAModule(chainId === process.env.NEXT_PUBLIC_INTO_CHAINID)
+    setChainHasIAModule(chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID)
 
 
     if (!chainIsConnected) {
@@ -289,7 +289,7 @@ export const BuildComponent = ({
       newMsg = newMsg.replaceAll('into', prefix)
       let processedMsg: string
   
-      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
+      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, true)
         processedMsg = newInput.msgs[0]
       } else {

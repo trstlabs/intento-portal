@@ -64,7 +64,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
 export const useGetTrustlessAgentICAByConnectionID = (connectionId: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
-    `hostedAccount/${connectionId}`,
+    `trustlessAgent/${connectionId}`,
     async () => {
       const hostedAccs = await getTrustlessAgents({ rpcClient })
       const hostedAcc = hostedAccs?.find(
@@ -88,7 +88,7 @@ export const useGetTrustlessAgentICAByConnectionID = (connectionId: string) => {
 export const useGetTrustlessAgentICAByTrustlessAgentAddress = (address: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
-    `hostedAccountByAddress/${address}`,
+    `trustlessAgentByAddress/${address}`,
     async () => {
       const hostedAccs = await getTrustlessAgents({ rpcClient })
       const hostedAcc = hostedAccs?.find(
