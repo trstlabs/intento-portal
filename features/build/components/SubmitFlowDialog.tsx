@@ -168,7 +168,7 @@ export const SubmitFlowDialog = ({
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
       TrustlessAgentConfig: {
-        agentAddress: trustlessAgent?.agentAddress, feeLimit: trustlessAgent?.feeConfig.feeCoinsSupported.find(coin => coin.denom === feeDenom)
+        agentAddress: trustlessAgent?.agentAddress, feeLimit: trustlessAgent?.feeConfig.feeCoinsSupported
       },
       label: flowLabel,
     });
