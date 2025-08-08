@@ -1,1 +1,48 @@
-[]
+[
+  {
+    "id": "cosmoshub-4",
+    "name": "Cosmos Hub",
+    "registry_name": "",
+    "symbol": "ATOM",
+    "chain_id": "cosmoshub-4",
+    "denom": "uatom",
+    "decimals": 6,
+    "channel": "channel-1",
+    "channel_to_intento": "channel-1",
+    "denom_local": "",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg",
+    "connection_id": "",
+    "counterparty_connection_id": "",
+    "prefix": "cosmos",
+    "rpc": "http://gaia-rpc-t.trustlesshub.com"
+  },
+  {
+    "id": "intento-dev-1",
+    "name": "Intento Devnet",
+    "registry_name": "intentodevnet",
+    "symbol": "INTO",
+    "chain_id": "intento-dev-1",
+    "denom": "uinto",
+    "decimals": 6,
+    "denom_local": "uinto",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/intentotestnet/images/into.png",
+    "prefix": "into"
+  },
+  {
+    "id": "osmosis-1",
+    "name": "Osmosis",
+    "registry_name": "",
+    "symbol": "OSMO",
+    "chain_id": "osmosis-1",
+    "denom": "uosmo",
+    "decimals": 6,
+    "channel": "channel-141",
+    "channel_to_intento": "channel-141",
+    "denom_local": "",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
+    "connection_id": "",
+    "counterparty_connection_id": "",
+    "prefix": "osmo",
+    "rpc": "http://osmo-rpc-t.trustlesshub.com"
+  }
+]

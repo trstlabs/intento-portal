@@ -1,5 +1,13 @@
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
+
+// Log environment variables for debugging
+console.log('Environment variables:');
+console.log('INTO_CHAIN_ID:', process.env.INTO_CHAIN_ID);
+console.log('INTO_NAME:', process.env.INTO_NAME);
+console.log('INTO_SYMBOL:', process.env.INTO_SYMBOL);
+console.log('INTO_DENOM:', process.env.INTO_DENOM);
 
 // Default configuration for known chains
 const CHAIN_TEMPLATES = {
@@ -180,6 +188,11 @@ const generateConfig = () => {
   
   // Process predefined chains
   Object.entries(CHAIN_TEMPLATES).forEach(([name, template]) => {
+    // Skip the IBC template as it's just a template, not a chain
+    if (name === 'IBC') {
+      return;
+    }
+    
     // Skip if chain is explicitly disabled
     if (parseBoolean(process.env[`DISABLE_${name}`]) === true) {
       console.log(`Skipping disabled chain: ${name}`);
