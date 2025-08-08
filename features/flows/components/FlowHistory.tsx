@@ -148,7 +148,7 @@ export const FlowHistory = ({
                       <Column>
                         <Text variant="caption">
                           Exec Fee:{' '}
-                          {convertMicroDenomToDenom(execFee.amount, 6)} INTO
+                          {convertMicroDenomToDenom(execFee.amount, 6)} {execFee.denom}
                         </Text>
                       </Column>
 
