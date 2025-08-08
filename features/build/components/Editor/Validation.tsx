@@ -140,7 +140,7 @@ export function findFileBySuffix(typeUrlSuffix: string): any | undefined {
     for (const key in cosmosMsgsJsonFiles) {
         ///TODO there may be identical messages so at some point it may suffice to add more controls for msg
         if (
-            cosmosMsgsJsonFiles.hasOwnProperty(key) &&
+            Object.prototype.hasOwnProperty.call(cosmosMsgsJsonFiles, key) &&
             key.includes(typeUrlSuffix)
         ) {
             return cosmosMsgsJsonFiles[key]
