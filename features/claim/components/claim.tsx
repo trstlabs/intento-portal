@@ -5,7 +5,7 @@ import PotLoading from "../assets/images/pot_loading.png";
 import PotEmpty from "../assets/images/pot_empty.png";
 import PotLight from "../assets/images/pot_light.png";
 import PotFull from "../assets/images/pot_full.png";
-import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1beta1/claim";
+import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
 
 export declare type ClaimAirdropProps = {
