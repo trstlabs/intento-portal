@@ -318,7 +318,7 @@
             },
             "additionalProperties": false,
             "type": "object",
-            "title": "Trustless Agent Execution Config",
+            "title": "Trustless Agent Config",
             "description": "config for trustless excution agent"
         }
     }

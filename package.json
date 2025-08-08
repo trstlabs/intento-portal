@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run generate:ibc-assets && next build",
+    "build-only": "next build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest --watch",

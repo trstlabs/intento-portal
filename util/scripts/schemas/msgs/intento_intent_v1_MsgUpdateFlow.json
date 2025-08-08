@@ -304,14 +304,14 @@
         "agentAddress": {
           "type": "string"
         },
-        "feeLimit": {
+        "feeCoinLimit": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
           "additionalProperties": false
         }
       },
       "additionalProperties": false,
       "type": "object",
-      "title": "Trustless Agent Execution Config",
+      "title": "Trustless Agent Config",
       "description": "config for trustless excution agent"
     }
   }
