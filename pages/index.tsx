@@ -398,7 +398,6 @@ export default function Home() {
 
       </Column>
 
-      {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout >
   )
 }
