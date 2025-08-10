@@ -11,7 +11,7 @@ import { QueryClientProvider } from 'react-query'
 import { RecoilRoot } from 'recoil'
 import { queryClient } from 'services/queryClient'
 // Try-catch for JSON import to catch any parsing errors
-let ibcAssetList = [];
+let ibcAssetList: IBCAssetInfo[] = [];
 try {
   const assetList = require('public/ibc_assets.json');
 
@@ -42,6 +42,7 @@ import { SignerOptions } from '@cosmos-kit/core'
 import { useEffect, useState, Suspense } from 'react';
 
 import Head from 'next/head';
+import { IBCAssetInfo } from '../hooks/useChainList'
 
 const toasterClassName = css({
   [media.sm]: {
@@ -85,9 +86,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
       })
 
       for (let asset of ibcAssetList) {
-
-
-        if (asset.name.includes("Local") || asset.name.toLowerCase().includes("intento") && process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.toLowerCase().includes("dev")) {
+        if (asset.name.toLowerCase().includes("devnet")) {
 
           const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
           chains.push({
