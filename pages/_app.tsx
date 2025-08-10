@@ -87,7 +87,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
       for (let asset of ibcAssetList) {
 
 
-        if (asset.name.includes("Local") || asset.name.toLowerCase().includes("intento") && process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.includes("dev")) {
+        if (asset.name.includes("Local") || asset.name.toLowerCase().includes("intento") && process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.toLowerCase().includes("dev")) {
 
           const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
           chains.push({
