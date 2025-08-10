@@ -10,7 +10,7 @@ import React, { useRef, useState } from 'react'
 
 import { QueryInput } from 'components//Input/QueryInput'
 
-type FlowInfosProps = {
+type FlowsProps = {
   readOnly?: boolean
   disabled?: boolean
   // codeId: number
@@ -18,14 +18,14 @@ type FlowInfosProps = {
   size?: 'small' | 'large'
 }
 
-export const FlowInfos = ({
+export const Flows = ({
   readOnly,
   // codeId,
   size = 'large',
-}: FlowInfosProps) => {
+}: FlowsProps) => {
   const wrapperRef = useRef<HTMLDivElement>()
   const inputRef = useRef<HTMLInputElement>()
-  // const infos = useFlowInfos(codeId)
+  // const infos = useFlows(codeId)
   const [isFlowListShowing, setFlowListShowing] = useState(false)
 
   // const { balance: availableAmount } = useTokenBalance(tokenSymbol)

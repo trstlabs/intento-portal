@@ -248,7 +248,7 @@ export default function Submit() {
             feeFunds: parsedData?.feeFunds || undefined,
             configuration: parsedData?.configuration || undefined,
             conditions: parsedData?.conditions || undefined,
-            TrustlessAgentConfig: parsedData?.TrustlessAgentConfig || undefined,
+            trustlessAgent: parsedData?.trustlessAgent || undefined,
             icaAddressForAuthZ: parsedData?.icaAddressForAuthZ || undefined,
             connectionId: parsedData?.connectionId || undefined,
             hostConnectionId: parsedData?.hostConnectionId || undefined
@@ -341,7 +341,7 @@ export default function Submit() {
           </div>
 
           {/* Wallet Button */}
-          {!flowInput?.TrustlessAgentConfig || flowInput?.TrustlessAgentConfig?.feeLimit?.[0]?.denom == 'uinto' && <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
+          {!flowInput?.trustlessAgent || flowInput?.trustlessAgent?.feeLimit?.[0]?.denom == 'uinto' && <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
             <WalletButton
               onClick={openView}
               connected={walletStatusesConnected && isClientConnected}

@@ -1,2 +1,2 @@
-export { FlowInfosModule } from './FlowInfosModule'
-export { FlowInfoBreakdown } from './FlowInfoBreakdown'
+export { FlowsModule } from './FlowsModule'
+export { FlowBreakdown } from './FlowBreakdown'

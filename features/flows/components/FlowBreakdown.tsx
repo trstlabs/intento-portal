@@ -21,7 +21,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateFlowParams } from '../../../types/trstTypes'
-import { FlowInfo, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Flow, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -46,18 +46,18 @@ import { Alert } from '../../../icons/Alert'
 import { EditExecutionSection } from './EditExecutionSection'
 
 
-type FlowInfoBreakdownProps = {
-  flowInfo: FlowInfo
+type FlowBreakdownProps = {
+  flow: Flow
   ibcInfo: IBCAssetInfo
 }
 
-export const FlowInfoBreakdown = ({
-  flowInfo,
+export const FlowBreakdown = ({
+  flow,
   ibcInfo,
 }: //size = 'large',
-  FlowInfoBreakdownProps) => {
+  FlowBreakdownProps) => {
 
-  const [icaAddress, _] = useGetICA(flowInfo.selfHostedIcaConfig?.connectionId, flowInfo.owner)
+  const [icaAddress, _] = useGetICA(flow.selfHostedIca?.connectionId, flow.owner)
 
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
@@ -69,12 +69,12 @@ export const FlowInfoBreakdown = ({
   )
 
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
-    flowInfo.feeAddress
+    flow.feeAddress
   )
   const isActive =
-    flowInfo.endTime &&
-    flowInfo.execTime &&
-    flowInfo.endTime.getTime() >= flowInfo.execTime.getTime() && flowInfo.endTime.getTime() > Date.now()
+    flow.endTime &&
+    flow.execTime &&
+    flow.endTime.getTime() >= flow.execTime.getTime() && flow.endTime.getTime() > Date.now()
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
 
@@ -127,7 +127,7 @@ export const FlowInfoBreakdown = ({
 
   useEffect(() => {
     async function fetchMsgs() {
-      const msgs = await transformFlowMsgs(flowInfo)
+      const msgs = await transformFlowMsgs(flow)
       if (msgs != undefined) {
         setTransformedMsgs(msgs)
       }
@@ -142,11 +142,11 @@ export const FlowInfoBreakdown = ({
   const [editExecution, setEditExecution] = useState(false)
   const [editMsgs, setEditMsgs] = useState([''])
   const flowParams: MsgUpdateFlowParams = {
-    id: Number(flowInfo.id),
-    owner: flowInfo.owner,
-    endTime: flowInfo.endTime.getTime(),
-    startAt: flowInfo.startTime ? flowInfo.startTime.getTime() : 0,
-    interval: Number(flowInfo.interval.seconds),
+    id: Number(flow.id),
+    owner: flow.owner,
+    endTime: flow.endTime.getTime(),
+    startAt: flow.startTime ? flow.startTime.getTime() : 0,
+    interval: Number(flow.interval.seconds),
 
   }
 
@@ -196,8 +196,8 @@ export const FlowInfoBreakdown = ({
     const updatedParams = {
       // ...flowParams,
       msgs: editMsgs,
-      owner: flowInfo.owner,
-      id: Number(flowInfo.id)
+      owner: flow.owner,
+      id: Number(flow.id)
     };
 
     console.log('Updating flow with params:', updatedParams);
@@ -209,21 +209,21 @@ export const FlowInfoBreakdown = ({
 
   function handleUpdateFlowConfigClick(config: ExecutionConfiguration) {
     let params: MsgUpdateFlowParams = {
-      id: Number(flowInfo.id),
+      id: Number(flow.id),
       configuration: config,
-      owner: flowInfo.owner,
+      owner: flow.owner,
     }
 
     setUpdatedFlowParams(params)
     return setRequestedUpdateFlow(true)
   }
 
-  function setUpdateFlowInfo(params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) {
+  function setUpdateFlow(params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) {
 
     // Only update the specific fields that changed
     let updateParams: MsgUpdateFlowParams = {
-      id: Number(flowInfo.id),
-      owner: flowInfo.owner,
+      id: Number(flow.id),
+      owner: flow.owner,
     };
 
     // Copy over the fields that are being updated
@@ -303,11 +303,11 @@ export const FlowInfoBreakdown = ({
         setEditMsgs(currentMsgs => {
           setUpdatedFlowParams(prevParams => ({
             ...prevParams,
-            id: Number(flowInfo.id),
+            id: Number(flow.id),
             msgs: [...currentMsgs],
-            owner: flowInfo.owner,
-            endTime: flowInfo.endTime.getTime(),
-            interval: Number(flowInfo.interval.seconds)
+            owner: flow.owner,
+            endTime: flow.endTime.getTime(),
+            interval: Number(flow.interval.seconds)
           }));
           return currentMsgs;
         });
@@ -337,9 +337,9 @@ export const FlowInfoBreakdown = ({
 
 
     let params: MsgUpdateFlowParams = {
-      id: Number(flowInfo.id),
+      id: Number(flow.id),
       msgs: newMsgs,
-      owner: flowInfo.owner,
+      owner: flow.owner,
     }
 
     setUpdatedFlowParams(params)
@@ -348,8 +348,8 @@ export const FlowInfoBreakdown = ({
   return (
     <>
       <InfoHeader
-        id={flowInfo.id.toString()}
-        owner={flowInfo.owner}
+        id={flow.id.toString()}
+        owner={flow.owner}
         good={isActive}
       />
       <Card
@@ -377,10 +377,10 @@ export const FlowInfoBreakdown = ({
               {isActive && <>🟢 </>}
             </Text>
             <Text variant="legend">
-              {flowInfo.label != '' ? (
-                <> {flowInfo.label}</>
+              {flow.label != '' ? (
+                <> {flow.label}</>
               ) : (
-                <>Flow {flowInfo.id.toString()}</>
+                <>Flow {flow.id.toString()}</>
               )}{' '}
             </Text>
             <Column align="center">
@@ -389,7 +389,7 @@ export const FlowInfoBreakdown = ({
                 <>
                   {' '}
                   {
-                    flowInfo.msgs[0]?.typeUrl?.split('.')
+                    flow.msgs[0]?.typeUrl?.split('.')
                       .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 
                       (transformedMsgs?.length > 0 ? safeJsonParse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
 
@@ -409,8 +409,8 @@ export const FlowInfoBreakdown = ({
           <Button as="a" css={{ marginRight: '$4' }}
             variant="secondary"
             target="__blank"
-            rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flowInfo.id}`} >Alerts</Button>
-          <FlowTransformButton flowInfo={flowInfo} initialChainID={chainId} />
+            rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flow.id}`} >Alerts</Button>
+          <FlowTransformButton flow={flow} initialChainID={chainId} />
         </Inline>
         <Row>
           <Inline
@@ -428,9 +428,9 @@ export const FlowInfoBreakdown = ({
                 Owner
               </Text>
 
-              <Text variant="body">{flowInfo.owner} </Text>
+              <Text variant="body">{flow.owner} </Text>
             </Column>
-            {flowInfo.selfHostedIcaConfig.portId && (
+            {flow.selfHostedIca.portId && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <Column
                 css={{ padding: '$3' }}
@@ -442,14 +442,14 @@ export const FlowInfoBreakdown = ({
                   IBC Port
                 </Text>
 
-                <Text variant="body">{flowInfo.selfHostedIcaConfig.portId} </Text>
+                <Text variant="body">{flow.selfHostedIca.portId} </Text>
               </Column>
             )}
 
           </Inline>
         </Row>
 
-        {icaAddress && icaBalance && flowInfo.selfHostedIcaConfig && (
+        {icaAddress && icaBalance && flow.selfHostedIca && (
           <Row>
             <Column
               style={{
@@ -555,7 +555,7 @@ export const FlowInfoBreakdown = ({
             </Tooltip>
             <Inline gap={2}>
               <Text css={{ wordBreak: 'break-all' }} variant="body">
-                {flowInfo.feeAddress}{' '}
+                {flow.feeAddress}{' '}
               </Text>
             </Inline>
             {!isFeeBalanceLoading && feeBalance > 0 && (
@@ -565,7 +565,7 @@ export const FlowInfoBreakdown = ({
               </Text>
             )}
 
-            {flowInfo.trustlessAgentConfig.agentAddress && (
+            {flow.trustlessAgent.agentAddress && (
               /* (icaActive && !isIcaActiveLoading ?  */
               <>
                 <Tooltip
@@ -578,9 +578,9 @@ export const FlowInfoBreakdown = ({
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
-                  {flowInfo.trustlessAgentConfig.agentAddress}{' '}<a
+                  {flow.trustlessAgent.agentAddress}{' '}<a
                     target={'_blank'}
-                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/hosted-account/${flowInfo.trustlessAgentConfig.agentAddress}`}
+                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/hosted-account/${flow.trustlessAgent.agentAddress}`}
                     rel="noopener noreferrer"
                   >
                     <b>View</b>
@@ -592,7 +592,7 @@ export const FlowInfoBreakdown = ({
             )}
           </Column>
         </Row>
-        {flowInfo.msgs.map((msg: any, msgIndex) => (
+        {flow.msgs.map((msg: any, msgIndex) => (
           <div key={msgIndex}>
             <Row>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -677,7 +677,7 @@ export const FlowInfoBreakdown = ({
           </div>
         ))}
 
-        {flowInfo.startTime.getTime() > 0 && (
+        {flow.startTime.getTime() > 0 && (
           <Row>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
@@ -697,7 +697,7 @@ export const FlowInfoBreakdown = ({
                   {!editExecution ? 'Edit' : 'Discard'}
                 </Button>
               </Inline>
-              {!editExecution && <> {flowInfo.startTime && (
+              {!editExecution && <> {flow.startTime && (
                 <>
                   <Tooltip
                     label={
@@ -710,7 +710,7 @@ export const FlowInfoBreakdown = ({
                   </Tooltip>
                   <Inline gap={2}>
                     <Text variant="body">
-                      {getRelativeTime(flowInfo.startTime.getTime())}
+                      {getRelativeTime(flow.startTime.getTime())}
                     </Text>
                   </Inline>
                 </>
@@ -726,10 +726,10 @@ export const FlowInfoBreakdown = ({
                 </Tooltip>
                 <Inline gap={2}>
                   <Text variant="body">
-                    {getRelativeTime(flowInfo.execTime.getTime())}
+                    {getRelativeTime(flow.execTime.getTime())}
                   </Text>
                 </Inline>
-                {flowInfo.interval.seconds.toString() != '0' && (
+                {flow.interval.seconds.toString() != '0' && (
                   <>
                     {' '}
                     <Tooltip
@@ -741,12 +741,12 @@ export const FlowInfoBreakdown = ({
                     </Tooltip>
                     <Inline gap={2}>
                       <Text variant="body">
-                        {getDuration(Number(flowInfo.interval.seconds))}
+                        {getDuration(Number(flow.interval.seconds))}
                       </Text>
                     </Inline>
                   </>
                 )}
-                {flowInfo.endTime.getTime() && (
+                {flow.endTime.getTime() && (
                   <>
                     <Tooltip
                       label={'End time is the time execution ends'}
@@ -757,7 +757,7 @@ export const FlowInfoBreakdown = ({
                     </Tooltip>
                     <Inline gap={2}>
                       <Text variant="body">
-                        {getRelativeTime(flowInfo.endTime.getTime())}
+                        {getRelativeTime(flow.endTime.getTime())}
                       </Text>
                     </Inline>
                   </>
@@ -766,7 +766,7 @@ export const FlowInfoBreakdown = ({
               {editExecution && (
                 <EditExecutionSection
                   updatedFlowParams={updatedFlowParams}
-                  setUpdateFlowInfo={setUpdateFlowInfo}
+                  setUpdateFlow={setUpdateFlow}
                   updateOnButtonClick={true}
                 />
               )}
@@ -780,7 +780,7 @@ export const FlowInfoBreakdown = ({
         )}
 
 
-        {flowInfo.conditions.comparisons && flowInfo.conditions.comparisons.map((comparison) => (
+        {flow.conditions.comparisons && flow.conditions.comparisons.map((comparison) => (
           <Row>
             <Column gap={8} align="flex-start" justifyContent="flex-start">
 
@@ -821,7 +821,7 @@ export const FlowInfoBreakdown = ({
             </Column>
           </Row>
         ))}
-        {flowInfo.conditions.feedbackLoops && flowInfo.conditions.feedbackLoops.map((feedbackLoop) => (
+        {flow.conditions.feedbackLoops && flow.conditions.feedbackLoops.map((feedbackLoop) => (
           <><Row>
             <Column gap={4} align="flex-start" justifyContent="flex-start">
               <Tooltip
@@ -865,12 +865,12 @@ export const FlowInfoBreakdown = ({
           </>
 
         ))}
-        {flowInfo.configuration && (
+        {flow.configuration && (
           showConfiguration()
 
         )}
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {flowInfo.conditions.skipOnFailureOf.length != 0 && (
+          {flow.conditions.skipOnFailureOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
@@ -883,13 +883,13 @@ export const FlowInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {flowInfo.conditions.skipOnFailureOf}
+                {flow.conditions.skipOnFailureOf}
               </Text>
             </Row>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {flowInfo.conditions.skipOnSuccessOf.length != 0 && (
+          {flow.conditions.skipOnSuccessOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
@@ -902,13 +902,13 @@ export const FlowInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {flowInfo.conditions.skipOnSuccessOf}
+                {flow.conditions.skipOnSuccessOf}
               </Text>
             </Row>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {flowInfo.conditions.stopOnFailureOf.length != 0 && (
+          {flow.conditions.stopOnFailureOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
@@ -921,13 +921,13 @@ export const FlowInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {flowInfo.conditions.stopOnFailureOf}
+                {flow.conditions.stopOnFailureOf}
               </Text>
             </Row>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
-          {flowInfo.conditions.stopOnSuccessOf.length != 0 && (
+          {flow.conditions.stopOnSuccessOf.length != 0 && (
             <Row>
               <Tooltip
                 label={
@@ -940,7 +940,7 @@ export const FlowInfoBreakdown = ({
               </Tooltip>
 
               <Text variant="body">
-                {flowInfo.conditions.stopOnSuccessOf}
+                {flow.conditions.stopOnSuccessOf}
               </Text>
             </Row>
           )}
@@ -951,7 +951,7 @@ export const FlowInfoBreakdown = ({
 
 
         {
-          flowInfo.updateHistory.length != 0 && (
+          flow.updateHistory.length != 0 && (
             <>
               {' '}
               <Row>
@@ -963,8 +963,8 @@ export const FlowInfoBreakdown = ({
                       Update History
                     </Text>
                   </Inline>
-                  {flowInfo.updateHistory?.length ? (
-                    flowInfo.updateHistory.map((entry: any, ei) => {
+                  {flow.updateHistory?.length ? (
+                    flow.updateHistory.map((entry: any, ei) => {
                       const date = new Date(Number(entry.seconds) * 1000);  // Convert seconds to milliseconds
                       return (
                         <div key={ei}>
@@ -987,7 +987,7 @@ export const FlowInfoBreakdown = ({
           )
         }
         <FlowHistory 
-          id={flowInfo.id.toString()} 
+          id={flow.id.toString()} 
           transformedMsgs={transformedMsgs}
         />
 
@@ -1017,7 +1017,7 @@ export const FlowInfoBreakdown = ({
           </Button>
         </Inline>
         {editConfig ?
-          <Configuration config={flowInfo.configuration}
+          <Configuration config={flow.configuration}
             disabled={false}
             onChange={handleUpdateFlowConfigClick} />
           :
@@ -1031,7 +1031,7 @@ export const FlowInfoBreakdown = ({
             </Tooltip>
 
             <Text variant="header">
-              {flowInfo.configuration.saveResponses ? '✔' : '✖'}
+              {flow.configuration.saveResponses ? '✔' : '✖'}
             </Text>
           </>
             <>
@@ -1043,7 +1043,7 @@ export const FlowInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flowInfo.configuration.updatingDisabled ? '✔' : '✖'}
+                {flow.configuration.updatingDisabled ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -1055,7 +1055,7 @@ export const FlowInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flowInfo.configuration.stopOnFailure ? '✔' : '✖'}
+                {flow.configuration.stopOnFailure ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -1067,7 +1067,7 @@ export const FlowInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flowInfo.configuration.stopOnSuccess ? '✔' : '✖'}
+                {flow.configuration.stopOnSuccess ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -1079,7 +1079,7 @@ export const FlowInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flowInfo.configuration.stopOnTimeout ? '✔' : '✖'}
+                {flow.configuration.stopOnTimeout ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -1091,7 +1091,7 @@ export const FlowInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flowInfo.configuration.fallbackToOwnerBalance ? '✔' : '✖'}
+                {flow.configuration.fallbackToOwnerBalance ? '✔' : '✖'}
               </Text>
             </>
             <>
@@ -1103,7 +1103,7 @@ export const FlowInfoBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flowInfo.conditions.useAndForComparisons ? '✔' : '✖'}
+                {flow.conditions.useAndForComparisons ? '✔' : '✖'}
               </Text>
             </>
           </>

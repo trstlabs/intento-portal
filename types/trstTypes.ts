@@ -15,7 +15,7 @@ export class FlowInput {
   feeFunds?: Coin
   configuration?: ExecutionConfiguration
   conditions?: ExecutionConditions
-  TrustlessAgentConfig?: TrustlessAgentConfig
+  trustlessAgent?: TrustlessAgentConfig
   icaAddressForAuthZ?: string
   connectionId?: string
   hostConnectionId?: string

@@ -83,14 +83,14 @@ type EditExecutionSectionProps = {
   startAt?: number
   interval?: number
   endTime?: number
-  setUpdateFlowInfo: (params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) => void
+  setUpdateFlow: (params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) => void
   isExecutingUpdateFlow?: boolean
   updateOnButtonClick?: boolean
 }
 
 export function EditExecutionSection({
   updatedFlowParams,
-  setUpdateFlowInfo,
+  setUpdateFlow,
   isExecutingUpdateFlow,
   updateOnButtonClick = false,
 }: EditExecutionSectionProps) {
@@ -155,7 +155,7 @@ export function EditExecutionSection({
       if (value !== undefined && value !== null) {
         params[field] = field === 'startAt' ? (value instanceof Date ? value.getTime() : value) : value;
       }
-      setUpdateFlowInfo(params);
+      setUpdateFlow(params);
     }
   };
 
@@ -264,7 +264,7 @@ export function EditExecutionSection({
         <Button
           disabled={isExecutingUpdateFlow}
           onClick={() => {
-            setUpdateFlowInfo({
+            setUpdateFlow({
               startAt: startAt ? startAt.getTime() : undefined,
               interval,
               endTime: endTime ? endTime.getTime() : undefined,

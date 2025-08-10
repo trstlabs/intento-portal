@@ -10,13 +10,13 @@ import {
 import Link from 'next/link'
 
 
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
 import { useGetConnectionIDFromHostAddress } from '../../../hooks/useICA'
 
 
-export declare type flowInfoWithDetails = {
-  flowInfo: FlowInfo | null
+export declare type flowWithDetails = {
+  flow: Flow | null
   isMyFlow?: boolean
 }
 
@@ -38,8 +38,8 @@ const SkeletonLoader = styled('div', {
   },
 })
 
-export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
-  if (!flowInfo) {
+export const FlowCard = ({ flow }: flowWithDetails) => {
+  if (!flow) {
     return (
       <Card variant="secondary" css={{ minHeight: '320px', height: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '$colors$dark5', }}>
         <CardContent size="medium" css={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -54,13 +54,13 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
       </Card>
     )
   }
-  //const flowInfoAmino = FlowInfo.toAmino(flowInfo)
-  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flowInfo.trustlessAgentConfig?.agentAddress)
-  const ibcInfo = useIBCAssetInfoFromConnection(flowInfo.selfHostedIcaConfig.connectionId || hostedConnectionID)
+  //const flowAmino = Flow.toAmino(flow)
+  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flow.trustlessAgent?.agentAddress)
+  const ibcInfo = useIBCAssetInfoFromConnection(flow.selfHostedIca.connectionId || hostedConnectionID)
 
   const now = Date.now()
-  const endTime = flowInfo.endTime?.getTime()
-  const execTime = flowInfo.execTime?.getTime()
+  const endTime = flow.endTime?.getTime()
+  const execTime = flow.execTime?.getTime()
 
   const isActive = endTime && execTime &&
     endTime > execTime &&
@@ -71,7 +71,7 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
   const notStarted = execTime && execTime > now;
 
   return (
-    <Link href={`/flows/${flowInfo.id.toString()}`} passHref>
+    <Link href={`/flows/${flow.id.toString()}`} passHref>
       <Card variant="secondary" active={isActive} css={{ minHeight: '240px', height: '100%', display: 'flex', flexDirection: 'column' }}>
         <CardContent size="medium" css={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Column align="center" css={{ flex: 1 }}>
@@ -92,7 +92,7 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
             </StyledDivForTokenLogos>
 
             <Column gap={2} css={{ width: '100%', padding: '0 $8' }}>
-              {flowInfo.label ? (
+              {flow.label ? (
                 <StyledText
                   variant="subtitle"
                   align="center"
@@ -104,7 +104,7 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
                     justifyContent: 'center'
                   }}
                 >
-                  {flowInfo.label.length < 35 ? flowInfo.label : flowInfo.label.substring(0, 32) + '...'}
+                  {flow.label.length < 35 ? flow.label : flow.label.substring(0, 32) + '...'}
                 </StyledText>
               ) : (
                 <StyledText
@@ -118,18 +118,18 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
                     justifyContent: 'center'
                   }}
                 >
-                  Flow {flowInfo.id.toString()}
+                  Flow {flow.id.toString()}
                 </StyledText>
               )}
-              {flowInfo.msgs && (
+              {flow.msgs && (
                 <Column align="center" gap={2}>
                   <StyledText variant="caption" css={{ padding: '$2 0' }}>
                     <>
-                      {flowInfo.trustlessAgentConfig?.agentAddress ? 'Hosted' :
-                        flowInfo.selfHostedIcaConfig?.connectionId ? 'Self-Hosted' : 'Local'
+                      {flow.trustlessAgent?.agentAddress ? 'Hosted' :
+                        flow.selfHostedIca?.connectionId ? 'Self-Hosted' : 'Local'
                       } {' '}| {' '}
                       {
-                        flowInfo.msgs[0]?.typeUrl?.split('.')
+                        flow.msgs[0]?.typeUrl?.split('.')
                           .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 'Unknown'
 
                       }
@@ -157,9 +157,9 @@ export const FlowCard = ({ flowInfo }: flowInfoWithDetails) => {
               {isActive ? (
                 <> 🟢 Active Flow {ibcInfo && <>on {ibcInfo.name}</>}</>
               ) : hasEnded ? (
-                <> Completed {flowInfo.endTime.toLocaleString()}</>
+                <> Completed {flow.endTime.toLocaleString()}</>
               ) : notStarted ? (
-                <>⏳ Starts {flowInfo.execTime.toLocaleString()}</>
+                <>⏳ Starts {flow.execTime.toLocaleString()}</>
               ) : (
                 <>⏸️ Inactive</>
               )}

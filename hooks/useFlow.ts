@@ -11,11 +11,11 @@ import { PageRequest } from 'intentojs/dist/codegen/cosmos/base/query/v1beta1/pa
 import { useRecoilValue } from 'recoil'
 import { walletState } from '../state/atoms/walletAtoms'
 
-export const useFlowInfos = (limit: number, key: any) => {
+export const useFlows = (limit: number, key: any) => {
   const client = useIntentoRpcClient()
 
   const { data, isLoading } = useQuery(
-    `useFlowInfos/${key}`,
+    `useFlows/${key}`,
     async () => {
       const pageRequest = PageRequest.fromPartial({
         limit: BigInt(limit),
@@ -27,11 +27,11 @@ export const useFlowInfos = (limit: number, key: any) => {
         pagination: pageRequest,
       })
 
-      // Transform each msg in flowInfos
-      const flowInfos = resp.flowInfos.map((flowInfo) => {
+      // Transform each msg in flows
+      const flows = resp.flows.map((flow) => {
         return {
-          ...flowInfo,
-          msgs: flowInfo.msgs.map((msg) => {
+          ...flow,
+          msgs: flow.msgs.map((msg) => {
             //GlobalDecoderRegistry.unwrapAny(msg.value)
             // let wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             // wrappedMsg.typeUrl =
@@ -59,7 +59,7 @@ export const useFlowInfos = (limit: number, key: any) => {
         }
       })
 
-      return { flowInfos: flowInfos, pagination: resp.pagination }
+      return { flows: flows, pagination: resp.pagination }
     },
     {
       enabled: Boolean(client && client.intento),
@@ -74,11 +74,11 @@ export const useFlowInfos = (limit: number, key: any) => {
   return [data, isLoading] as const
 }
 
-export const useFlowInfosByOwner = (limit: number, key: any) => {
+export const useFlowsByOwner = (limit: number, key: any) => {
   const client = useIntentoRpcClient()
   const { address } = useRecoilValue(walletState)
   const { data, isLoading } = useQuery(
-    'useFlowInfosByOwner',
+    'useFlowsByOwner',
     async () => {
       const pageRequest = PageRequest.fromPartial({
         limit: BigInt(limit),
@@ -93,11 +93,11 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
           pagination: pageRequest,
         })
 
-      // Transform each msg in flowInfos
-      const flowInfos = resp.flowInfos.map((flowInfo) => {
+      // Transform each msg in flows
+      const flows = resp.flows.map((flow) => {
         return {
-          ...flowInfo,
-          msgs: flowInfo.msgs.map((msg) => {
+          ...flow,
+          msgs: flow.msgs.map((msg) => {
             //GlobalDecoderRegistry.unwrapAny(msg.value)
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
@@ -114,7 +114,7 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
         }
       })
 
-      return { flowInfos: flowInfos, pagination: resp.pagination }
+      return { flows: flows, pagination: resp.pagination }
     },
     {
       enabled: Boolean(client && client.intento),
@@ -127,7 +127,7 @@ export const useFlowInfosByOwner = (limit: number, key: any) => {
   return [data, isLoading] as const
 }
 
-export const useFlowInfo = (id) => {
+export const useFlow = (id) => {
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
     ['flowId', id],
@@ -135,11 +135,11 @@ export const useFlowInfo = (id) => {
       if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
       }
-      const flowInfo = (await client.intento.intent.v1.flow({ id }))
-        .flowInfo
+      const flow = (await client.intento.intent.v1.flow({ id }))
+        .flow
       return {
-        ...flowInfo,
-        msgs: flowInfo.msgs.map((msg) => {
+        ...flow,
+        msgs: flow.msgs.map((msg) => {
           const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
           wrappedMsg.typeUrl =
             wrappedMsg.typeUrl ==

@@ -6,15 +6,15 @@ import {
     TransactionStatus,
     transactionStatusState,
 } from 'state/atoms/transactionAtoms'
-import { useFlowInfos } from '../../../hooks/useFlowInfo'
-import { FlowInfos } from './FlowInfos'
+import { useFlows } from '../../../hooks/useFlow'
+import { Flows } from './Flows'
 
-export const FlowInfosModule = () => {
+export const FlowsModule = () => {
 
     const transactionStatus = useRecoilValue(transactionStatusState)
 
     /* fetch token list and set initial state */
-    const [flowList, isFlowListLoading] = useFlowInfos(Number(100), undefined)
+    const [flowList, isFlowListLoading] = useFlows(Number(100), undefined)
     useEffect(() => {
 
     }, [flowList])
@@ -28,7 +28,7 @@ export const FlowInfosModule = () => {
     return (
         <>
             <StyledDivForWrapper>
-                <FlowInfos
+                <Flows
 
                     onChange={() => {
                     }}

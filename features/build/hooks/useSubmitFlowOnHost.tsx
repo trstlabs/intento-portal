@@ -116,7 +116,7 @@ export const useSubmitFlowOnHost = ({
         // Determine grantee address - use propGrantee if provided, otherwise fall back to flowInput values
         const granteeAddress = propGrantee ||
           flowInput.icaAddressForAuthZ ||
-          flowInput.TrustlessAgentConfig?.agentAddress;
+          flowInput.trustlessAgent?.agentAddress;
 
         if (!granteeAddress) {
           const errorMsg = 'No grantee address available for authz grants. Please check your connection and try again.';
@@ -212,7 +212,7 @@ export const useSubmitFlowOnHost = ({
             ? Math.floor((Date.now() + flowInput.startTime) / 1000)
             : "0",
           interval: flowInput.interval ? `${Math.ceil(flowInput.interval / 1000)}s` : '0',
-          trustless_agent: flowInput.TrustlessAgentConfig?.agentAddress || "",
+          trustless_agent: flowInput.trustlessAgent?.agentAddress || "",
           cid: flowInput.connectionId || "",
           stop_on_fail: flowInput.configuration.stopOnFailure.toString(),
           stop_on_timeout: flowInput.configuration.stopOnTimeout.toString(),
@@ -221,7 +221,7 @@ export const useSubmitFlowOnHost = ({
           update_disabled: flowInput.configuration.updatingDisabled.toString(),
           save_responses: flowInput.configuration.saveResponses.toString(),
           conditions: flowInput.conditions,
-          fee_limit: flowInput.TrustlessAgentConfig?.feeLimit
+          fee_limit: flowInput.trustlessAgent?.feeLimit
             ?.map(f => `${f.amount}${f.denom}`)
             .join(','),
           label: flowInput.label,
@@ -229,7 +229,7 @@ export const useSubmitFlowOnHost = ({
       })
 
       // Use provided fee or fallback to the one from flowInput
-      const feeAmount = propFee?.amount || flowInput.TrustlessAgentConfig?.feeLimit?.[0]?.amount?.toString() || '0'
+      const feeAmount = propFee?.amount || flowInput.trustlessAgent?.feeLimit?.[0]?.amount?.toString() || '0'
       const feeDenom = propFee?.denom || ibcAssetInfo.denom
 
       // Create MsgTransfer to send tokens to the host chain

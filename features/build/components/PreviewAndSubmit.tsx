@@ -232,7 +232,7 @@ import {
   
     const [_chainHasIAModule, setChainHasIAModule] = useState(true)
   
-    const shouldTransferFromHost = flowInput.TrustlessAgentConfig?.feeLimit?.[0]?.denom != 'uinto'
+    const shouldTransferFromHost = flowInput.trustlessAgent?.feeLimit?.[0]?.denom != 'uinto'
     // Get the ICA address from the flow input
     //const icaAddressForGrants = flowInput.icaAddressForAuthZ;
   
@@ -270,7 +270,7 @@ import {
   
     const [icaAddress, _isIcaLoading] = useGetICA(flowInput.connectionId, '')
   
-    const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.TrustlessAgentConfig.agentAddress || "")
+    const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.trustlessAgent?.agentAddress || "")
     const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId || "")
   
     const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(

@@ -2,10 +2,10 @@ import { AppLayout } from 'components'
 import { Button, Column, IconWrapper, Inline, media, Spinner, styled, Text } from 'junoblocks'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
-import { useFlowInfos } from 'hooks/useFlowInfo'
+import { useFlows } from 'hooks/useFlow'
 import { FlowCard } from '../../../features/flows/components/FlowCard'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 export default function FlowsByOwner() {
   const router = useRouter()
@@ -15,13 +15,13 @@ export default function FlowsByOwner() {
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   
-  const [allFlows, isLoading] = useFlowInfos(flowsPerPage, paginationKey)
-  const [filteredFlows, setFilteredFlows] = useState<Array<FlowInfo>>([])
+  const [allFlows, isLoading] = useFlows(flowsPerPage, paginationKey)
+  const [filteredFlows, setFilteredFlows] = useState<Array<Flow>>([])
   
   useEffect(() => {
-    if (allFlows?.flowInfos) {
+    if (allFlows?.flows) {
       setFilteredFlows(
-        allFlows.flowInfos.filter(
+        allFlows.flows.filter(
           (flow) => flow.owner === owner
         )
       )
@@ -126,14 +126,14 @@ export default function FlowsByOwner() {
               Array(8).fill(0).map((_, index) => (
                 <FlowCard
                   key={`placeholder-${index}`}
-                  flowInfo={null}
+                  flow={null}
                 />
               ))
             ) : filteredFlows.length > 0 ? (
-              filteredFlows.map((flowInfo, index) => (
+              filteredFlows.map((flow, index) => (
                 <FlowCard
-                  key={`${flowInfo.id}-${index}`}
-                  flowInfo={flowInfo}
+                  key={`${flow.id}-${index}`}
+                  flow={flow}
                 />
               ))
             ) : (

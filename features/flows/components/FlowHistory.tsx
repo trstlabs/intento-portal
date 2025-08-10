@@ -12,7 +12,7 @@ import React from 'react'
 
 import { GlobalDecoderRegistry } from 'intentojs'
 import { convertMicroDenomToDenom } from 'util/conversion'
-import { useFlowHistory } from '../../../hooks/useFlowInfo'
+import { useFlowHistory } from '../../../hooks/useFlow'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
 

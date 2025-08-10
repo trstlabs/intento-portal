@@ -167,7 +167,7 @@ export const SubmitFlowDialog = ({
       feeFunds: {
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
-      TrustlessAgentConfig: {
+      trustlessAgent: {
         agentAddress: trustlessAgent?.agentAddress, feeLimit: trustlessAgent?.feeConfig.feeCoinsSupported
       },
       label: flowLabel,
@@ -213,7 +213,7 @@ export const SubmitFlowDialog = ({
 
               <EditExecutionSection
                 updatedFlowParams={executionParams}
-                setUpdateFlowInfo={setUpdateExecutionParams}
+                setUpdateFlow={setUpdateExecutionParams}
               />
 
             </Card>

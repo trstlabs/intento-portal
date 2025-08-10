@@ -1,6 +1,6 @@
-// import { FlowInfo } from 'queries/useQueryFlows'
+// import { Flow } from 'queries/useQueryFlows'
 import { useMemo } from 'react'
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 export type SortParameters =
   | 'end_time'
@@ -11,7 +11,7 @@ export type SortParameters =
 export type SortDirections = 'asc' | 'desc'
 
 export type InfoArgs = {
-  infos: FlowInfo[]
+  infos: Flow[]
   address: String
 }
 
@@ -31,8 +31,8 @@ export const useSortFlows = ({
   filter,
   sortBy,
 }: UseSortFlowsArgs) => {
-  return useMemo((): readonly [Array<FlowInfo>, boolean] => {
-    const sortedFlows = [] as Array<FlowInfo>
+  return useMemo((): readonly [Array<Flow>, boolean] => {
+    const sortedFlows = [] as Array<Flow>
 
     if (!infoArgs.infos?.length) {
       return [sortedFlows, false]
@@ -51,7 +51,7 @@ export const useSortFlows = ({
 }
 
 function sortFlows(
-  flows: Array<FlowInfo>,
+  flows: Array<Flow>,
   sortBy?: UseSortFlowsArgs['sortBy']
 ) {
   if (!sortBy) return flows
@@ -123,7 +123,7 @@ function sortFlows(
 }
 
 function filterFlowsByAcc(
-  flows: Array<FlowInfo>,
+  flows: Array<Flow>,
   filter?: UseSortFlowsArgs['filter']
 ) {
   if (!filter || !filter.owner) return flows
