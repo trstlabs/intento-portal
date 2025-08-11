@@ -30,7 +30,6 @@ import {
   import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
   import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
   
-  import { sleep } from '../../../localtrst/utils'
   import { useIBCAssetInfoByChainID } from 'hooks/useIBCAssetInfo'
   import { useChainInfoByChainID } from 'hooks/useChainList'
   import { FlowInput } from '../../../types/trstTypes'
@@ -432,7 +431,7 @@ import {
   
       setChainHasIAModule(chainId === 'INTO')
   
-      await sleep(200)
+      await new Promise((resolve) => setTimeout(resolve, 200))
       connectExternalWallet(null)
     }
   
