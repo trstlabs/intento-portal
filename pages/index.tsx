@@ -85,14 +85,14 @@ export default function Home() {
 
 
   const FeatureBadge = styled('div', {
-
     padding: '6px 12px',
     borderRadius: '20px',
-    fontSize: '14px',
+    fontSize: '12px',
     display: 'inline-flex',
     alignItems: 'center',
     gap: '4px',
     backdropFilter: 'blur(10px)',
+
     border: '1px solid rgba(255, 255, 255, 0.1)',
     variants: {
       variant: {
