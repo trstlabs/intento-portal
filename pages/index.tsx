@@ -88,7 +88,7 @@ export default function Home() {
 
     padding: '6px 12px',
     borderRadius: '20px',
-    fontSize: '14px',
+    fontSize: '12px',
     display: 'inline-flex',
     alignItems: 'center',
     gap: '4px',
