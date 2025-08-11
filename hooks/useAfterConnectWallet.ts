@@ -3,7 +3,7 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
-// import { addLocalChainToKeplr } from './useConnectIBCWallet'
+import { addLocalChainToKeplr } from './useConnectIBCWallet'
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2],
 ) => {
@@ -17,8 +17,17 @@ export const useAfterConnectWallet = (
       state: WalletStatusType.connecting,
     }))
     console.log(username, address)
+
     try {
       if (address) {
+        if (process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.toLowerCase().includes("devnet")) {
+          const added = await addLocalChainToKeplr(process.env.NEXT_PUBLIC_INTO_CHAIN_ID);
+          if (added) {
+            console.log('Chain added to Keplr, waiting for chain to be ready...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+
         const chainClient = await getSigningStargateClient()
         if (chainClient) {
           setWalletState({
