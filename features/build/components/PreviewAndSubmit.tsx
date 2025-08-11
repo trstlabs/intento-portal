@@ -39,7 +39,7 @@ import {
   import { Configuration } from './Conditions/Configuration'
   import { StepIcon } from '../../../icons/StepIcon'
   import { Conditions } from './Conditions/Conditions'
-  import { convertDenomToMicroDenom } from '../../../util/conversion'
+  import { convertDenomToMicroDenom, formatDenom } from '../../../util/conversion'
   
   import { SchedulingSection } from './SchedulingSection'
   import TinyJsonViewer from './Editor/TinyJsonViewer'
@@ -95,15 +95,6 @@ import {
     // Check if on mobile - use prop if provided, otherwise use internal check
     const internalIsMobile = useMedia('sm')
     const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
-  
-    // Format denom by removing 'u' prefix and capitalizing
-    const formatDenom = (denom: string): string => {
-      // For non-IBC denoms, handle the 'u' prefix if it exists
-      if (/^u[a-z]+$/.test(denom)) {
-        return denom.slice(1).toUpperCase()
-      }
-      return denom.toUpperCase()
-    }
   
     // Memoized function to resolve denom with multiple fallback strategies
     // Returns an object with both the display symbol and the original denom

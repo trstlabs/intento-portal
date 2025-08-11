@@ -38,3 +38,14 @@ export const formatTokenName = (name: string) => {
   }
   return ''
 }
+
+
+// Format denom by removing 'u' prefix and capitalizing
+export const formatDenom = (denom: string): string => {
+  // For non-IBC denoms, handle the 'u' prefix if it exists
+  if (/^u[a-z]+$/.test(denom)) {
+    return denom.slice(1).toUpperCase()
+  }
+  return denom.toUpperCase()
+}
+
