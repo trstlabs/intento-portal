@@ -20,13 +20,7 @@ export const useAfterConnectWallet = (
 
     try {
       if (address) {
-        if (process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.toLowerCase().includes("devnet")) {
-          const added = await addLocalChainToKeplr(process.env.NEXT_PUBLIC_INTO_CHAIN_ID);
-          if (added) {
-            console.log('Chain added to Keplr, waiting for chain to be ready...');
-            await new Promise(resolve => setTimeout(resolve, 1000));
-          }
-        }
+
 
         const chainClient = await getSigningStargateClient()
         if (chainClient) {
@@ -41,6 +35,13 @@ export const useAfterConnectWallet = (
           // Handle the case where the client could not be obtained
           throw new Error('Failed to obtain the client')
         }
+      } else if (process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.toLowerCase().includes("devnet")) {
+        const added = await addLocalChainToKeplr(process.env.NEXT_PUBLIC_INTO_CHAIN_ID);
+        if (added) {
+          console.log('Chain added to Keplr, waiting for chain to be ready...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
       }
     } catch (error) {
       console.error('Error connecting the wallet:', error)
