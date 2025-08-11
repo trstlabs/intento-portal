@@ -26,13 +26,13 @@ export default function Flow() {
   const isMobile = useMedia('sm')
 
   const [flow, isLoading] = useFlow(id)
-  const [hostedICA, _isTrustlessAgentICALoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flow?.trustlessAgent?.agentAddress)
+  const [trustlessAgentICA, _isTrustlessAgentICALoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flow?.trustlessAgent?.agentAddress)
 
   const connectionId = flow ? (
     flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== '' 
       ? flow.selfHostedIca.connectionId 
-      : flow.trustlessAgent && hostedICA?.icaConfig?.connectionId 
-      ? hostedICA.icaConfig.connectionId 
+      : flow.trustlessAgent && trustlessAgentICA?.icaConfig?.connectionId 
+      ? trustlessAgentICA.icaConfig.connectionId 
       : ''
   ) : ''
 

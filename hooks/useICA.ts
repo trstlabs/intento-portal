@@ -129,7 +129,7 @@ export const useGetConnectionIDFromHostAddress = (address: string) => {
   return [connectionID, isLoading] as const
 }
 
-export const useGetHostICAAddress = (accAddr: string, connectionId: string) => {
+export const useGetTrustlessAgentICAAddress = (accAddr: string, connectionId: string) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `hostInterchainAccount/${connectionId}/${accAddr}`,

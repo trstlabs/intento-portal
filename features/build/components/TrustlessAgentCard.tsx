@@ -17,13 +17,13 @@ import { useIBCAssetList } from '../../../hooks/useChainList' // <-- import hook
 
 interface TrustlessAgentCardProps {
   trustlessAgent: TrustlessAgent
-  hostedICAAddress: string
+  trustlessAgentICAAddress: string
   flowInput: FlowInput
 }
 
 export const TrustlessAgentCard = ({
   trustlessAgent,
-  hostedICAAddress,
+  trustlessAgentICAAddress,
   flowInput
 }: TrustlessAgentCardProps) => {
   const [showICAInfo, setShowICAInfo] = useState(false)
@@ -33,12 +33,12 @@ export const TrustlessAgentCard = ({
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
 
   const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
-    hostedICAAddress,
+    trustlessAgentICAAddress,
     flowInput
   )
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } =
     useCreateAuthzGrant({
-      grantee: hostedICAAddress,
+      grantee: trustlessAgentICAAddress,
       grantInfos: authzGrants
         ? authzGrants.filter((grant) => !grant.hasGrant)
         : [],
@@ -104,11 +104,11 @@ export const TrustlessAgentCard = ({
           <Text variant="legend">Address</Text>
           {isMobile ? (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
-              {hostedICAAddress.substring(0, 33) + '..'}
+              {trustlessAgentICAAddress.substring(0, 33) + '..'}
             </Text>
           ) : (
             <Text wrap={true} css={{ padding: '$4' }} variant="caption">
-              {hostedICAAddress}
+              {trustlessAgentICAAddress}
             </Text>
           )}
           <Divider offsetY="$4" />

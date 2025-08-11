@@ -80,7 +80,7 @@ export const useConnectIBCWallet = (
       console.log('Ensuring correct chain is selected in Keplr...');
 
       // Always try to add/suggest the chain to Keplr for local/dev environments
-      if (['cosmostest'].some(
+      if (['cosmosdev'].some(
         chain => (assetInfo.registry_name || '').toLowerCase().includes(chain)
       )) {
         console.log('Adding/suggesting chain to Keplr...');

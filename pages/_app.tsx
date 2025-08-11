@@ -179,12 +179,12 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
                     rpc: [process.env.NEXT_PUBLIC_INTO_RPC],
                     rest: [process.env.NEXT_PUBLIC_INTO_API],
                   },
-                  cosmostest: {
+                  cosmosdev: {
                     isLazy: true,
                     rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
                     rest: [process.env.NEXT_PUBLIC_ATOM_API],
                   },
-                  osmosis: {
+                  osmosisdev: {
                     isLazy: true,
                     rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
                     rest: [process.env.NEXT_PUBLIC_OSMO_API],

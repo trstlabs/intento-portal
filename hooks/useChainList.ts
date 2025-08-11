@@ -104,9 +104,9 @@ export const useChainInfoByChainID = (chainId: string) => {
   }
   
   // As a last resort, try to find by chain name (for backward compatibility)
-  const fallbackChain = chains.find((chain) => chain.chain_name === 'cosmostest')
+  const fallbackChain = chains.find((chain) => chain.chain_name === 'cosmosdev')
   if (fallbackChain) {
-    console.warn(`Chain with ID ${chainId} not found, falling back to cosmostest`)
+    console.warn(`Chain with ID ${chainId} not found, falling back to cosmosdev`)
     return transformChain(fallbackChain)
   }
   

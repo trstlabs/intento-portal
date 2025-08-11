@@ -21,7 +21,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
-  useGetTrustlessAgentICAByConnectionID, useGetHostICAAddress,
+  useGetTrustlessAgentICAByConnectionID, useGetTrustlessAgentICAAddress,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -79,13 +79,13 @@ export const BuildComponent = ({
     chainIsConnected
   )
   const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByConnectionID(flowInput.connectionId)
-  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId)
+  const [trustlessAgentICA, _istrustlessAgentICALoading] = useGetTrustlessAgentICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId)
 
   const refetchTrustlessAgentICA = useRefetchQueries([
     `hostInterchainAccount/${trustlessAgent?.agentAddress || ""}/${flowInput.connectionId}`,
   ])
   const refetchAuthZForTrustlessAgentICA = useRefetchQueries(
-    `userAuthZGrants / ${hostedICA}`
+    `userAuthZGrants / ${trustlessAgentICA}`
   )
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance / ${denom} / ${icaAddress}`,
@@ -276,11 +276,11 @@ export const BuildComponent = ({
   }, [chainId, trustlessAgent]);
 
   useEffect(() => {
-    if (hostedICA) {
+    if (trustlessAgentICA) {
       refetchAuthZForTrustlessAgentICA()
     }
 
-  }, [hostedICA]);
+  }, [trustlessAgentICA]);
 
   function setExample(index: number, msgObject: any) {
     try {
@@ -479,7 +479,7 @@ export const BuildComponent = ({
                 <>
                   {!icaAddress ? (<>  {trustlessAgent && <TrustlessAgentCard
                     trustlessAgent={trustlessAgent}
-                    hostedICAAddress={hostedICA}
+                    trustlessAgentICAAddress={trustlessAgentICA}
                     flowInput={flowInput}
                   />}
                     {/* <Text variant="caption">
@@ -549,7 +549,7 @@ export const BuildComponent = ({
         }
       </Card>
       <SubmitFlowDialog
-        icaAddress={icaAddress || hostedICA}
+        icaAddress={icaAddress || trustlessAgentICA}
         flowInput={flowInput}
         isDialogShowing={isSubmitFlowDialogShowing}
         chainName={chainName}
