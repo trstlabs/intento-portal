@@ -125,14 +125,12 @@ export const FlowCard = ({ flow }: flowWithDetails) => {
                 <Column align="center" gap={2}>
                   <StyledText variant="caption" css={{ padding: '$2 0' }}>
                     <>
-                      {flow.trustlessAgent?.agentAddress ? 'Hosted' :
-                        flow.selfHostedIca?.connectionId ? 'Self-Hosted' : 'Local'
-                      } {' '}| {' '}
-                      {
-                        flow.msgs[0]?.typeUrl?.split('.')
+                      {flow.trustlessAgent?.agentAddress ? 'Trustless Agent' :
+                        flow.selfHostedIca?.connectionId ? 'Self-Hosted | ' + flow.msgs[0]?.typeUrl?.split('.')
                           .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 'Unknown'
-
-                      }
+                        : 'Local | ' + flow.msgs[0]?.typeUrl?.split('.')
+                          .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 'Unknown'
+                      } 
                     </>
                   </StyledText>
                 </Column>

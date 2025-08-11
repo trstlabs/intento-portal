@@ -30,7 +30,6 @@ import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
-import { sleep } from '../../../localtrst/utils'
 import { FlowInput } from '../../../types/trstTypes'
 import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { GearIcon } from '../../../icons'
@@ -258,7 +257,7 @@ export const BuildComponent = ({
     if (!chainIsConnected) {
       return
     }
-    await sleep(200)
+    await Promise.resolve().then(() => setTimeout(() => {}, 200))
     connectExternalWallet(null)
   }
 

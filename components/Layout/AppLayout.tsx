@@ -27,7 +27,7 @@ export const AppLayout = ({
       const timer = setTimeout(() => {
         popConfetti(false);
       }, 4000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isConfetti, popConfetti]);
@@ -71,67 +71,103 @@ export const AppLayout = ({
 
   // Define the particles configuration inline
   const particlesConfig = {
-    fpsLimit: 120,
+    fullScreen: {
+      enable: true
+    },
     particles: {
       number: {
         value: 100,
         density: {
           enable: true,
-          value_area: 800
+          value_area: 100
         }
       },
       color: {
-        value: isDarkMode ? "#ADD8E6" : "#000000"
+        value: "#ccc"
       },
       shape: {
         type: "circle"
       },
       opacity: {
-        value: 0.5,
+        value: 1,
         random: true,
-        animation: {
+        anim: {
           enable: true,
           speed: 1,
-          minimumValue: 0.1,
+          opacity_min: 0,
           sync: false
         }
       },
       size: {
-        value: 3,
-        random: true
+        value: 1,
+        random: true,
+        anim: {
+          enable: false,
+          speed: 4,
+          size_min: 0.3,
+          sync: false
+        }
+      },
+      line_linked: {
+        enable: false,
+        distance: 150,
+        color: "#ffffff",
+        opacity: 0.1,
+        width: 1
       },
       move: {
         enable: true,
-        speed: 2,
-        direction: "none" as const,
+        speed: 0,
+        direction: "none",
         random: true,
         straight: false,
-        outModes: {
-          default: "out" as const
+        out_mode: "out",
+        bounce: false,
+        attract: {
+          enable: false,
+          rotateX: 600,
+          rotateY: 600
         }
       }
     },
     interactivity: {
-      detectsOn: "canvas" as const,
       events: {
-        onHover: {
-          enable: true,
-          mode: "grab"
+        onhover: {
+          mode: "bubble"
         },
-        resize: {
-          enable: true
+        onclick: {
+          mode: "repulse"
         }
       },
       modes: {
         grab: {
-          distance: 140,
-          links: {
-            opacity: 0.5
+          distance: 400,
+          line_linked: {
+            opacity: 1
           }
+        },
+        bubble: {
+          distance: 150,
+          size: 0,
+          duration: 5,
+          opacity: 0,
+          speed: 5
+        },
+        repulse: {
+          distance: 400,
+          duration: 0.4
+        },
+        push: {
+          particles_nb: 4
+        },
+        remove: {
+          particles_nb: 2
         }
       }
     },
-    detectRetina: true
+    retina_detect: true
+
+
   };
 
   // Confetti configuration
