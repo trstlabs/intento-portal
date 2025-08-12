@@ -287,7 +287,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
                 />
               </StyledDivForLogo>
             </Link>{' '}
-            <Text variant="caption" color="primary" css={{ textAlign: 'end', fontFamily: 'Oceanwide', fontWeight: 700, fontSize: 14 }}>
+            <Text variant="caption" color="primary" css={{ textAlign: 'end', fontFamily: 'Oceanwide, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', fontWeight: 700, fontSize: 14 }}>
               {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
             </Text>
             {triggerMenuButton}
@@ -320,7 +320,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Text
           variant="caption"
           color="primary"
-          css={{ textAlign: 'center', paddingBottom: '$5', fontFamily: 'Oceanwide', fontWeight: 700, fontSize: 14 }}
+          css={{ textAlign: 'center', paddingBottom: '$5', fontFamily: 'Oceanwide, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', fontWeight: 700, fontSize: 14 }}
         >
           {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
         </Text>

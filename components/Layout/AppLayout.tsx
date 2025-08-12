@@ -27,7 +27,7 @@ export const AppLayout = ({
       const timer = setTimeout(() => {
         popConfetti(false);
       }, 4000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isConfetti, popConfetti]);
@@ -233,29 +233,40 @@ const StyledWrapper = styled('div', {
       light: {
         background: `
           linear-gradient(
-            135deg,
-            rgba(200, 220, 255, 0.9) 0%,
-            rgba(255, 240, 200, 0.9) 100%
-          ),
-          linear-gradient(
-            45deg,
-            rgba(173, 216, 230, 0.7) 0%,
-            rgba(255, 215, 0, 0.4) 100%
+            to bottom left,
+            rgba(225, 235, 255, 1) 0%,
+            rgba(240, 245, 255, 1) 60%,
+            rgba(255, 255, 255, 1) 100%
           )`,
-        backgroundBlendMode: 'overlay',
         backgroundAttachment: 'fixed',
         '&::before': {
           content: '""',
           position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.8) 0%, transparent 70%)',
+          top: '50%',
+          left: '50%',
+          width: '60%',
+          height: '60%',
+          background: 'radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.15) 0%, transparent 60%)',
           zIndex: 0,
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          borderRadius: '50%',
+          filter: 'blur(40px)'
+        },
+        '&::after': {
+          content: '""',
+          position: 'fixed',
+          top: '20%',
+          left: '70%',
+          width: '30%',
+          height: '30%',
+          background: 'radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%)',
+          zIndex: 0,
+          pointerEvents: 'none',
+          borderRadius: '50%',
+          filter: 'blur(30px)'
         }
       }
+
     }
   },
   [media.md]: {
@@ -267,7 +278,7 @@ const StyledChildren = styled('div', {
   position: 'relative',
   zIndex: 1,
   padding: '$12',
- 
+
 })
 
 const StyledContainer = styled('div', {
