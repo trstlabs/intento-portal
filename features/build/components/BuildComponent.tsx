@@ -637,6 +637,7 @@ export const BuildComponent = ({
 
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
+  padding: '$4',
 })
 
 export function Row({ children }) {

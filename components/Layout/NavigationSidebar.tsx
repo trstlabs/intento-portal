@@ -287,7 +287,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
                 />
               </StyledDivForLogo>
             </Link>{' '}
-            <Text variant="caption" color="primary" css={{ textAlign: 'end' }}>
+            <Text variant="caption" color="primary" css={{ textAlign: 'end', fontFamily: 'Oceanwide', fontWeight: 700, fontSize: 14 }}>
               {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
             </Text>
             {triggerMenuButton}
@@ -306,7 +306,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   return (
     <StyledWrapper>
-      <StyledMenuContainer dark={themeController.theme.name === 'dark'}>
+      <StyledMenuContainer>
         <Link href="/" passHref >
 
           <StyledDivForLogo as="a">
@@ -320,7 +320,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Text
           variant="caption"
           color="primary"
-          css={{ textAlign: 'center', paddingBottom: '$5' }}
+          css={{ textAlign: 'center', paddingBottom: '$5', fontFamily: 'Oceanwide', fontWeight: 700, fontSize: 14 }}
         >
           {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
         </Text>
@@ -445,14 +445,6 @@ const StyledWrapperForMobile = styled('div', {
 
 const StyledMenuContainer = styled('div', {
   display: 'flex',
-  variants: {
-    dark: {
-      true: {
-        background: `linear-gradient(90deg, rgba(7,9,11, 0.1), rgba(7,9,11, 0.9) 7%, rgba(7,9,11, 0.9) 96%, rgba(7,9,11, 0.1) 100%) !important`,
-      },
-    },
-  },
-  backgroundColor: '$backgroundColors$base',
   flexDirection: 'column',
   position: 'relative',
   zIndex: '$2',

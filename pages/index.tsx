@@ -185,7 +185,14 @@ export default function Home() {
             </title>
           </Head>
         )}
-        <Text variant="header" css={{ marginBottom: '$8', marginTop: '$8', fontSize: 24 }}>
+        <Text variant="header" css={{ 
+          marginBottom: '$8', 
+          marginTop: '$8', 
+          fontSize: 24,
+          fontFamily: '"Oceanwide", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+          fontWeight: 700,
+          letterSpacing: '-0.5px'
+        }}>
           Orchestrate Anything. Any Action, Anywhere, Anytime.
         </Text>
 
@@ -217,7 +224,7 @@ export default function Home() {
           <CardContent>
             <Inline gap={4} align="flex-start" css={{ alignItems: 'flex-start', width: '100%' }}>
               <Text css={{ color: '$colors$primary' }}>💡</Text>
-              <Text variant="caption" css={{ color: '$textColors$secondary', lineHeight: 1.6 }}>
+              <Text variant="caption" css={{ color: '$textColors$secondary', lineHeight: 1.6, marginTop: '$2' }}>
                 Tip: Browse around and hit &apos;Copy and Create&apos; to quickly set up common flows like staking rewards,
                 liquidity provision, or cross-chain swaps with just a few clicks.
               </Text>
