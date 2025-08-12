@@ -11,12 +11,13 @@ import {
 import React from 'react'
 
 import { GlobalDecoderRegistry } from 'intentojs'
-import { convertMicroDenomToDenom } from 'util/conversion'
+import { convertMicroDenomToDenom, formatDenom, resolveDenom } from 'util/conversion'
 import { useFlowHistory } from '../../../hooks/useFlow'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
 
 import { __TEST_MODE__ } from '../../../util/constants'
+import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 
@@ -33,13 +34,14 @@ export const FlowHistory = ({
 
 
 
-  const [flowHistory, setFlowHistory] = useState([]);
+  const [flowHistory, setFlowHistory] = useState<FlowHistoryEntry[]>([]);
   const [historyLimit] = useState(5);
   const [fetchNext, setFetchNext] = useState(false);
   const [paginationKey, setPaginationKey] = useState(undefined);
   const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`flowHistory/${id.toString()}/${paginationKey}`], 15);
 
+ 
   // Clear flowHistory when id changes
   useEffect(() => {
     if (paginationKey == undefined) {
@@ -116,8 +118,8 @@ export const FlowHistory = ({
                     executed,
                     errors,
                     timedOut,
-                    queryResponses
-
+                    queryResponses,
+                    packetSequence
                   },
                   index
                 ) => (
@@ -145,14 +147,23 @@ export const FlowHistory = ({
                               </Text>
                             </Column>
                           )} */}
-                      <Column>
-                        <Text variant="caption">
-                          Exec Fee:{' '}
-                          {convertMicroDenomToDenom(execFee.amount, 6)} {execFee.denom}
-                        </Text>
-                      </Column>
+                      {execFee && execFee.length > 0 && execFee.map((fee) => (
+                        <Column>
+                          <Text variant="caption">
+                            Exec Fee:{' '}
+                            {convertMicroDenomToDenom(fee.amount, 6)} {formatDenom(fee.denom)}
+                          </Text>
+                        </Column>
+                      ))}
 
                       <Column>
+                        {packetSequence != undefined &&
+                          <Column>
+                            <Text variant="caption">
+                              Packet Sequence:  {Number(packetSequence)}
+                            </Text>
+                          </Column>
+                        }
 
                         {queryResponses.map((queryResponse) => (
                           <Column>

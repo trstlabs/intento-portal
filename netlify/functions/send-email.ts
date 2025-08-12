@@ -1,5 +1,6 @@
 import { Handler } from '@netlify/functions'
 import nodemailer from 'nodemailer'
+import { resolveDenom } from '../../util/conversion/conversion'
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -156,31 +157,4 @@ export const handler: Handler = async (event, _context) => {
       body: JSON.stringify({ message: 'Internal server error' }),
     }
   }
-}
-async function resolveDenom(denom: string): Promise<string> {
-  if (!denom.startsWith('ibc/')) return formatDenom(denom)
-
-  const hash = denom.split('/')[1]
-  const apiBase = process.env.NEXT_PUBLIC_INTO_API
-  const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`
-
-  try {
-    const res = await fetch(url)
-    if (!res.ok) throw new Error('Failed to fetch denom trace')
-    const data = await res.json()
-    const base = data?.denom_trace?.base_denom || denom
-    const path = data?.denom_trace?.path || ''
-    return `${formatDenom(base)} (${path})`
-  } catch (err) {
-    console.warn(`Failed to resolve denom ${denom}:`, err)
-    return denom
-  }
-}
-
-function formatDenom(denom: string): string {
-  // If it starts with 'u' and is followed by letters, strip it and capitalize
-  if (/^u[a-z]+$/.test(denom)) {
-    return denom.slice(1).toUpperCase()
-  }
-  return denom.toUpperCase()
 }
