@@ -1,3 +1,5 @@
+import { Coin } from "intentojs/dist/codegen/cosmos/base/v1beta1/coin"
+
 export const protectAgainstNaN = (value: number) => (isNaN(value) ? 0 : value)
 
 export function convertMicroDenomToDenom(
@@ -79,8 +81,6 @@ export async function resolveDenom(denom: string): Promise<string> {
     console.warn('Failed to fetch IBC asset list:', error);
   }
 
-
-
   const hash = denom.split('/')[1];
   const apiBase = process.env.NEXT_PUBLIC_INTO_API;
   const url = `${apiBase}/ibc/apps/transfer/v1/denom_traces/${hash}`;
@@ -96,4 +96,11 @@ export async function resolveDenom(denom: string): Promise<string> {
     console.warn(`Failed to resolve denom ${denom}:`, err);
     return formatDenom(denom);
   }
+}
+
+export async function resolveDenoms(coins: Coin[]): Promise<Coin[]> {
+  await Promise.all(
+    coins.map(async (coin) => coin.denom = await resolveDenom(coin.denom))
+  );
+  return coins;
 }

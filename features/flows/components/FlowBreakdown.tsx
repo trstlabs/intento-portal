@@ -44,6 +44,7 @@ import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { EditExecutionSection } from './EditExecutionSection'
+import { resolveDenoms } from '../../../util/conversion'
 
 
 type FlowBreakdownProps = {
@@ -316,7 +317,7 @@ export const FlowBreakdown = ({
   };
 
   // Clean up timer on unmount
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (debounceTimerRef.current) {
         clearTimeout(debounceTimerRef.current);
@@ -324,6 +325,15 @@ export const FlowBreakdown = ({
     };
   }, []);
 
+  useEffect(() => {
+    const resolveFeeLimit = async () => {
+      if (flow.trustlessAgent) {
+        flow.trustlessAgent.feeLimit = await resolveDenoms(flow.trustlessAgent.feeLimit);
+      }
+    };
+
+    resolveFeeLimit();
+  }, [flow.trustlessAgent?.feeLimit]);
   function handleRemoveMsg(index: number) {
 
 
@@ -390,8 +400,8 @@ export const FlowBreakdown = ({
                   {' '}
                   {
                     flow.msgs[0]?.typeUrl?.split('.')
-                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] || 
-                      (transformedMsgs?.length > 0 ? safeJsonParse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
+                      .find((msgSection) => msgSection.includes('Msg'))?.split(',')[0] ||
+                    (transformedMsgs?.length > 0 ? safeJsonParse(transformedMsgs[0])?.typeUrl : 'Unknown Type') || 'Unknown Type'
 
                   }
                 </>
@@ -570,23 +580,26 @@ export const FlowBreakdown = ({
               <>
                 <Tooltip
                   label={
-                    "Address of the Hosted Interchain Account that is used to execute flows on the target chain. A hosted account has it's own fee configuration"
+                    "Address of the Trustless Agent Interchain Account (ICA) that is used to execute flows on the target chain. A Trustless Agent Interchain Account has it's own fee configuration"
                   }
                 >
                   <Text variant="legend" color="secondary" align="left">
-                    Hosted Interchain Account Address
+                    Trustless Agent Interchain Account Address
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
                   {flow.trustlessAgent.agentAddress}{' '}<a
                     target={'_blank'}
-                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/hosted-account/${flow.trustlessAgent.agentAddress}`}
+                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/trustless-agent/${flow.trustlessAgent.agentAddress}`}
                     rel="noopener noreferrer"
                   >
-                    <b>View</b>
+                    <b>View Configuration</b>
                   </a>
                 </Text>
-
+                {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Fee Limit limits the amount of gas charged for your execution on the host chain by the Trustless Agent Interchain Account"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
+                {flow.trustlessAgent.feeLimit?.length > 0 && flow.trustlessAgent.feeLimit.map((feeLimit: any) => (
+                  <Text variant="caption" > {feeLimit.amount} {feeLimit.denom}</Text>
+                ))}
 
               </>
             )}
@@ -986,8 +999,8 @@ export const FlowBreakdown = ({
             </>
           )
         }
-        <FlowHistory 
-          id={flow.id.toString()} 
+        <FlowHistory
+          id={flow.id.toString()}
           transformedMsgs={transformedMsgs}
         />
 
