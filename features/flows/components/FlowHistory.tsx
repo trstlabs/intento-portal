@@ -18,6 +18,7 @@ import { getRelativeTime } from '../../../util/time'
 
 import { __TEST_MODE__ } from '../../../util/constants'
 import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Link } from '@interchain-ui/react'
 
 
 
@@ -41,7 +42,7 @@ export const FlowHistory = ({
   const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`flowHistory/${id.toString()}/${paginationKey}`], 15);
 
- 
+
   // Clear flowHistory when id changes
   useEffect(() => {
     if (paginationKey == undefined) {
@@ -119,7 +120,7 @@ export const FlowHistory = ({
                     errors,
                     timedOut,
                     queryResponses,
-                    packetSequence
+                    packetSequences
                   },
                   index
                 ) => (
@@ -157,13 +158,13 @@ export const FlowHistory = ({
                       ))}
 
                       <Column>
-                        {packetSequence != undefined &&
-                          <Column>
-                            <Text variant="caption">
-                              Packet Sequence:  {Number(packetSequence)}
-                            </Text>
-                          </Column>
-                        }
+                        {packetSequences != undefined && <Text variant="caption"> Packet Sequences: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                          <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
+                            {Number(packetSequence)} 
+                          { i < packetSequences.length - 1 && <span>, </span>}
+                          </Link>
+
+                        ))}</Text>}
 
                         {queryResponses.map((queryResponse) => (
                           <Column>
