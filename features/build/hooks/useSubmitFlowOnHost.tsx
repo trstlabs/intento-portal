@@ -217,7 +217,7 @@ export const useSubmitFlowOnHost = ({
           stop_on_fail: flowInput.configuration.stopOnFailure.toString(),
           stop_on_timeout: flowInput.configuration.stopOnTimeout.toString(),
           stop_on_success: flowInput.configuration.stopOnSuccess.toString(),
-          fallback: flowInput.configuration.fallbackToOwnerBalance.toString(),
+          fallback: flowInput.configuration.walletFallback.toString(),
           update_disabled: flowInput.configuration.updatingDisabled.toString(),
           save_responses: flowInput.configuration.saveResponses.toString(),
           conditions: flowInput.conditions,

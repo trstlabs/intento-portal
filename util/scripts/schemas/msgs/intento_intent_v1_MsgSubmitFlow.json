@@ -210,7 +210,7 @@
           "type": "boolean",
           "description": "If true, will stop if message times oiut"
         },
-        "fallbackToOwnerBalance": {
+        "walletFallback": {
           "type": "boolean",
           "description": "If true, owner account balance is used when trigger account funds run out"
         }

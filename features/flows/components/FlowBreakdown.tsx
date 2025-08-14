@@ -1104,7 +1104,7 @@ export const FlowBreakdown = ({
                 </Text>
               </Tooltip>
               <Text variant="header">
-                {flow.configuration.fallbackToOwnerBalance ? '✔' : '✖'}
+                {flow.configuration.walletFallback ? '✔' : '✖'}
               </Text>
             </>
             <>

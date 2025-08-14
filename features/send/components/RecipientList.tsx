@@ -68,7 +68,7 @@ export const RecipientList = ({
     stopOnFailure: true,
     stopOnSuccess: false,
     stopOnTimeout: false,
-    fallbackToOwnerBalance: true,
+    walletFallback: true,
   }
   data.configuration = initConfig
   const initConditions: ExecutionConditions = {

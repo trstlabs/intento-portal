@@ -29,12 +29,20 @@ export default function Flow() {
   const [trustlessAgentICA, _isTrustlessAgentICALoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flow?.trustlessAgent?.agentAddress)
 
   const connectionId = flow ? (
-    flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== '' 
-      ? flow.selfHostedIca.connectionId 
-      : flow.trustlessAgent && trustlessAgentICA?.icaConfig?.connectionId 
-      ? trustlessAgentICA.icaConfig.connectionId 
-      : ''
+    flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== ''
+      ? flow.selfHostedIca.connectionId
+      : flow.trustlessAgent && trustlessAgentICA?.icaConfig?.connectionId
+        ? trustlessAgentICA.icaConfig.connectionId
+        : ''
   ) : ''
+
+  //can speed up connection id retrieval or display
+  // const connectionId = flow ? (
+  //   flow.trustlessAgent?.connectionId && flow.trustlessAgent.connectionId !== ''
+  //     ? flow.trustlessAgent.connectionId
+  //     : flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== ''
+  //       ? flow.selfHostedIca.connectionId
+  //       : trustlessAgentICA?.icaConfig?.connectionId || ''
 
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
@@ -87,17 +95,17 @@ export default function Flow() {
         )}
 
         {!isLoading && flow && flow.feeAddress &&
-            <>
-              <FlowBreakdown flow={flow} ibcInfo={ibcInfo} />
-            </>
+          <>
+            <FlowBreakdown flow={flow} ibcInfo={ibcInfo} />
+          </>
         }
         {!isLoading && !flow && (
-            <StyledDiv>
-              <Text variant="legend">
-                <>Flow not found in this space continuum 🌌 </>
-              </Text>{' '}
-            </StyledDiv>
-          )}
+          <StyledDiv>
+            <Text variant="legend">
+              <>Flow not found in this space continuum 🌌 </>
+            </Text>{' '}
+          </StyledDiv>
+        )}
       </AppLayout>
     </>
   )

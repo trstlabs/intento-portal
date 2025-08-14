@@ -95,7 +95,7 @@ export const executeSubmitFlow = async ({
           stopOnSuccess: false,
           stopOnFailure: false,
           stopOnTimeout: false,
-          fallbackToOwnerBalance: true,
+          walletFallback: true,
         },
       feeFunds,
       conditions: flowInput.conditions,
