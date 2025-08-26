@@ -1,0 +1,71 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgSubmitQueryResponse",
+    "definitions": {
+        "MsgSubmitQueryResponse": {
+            "properties": {
+                "chain_id": {
+                    "type": "string"
+                },
+                "query_id": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "string",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "proof_ops": {
+                    "$ref": "#/definitions/tendermint.crypto.ProofOps",
+                    "additionalProperties": false
+                },
+                "height": {
+                    "type": "string"
+                },
+                "from_address": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Submit Query Response",
+            "description": "MsgSubmitQueryResponse represents a message type to fulfil a query request."
+        },
+        "tendermint.crypto.ProofOp": {
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "key": {
+                    "type": "string",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "data": {
+                    "type": "string",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Proof Op",
+            "description": "ProofOp defines an operation used for calculating Merkle root The data could be arbitrary format, providing nessecary data for example neighbouring node hash"
+        },
+        "tendermint.crypto.ProofOps": {
+            "properties": {
+                "ops": {
+                    "items": {
+                        "$ref": "#/definitions/tendermint.crypto.ProofOp"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Proof Ops",
+            "description": "ProofOps is Merkle proof defined by the list of ProofOps"
+        }
+    }
+}

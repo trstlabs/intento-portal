@@ -16,7 +16,7 @@ export const useClaimRecord = () => {
         throw new Error('Invalid address or wallet not connected')
       }
       try {
-        const claimRecordResp = await client.intento.claim.v1beta1.claimRecord({
+        const claimRecordResp = await client.intento.claim.v1.claimRecord({
           address,
         })
         const claimRecord = claimRecordResp ? claimRecordResp.claimRecord : ''
@@ -52,7 +52,7 @@ export const useClaimRecordForAddress = (address: string) => {
         throw new Error('Invalid address or wallet not connected')
       }
       try {
-        const claimRecordResp = await client.intento.claim.v1beta1.claimRecord({
+        const claimRecordResp = await client.intento.claim.v1.claimRecord({
           address: addrToClaim,
         })
         const claimRecord = claimRecordResp ? claimRecordResp.claimRecord : ''
@@ -84,7 +84,7 @@ export const useTotalClaimable = () => {
         throw new Error('Invalid address or wallet not connected')
       }
       const total = (
-        await client.intento.claim.v1beta1.totalClaimable({ address })
+        await client.intento.claim.v1.totalClaimable({ address })
       ).total.amount
 
       return total

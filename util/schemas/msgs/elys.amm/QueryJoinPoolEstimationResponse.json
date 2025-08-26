@@ -1,0 +1,54 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryJoinPoolEstimationResponse",
+    "definitions": {
+        "QueryJoinPoolEstimationResponse": {
+            "properties": {
+                "share_amount_out": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "amounts_in": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "slippage": {
+                    "type": "string"
+                },
+                "weight_balance_ratio": {
+                    "type": "string"
+                },
+                "swap_fee": {
+                    "type": "string"
+                },
+                "taker_fee": {
+                    "type": "string"
+                },
+                "weight_balance_reward_amount": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Join Pool Estimation Response"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        }
+    }
+}

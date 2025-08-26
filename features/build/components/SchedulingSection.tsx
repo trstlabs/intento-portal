@@ -25,10 +25,10 @@ interface SchedulingSectionProps {
   onFeeCalculated?: (fee: string, symbol: string, denom: string, microAmount?: string) => void
   useMsgExec?: boolean
   //setUseMsgExec?: (value: boolean) => void
-  hostedAccount?: any // Add hostedAccount prop
+  trustlessAgent?: any // Add trustlessAgent prop
 }
 
-export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeCalculated, useMsgExec: propUseMsgExec, hostedAccount }: SchedulingSectionProps) => {
+export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeCalculated, useMsgExec: propUseMsgExec, trustlessAgent }: SchedulingSectionProps) => {
   // Time constants in milliseconds
   const HOUR_MS = 60 * 60 * 1000
   const DAY_MS = 24 * HOUR_MS
@@ -122,7 +122,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
     },
     denomLocal,
     interval,
-    hostedAccount
+    trustlessAgent
   )
 
   // Always use the symbol from the fee calculation, defaulting to 'INTO' if not available

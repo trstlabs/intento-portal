@@ -46,7 +46,7 @@
           "description": "Authority is the address of the governance account."
         },
         "params": {
-          "$ref": "#/definitions/intento.alloc.v1beta1.Params",
+          "$ref": "#/definitions/intento.alloc.v1.Params",
           "additionalProperties": false,
           "description": "NOTE: All parameters must be supplied."
         }
@@ -70,7 +70,7 @@
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
     },
-    "intento.alloc.v1beta1.DistributionProportions": {
+    "intento.alloc.v1.DistributionProportions": {
       "properties": {
         "developerRewards": {
           "type": "string"
@@ -87,16 +87,16 @@
       "title": "Distribution Proportions",
       "description": "DistributionProportions defines the proportion that each bucket  receives."
     },
-    "intento.alloc.v1beta1.Params": {
+    "intento.alloc.v1.Params": {
       "properties": {
         "distributionProportions": {
-          "$ref": "#/definitions/intento.alloc.v1beta1.DistributionProportions",
+          "$ref": "#/definitions/intento.alloc.v1.DistributionProportions",
           "additionalProperties": false,
           "description": "distribution_proportions defines the proportion of the minted denom"
         },
         "weightedDeveloperRewardsReceivers": {
           "items": {
-            "$ref": "#/definitions/intento.alloc.v1beta1.WeightedAddress"
+            "$ref": "#/definitions/intento.alloc.v1.WeightedAddress"
           },
           "additionalProperties": false,
           "type": "array",
@@ -116,7 +116,7 @@
       "title": "Params",
       "description": "Params defines the parameters for the alloc module."
     },
-    "intento.alloc.v1beta1.WeightedAddress": {
+    "intento.alloc.v1.WeightedAddress": {
       "properties": {
         "address": {
           "type": "string"
@@ -148,9 +148,9 @@
   }
 }
 ,{
-  "$ref": "#/definitions/MsgCreateHostedAccount",
+  "$ref": "#/definitions/MsgCreateTrustlessAgent",
   "definitions": {
-    "MsgCreateHostedAccount": {
+    "MsgCreateTrustlessAgent": {
       "properties": {
         "creator": {
           "type": "string"
@@ -243,7 +243,7 @@
           "description": "optional fees to be used for flow execution limiting the amount of fees incurred"
         },
         "configuration": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ExecutionConfiguration",
+          "$ref": "#/definitions/intento.intent.v1.ExecutionConfiguration",
           "additionalProperties": false,
           "description": "optional array of dependent txs that should be executed before execution is allowed"
         },
@@ -254,7 +254,7 @@
           "type": "string"
         },
         "conditions": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ExecutionConditions",
+          "$ref": "#/definitions/intento.intent.v1.ExecutionConditions",
           "additionalProperties": false
         }
       },
@@ -277,7 +277,7 @@
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
     },
-    "intento.intent.v1beta1.Comparison": {
+    "intento.intent.v1.Comparison": {
       "properties": {
         "flowId": {
           "type": "string",
@@ -293,7 +293,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "operator": {
           "enum": [
@@ -316,7 +316,7 @@
           "type": "string"
         },
         "icqConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ICQConfig",
+          "$ref": "#/definitions/intento.intent.v1.ICQConfig",
           "additionalProperties": false,
           "description": "bool calculate_difference = 7; //True: Calculate the difference with the previous value.  config of ICQ to perform"
         }
@@ -326,11 +326,11 @@
       "title": "Comparison",
       "description": "Comparison is checked on the response in JSON before execution of flow and outputs true or false"
     },
-    "intento.intent.v1beta1.ExecutionConditions": {
+    "intento.intent.v1.ExecutionConditions": {
       "properties": {
         "feedbackLoops": {
           "items": {
-            "$ref": "#/definitions/intento.intent.v1beta1.FeedbackLoop"
+            "$ref": "#/definitions/intento.intent.v1.FeedbackLoop"
           },
           "additionalProperties": false,
           "type": "array",
@@ -338,7 +338,7 @@
         },
         "comparisons": {
           "items": {
-            "$ref": "#/definitions/intento.intent.v1beta1.Comparison"
+            "$ref": "#/definitions/intento.intent.v1.Comparison"
           },
           "additionalProperties": false,
           "type": "array",
@@ -382,7 +382,7 @@
       "title": "Execution Conditions",
       "description": "ExecutionConditions provides execution conditions for the flow"
     },
-    "intento.intent.v1beta1.ExecutionConfiguration": {
+    "intento.intent.v1.ExecutionConfiguration": {
       "properties": {
         "saveResponses": {
           "type": "boolean",
@@ -404,7 +404,7 @@
           "type": "boolean",
           "description": "If true, will stop if message times oiut"
         },
-        "fallbackToOwnerBalance": {
+        "walletFallback": {
           "type": "boolean",
           "description": "If true, owner account balance is used when trigger account funds run out"
         }
@@ -414,7 +414,7 @@
       "title": "Execution Configuration",
       "description": "ExecutionConfiguration provides the execution-related configuration of the flow"
     },
-    "intento.intent.v1beta1.FeedbackLoop": {
+    "intento.intent.v1.FeedbackLoop": {
       "properties": {
         "flowId": {
           "type": "string",
@@ -438,10 +438,10 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "icqConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ICQConfig",
+          "$ref": "#/definitions/intento.intent.v1.ICQConfig",
           "additionalProperties": false,
           "description": "bool calculate_difference = 7; //True: calculate the difference with the previous value instead of using the value directly.  config of ICQ to perform"
         }
@@ -451,7 +451,7 @@
       "title": "Feedback Loop",
       "description": "Replace value with value from message or response from another flow’s latest output before execution"
     },
-    "intento.intent.v1beta1.ICQConfig": {
+    "intento.intent.v1.ICQConfig": {
       "properties": {
         "connectionId": {
           "type": "string"
@@ -565,7 +565,7 @@
           "description": "optional fees to be used for flow execution limiting the amount of fees incurred"
         },
         "configuration": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ExecutionConfiguration",
+          "$ref": "#/definitions/intento.intent.v1.ExecutionConfiguration",
           "additionalProperties": false,
           "description": "optional configuration parameters"
         },
@@ -573,13 +573,13 @@
           "type": "string",
           "description": "optional connection ID interchain account"
         },
-        "hostedIcaConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.HostedICAConfig",
+        "trustlessAgentFeeConfig": {
+          "$ref": "#/definitions/intento.intent.v1.TrustlessAgentICAConfig",
           "additionalProperties": false,
           "description": "optional use of a hosted account"
         },
         "conditions": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ExecutionConditions",
+          "$ref": "#/definitions/intento.intent.v1.ExecutionConditions",
           "additionalProperties": false
         }
       },
@@ -602,7 +602,7 @@
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
     },
-    "intento.intent.v1beta1.Comparison": {
+    "intento.intent.v1.Comparison": {
       "properties": {
         "flowId": {
           "type": "string",
@@ -618,7 +618,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "operator": {
           "enum": [
@@ -641,7 +641,7 @@
           "type": "string"
         },
         "icqConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ICQConfig",
+          "$ref": "#/definitions/intento.intent.v1.ICQConfig",
           "additionalProperties": false,
           "description": "bool calculate_difference = 7; //True: Calculate the difference with the previous value.  config of ICQ to perform"
         }
@@ -651,11 +651,11 @@
       "title": "Comparison",
       "description": "Comparison is checked on the response in JSON before execution of flow and outputs true or false"
     },
-    "intento.intent.v1beta1.ExecutionConditions": {
+    "intento.intent.v1.ExecutionConditions": {
       "properties": {
         "feedbackLoops": {
           "items": {
-            "$ref": "#/definitions/intento.intent.v1beta1.FeedbackLoop"
+            "$ref": "#/definitions/intento.intent.v1.FeedbackLoop"
           },
           "additionalProperties": false,
           "type": "array",
@@ -663,7 +663,7 @@
         },
         "comparisons": {
           "items": {
-            "$ref": "#/definitions/intento.intent.v1beta1.Comparison"
+            "$ref": "#/definitions/intento.intent.v1.Comparison"
           },
           "additionalProperties": false,
           "type": "array",
@@ -707,7 +707,7 @@
       "title": "Execution Conditions",
       "description": "ExecutionConditions provides execution conditions for the flow"
     },
-    "intento.intent.v1beta1.ExecutionConfiguration": {
+    "intento.intent.v1.ExecutionConfiguration": {
       "properties": {
         "saveResponses": {
           "type": "boolean",
@@ -729,7 +729,7 @@
           "type": "boolean",
           "description": "If true, will stop if message times oiut"
         },
-        "fallbackToOwnerBalance": {
+        "walletFallback": {
           "type": "boolean",
           "description": "If true, owner account balance is used when trigger account funds run out"
         }
@@ -739,7 +739,7 @@
       "title": "Execution Configuration",
       "description": "ExecutionConfiguration provides the execution-related configuration of the flow"
     },
-    "intento.intent.v1beta1.FeedbackLoop": {
+    "intento.intent.v1.FeedbackLoop": {
       "properties": {
         "flowId": {
           "type": "string",
@@ -763,10 +763,10 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "icqConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ICQConfig",
+          "$ref": "#/definitions/intento.intent.v1.ICQConfig",
           "additionalProperties": false,
           "description": "bool calculate_difference = 7; //True: calculate the difference with the previous value instead of using the value directly.  config of ICQ to perform"
         }
@@ -776,12 +776,12 @@
       "title": "Feedback Loop",
       "description": "Replace value with value from message or response from another flow’s latest output before execution"
     },
-    "intento.intent.v1beta1.HostedICAConfig": {
+    "intento.intent.v1.TrustlessAgentICAConfig": {
       "properties": {
         "hostedAddress": {
           "type": "string"
         },
-        "feeCoinLimit": {
+        "feeLimit": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
           "additionalProperties": false
         }
@@ -791,7 +791,7 @@
       "title": "Hosted ICA Config",
       "description": "config for hosted account"
     },
-    "intento.intent.v1beta1.ICQConfig": {
+    "intento.intent.v1.ICQConfig": {
       "properties": {
         "connectionId": {
           "type": "string"
@@ -915,18 +915,18 @@
           "description": "add fees for flow execution, optional"
         },
         "configuration": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ExecutionConfiguration",
+          "$ref": "#/definitions/intento.intent.v1.ExecutionConfiguration",
           "additionalProperties": false
         },
         "connectionId": {
           "type": "string"
         },
-        "hostedIcaConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.HostedICAConfig",
+        "trustlessAgentFeeConfig": {
+          "$ref": "#/definitions/intento.intent.v1.TrustlessAgentICAConfig",
           "additionalProperties": false
         },
         "conditions": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ExecutionConditions",
+          "$ref": "#/definitions/intento.intent.v1.ExecutionConditions",
           "additionalProperties": false
         }
       },
@@ -949,7 +949,7 @@
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
     },
-    "intento.intent.v1beta1.Comparison": {
+    "intento.intent.v1.Comparison": {
       "properties": {
         "flowId": {
           "type": "string",
@@ -965,7 +965,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "operator": {
           "enum": [
@@ -988,7 +988,7 @@
           "type": "string"
         },
         "icqConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ICQConfig",
+          "$ref": "#/definitions/intento.intent.v1.ICQConfig",
           "additionalProperties": false,
           "description": "bool calculate_difference = 7; //True: Calculate the difference with the previous value.  config of ICQ to perform"
         }
@@ -998,11 +998,11 @@
       "title": "Comparison",
       "description": "Comparison is checked on the response in JSON before execution of flow and outputs true or false"
     },
-    "intento.intent.v1beta1.ExecutionConditions": {
+    "intento.intent.v1.ExecutionConditions": {
       "properties": {
         "feedbackLoops": {
           "items": {
-            "$ref": "#/definitions/intento.intent.v1beta1.FeedbackLoop"
+            "$ref": "#/definitions/intento.intent.v1.FeedbackLoop"
           },
           "additionalProperties": false,
           "type": "array",
@@ -1010,7 +1010,7 @@
         },
         "comparisons": {
           "items": {
-            "$ref": "#/definitions/intento.intent.v1beta1.Comparison"
+            "$ref": "#/definitions/intento.intent.v1.Comparison"
           },
           "additionalProperties": false,
           "type": "array",
@@ -1054,7 +1054,7 @@
       "title": "Execution Conditions",
       "description": "ExecutionConditions provides execution conditions for the flow"
     },
-    "intento.intent.v1beta1.ExecutionConfiguration": {
+    "intento.intent.v1.ExecutionConfiguration": {
       "properties": {
         "saveResponses": {
           "type": "boolean",
@@ -1076,7 +1076,7 @@
           "type": "boolean",
           "description": "If true, will stop if message times oiut"
         },
-        "fallbackToOwnerBalance": {
+        "walletFallback": {
           "type": "boolean",
           "description": "If true, owner account balance is used when trigger account funds run out"
         }
@@ -1086,7 +1086,7 @@
       "title": "Execution Configuration",
       "description": "ExecutionConfiguration provides the execution-related configuration of the flow"
     },
-    "intento.intent.v1beta1.FeedbackLoop": {
+    "intento.intent.v1.FeedbackLoop": {
       "properties": {
         "flowId": {
           "type": "string",
@@ -1110,10 +1110,10 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "icqConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.ICQConfig",
+          "$ref": "#/definitions/intento.intent.v1.ICQConfig",
           "additionalProperties": false,
           "description": "bool calculate_difference = 7; //True: calculate the difference with the previous value instead of using the value directly.  config of ICQ to perform"
         }
@@ -1123,12 +1123,12 @@
       "title": "Feedback Loop",
       "description": "Replace value with value from message or response from another flow’s latest output before execution"
     },
-    "intento.intent.v1beta1.HostedICAConfig": {
+    "intento.intent.v1.TrustlessAgentICAConfig": {
       "properties": {
         "hostedAddress": {
           "type": "string"
         },
-        "feeCoinLimit": {
+        "feeLimit": {
           "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
           "additionalProperties": false
         }
@@ -1138,7 +1138,7 @@
       "title": "Hosted ICA Config",
       "description": "config for hosted account"
     },
-    "intento.intent.v1beta1.ICQConfig": {
+    "intento.intent.v1.ICQConfig": {
       "properties": {
         "connectionId": {
           "type": "string"
@@ -1183,9 +1183,9 @@
   }
 }
 ,{
-  "$ref": "#/definitions/MsgUpdateHostedAccount",
+  "$ref": "#/definitions/MsgUpdateTrustlessAgent",
   "definitions": {
-    "MsgUpdateHostedAccount": {
+    "MsgUpdateTrustlessAgent": {
       "properties": {
         "admin": {
           "type": "string"
@@ -1194,7 +1194,7 @@
           "type": "string"
         },
         "hostFeeConfig": {
-          "$ref": "#/definitions/intento.intent.v1beta1.HostFeeConfig",
+          "$ref": "#/definitions/intento.intent.v1.HostFeeConfig",
           "additionalProperties": false,
           "description": "string connection_id = 3 [(gogoproto.customname) = \"ConnectionID\"];"
         }
@@ -1217,7 +1217,7 @@
       "title": "Coin",
       "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
     },
-    "intento.intent.v1beta1.HostFeeConfig": {
+    "intento.intent.v1.HostFeeConfig": {
       "properties": {
         "admin": {
           "type": "string"
@@ -1246,7 +1246,7 @@
           "description": "Authority is the address of the governance account."
         },
         "params": {
-          "$ref": "#/definitions/intento.mint.v1beta1.Params",
+          "$ref": "#/definitions/intento.mint.v1.Params",
           "additionalProperties": false,
           "description": "NOTE: All parameters must be supplied."
         }
@@ -1256,7 +1256,7 @@
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the request type for updating module's params. Since: v14"
     },
-    "intento.mint.v1beta1.Params": {
+    "intento.mint.v1.Params": {
       "properties": {
         "mintDenom": {
           "type": "string",

@@ -3,8 +3,8 @@ import { useRecoilState, useRecoilValue } from 'recoil'
 import { ibcWalletState, walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useIBCAssetInfoByChainID } from './useIBCAssetInfo'
 import { useChain } from '@cosmos-kit/react'
-import { useChainInfoByChainID } from './useChainList'
-// import toast from 'react-hot-toast'
+import { IBCAssetInfo, useChainInfoByChainID } from './useChainList'
+
 import { ChainInfo } from '@keplr-wallet/types'
 import { useEffect } from 'react'
 
@@ -55,85 +55,6 @@ export const useConnectIBCWallet = (
 
   const { getSigningStargateClient, connect, address } = useChain(chainRegistryName)
 
-  // Function to add local chain to Keplr
-  const addLocalChainToKeplr = async (chainId: string) => {
-    try {
-      // Try to get chain info from the public JSON file
-      let chainInfo;
-      try {
-        const response = await fetch('/ibc_assets.json');
-        const ibcAssets = await response.json();
-        chainInfo = ibcAssets.find((asset: any) => asset.chain_id === chainId);
-      } catch (error) {
-        console.warn('Failed to fetch chain info from ibc_assets.json:', error);
-      }
-
-      // Fallback to default values if chain info not found
-      if (!chainInfo) {
-        console.warn(`Chain info not found for chainId: ${chainId}, using defaults`);
-        chainInfo = {
-          chain_id: chainId,
-          name: `Chain ${chainId}`,
-          symbol: 'TOKEN',
-          denom: 'utoken',
-          decimals: 6,
-          prefix: 'cosmos',
-          rpc: `http://localhost:26657`,
-          rest: `http://localhost:1317`
-        };
-      }
-
-      const keplr = (window as any).keplr;
-      if (!keplr) {
-        console.warn('Keplr extension not found');
-        return false;
-      }
-
-      const chainInfoForKeplr: ChainInfo = {
-        chainId: chainInfo.chain_id,
-        chainName: chainInfo.name,
-        rpc: chainInfo.rpc || `http://localhost:26657`,
-        rest: chainInfo.rest || `http://localhost:1317`,
-        bip44: {
-          coinType: 118,
-        },
-        bech32Config: {
-          bech32PrefixAccAddr: chainInfo.prefix || 'cosmos',
-          bech32PrefixAccPub: `${chainInfo.prefix}pub`,
-          bech32PrefixValAddr: `${chainInfo.prefix}valoper`,
-          bech32PrefixValPub: `${chainInfo.prefix}valoperpub`,
-          bech32PrefixConsAddr: `${chainInfo.prefix}valcons`,
-          bech32PrefixConsPub: `${chainInfo.prefix}valconspub`,
-        },
-        currencies: [
-          {
-            coinDenom: chainInfo.symbol,
-            coinMinimalDenom: chainInfo.denom,
-            coinDecimals: chainInfo.decimals || 6,
-          },
-        ],
-        feeCurrencies: [
-          {
-            coinDenom: chainInfo.symbol,
-            coinMinimalDenom: chainInfo.denom,
-            coinDecimals: chainInfo.decimals || 6,
-          },
-        ],
-        stakeCurrency: {
-          coinDenom: chainInfo.symbol,
-          coinMinimalDenom: chainInfo.denom,
-          coinDecimals: chainInfo.decimals || 6,
-        },
-        features: [],
-      };
-      console.log(chainInfoForKeplr)
-      await keplr.experimentalSuggestChain(chainInfoForKeplr);
-      return true;
-    } catch (error) {
-      console.error('Failed to add chain to Keplr:', error);
-      return false;
-    }
-  };
 
   const mutation = useMutation(async () => {
     console.log('useConnectIBCWallet: Starting wallet connection...');
@@ -159,7 +80,7 @@ export const useConnectIBCWallet = (
       console.log('Ensuring correct chain is selected in Keplr...');
 
       // Always try to add/suggest the chain to Keplr for local/dev environments
-      if (['cosmostest'].some(
+      if (['cosmosdev'].some(
         chain => (assetInfo.registry_name || '').toLowerCase().includes(chain)
       )) {
         console.log('Adding/suggesting chain to Keplr...');
@@ -310,3 +231,69 @@ export const useConnectIBCWallet = (
     }
   }
 }
+
+
+// Function to add local chain to Keplr
+export const addLocalChainToKeplr = async (chainId: string) => {
+  try {
+    // Try to get chain info from the public JSON file
+    try {
+      const response = await fetch('/ibc_assets.json');
+      const ibcAssets: IBCAssetInfo[] = await response.json();
+      const ibcAsset = ibcAssets.find((asset: IBCAssetInfo) => asset.chain_id === chainId);
+
+      const keplr = (window as any).keplr;
+      if (!keplr) {
+        console.warn('Keplr extension not found');
+        return false;
+      }
+
+      const chainInfoForKeplr: ChainInfo = {
+        chainId: ibcAsset.chain_id,
+        chainName: ibcAsset.name,
+        rpc: ibcAsset.rpc || `http://localhost:26657`,
+        rest: ibcAsset.rpc.replace('rpc', 'api') || `http://localhost:1317`,
+        bip44: {
+          coinType: 118,
+        },
+        bech32Config: {
+          bech32PrefixAccAddr: ibcAsset.prefix || 'cosmos',
+          bech32PrefixAccPub: `${ibcAsset.prefix}pub`,
+          bech32PrefixValAddr: `${ibcAsset.prefix}valoper`,
+          bech32PrefixValPub: `${ibcAsset.prefix}valoperpub`,
+          bech32PrefixConsAddr: `${ibcAsset.prefix}valcons`,
+          bech32PrefixConsPub: `${ibcAsset.prefix}valconspub`,
+        },
+        currencies: [
+          {
+            coinDenom: ibcAsset.symbol,
+            coinMinimalDenom: ibcAsset.denom,
+            coinDecimals: ibcAsset.decimals || 6,
+          },
+        ],
+        feeCurrencies: [
+          {
+            coinDenom: ibcAsset.symbol,
+            coinMinimalDenom: ibcAsset.denom,
+            coinDecimals: ibcAsset.decimals || 6,
+          },
+        ],
+        stakeCurrency: {
+          coinDenom: ibcAsset.symbol,
+          coinMinimalDenom: ibcAsset.denom,
+          coinDecimals: ibcAsset.decimals || 6,
+        },
+        features: [],
+      };
+      console.log(chainInfoForKeplr)
+      await keplr.experimentalSuggestChain(chainInfoForKeplr);
+      return true;
+    } catch (error) {
+      console.warn('Failed to fetch chain info from ibc_assets.json:', error);
+    }
+
+  } catch (error) {
+    console.error('Failed to add chain to Keplr:', error);
+    return false;
+  }
+};

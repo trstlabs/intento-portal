@@ -29,9 +29,6 @@ import { useRouter } from 'next/router'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__ } from 'util/constants'
-
-import { SwapIcon } from '../../icons/Swap'
-// import { TransferIcon } from '../../icons/Transfer'
 import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
@@ -59,7 +56,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
     username,
     address,
     openView
-  } = useChain('intentotestnet')
+  } = useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
 
 
   // Watch for address changes and trigger the mutation
@@ -192,44 +189,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
-      {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == 'true' && (
-        <>
-          <Link href="/swap" passHref>
-            <Button
-              as="a"
-              variant="menu"
-              size="large"
-              iconLeft={<SwapIcon />}
-              selected={getIsLinkActive('/swap')}
-            >
-              <Inline css={{ paddingLeft: '$4' }}>Swap</Inline>
-            </Button>
-          </Link>
-          <Link href="/token-send" passHref>
-            <Button
-              as="a"
-              variant="menu"
-              size="large"
-              iconLeft={<DoubleArrowIcon rotation="-90deg" />}
-              selected={getIsLinkActive('/token-send')}
-            >
-              <Inline css={{ paddingLeft: '$4' }}>Send</Inline>
-            </Button>
-          </Link>
-          <Link href="/pools" passHref>
-            <Button
-              as="a"
-              // disabled="true"
-              variant="menu"
-              size="large"
-              iconLeft={<PoolsIcon />}
-              selected={getIsLinkActive('/pools')}
-            >
-              <Inline css={{ paddingLeft: '$4' }}>Pools</Inline>
-            </Button>
-          </Link>
-        </>
-      )}
       {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' ? (
         <Link href="/claim" passHref>
           <Button
@@ -242,7 +201,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             <Inline css={{ paddingLeft: '$4' }}> Airdrop </Inline>
           </Button>
         </Link>
-      ) :  <Link href="https://discord.gg/ME76AXcsMm" passHref>
+      ) : <Link href="https://discord.gg/ME76AXcsMm" passHref>
         <Button
           as="a"
           variant="menu"
@@ -328,7 +287,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
                 />
               </StyledDivForLogo>
             </Link>{' '}
-            <Text variant="caption" color="primary" css={{ textAlign: 'end' }}>
+            <Text variant="caption" color="primary" css={{ textAlign: 'end', fontFamily: 'Oceanwide, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', fontWeight: 700, fontSize: 14 }}>
               {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
             </Text>
             {triggerMenuButton}
@@ -347,7 +306,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
 
   return (
     <StyledWrapper>
-      <StyledMenuContainer dark={themeController.theme.name === 'dark'}>
+      <StyledMenuContainer>
         <Link href="/" passHref >
 
           <StyledDivForLogo as="a">
@@ -361,7 +320,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Text
           variant="caption"
           color="primary"
-          css={{ textAlign: 'center', paddingBottom: '$5' }}
+          css={{ textAlign: 'center', paddingBottom: '$5', fontFamily: 'Oceanwide, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', fontWeight: 700, fontSize: 14 }}
         >
           {__TEST_MODE__ ? 'Testnet' : 'Mainnet'}
         </Text>
@@ -486,14 +445,6 @@ const StyledWrapperForMobile = styled('div', {
 
 const StyledMenuContainer = styled('div', {
   display: 'flex',
-  variants: {
-    dark: {
-      true: {
-        background: `linear-gradient(90deg, rgba(7,9,11, 0.1), rgba(7,9,11, 0.9) 7%, rgba(7,9,11, 0.9) 96%, rgba(7,9,11, 0.1) 100%) !important`,
-      },
-    },
-  },
-  backgroundColor: '$backgroundColors$base',
   flexDirection: 'column',
   position: 'relative',
   zIndex: '$2',

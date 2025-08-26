@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgClaimRewards",
+    "definitions": {
+        "MsgClaimRewards": {
+            "properties": {
+                "sender": {
+                    "type": "string"
+                },
+                "pool_ids": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Claim Rewards"
+        }
+    }
+}

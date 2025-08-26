@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpFrontSwapExactAmountInResponse",
+    "definitions": {
+        "MsgUpFrontSwapExactAmountInResponse": {
+            "properties": {
+                "token_out_amount": {
+                    "type": "string"
+                },
+                "swap_fee": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Up Front Swap Exact Amount In Response"
+        }
+    }
+}

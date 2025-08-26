@@ -1,0 +1,36 @@
+{
+  "$ref": "#/definitions/MsgUpdateAirdropParams",
+  "definitions": {
+    "MsgUpdateAirdropParams": {
+      "properties": {
+        "authority": {
+          "type": "string"
+        },
+        "enableClaim": {
+          "type": "boolean"
+        },
+        "startAirdropClaimHeight": {
+          "type": "string"
+        },
+        "endAirdropClaimHeight": {
+          "type": "string"
+        },
+        "startKolClaimHeight": {
+          "type": "string"
+        },
+        "endKolClaimHeight": {
+          "type": "string"
+        },
+        "startRewardProgramClaimHeight": {
+          "type": "string"
+        },
+        "endRewardProgramClaimHeight": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Update Airdrop Params"
+    }
+  }
+}

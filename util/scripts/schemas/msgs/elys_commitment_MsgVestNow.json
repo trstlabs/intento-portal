@@ -1,0 +1,21 @@
+{
+  "$ref": "#/definitions/MsgVestNow",
+  "definitions": {
+    "MsgVestNow": {
+      "properties": {
+        "creator": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "denom": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Vest Now"
+    }
+  }
+}

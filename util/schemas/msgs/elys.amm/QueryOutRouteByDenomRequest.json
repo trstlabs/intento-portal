@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryOutRouteByDenomRequest",
+    "definitions": {
+        "QueryOutRouteByDenomRequest": {
+            "properties": {
+                "denom_out": {
+                    "type": "string"
+                },
+                "denom_in": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Out Route By Denom Request"
+        }
+    }
+}

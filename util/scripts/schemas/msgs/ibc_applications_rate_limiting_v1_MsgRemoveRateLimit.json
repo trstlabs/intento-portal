@@ -1,0 +1,25 @@
+{
+  "$ref": "#/definitions/MsgRemoveRateLimit",
+  "definitions": {
+    "MsgRemoveRateLimit": {
+      "properties": {
+        "signer": {
+          "type": "string",
+          "description": "signer defines the x/gov module account address or other authority signing the message"
+        },
+        "denom": {
+          "type": "string",
+          "description": "Denom for the rate limit, as it appears on the rate limited chain When rate limiting a non-native token, this will be an ibc denom"
+        },
+        "channelOrClientId": {
+          "type": "string",
+          "description": "ChannelId for the rate limit, on the side of the rate limited chain"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Remove Rate Limit",
+      "description": "Gov tx to remove a rate limit"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUncommitTokensResponse",
+    "definitions": {
+        "MsgUncommitTokensResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Uncommit Tokens Response"
+        }
+    }
+}

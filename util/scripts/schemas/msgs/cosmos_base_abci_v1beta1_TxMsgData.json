@@ -26,7 +26,7 @@
           },
           "additionalProperties": false,
           "type": "array",
-          "description": "msg_responses contains the Msg handler responses packed into Anys."
+          "description": "msg_responses contains the Msg handler responses packed into Anys. Since: cosmos-sdk 0.46"
         }
       },
       "additionalProperties": false,

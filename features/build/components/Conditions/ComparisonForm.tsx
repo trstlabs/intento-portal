@@ -1,6 +1,6 @@
 import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper } from "junoblocks"
 import { Field } from "./Fields"
-import { ComparisonOperator, Comparison } from "intentojs/dist/codegen/intento/intent/v1beta1/flow"
+import { ComparisonOperator, Comparison } from "intentojs/dist/codegen/intento/intent/v1/flow"
 import ConditionDropdown from "./ConditionDropdown"
 
 import Dropdown from "./Dropdown"
@@ -32,7 +32,7 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
     setDisabled()
   }
 
-  const valueTypeOptions = ['string', 'sdk.Int', 'sdk.Coin', 'sdk.Coins', '[]string', '[]sdk.Int']
+  const valueTypeOptions = ['string', 'math.Int', 'sdk.Coin', 'sdk.Coins', '[]string', '[]math.Int']
 
   return (
     <Card

@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, convertMicroDenomToDenom, Text } from "junoblocks"; // Replace with actual `junoblocks` imports
 
-import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1beta1/claim";
+import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
 
 export declare type ViewAirdropEligibilityProps = {

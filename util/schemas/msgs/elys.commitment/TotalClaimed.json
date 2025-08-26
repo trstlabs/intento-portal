@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/TotalClaimed",
+    "definitions": {
+        "TotalClaimed": {
+            "properties": {
+                "total_elys_claimed": {
+                    "type": "string"
+                },
+                "total_eden_claimed": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Total Claimed"
+        }
+    }
+}

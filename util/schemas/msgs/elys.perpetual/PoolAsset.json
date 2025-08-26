@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/PoolAsset",
+    "definitions": {
+        "PoolAsset": {
+            "properties": {
+                "liabilities": {
+                    "type": "string"
+                },
+                "custody": {
+                    "type": "string"
+                },
+                "take_profit_liabilities": {
+                    "type": "string"
+                },
+                "take_profit_custody": {
+                    "type": "string"
+                },
+                "asset_denom": {
+                    "type": "string"
+                },
+                "collateral": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Asset"
+        }
+    }
+}

@@ -8,6 +8,7 @@
 
 # testing
 /coverage
+/util/schemas
 
 # next.js
 /.next/
@@ -15,6 +16,9 @@
 
 # production
 /build
+
+# IBC assets (generated from environment variables)
+public/ibc_assets.json
 
 # misc
 .DS_Store
@@ -67,7 +71,7 @@ node_modules
 
 localtrst
 util/scripts/intento
-util/scripts/cosmos-sdk-main
+util/scripts/cosmos-sdk
 util/scripts/wasmd-main
 util/scripts/ibc-go-main
 util/scripts/aggregated_msgs

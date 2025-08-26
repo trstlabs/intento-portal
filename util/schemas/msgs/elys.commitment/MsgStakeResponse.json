@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgStakeResponse",
+    "definitions": {
+        "MsgStakeResponse": {
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "result": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Stake Response"
+        }
+    }
+}

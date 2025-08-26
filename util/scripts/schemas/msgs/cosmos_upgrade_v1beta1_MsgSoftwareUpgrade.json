@@ -16,7 +16,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Software Upgrade",
-      "description": "MsgSoftwareUpgrade is the Msg/SoftwareUpgrade request type."
+      "description": "MsgSoftwareUpgrade is the Msg/SoftwareUpgrade request type. Since: cosmos-sdk 0.46"
     },
     "cosmos.upgrade.v1beta1.Plan": {
       "properties": {

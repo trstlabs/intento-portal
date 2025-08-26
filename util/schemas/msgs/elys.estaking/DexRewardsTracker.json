@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/DexRewardsTracker",
+    "definitions": {
+        "DexRewardsTracker": {
+            "properties": {
+                "num_blocks": {
+                    "type": "string",
+                    "description": "Number of blocks since start of epoch (distribution epoch)"
+                },
+                "amount": {
+                    "type": "string",
+                    "description": "Accumulated amount at distribution epoch - recalculated at every distribution epoch"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Dex Rewards Tracker",
+            "description": "DexRewardsTracker is used for tracking rewards for stakers and LPs, all amount here is in USDC"
+        }
+    }
+}

@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/AccessControlType",
+    "definitions": {
+        "AccessControlType": {
+            "properties": {
+                "access_type": {
+                    "enum": [
+                        "ACCESS_TYPE_PERMISSIONLESS",
+                        "ACCESS_TYPE_RESTRICTED",
+                        "ACCESS_TYPE_PERMISSIONED"
+                    ],
+                    "type": "string",
+                    "title": "Access Type",
+                    "description": "AccessType defines the types of permissions for the operations"
+                },
+                "access_control_list": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array",
+                    "description": "access_control_list defines defines different things depending on the AccessType: - ACCESS_TYPE_PERMISSIONLESS: list of addresses that are blocked from performing the operation - ACCESS_TYPE_RESTRICTED: ignored - ACCESS_TYPE_PERMISSIONED: list of addresses that are allowed to perform the operation"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Access Control Type",
+            "description": "AccessControlType defines the permission type for policies"
+        }
+    }
+}

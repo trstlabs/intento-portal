@@ -1,0 +1,305 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/GenesisState",
+    "definitions": {
+        "GenesisState": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/elys.commitment.Params",
+                    "additionalProperties": false
+                },
+                "commitments": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.Commitments"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "atom_stakers": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.AtomStaker"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "nft_holders": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.NftHolder"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "cadets": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.Cadet"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "governors": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.Governor"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "kol_list": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.KolList"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Genesis State",
+            "description": "GenesisState defines the commitment module's genesis state."
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.commitment.AtomStaker": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Atom Staker"
+        },
+        "elys.commitment.Cadet": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Cadet"
+        },
+        "elys.commitment.Commitments": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "committed_tokens": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.CommittedTokens"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "claimed": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "vesting_tokens": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.VestingTokens"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Commitments",
+            "description": "GenesisState defines the commitment module's genesis state."
+        },
+        "elys.commitment.CommittedTokens": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                },
+                "lockups": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.Lockup"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Committed Tokens"
+        },
+        "elys.commitment.Governor": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Governor"
+        },
+        "elys.commitment.KolList": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                },
+                "claimed": {
+                    "type": "boolean"
+                },
+                "refunded": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Kol List"
+        },
+        "elys.commitment.Lockup": {
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "unlock_timestamp": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Lockup"
+        },
+        "elys.commitment.NftHolder": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Nft Holder"
+        },
+        "elys.commitment.Params": {
+            "properties": {
+                "vesting_infos": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.VestingInfo"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "total_committed": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "number_of_commitments": {
+                    "type": "string"
+                },
+                "enable_vest_now": {
+                    "type": "boolean"
+                },
+                "start_airdrop_claim_height": {
+                    "type": "string"
+                },
+                "end_airdrop_claim_height": {
+                    "type": "string"
+                },
+                "enable_claim": {
+                    "type": "boolean"
+                },
+                "start_kol_claim_height": {
+                    "type": "string"
+                },
+                "end_kol_claim_height": {
+                    "type": "string"
+                },
+                "start_reward_program_claim_height": {
+                    "type": "string"
+                },
+                "end_reward_program_claim_height": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params"
+        },
+        "elys.commitment.VestingInfo": {
+            "properties": {
+                "base_denom": {
+                    "type": "string"
+                },
+                "vesting_denom": {
+                    "type": "string"
+                },
+                "num_blocks": {
+                    "type": "string"
+                },
+                "vest_now_factor": {
+                    "type": "string"
+                },
+                "num_max_vestings": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Vesting Info"
+        },
+        "elys.commitment.VestingTokens": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "string"
+                },
+                "claimed_amount": {
+                    "type": "string"
+                },
+                "num_blocks": {
+                    "type": "string"
+                },
+                "start_block": {
+                    "type": "string"
+                },
+                "vest_started_timestamp": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Vesting Tokens"
+        }
+    }
+}

@@ -11,7 +11,7 @@ import { QueryClientProvider } from 'react-query'
 import { RecoilRoot } from 'recoil'
 import { queryClient } from 'services/queryClient'
 // Try-catch for JSON import to catch any parsing errors
-let ibcAssetList = [];
+let ibcAssetList: IBCAssetInfo[] = [];
 try {
   const assetList = require('public/ibc_assets.json');
 
@@ -42,6 +42,7 @@ import { SignerOptions } from '@cosmos-kit/core'
 import { useEffect, useState, Suspense } from 'react';
 
 import Head from 'next/head';
+import { IBCAssetInfo } from '../hooks/useChainList'
 
 const toasterClassName = css({
   [media.sm]: {
@@ -64,7 +65,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
     if (!dataPushed && ibcAssetList && ibcAssetList.length > 0) {
       // Push your data to assets and chains arrays here
       assets.push({
-        chain_name: 'intentotestnet',
+        chain_name: process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME,
         assets: [
           {
             name: 'Intento INTO',
@@ -85,9 +86,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
       })
 
       for (let asset of ibcAssetList) {
-
-
-        if (asset.name.includes("Local")) {
+        if (asset.name.toLowerCase().includes("devnet")) {
 
           const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
           chains.push({
@@ -131,7 +130,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
 
           // console.log(chains[chains.length - 1])
         }
-        // console.log(chains.find((i) => i.chain_name == 'cosmostest'))
+        console.log(chains.find((i) => i.chain_name == 'intentodevnet'))
       }
       // Mark the data as pushed
       setDataPushed(true)
@@ -175,24 +174,21 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
               //isLazy = true, no validation because these are not part of the chain registry
               endpointOptions={{
                 endpoints: {
-                  intentozone: {
+                  [process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME]: {
                     isLazy: true,
+                    rpc: [process.env.NEXT_PUBLIC_INTO_RPC],
+                    rest: [process.env.NEXT_PUBLIC_INTO_API],
                   },
-                  cosmostest: {
+                  cosmosdev: {
                     isLazy: true,
                     rpc: [process.env.NEXT_PUBLIC_ATOM_RPC],
                     rest: [process.env.NEXT_PUBLIC_ATOM_API],
                   },
-                  osmosis: {
+                  osmosisdev: {
                     isLazy: true,
                     rpc: [process.env.NEXT_PUBLIC_OSMO_RPC],
                     rest: [process.env.NEXT_PUBLIC_OSMO_API],
-                  },
-                  host: {
-                    isLazy: true,
-                    rpc: [process.env.NEXT_PUBLIC_COSM_RPC],
-                    rest: [process.env.NEXT_PUBLIC_COSM_API],
-                  },
+                  }
                 },
               }}
             >

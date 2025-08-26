@@ -1,5 +1,5 @@
 import { SigningStargateClient } from '@cosmjs/stargate'
-// import { MsgUpdateFlow } from "intentojs/dist/codegen/intento/intent/v1beta1/tx"
+// import { MsgUpdateFlow } from "intentojs/dist/codegen/intento/intent/v1/tx"
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { intento } from 'intentojs'
 import { MsgUpdateFlowParams } from '../../types/trstTypes'
@@ -35,7 +35,7 @@ export const executeUpdateFlow = async ({
   }
 
   const msgUpdateFlow =
-    intento.intent.v1beta1.MessageComposer.withTypeUrl.updateFlow({
+    intento.intent.v1.MessageComposer.withTypeUrl.updateFlow({
       id: BigInt(flowParams.id),
       owner: flowParams.owner,
       connectionId: flowParams.connectionId ? flowParams.connectionId : '',

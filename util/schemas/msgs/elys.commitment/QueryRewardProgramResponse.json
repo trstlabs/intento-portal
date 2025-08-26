@@ -1,0 +1,19 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryRewardProgramResponse",
+    "definitions": {
+        "QueryRewardProgramResponse": {
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "claimed": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Reward Program Response"
+        }
+    }
+}

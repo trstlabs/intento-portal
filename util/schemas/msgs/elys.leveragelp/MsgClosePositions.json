@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgClosePositions",
+    "definitions": {
+        "MsgClosePositions": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "liquidate": {
+                    "items": {
+                        "$ref": "#/definitions/elys.leveragelp.PositionRequest"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "stop_loss": {
+                    "items": {
+                        "$ref": "#/definitions/elys.leveragelp.PositionRequest"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Close Positions"
+        },
+        "elys.leveragelp.PositionRequest": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Position Request"
+        }
+    }
+}

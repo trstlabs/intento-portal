@@ -40,6 +40,10 @@
         "encoding": {
           "type": "string",
           "description": "optional encoding"
+        },
+        "useAliasing": {
+          "type": "boolean",
+          "description": "boolean flag to indicate if the transfer message is sent with the IBC v2 protocol but uses v1 channel identifiers. In this case, the v1 channel identifiers function as aliases to the underlying client ids. This only needs to be set if the channel IDs are V1 channel identifiers."
         }
       },
       "additionalProperties": false,

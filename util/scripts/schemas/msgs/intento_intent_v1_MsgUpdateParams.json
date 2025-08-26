@@ -1,0 +1,89 @@
+{
+  "$ref": "#/definitions/MsgUpdateParams",
+  "definitions": {
+    "MsgUpdateParams": {
+      "properties": {
+        "authority": {
+          "type": "string",
+          "description": "authority is the address that controls the module (defaults to x/gov unless overwritten)."
+        },
+        "params": {
+          "$ref": "#/definitions/intento.intent.v1.Params",
+          "additionalProperties": false,
+          "description": "params defines the x/intent parameters to update. NOTE: All parameters must be supplied."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Update Params",
+      "description": "MsgUpdateParams is the Msg/UpdateParams request type."
+    },
+    "cosmos.base.v1beta1.Coin": {
+      "properties": {
+        "denom": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Coin",
+      "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+    },
+    "intento.intent.v1.Params": {
+      "properties": {
+        "flowFundsCommission": {
+          "type": "string",
+          "description": "Commision rate percentage for returning remaining funds in flow fee account after final execution, e.g. 100 = 1X, 250 = 250"
+        },
+        "flowFlexFeeMul": {
+          "type": "string",
+          "description": "Multiplier to the flexible flow gas fee in promille, e.g. 1000 = 1X, 2500 = 2,5x"
+        },
+        "burnFeePerMsg": {
+          "type": "string",
+          "description": "Fixed burn fee per message execution to burn native denom"
+        },
+        "gasFeeCoins": {
+          "items": {
+            "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+          },
+          "additionalProperties": false,
+          "type": "array",
+          "description": "Array of denoms that can be used for fee payment together with an amount"
+        },
+        "maxFlowDuration": {
+          "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+          "type": "string",
+          "description": "Maximum period for a flow",
+          "format": "regex"
+        },
+        "minFlowDuration": {
+          "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+          "type": "string",
+          "description": "Minimum period for a flow",
+          "format": "regex"
+        },
+        "minFlowInterval": {
+          "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+          "type": "string",
+          "description": "Minimum period for a flow",
+          "format": "regex"
+        },
+        "relayerRewards": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "relayer rewards in uinto for each message type 0=SDK,1=Wasm, 2=Osmo. Rewards are in uinto and topped up in the module account by alloc module."
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Params",
+      "description": "Params defines the params for activeness of Flows on governance proposals."
+    }
+  }
+}

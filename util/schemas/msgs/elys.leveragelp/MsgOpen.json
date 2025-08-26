@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgOpen",
+    "definitions": {
+        "MsgOpen": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "collateral_asset": {
+                    "type": "string"
+                },
+                "collateral_amount": {
+                    "type": "string"
+                },
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "leverage": {
+                    "type": "string"
+                },
+                "stop_loss_price": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Open"
+        }
+    }
+}

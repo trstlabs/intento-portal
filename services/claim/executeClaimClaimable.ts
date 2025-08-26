@@ -13,7 +13,7 @@ export const executeClaimClaimable = async ({
   address
 }: ExecuteClaimClaimableArgs): Promise<any> => {
   const claimMsg =
-  intento.claim.v1beta1.MessageComposer.withTypeUrl.claimClaimable({
+  intento.claim.v1.MessageComposer.withTypeUrl.claimClaimable({
     sender: address
     })
 

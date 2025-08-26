@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgTogglePoolEdenRewards",
+    "definitions": {
+        "MsgTogglePoolEdenRewards": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                },
+                "enable": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Toggle Pool Eden Rewards"
+        }
+    }
+}

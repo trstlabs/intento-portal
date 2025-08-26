@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyParams",
+    "definitions": {
+        "LegacyParams": {
+            "properties": {
+                "leverage_max": {
+                    "type": "string"
+                },
+                "max_open_positions": {
+                    "type": "string"
+                },
+                "pool_open_threshold": {
+                    "type": "string"
+                },
+                "safety_factor": {
+                    "type": "string"
+                },
+                "whitelisting_enabled": {
+                    "type": "boolean"
+                },
+                "epoch_length": {
+                    "type": "string"
+                },
+                "fallback_enabled": {
+                    "type": "boolean"
+                },
+                "number_per_block": {
+                    "type": "string",
+                    "description": "Number of positions to process per block"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Params",
+            "description": "Params defines the parameters for the module."
+        }
+    }
+}

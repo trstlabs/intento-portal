@@ -3,11 +3,12 @@ import { useMutation } from 'react-query'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useChain } from '@cosmos-kit/react'
+import { addLocalChainToKeplr } from './useConnectIBCWallet'
 export const useAfterConnectWallet = (
   mutationOptions?: Parameters<typeof useMutation>[2],
 ) => {
   let { connect, getSigningStargateClient, address, username } =
-    useChain('intentotestnet')
+    useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
 
   const [{ status }, setWalletState] = useRecoilState(walletState)
   const mutation = useMutation(async () => {
@@ -16,10 +17,12 @@ export const useAfterConnectWallet = (
       state: WalletStatusType.connecting,
     }))
     console.log(username, address)
+
     try {
       if (address) {
-        const chainClient = await getSigningStargateClient()
 
+
+        const chainClient = await getSigningStargateClient()
         if (chainClient) {
           setWalletState({
             key: username,
@@ -32,6 +35,13 @@ export const useAfterConnectWallet = (
           // Handle the case where the client could not be obtained
           throw new Error('Failed to obtain the client')
         }
+      } else if (process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME.toLowerCase().includes("devnet")) {
+        const added = await addLocalChainToKeplr(process.env.NEXT_PUBLIC_INTO_CHAIN_ID);
+        if (added) {
+          console.log('Chain added to Keplr, waiting for chain to be ready...');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
       }
     } catch (error) {
       console.error('Error connecting the wallet:', error)
@@ -52,7 +62,7 @@ export const useAfterConnectWallet = (
         connect()
         mutation.mutate(null)
       }
-    }, 
+    },
     [status]
   )
 

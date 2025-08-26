@@ -11,12 +11,14 @@ import {
 import React from 'react'
 
 import { GlobalDecoderRegistry } from 'intentojs'
-import { convertMicroDenomToDenom } from 'util/conversion'
-import { useFlowHistory } from '../../../hooks/useFlowInfo'
+import { convertMicroDenomToDenom, formatDenom } from 'util/conversion'
+import { useFlowHistory } from '../../../hooks/useFlow'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
 
 import { __TEST_MODE__ } from '../../../util/constants'
+import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Link } from '@interchain-ui/react'
 
 
 
@@ -33,12 +35,13 @@ export const FlowHistory = ({
 
 
 
-  const [flowHistory, setFlowHistory] = useState([]);
+  const [flowHistory, setFlowHistory] = useState<FlowHistoryEntry[]>([]);
   const [historyLimit] = useState(5);
   const [fetchNext, setFetchNext] = useState(false);
   const [paginationKey, setPaginationKey] = useState(undefined);
   const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`flowHistory/${id.toString()}/${paginationKey}`], 15);
+
 
   // Clear flowHistory when id changes
   useEffect(() => {
@@ -116,8 +119,8 @@ export const FlowHistory = ({
                     executed,
                     errors,
                     timedOut,
-                    queryResponses
-
+                    queryResponses,
+                    packetSequences
                   },
                   index
                 ) => (
@@ -145,14 +148,23 @@ export const FlowHistory = ({
                               </Text>
                             </Column>
                           )} */}
-                      <Column>
-                        <Text variant="caption">
-                          Exec Fee:{' '}
-                          {convertMicroDenomToDenom(execFee.amount, 6)} INTO
-                        </Text>
-                      </Column>
+                      {execFee && execFee.length > 0 && execFee.map((fee) => (
+                        <Column>
+                          <Text variant="caption">
+                            Exec Fee:{' '}
+                            {convertMicroDenomToDenom(fee.amount, 6)} {formatDenom(fee.denom)}
+                          </Text>
+                        </Column>
+                      ))}
 
                       <Column>
+                        {packetSequences != undefined && <Text variant="caption"> Packet Sequences: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                          <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
+                            {Number(packetSequence)} 
+                          { i < packetSequences.length - 1 && <span>, </span>}
+                          </Link>
+
+                        ))}</Text>}
 
                         {queryResponses.map((queryResponse) => (
                           <Column>

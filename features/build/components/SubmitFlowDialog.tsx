@@ -30,7 +30,7 @@ import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 import { TokenSelector } from '../../send/components/TokenSelector'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from '../../../hooks/useChainList'
-import { HostedAccount } from 'intentojs/dist/codegen/intento/intent/v1beta1/hostedaccount'
+import { TrustlessAgent } from 'intentojs/dist/codegen/intento/intent/v1/trustless_agent'
 import { EditExecutionSection } from '../../flows/components/EditExecutionSection'
 import { FlowSummary } from './FlowSummary'
 
@@ -41,7 +41,7 @@ interface SubmitFlowDialogProps {
   isLoading: boolean
   onRequestClose: () => void
   handleSubmitFlow: (data: FlowInput) => void
-  hostedAccount?: HostedAccount
+  trustlessAgent?: TrustlessAgent
   chainId: string
   chainName?: string // Optional chain name
 }
@@ -55,7 +55,7 @@ export const SubmitFlowDialog = ({
   isLoading,
   onRequestClose,
   handleSubmitFlow,
-  hostedAccount,
+  trustlessAgent,
   chainName: propChainName,
 }: SubmitFlowDialogProps) => {
   // Lookup chain name if not provided
@@ -115,7 +115,7 @@ export const SubmitFlowDialog = ({
     flowInput,
     feeDenom,
     interval / 1000,
-    hostedAccount
+    trustlessAgent
   );
 
   const canSchedule = duration > 0 && interval > 0
@@ -167,8 +167,8 @@ export const SubmitFlowDialog = ({
       feeFunds: {
         amount: convertDenomToMicroDenom(feeFunds, 6).toString(), denom: denom_local
       },
-      hostedIcaConfig: {
-        hostedAddress: hostedAccount?.hostedAddress, feeCoinLimit: hostedAccount?.hostFeeConfig.feeCoinsSuported.find(coin => coin.denom === feeDenom)
+      trustlessAgent: {
+        agentAddress: trustlessAgent?.agentAddress, feeLimit: trustlessAgent?.feeConfig.feeCoinsSupported, connectionId: chainInfo.connection_id || ''
       },
       label: flowLabel,
     });
@@ -213,7 +213,7 @@ export const SubmitFlowDialog = ({
 
               <EditExecutionSection
                 updatedFlowParams={executionParams}
-                setUpdateFlowInfo={setUpdateExecutionParams}
+                setUpdateFlow={setUpdateExecutionParams}
               />
 
             </Card>

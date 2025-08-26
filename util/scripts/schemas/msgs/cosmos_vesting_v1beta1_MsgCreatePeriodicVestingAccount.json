@@ -24,7 +24,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Create Periodic Vesting Account",
-      "description": "MsgCreateVestingAccount defines a message that enables creating a vesting account."
+      "description": "MsgCreateVestingAccount defines a message that enables creating a vesting account. Since: cosmos-sdk 0.46"
     },
     "cosmos.base.v1beta1.Coin": {
       "properties": {

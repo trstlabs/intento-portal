@@ -1,0 +1,31 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/FundingRateBlock",
+    "definitions": {
+        "FundingRateBlock": {
+            "properties": {
+                "funding_rate_long": {
+                    "type": "string"
+                },
+                "funding_rate_short": {
+                    "type": "string"
+                },
+                "funding_share_short": {
+                    "type": "string"
+                },
+                "funding_share_long": {
+                    "type": "string"
+                },
+                "block_height": {
+                    "type": "string"
+                },
+                "block_time": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Funding Rate Block"
+        }
+    }
+}

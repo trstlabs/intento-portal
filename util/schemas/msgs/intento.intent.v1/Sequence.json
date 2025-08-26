@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Sequence",
+    "definitions": {
+        "Sequence": {
+            "properties": {
+                "id_key": {
+                    "type": "string",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Sequence",
+            "description": "Sequence id and value of a counter"
+        }
+    }
+}

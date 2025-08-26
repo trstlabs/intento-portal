@@ -21,7 +21,7 @@ import {
 import { ChainSelector } from './ChainSelector/ChainSelector'
 
 import {
-  useGetHostedICAByConnectionID, useGetHostICAAddress,
+  useGetTrustlessAgentICAByConnectionID, useGetTrustlessAgentICAAddress,
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
@@ -30,16 +30,15 @@ import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { IcaCard } from './IcaCard'
 import { JsonFormWrapper } from './Editor/JsonFormWrapper'
-import { sleep } from '../../../localtrst/utils'
 import { FlowInput } from '../../../types/trstTypes'
-import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { GearIcon } from '../../../icons'
 import { SubmitFlowDialog } from './SubmitFlowDialog'
 import { Configuration } from './Conditions/Configuration'
 import { StepIcon } from '../../../icons/StepIcon'
 import { Conditions } from './Conditions/Conditions'
 import { convertDenomToMicroDenom } from '../../../util/conversion'
-import { HostedAccountCard } from './HostedAccountCard'
+import { TrustlessAgentCard } from './TrustlessAgentCard'
 import { processFlowInput } from '../utils/addressUtils'
 
 
@@ -62,7 +61,7 @@ export const BuildComponent = ({
   const [chainName, setChainName] = useState('')
 
   const [chainSymbol, setChainSymbol] = useState('INTO')
-  const [chainId, setChainId] = useState(process.env.NEXT_PUBLIC_INTO_CHAINID || "")
+  const [chainId, setChainId] = useState(process.env.NEXT_PUBLIC_INTO_CHAIN_ID || "")
   const [chainIsConnected, setChainIsConnected] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
@@ -78,14 +77,14 @@ export const BuildComponent = ({
     icaAddress,
     chainIsConnected
   )
-  const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByConnectionID(flowInput.connectionId)
-  const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId)
+  const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByConnectionID(flowInput.connectionId)
+  const [trustlessAgentICA, _istrustlessAgentICALoading] = useGetTrustlessAgentICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId)
 
-  const refetchHostedICA = useRefetchQueries([
-    `hostInterchainAccount/${hostedAccount?.hostedAddress || ""}/${flowInput.connectionId}`,
+  const refetchTrustlessAgentICA = useRefetchQueries([
+    `hostInterchainAccount/${trustlessAgent?.agentAddress || ""}/${flowInput.connectionId}`,
   ])
-  const refetchAuthZForHostedICA = useRefetchQueries(
-    `userAuthZGrants / ${hostedICA}`
+  const refetchAuthZForTrustlessAgentICA = useRefetchQueries(
+    `userAuthZGrants / ${trustlessAgentICA}`
   )
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance / ${denom} / ${icaAddress}`,
@@ -234,7 +233,7 @@ export const BuildComponent = ({
         )
 
       }
-      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
+      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
         updatedFlowInput = processFlowInput(updatedFlowInput, true)
       } else {
         updatedFlowInput = processFlowInput(updatedFlowInput, false)
@@ -252,13 +251,13 @@ export const BuildComponent = ({
     setPrefix(newPrefix)
     let chainIsConnected = connectionId != undefined && connectionId != ''
     setChainIsConnected(chainIsConnected)
-    setChainHasIAModule(chainId === process.env.NEXT_PUBLIC_INTO_CHAINID)
+    setChainHasIAModule(chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID)
 
 
     if (!chainIsConnected) {
       return
     }
-    await sleep(200)
+    await Promise.resolve().then(() => setTimeout(() => {}, 200))
     connectExternalWallet(null)
   }
 
@@ -269,18 +268,18 @@ export const BuildComponent = ({
   }, [denom, icaAddress]);
 
   useEffect(() => {
-    if ((hostedAccount) && chainId) {
-      refetchHostedICA();
+    if ((trustlessAgent) && chainId) {
+      refetchTrustlessAgentICA();
     }
 
-  }, [chainId, hostedAccount]);
+  }, [chainId, trustlessAgent]);
 
   useEffect(() => {
-    if (hostedICA) {
-      refetchAuthZForHostedICA()
+    if (trustlessAgentICA) {
+      refetchAuthZForTrustlessAgentICA()
     }
 
-  }, [hostedICA]);
+  }, [trustlessAgentICA]);
 
   function setExample(index: number, msgObject: any) {
     try {
@@ -289,7 +288,7 @@ export const BuildComponent = ({
       newMsg = newMsg.replaceAll('into', prefix)
       let processedMsg: string
   
-      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAINID) {
+      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, true)
         processedMsg = newInput.msgs[0]
       } else {
@@ -477,9 +476,9 @@ export const BuildComponent = ({
                 <Spinner size={18} style={{ margin: 0 }} />
               ) : (
                 <>
-                  {!icaAddress ? (<>  {hostedAccount && <HostedAccountCard
-                    hostedAccount={hostedAccount}
-                    hostedICAAddress={hostedICA}
+                  {!icaAddress ? (<>  {trustlessAgent && <TrustlessAgentCard
+                    trustlessAgent={trustlessAgent}
+                    trustlessAgentICAAddress={trustlessAgentICA}
                     flowInput={flowInput}
                   />}
                     {/* <Text variant="caption">
@@ -549,7 +548,7 @@ export const BuildComponent = ({
         }
       </Card>
       <SubmitFlowDialog
-        icaAddress={icaAddress || hostedICA}
+        icaAddress={icaAddress || trustlessAgentICA}
         flowInput={flowInput}
         isDialogShowing={isSubmitFlowDialogShowing}
         chainName={chainName}
@@ -562,7 +561,7 @@ export const BuildComponent = ({
         handleSubmitFlow={(flowInput) =>
           handleSubmitFlowClick(flowInput)
         }
-        hostedAccount={hostedAccount}
+        trustlessAgent={trustlessAgent}
         chainId={chainId}
       />
       <Column>
@@ -638,6 +637,7 @@ export const BuildComponent = ({
 
 const StyledDivForContainer = styled('div', {
   borderRadius: '$4',
+  padding: '$4',
 })
 
 export function Row({ children }) {

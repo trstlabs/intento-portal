@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyOrderPriceV1",
+    "definitions": {
+        "LegacyOrderPriceV1": {
+            "properties": {
+                "base_denom": {
+                    "type": "string"
+                },
+                "quote_denom": {
+                    "type": "string"
+                },
+                "rate": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Order Price V 1"
+        }
+    }
+}

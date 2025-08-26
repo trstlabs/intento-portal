@@ -1,0 +1,55 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryAllDenomLiquidityResponse",
+    "definitions": {
+        "QueryAllDenomLiquidityResponse": {
+            "properties": {
+                "denom_liquidity": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.DenomLiquidity"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/cosmos.base.query.v1beta1.PageResponse",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query All Denom Liquidity Response"
+        },
+        "cosmos.base.query.v1beta1.PageResponse": {
+            "properties": {
+                "next_key": {
+                    "type": "string",
+                    "description": "next_key is the key to be passed to PageRequest.key to query the next page most efficiently. It will be empty if there are no more results.",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "total": {
+                    "type": "string",
+                    "description": "total is total number of results available if PageRequest.count_total was set, its value is undefined otherwise"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Page Response",
+            "description": "PageResponse is to be embedded in gRPC response messages where the corresponding request message has used PageRequest.  message SomeResponse {          repeated Bar results = 1;          PageResponse page = 2;  }"
+        },
+        "elys.amm.DenomLiquidity": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "liquidity": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Denom Liquidity"
+        }
+    }
+}

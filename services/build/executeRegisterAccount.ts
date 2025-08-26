@@ -28,7 +28,7 @@ export const executeRegisterAccount = async ({
   const version = JSON.stringify(versionObject)
 
   const msgRegisterAccount =
-    intento.intent.v1beta1.MessageComposer.withTypeUrl.registerAccount({
+    intento.intent.v1.MessageComposer.withTypeUrl.registerAccount({
       version,
       connectionId,
       owner,

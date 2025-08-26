@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryOutRouteByDenomResponse",
+    "definitions": {
+        "QueryOutRouteByDenomResponse": {
+            "properties": {
+                "out_route": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.SwapAmountOutRoute"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Out Route By Denom Response"
+        },
+        "elys.amm.SwapAmountOutRoute": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "token_in_denom": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Swap Amount Out Route"
+        }
+    }
+}

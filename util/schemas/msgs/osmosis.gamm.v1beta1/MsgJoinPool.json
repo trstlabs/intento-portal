@@ -1,0 +1,44 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgJoinPool",
+    "definitions": {
+        "MsgJoinPool": {
+            "properties": {
+                "sender": {
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                },
+                "share_out_amount": {
+                    "type": "string"
+                },
+                "token_in_maxs": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Join Pool",
+            "description": "===================== MsgJoinPool This is really MsgJoinPoolNoSwap"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        }
+    }
+}

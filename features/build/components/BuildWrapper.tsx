@@ -28,7 +28,7 @@ export const BuildWrapper = ({
     stopOnFailure: true,
     stopOnSuccess: false,
     stopOnTimeout: false,
-    fallbackToOwnerBalance: true,
+    walletFallback: true,
   }
   initialFlowInput.configuration = initConfig
   const initConditions = {

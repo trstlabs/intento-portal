@@ -1,7 +1,7 @@
 import { AppLayout } from 'components'
 import { Button, Column, IconWrapper, Inline, media, Spinner, styled, Text } from 'junoblocks'
 import { useCallback, useState } from 'react'
-import { useFlowInfos } from 'hooks/useFlowInfo'
+import { useFlows } from 'hooks/useFlow'
 import { FlowCard } from '../../features/flows/components/FlowCard'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
@@ -9,10 +9,10 @@ export default function Flows() {
   const flowsPerPage = 20;
   const [paginationKey, setPaginationKey] = useState<Uint8Array | undefined>(undefined)
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
-  const [allFlows, isLoading] = useFlowInfos(flowsPerPage, paginationKey)
+  const [allFlows, isLoading] = useFlows(flowsPerPage, paginationKey)
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flowInfos.length
+  const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flows.length
 
   // Handle pagination
   const handleNextPage = useCallback(() => {
@@ -114,15 +114,15 @@ export default function Flows() {
               Array(8).fill(0).map((_, index) => (
                 <FlowCard
                   key={`placeholder-${index}`}
-                  flowInfo={null}
+                  flow={null}
                 />
               ))
-            ) : allFlows?.flowInfos?.length > 0 ? (
+            ) : allFlows?.flows?.length > 0 ? (
               // Show actual flows when loaded
-              allFlows.flowInfos.map((flowInfo, index) => (
+              allFlows.flows.map((flow, index) => (
                 <FlowCard
-                  key={`${flowInfo.id}-${index}`}
-                  flowInfo={structuredClone(flowInfo)}
+                  key={`${flow.id}-${index}`}
+                  flow={structuredClone(flow)}
                 />
               ))
             ) : (

@@ -27,7 +27,7 @@ export const AppLayout = ({
       const timer = setTimeout(() => {
         popConfetti(false);
       }, 4000);
-      
+
       return () => clearTimeout(timer);
     }
   }, [isConfetti, popConfetti]);
@@ -69,70 +69,6 @@ export const AppLayout = ({
     )
   }
 
-  // Define the particles configuration inline
-  const particlesConfig = {
-    fpsLimit: 120,
-    particles: {
-      number: {
-        value: 100,
-        density: {
-          enable: true,
-          value_area: 800
-        }
-      },
-      color: {
-        value: isDarkMode ? "#ADD8E6" : "#000000"
-      },
-      shape: {
-        type: "circle"
-      },
-      opacity: {
-        value: 0.5,
-        random: true,
-        animation: {
-          enable: true,
-          speed: 1,
-          minimumValue: 0.1,
-          sync: false
-        }
-      },
-      size: {
-        value: 3,
-        random: true
-      },
-      move: {
-        enable: true,
-        speed: 2,
-        direction: "none" as const,
-        random: true,
-        straight: false,
-        outModes: {
-          default: "out" as const
-        }
-      }
-    },
-    interactivity: {
-      detectsOn: "canvas" as const,
-      events: {
-        onHover: {
-          enable: true,
-          mode: "grab"
-        },
-        resize: {
-          enable: true
-        }
-      },
-      modes: {
-        grab: {
-          distance: 140,
-          links: {
-            opacity: 0.5
-          }
-        }
-      }
-    },
-    detectRetina: true
-  };
 
   // Confetti configuration
   const confettiConfig = {
@@ -235,21 +171,19 @@ export const AppLayout = ({
 
   return (
     <>
-      <StyledWrapper>
+      <StyledWrapper theme={isDarkMode ? 'dark' : 'light'}>
         {navigationSidebar}
         <StyledContainer>
-          {isDarkMode ? (
-            <StyledChildrenDark>{children}</StyledChildrenDark>
-          ) : (
-            <StyledChildrenLight>{children}</StyledChildrenLight>
-          )}
+          <StyledChildren>
+            {children}
+          </StyledChildren>
         </StyledContainer>
       </StyledWrapper>
-      {init && (
+      {init && isConfetti && (
         <Particles
           id="tsparticles"
           particlesLoaded={particlesLoaded}
-          options={isConfetti ? confettiConfig : (isDarkMode ? particlesConfig : {})}
+          options={confettiConfig}
         />
       )}
     </>
@@ -259,26 +193,92 @@ export const AppLayout = ({
 const StyledWrapper = styled('div', {
   display: 'flex',
   flexDirection: 'row',
-
   minHeight: '100vh',
-  backgroundColor: '$backgroundColors$base',
+  variants: {
+    theme: {
+      dark: {
+        background: `
+          linear-gradient(
+            to bottom left,
+            rgba(5, 2, 10, 1) 0%,
+            rgba(5, 2, 10, 1) 60%,
+            rgba(15, 5, 30, 1) 100%
+          )`,
+        backgroundAttachment: 'fixed',
+        '&::before': {
+          content: '""',
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at 80% 80%, rgba(70, 30, 120, 0.5) 0%, transparent 60%)',
+          zIndex: 0,
+          pointerEvents: 'none'
+        },
+        '&::after': {
+          content: '""',
+          position: 'fixed',
+          top: '20%',
+          left: '80%',
+          width: '30%',
+          height: '30%',
+          background: 'radial-gradient(circle, rgba(100, 60, 180, 0.2) 0%, transparent 70%)',
+          zIndex: 0,
+          pointerEvents: 'none',
+          borderRadius: '50%',
+          filter: 'blur(30px)'
+        }
+      },
+      light: {
+        background: `
+          linear-gradient(
+            to bottom left,
+            rgba(225, 235, 255, 1) 0%,
+            rgba(240, 245, 255, 1) 60%,
+            rgba(255, 255, 255, 1) 100%
+          )`,
+        backgroundAttachment: 'fixed',
+        '&::before': {
+          content: '""',
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          width: '60%',
+          height: '60%',
+          background: 'radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.15) 0%, transparent 60%)',
+          zIndex: 0,
+          pointerEvents: 'none',
+          borderRadius: '50%',
+          filter: 'blur(40px)'
+        },
+        '&::after': {
+          content: '""',
+          position: 'fixed',
+          top: '20%',
+          left: '70%',
+          width: '30%',
+          height: '30%',
+          background: 'radial-gradient(circle, rgba(255, 215, 0, 0.1) 0%, transparent 70%)',
+          zIndex: 0,
+          pointerEvents: 'none',
+          borderRadius: '50%',
+          filter: 'blur(30px)'
+        }
+      }
+
+    }
+  },
   [media.md]: {
     gridTemplateColumns: '25rem 1fr',
   },
 })
 
-const StyledChildrenLight = styled('div', {
-  backgroundColor: 'rgba(255, 255, 255, 0.3) !important',
+const StyledChildren = styled('div', {
   position: 'relative',
   zIndex: 1,
   padding: '$12',
-})
 
-const StyledChildrenDark = styled('div', {
-  background: `linear-gradient(90deg, rgba(7,9,11, 0.1), rgba(7,9,11, 0.9) 7%, rgba(7,9,11, 0.9) 96%, rgba(7,9,11, 0.1) 100%) !important`,
-  position: 'relative',
-  zIndex: 1,
-  padding: '$12',
 })
 
 const StyledContainer = styled('div', {

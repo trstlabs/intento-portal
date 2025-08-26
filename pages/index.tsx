@@ -21,7 +21,7 @@ import {
 } from 'junoblocks'
 import { useCallback, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
-import { useFlowInfos, useFlowInfosByOwner } from 'hooks/useFlowInfo'
+import { useFlows, useFlowsByOwner } from 'hooks/useFlow'
 import { FlowCard } from '../features/flows/components/FlowCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
@@ -30,12 +30,12 @@ import { APP_NAME } from '../util/constants'
 import Head from 'next/head'
 
 export default function Home() {
-  const { address } = useChain('intentotestnet')
+  const { address } = useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
   const flowsPerPage = 20;
   const [paginationKey, setPaginationKey] = useState<Uint8Array | undefined>(undefined)
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
-  const [allFlows, isLoading] = useFlowInfos(Number(flowsPerPage), paginationKey)
-  const [flows, isMyFlowsLoading] = useFlowInfosByOwner(Number(flowsPerPage), undefined)
+  const [allFlows, isLoading] = useFlows(Number(flowsPerPage), paginationKey)
+  const [flows, isMyFlowsLoading] = useFlowsByOwner(Number(flowsPerPage), undefined)
   const { sortDirection, sortParameter, setSortDirection, setSortParameter } = useSortControllers()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const isMobile = useMedia('sm')
@@ -65,7 +65,7 @@ export default function Home() {
     setTimeout(() => setIsRefreshing(false), 1000)
   }, [])
 
-  const infoArgs = { infos: flows?.flowInfos || [], address }
+  const infoArgs = { infos: flows?.flows || [], address }
   const [myFlows, isSorting] = useSortFlows({
     infoArgs,
     sortBy: useMemo(
@@ -78,14 +78,13 @@ export default function Home() {
   })
 
   const shouldShowAutoCompound = !myFlows?.length || myFlows.find((tx) => tx.label === 'Autocompound') == undefined
-  const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flowInfos.length && isMyFlowsLoading && !myFlows?.length
+  const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flows.length && isMyFlowsLoading && !myFlows?.length
   const shouldRenderMyFlows = Boolean(myFlows?.length)
   const hasNextPage = Boolean(allFlows?.pagination?.nextKey)
   const hasPrevPage = paginationHistory.length > 0
 
 
   const FeatureBadge = styled('div', {
-
     padding: '6px 12px',
     borderRadius: '20px',
     fontSize: '12px',
@@ -93,6 +92,7 @@ export default function Home() {
     alignItems: 'center',
     gap: '4px',
     backdropFilter: 'blur(10px)',
+
     border: '1px solid rgba(255, 255, 255, 0.1)',
     variants: {
       variant: {
@@ -185,7 +185,14 @@ export default function Home() {
             </title>
           </Head>
         )}
-        <Text variant="header" css={{ marginBottom: '$8', marginTop: '$8', fontSize: 24 }}>
+        <Text variant="header" css={{ 
+          marginBottom: '$8', 
+          marginTop: '$8', 
+          fontSize: 24,
+          fontFamily: '"Oceanwide", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+          fontWeight: 700,
+          letterSpacing: '-0.5px'
+        }}>
           Orchestrate Anything. Any Action, Anywhere, Anytime.
         </Text>
 
@@ -217,7 +224,7 @@ export default function Home() {
           <CardContent>
             <Inline gap={4} align="flex-start" css={{ alignItems: 'flex-start', width: '100%' }}>
               <Text css={{ color: '$colors$primary' }}>💡</Text>
-              <Text variant="caption" css={{ color: '$textColors$secondary', lineHeight: 1.6 }}>
+              <Text variant="caption" css={{ color: '$textColors$secondary', lineHeight: 1.6, marginTop: '$2' }}>
                 Tip: Browse around and hit &apos;Copy and Create&apos; to quickly set up common flows like staking rewards,
                 liquidity provision, or cross-chain swaps with just a few clicks.
               </Text>
@@ -267,11 +274,11 @@ export default function Home() {
             </Inline>
               <StyledDivForFlowsGrid>
 
-                {myFlows.map((flowInfo, index) => (
+                {myFlows.map((flow, index) => (
                   <FlowCard
                     key={index}
                     //structuredClone does not work on ios
-                    flowInfo={structuredClone(flowInfo)}
+                    flow={structuredClone(flow)}
                   />
                 ))}
               </StyledDivForFlowsGrid>
@@ -282,7 +289,7 @@ export default function Home() {
       }
       <StyledDivForFlowsGrid>
         <>
-          {Boolean(allFlows?.flowInfos.length) ? (
+          {Boolean(allFlows?.flows.length) ? (
             <Inline
               gap={4}
               css={{
@@ -375,17 +382,17 @@ export default function Home() {
             Array(16).fill(0).map((_, index) => (
               <FlowCard
                 key={`placeholder-${index}`}
-                flowInfo={null}
+                flow={null}
                 isMyFlow={false}
               />
             ))
-          ) : allFlows?.flowInfos?.length > 0 ? (
+          ) : allFlows?.flows?.length > 0 ? (
             // Show actual flows when loaded
-            allFlows.flowInfos.map((flowInfo) => (
+            allFlows.flows.map((flow) => (
               <FlowCard
-                key={`${flowInfo.id}`}
-                flowInfo={flowInfo}
-                isMyFlow={flowInfo.owner === address}
+                key={`${flow.id}`}
+                flow={flow}
+                isMyFlow={flow.owner === address}
               />
             ))
           ) : (
@@ -398,7 +405,6 @@ export default function Home() {
 
       </Column>
 
-      {/* {process.env.NEXT_PUBLIC_CONTRACTS_ENABLED == "true" && <Contracts />} */}
     </AppLayout >
   )
 }

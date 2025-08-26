@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryModuleAccountBalanceRequest",
+    "definitions": {
+        "QueryModuleAccountBalanceRequest": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Module Account Balance Request",
+            "description": "QueryParamsRequest is the request type for the Query/Params RPC method."
+        }
+    }
+}

@@ -1,0 +1,38 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/ExecutionConfiguration",
+    "definitions": {
+        "ExecutionConfiguration": {
+            "properties": {
+                "save_responses": {
+                    "type": "boolean",
+                    "description": "if true, the flow response outputs are saved and can be used in logic"
+                },
+                "updating_disabled": {
+                    "type": "boolean",
+                    "description": "if true, the flow is not updatable"
+                },
+                "stop_on_success": {
+                    "type": "boolean",
+                    "description": "If true, will execute until we get a successful Flow, if false/unset will always execute"
+                },
+                "stop_on_failure": {
+                    "type": "boolean",
+                    "description": "If true, will execute until successful Flow, if false/unset will always execute"
+                },
+                "stop_on_timeout": {
+                    "type": "boolean",
+                    "description": "If true, will stop if message times oiut"
+                },
+                "fallback_to_owner_balance": {
+                    "type": "boolean",
+                    "description": "If true, owner account balance is used when trigger account funds run out"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Execution Configuration",
+            "description": "ExecutionConfiguration provides the execution-related configuration of the flow"
+        }
+    }
+}

@@ -2209,7 +2209,7 @@
           "description": "authority is the address that controls the module (defaults to x/gov unless overwritten)."
         },
         "params": {
-          "$ref": "#/definitions/cosmos.mint.v1beta1.Params",
+          "$ref": "#/definitions/cosmos.mint.v1.Params",
           "additionalProperties": false,
           "description": "params defines the x/mint parameters to update. NOTE: All parameters must be supplied."
         }
@@ -2219,7 +2219,7 @@
       "title": "Msg Update Params",
       "description": "MsgUpdateParams is the Msg/UpdateParams request type."
     },
-    "cosmos.mint.v1beta1.Params": {
+    "cosmos.mint.v1.Params": {
       "properties": {
         "mintDenom": {
           "type": "string",

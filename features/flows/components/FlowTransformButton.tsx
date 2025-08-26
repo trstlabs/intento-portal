@@ -1,4 +1,4 @@
-import { FlowInfo } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow';
+import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow';
 import { useRouter } from 'next/router';
 import { FlowInput } from '../../../types/trstTypes';
 import { Button, CopyIcon } from 'junoblocks';
@@ -6,11 +6,11 @@ import { fetchFlowMsgs } from '../../../hooks/useGetMsgsFromAPI';
 
 
 type FlowTransformButtonProps = {
-  flowInfo: any
+  flow: any
   initialChainID?: string
 }
 
-export const FlowTransformButton = ({ flowInfo, initialChainID }: FlowTransformButtonProps) => {
+export const FlowTransformButton = ({ flow, initialChainID }: FlowTransformButtonProps) => {
     const router = useRouter();
     const convertBigIntToString = (obj) => {
         if (typeof obj !== 'object' || obj === null) {
@@ -36,20 +36,20 @@ export const FlowTransformButton = ({ flowInfo, initialChainID }: FlowTransformB
         );
     };
 
-    const transformFlowInfo = async (info: FlowInfo) => {
-        const msgs = await transformFlowMsgs(info)
+    const transformFlow = async (flow: Flow) => {
+        const msgs = await transformFlowMsgs(flow)
         console.log(msgs)
-        // Transform FlowInfo to FlowInput
+        // Transform Flow to FlowInput
         const flowInput: FlowInput = {
             // Your transformation logic here
-            duration: info.endTime.getMilliseconds() - info.startTime.getMilliseconds(),
-            interval: Number(info.interval.seconds) * 1000 + Number(info.interval.nanos),
+            duration: flow.endTime.getMilliseconds() - flow.startTime.getMilliseconds(),
+            interval: Number(flow.interval.seconds) * 1000 + Number(flow.interval.nanos),
             msgs: msgs,
-            conditions: info.conditions,
-            configuration: info.configuration,
-            connectionId: info.icaConfig.connectionId,
-            hostedIcaConfig: info.hostedIcaConfig,
-            label: info.label
+            conditions: flow.conditions,
+            configuration: flow.configuration,
+            connectionId: flow.selfHostedIca.connectionId,
+            trustlessAgent: flow.trustlessAgent,
+            label: flow.label
 
         };
         console.log(flowInput)
@@ -58,7 +58,7 @@ export const FlowTransformButton = ({ flowInfo, initialChainID }: FlowTransformB
     };
 
     const handleClick = async () => {
-        let flowInput = await transformFlowInfo(flowInfo);
+        let flowInput = await transformFlow(flow);
         flowInput = convertBigIntToString(flowInput);
         router.push({
             pathname: '/build',
@@ -124,11 +124,11 @@ const cleanMessageObject = (
   
     return result;
   };
-export async function transformFlowMsgs(info) {
+export async function transformFlowMsgs(flow) {
     let msgs: string[] = [];
 
     try {
-        const msgsObj = await fetchFlowMsgs(info.id.toString());
+        const msgsObj = await fetchFlowMsgs(flow.id.toString());
 
         if (Array.isArray(msgsObj)) {
             msgsObj.forEach((msgObj: any, index) => {

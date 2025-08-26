@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Debt",
+    "definitions": {
+        "Debt": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "borrowed": {
+                    "type": "string"
+                },
+                "interest_paid": {
+                    "type": "string"
+                },
+                "interest_stacked": {
+                    "type": "string"
+                },
+                "borrow_time": {
+                    "type": "string"
+                },
+                "last_interest_calc_time": {
+                    "type": "string"
+                },
+                "last_interest_calc_block": {
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Debt"
+        }
+    }
+}

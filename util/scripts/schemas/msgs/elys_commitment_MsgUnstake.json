@@ -1,0 +1,24 @@
+{
+  "$ref": "#/definitions/MsgUnstake",
+  "definitions": {
+    "MsgUnstake": {
+      "properties": {
+        "creator": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "asset": {
+          "type": "string"
+        },
+        "validatorAddress": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Unstake"
+    }
+  }
+}

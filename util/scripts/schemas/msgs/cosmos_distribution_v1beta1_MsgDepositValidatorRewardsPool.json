@@ -20,7 +20,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Deposit Validator Rewards Pool",
-      "description": "DepositValidatorRewardsPool defines the request structure to provide additional rewards to delegators from a specific validator."
+      "description": "DepositValidatorRewardsPool defines the request structure to provide additional rewards to delegators from a specific validator. Since: cosmos-sdk 0.50"
     },
     "cosmos.base.v1beta1.Coin": {
       "properties": {

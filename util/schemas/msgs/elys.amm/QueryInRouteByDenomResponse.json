@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryInRouteByDenomResponse",
+    "definitions": {
+        "QueryInRouteByDenomResponse": {
+            "properties": {
+                "in_route": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.SwapAmountInRoute"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query In Route By Denom Response"
+        },
+        "elys.amm.SwapAmountInRoute": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "token_out_denom": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Swap Amount In Route"
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Status",
+    "definitions": {
+        "Status": {
+            "properties": {
+                "action_completed": {
+                    "type": "boolean",
+                    "description": "true if action is completed"
+                },
+                "vesting_periods_completed": {
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "type": "array",
+                    "description": "true if action is completed index refers to the 4 vesting periods for the given action"
+                },
+                "vesting_periods_claimed": {
+                    "items": {
+                        "type": "boolean"
+                    },
+                    "type": "array",
+                    "description": "true if action is completed index refers to the 4 vesting periods for the given action"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Status",
+            "description": "Status contains for an action if it is completed and claimed"
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdatePoolParamsResponse",
+    "definitions": {
+        "MsgUpdatePoolParamsResponse": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "pool_params": {
+                    "$ref": "#/definitions/elys.amm.PoolParams",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Pool Params Response"
+        },
+        "elys.amm.PoolParams": {
+            "properties": {
+                "swap_fee": {
+                    "type": "string"
+                },
+                "use_oracle": {
+                    "type": "boolean"
+                },
+                "fee_denom": {
+                    "type": "string",
+                    "description": "denom for fee collection"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool Params"
+        }
+    }
+}

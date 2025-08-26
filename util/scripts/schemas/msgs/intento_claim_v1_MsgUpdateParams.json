@@ -1,0 +1,54 @@
+{
+  "$ref": "#/definitions/MsgUpdateParams",
+  "definitions": {
+    "MsgUpdateParams": {
+      "properties": {
+        "authority": {
+          "type": "string"
+        },
+        "params": {
+          "$ref": "#/definitions/intento.claim.v1.Params",
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Update Params",
+      "description": "MsgUpdateParams is the request type for updating claim module's params."
+    },
+    "intento.claim.v1.Params": {
+      "properties": {
+        "airdropStartTime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "durationUntilDecay": {
+          "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+          "type": "string",
+          "format": "regex"
+        },
+        "durationOfDecay": {
+          "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+          "type": "string",
+          "format": "regex"
+        },
+        "claimDenom": {
+          "type": "string",
+          "description": "denom of claimable asset"
+        },
+        "durationVestingPeriods": {
+          "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "format": "regex"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Params",
+      "description": "Params defines the claim module's parameters."
+    }
+  }
+}

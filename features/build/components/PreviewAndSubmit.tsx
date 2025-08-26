@@ -22,7 +22,7 @@ import {
   import { ChainSelector } from './ChainSelector/ChainSelector'
   
   import {
-    useGetHostedICAByHostedAddress, useGetHostICAAddress,
+    useGetTrustlessAgentICAByTrustlessAgentAddress, useGetTrustlessAgentICAAddress,
     useGetICA,
     useAuthZMsgGrantInfoForUser,
   } from '../../../hooks/useICA'
@@ -30,16 +30,15 @@ import {
   import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
   import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
   
-  import { sleep } from '../../../localtrst/utils'
   import { useIBCAssetInfoByChainID } from 'hooks/useIBCAssetInfo'
   import { useChainInfoByChainID } from 'hooks/useChainList'
   import { FlowInput } from '../../../types/trstTypes'
-  import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+  import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
   import { GearIcon } from '../../../icons'
   import { Configuration } from './Conditions/Configuration'
   import { StepIcon } from '../../../icons/StepIcon'
   import { Conditions } from './Conditions/Conditions'
-  import { convertDenomToMicroDenom } from '../../../util/conversion'
+  import { convertDenomToMicroDenom, formatDenom } from '../../../util/conversion'
   
   import { SchedulingSection } from './SchedulingSection'
   import TinyJsonViewer from './Editor/TinyJsonViewer'
@@ -95,15 +94,6 @@ import {
     // Check if on mobile - use prop if provided, otherwise use internal check
     const internalIsMobile = useMedia('sm')
     const isMobile = propIsMobile !== undefined ? propIsMobile : internalIsMobile
-  
-    // Format denom by removing 'u' prefix and capitalizing
-    const formatDenom = (denom: string): string => {
-      // For non-IBC denoms, handle the 'u' prefix if it exists
-      if (/^u[a-z]+$/.test(denom)) {
-        return denom.slice(1).toUpperCase()
-      }
-      return denom.toUpperCase()
-    }
   
     // Memoized function to resolve denom with multiple fallback strategies
     // Returns an object with both the display symbol and the original denom
@@ -228,11 +218,11 @@ import {
     const [denom, setDenom] = useState('uinto')
   
     const [chainSymbol, setChainSymbol] = useState('INTO')
-    const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAINID || "")
+    const [chainId, setChainId] = useState(initialChainId || process.env.NEXT_PUBLIC_INTO_CHAIN_ID || "")
   
     const [_chainHasIAModule, setChainHasIAModule] = useState(true)
   
-    const shouldTransferFromHost = flowInput.hostedIcaConfig?.feeCoinLimit?.denom != 'uinto'
+    const shouldTransferFromHost = flowInput.trustlessAgent?.feeLimit?.[0]?.denom != 'uinto'
     // Get the ICA address from the flow input
     //const icaAddressForGrants = flowInput.icaAddressForAuthZ;
   
@@ -270,11 +260,11 @@ import {
   
     const [icaAddress, _isIcaLoading] = useGetICA(flowInput.connectionId, '')
   
-    const [hostedAccount, _ishostedAccountLoading] = useGetHostedICAByHostedAddress(flowInput.hostedIcaConfig.hostedAddress || "")
-    const [hostedICA, _ishostedICALoading] = useGetHostICAAddress(hostedAccount?.hostedAddress || "", flowInput.connectionId || "")
+    const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.trustlessAgent?.agentAddress || "")
+    const [trustlessAgentICA, _istrustlessAgentICALoading] = useGetTrustlessAgentICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId || "")
   
     const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
-      hostedICA || icaAddress,
+      trustlessAgentICA || icaAddress,
       flowInput
     )
   
@@ -284,7 +274,7 @@ import {
       { startTime: flowInput.startTime, duration: flowInput.duration }
     )
   
-    const granteeAddress = hostedICA || icaAddress;
+    const granteeAddress = trustlessAgentICA || icaAddress;
     const { mutate: submitFlowOnHost, isLoading: isSubmittingOnHost } = useSubmitFlowOnHost({
       flowInput,
       ibcAssetInfo,
@@ -298,13 +288,13 @@ import {
   
     // Log with proper null check to avoid undefined issues
     // useEffect(() => {
-    //   console.log("hostedICA", hostedICA, "flowInput.connectionId", flowInput.connectionId || "<not set>")
-    // }, [hostedICA, flowInput.connectionId]) 
-    const refetchHostedICA = useRefetchQueries([
-      `hostInterchainAccount/${hostedAccount?.hostedAddress || ""}/${flowInput.connectionId || ""}`,
+    //   console.log("trustlessAgentICA", trustlessAgentICA, "flowInput.connectionId", flowInput.connectionId || "<not set>")
+    // }, [trustlessAgentICA, flowInput.connectionId]) 
+    const refetchTrustlessAgentICA = useRefetchQueries([
+      `hostInterchainAccount/${trustlessAgent?.agentAddress || ""}/${flowInput.connectionId || ""}`,
     ])
-    const refetchAuthZForHostedICA = useRefetchQueries(
-      `userAuthZGrants / ${hostedICA}`
+    const refetchAuthZForTrustlessAgentICA = useRefetchQueries(
+      `userAuthZGrants / ${trustlessAgentICA}`
     )
     const refetchICA = useRefetchQueries([
       `ibcTokenBalance / ${denom} / ${icaAddress}`,
@@ -441,7 +431,7 @@ import {
   
       setChainHasIAModule(chainId === 'INTO')
   
-      await sleep(200)
+      await new Promise((resolve) => setTimeout(resolve, 200))
       connectExternalWallet(null)
     }
   
@@ -452,18 +442,18 @@ import {
     }, [denom, icaAddress]);
   
     useEffect(() => {
-      if ((hostedAccount) && chainId) {
-        refetchHostedICA();
+      if ((trustlessAgent) && chainId) {
+        refetchTrustlessAgentICA();
       }
   
-    }, [chainId, hostedAccount]);
+    }, [chainId, trustlessAgent]);
   
     useEffect(() => {
-      if (hostedICA) {
-        refetchAuthZForHostedICA()
+      if (trustlessAgentICA) {
+        refetchAuthZForTrustlessAgentICA()
       }
   
-    }, [hostedICA]);
+    }, [trustlessAgentICA]);
   
   
     function setConfig(updatedConfig: ExecutionConfiguration) {
@@ -603,7 +593,7 @@ import {
                 //icaAddress={icaAddress}
                 onFeeCalculated={handleFeeCalculated}
                 useMsgExec={useMsgExec}
-                hostedAccount={hostedAccount}
+                trustlessAgent={trustlessAgent}
               //setUseMsgExec={setUseMsgExec}
               />
             </Column>
@@ -695,7 +685,7 @@ import {
                 expectedFee={feeDetails.amount}
                 useMsgExec={useMsgExec}
                 chainId={chainId}
-                grantee={hostedICA || icaAddress}
+                grantee={trustlessAgentICA || icaAddress}
                 authzGrants={authzGrants}
                 isAuthzGrantsLoading={isAuthzGrantsLoading}
                 refetchAuthzGrants={refetchAuthzGrants}

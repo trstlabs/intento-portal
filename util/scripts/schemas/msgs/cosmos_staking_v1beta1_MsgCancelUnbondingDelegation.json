@@ -22,7 +22,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Cancel Unbonding Delegation",
-      "description": "MsgCancelUnbondingDelegation defines the SDK message for performing a cancel unbonding delegation for delegator"
+      "description": "MsgCancelUnbondingDelegation defines the SDK message for performing a cancel unbonding delegation for delegator Since: cosmos-sdk 0.46"
     },
     "cosmos.base.v1beta1.Coin": {
       "properties": {

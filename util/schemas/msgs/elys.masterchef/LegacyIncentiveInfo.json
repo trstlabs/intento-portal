@@ -1,0 +1,30 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyIncentiveInfo",
+    "definitions": {
+        "LegacyIncentiveInfo": {
+            "properties": {
+                "eden_amount_per_year": {
+                    "type": "string",
+                    "description": "reward amount in eden for 1 year"
+                },
+                "distribution_start_block": {
+                    "type": "string",
+                    "description": "starting block height of the distribution"
+                },
+                "total_blocks_per_year": {
+                    "type": "string",
+                    "description": "distribution duration - block number per year"
+                },
+                "blocks_distributed": {
+                    "type": "string",
+                    "description": "blocks distributed"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Incentive Info",
+            "description": "Incentive Info"
+        }
+    }
+}

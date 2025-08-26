@@ -1,0 +1,18 @@
+{
+  "$ref": "#/definitions/MsgUpdateEnableVestNow",
+  "definitions": {
+    "MsgUpdateEnableVestNow": {
+      "properties": {
+        "authority": {
+          "type": "string"
+        },
+        "enableVestNow": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Update Enable Vest Now"
+    }
+  }
+}

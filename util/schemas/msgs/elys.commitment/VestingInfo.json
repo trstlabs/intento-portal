@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/VestingInfo",
+    "definitions": {
+        "VestingInfo": {
+            "properties": {
+                "base_denom": {
+                    "type": "string"
+                },
+                "vesting_denom": {
+                    "type": "string"
+                },
+                "num_blocks": {
+                    "type": "string"
+                },
+                "vest_now_factor": {
+                    "type": "string"
+                },
+                "num_max_vestings": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Vesting Info"
+        }
+    }
+}

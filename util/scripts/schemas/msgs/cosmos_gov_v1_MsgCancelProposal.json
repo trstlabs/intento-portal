@@ -15,7 +15,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Cancel Proposal",
-      "description": "MsgCancelProposal is the Msg/CancelProposal request type."
+      "description": "MsgCancelProposal is the Msg/CancelProposal request type. Since: cosmos-sdk 0.50"
     }
   }
 }

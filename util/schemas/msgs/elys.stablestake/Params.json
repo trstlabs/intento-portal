@@ -1,0 +1,50 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Params",
+    "definitions": {
+        "Params": {
+            "properties": {
+                "legacy_deposit_denom": {
+                    "type": "string"
+                },
+                "legacy_redemption_rate": {
+                    "type": "string"
+                },
+                "epoch_length": {
+                    "type": "string"
+                },
+                "legacy_interest_rate": {
+                    "type": "string"
+                },
+                "legacy_interest_rate_max": {
+                    "type": "string"
+                },
+                "legacy_interest_rate_min": {
+                    "type": "string"
+                },
+                "legacy_interest_rate_increase": {
+                    "type": "string"
+                },
+                "legacy_interest_rate_decrease": {
+                    "type": "string"
+                },
+                "legacy_health_gain_factor": {
+                    "type": "string"
+                },
+                "total_value": {
+                    "type": "string"
+                },
+                "legacy_max_leverage_ratio": {
+                    "type": "string"
+                },
+                "legacy_max_withdraw_ratio": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the parameters for the module."
+        }
+    }
+}

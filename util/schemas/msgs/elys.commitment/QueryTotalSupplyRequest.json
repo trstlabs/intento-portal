@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryTotalSupplyRequest",
+    "definitions": {
+        "QueryTotalSupplyRequest": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Total Supply Request"
+        }
+    }
+}

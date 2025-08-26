@@ -1,0 +1,28 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryAirDropResponse",
+    "definitions": {
+        "QueryAirDropResponse": {
+            "properties": {
+                "atom_staking": {
+                    "type": "string"
+                },
+                "cadet": {
+                    "type": "string"
+                },
+                "nft_holder": {
+                    "type": "string"
+                },
+                "governor": {
+                    "type": "string"
+                },
+                "claimed": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Air Drop Response"
+        }
+    }
+}

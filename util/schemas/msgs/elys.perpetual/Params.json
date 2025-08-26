@@ -1,0 +1,87 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Params",
+    "definitions": {
+        "Params": {
+            "properties": {
+                "leverage_max": {
+                    "type": "string"
+                },
+                "borrow_interest_rate_max": {
+                    "type": "string"
+                },
+                "borrow_interest_rate_min": {
+                    "type": "string"
+                },
+                "borrow_interest_rate_increase": {
+                    "type": "string"
+                },
+                "borrow_interest_rate_decrease": {
+                    "type": "string"
+                },
+                "health_gain_factor": {
+                    "type": "string"
+                },
+                "max_open_positions": {
+                    "type": "string"
+                },
+                "pool_open_threshold": {
+                    "type": "string"
+                },
+                "borrow_interest_payment_fund_percentage": {
+                    "type": "string"
+                },
+                "borrow_interest_payment_fund_address": {
+                    "type": "string"
+                },
+                "safety_factor": {
+                    "type": "string"
+                },
+                "borrow_interest_payment_enabled": {
+                    "type": "boolean"
+                },
+                "whitelisting_enabled": {
+                    "type": "boolean"
+                },
+                "perpetual_swap_fee": {
+                    "type": "string"
+                },
+                "max_limit_order": {
+                    "type": "string"
+                },
+                "fixed_funding_rate": {
+                    "type": "string"
+                },
+                "minimum_long_take_profit_price_ratio": {
+                    "type": "string",
+                    "description": "minimum value for take_profit_price/current price for long, should be greater than 1"
+                },
+                "maximum_long_take_profit_price_ratio": {
+                    "type": "string",
+                    "description": "max value for take_profit_price/current price for long, should be greater than 1"
+                },
+                "maximum_short_take_profit_price_ratio": {
+                    "type": "string",
+                    "description": "max value for take_profit_price/current price for short, should be less than 1"
+                },
+                "enable_take_profit_custody_liabilities": {
+                    "type": "boolean",
+                    "description": "No need for minimumShortTakeProfitPriceRatio as it will be 0, checked in validate message"
+                },
+                "weight_breaking_fee_factor": {
+                    "type": "string",
+                    "description": "We create this and send this value to estimate swap ONLY when opening and closing the position Ideally this value is set to half. When trader open a position if they receive a weight balance bonus (which is half of weight breaking fee, ideally) then while closing position they are charged weight breaking fee. So we just directly apply half weight breaking fee on perpetual swaps Question: does each need to have separate value of this because PoolParams.WeightRecoveryFeePortion can be different Also, if trader has no bonus only fee, then overall we are only applying the fee half time"
+                },
+                "enabled_pools": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params"
+        }
+    }
+}

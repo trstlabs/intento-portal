@@ -1,0 +1,97 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QuerySwapEstimationByDenomResponse",
+    "definitions": {
+        "QuerySwapEstimationByDenomResponse": {
+            "properties": {
+                "in_route": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.SwapAmountInRoute"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "out_route": {
+                    "items": {
+                        "$ref": "#/definitions/elys.amm.SwapAmountOutRoute"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "spot_price": {
+                    "type": "string"
+                },
+                "amount": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "swap_fee": {
+                    "type": "string"
+                },
+                "discount": {
+                    "type": "string"
+                },
+                "available_liquidity": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "weight_balance_ratio": {
+                    "type": "string"
+                },
+                "slippage": {
+                    "type": "string"
+                },
+                "price_impact": {
+                    "type": "string"
+                },
+                "weight_balance_reward_amount": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Swap Estimation By Denom Response"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.amm.SwapAmountInRoute": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "token_out_denom": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Swap Amount In Route"
+        },
+        "elys.amm.SwapAmountOutRoute": {
+            "properties": {
+                "pool_id": {
+                    "type": "string"
+                },
+                "token_in_denom": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Swap Amount Out Route"
+        }
+    }
+}

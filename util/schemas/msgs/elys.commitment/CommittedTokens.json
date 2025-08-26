@@ -1,0 +1,39 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/CommittedTokens",
+    "definitions": {
+        "CommittedTokens": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                },
+                "lockups": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.Lockup"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Committed Tokens"
+        },
+        "elys.commitment.Lockup": {
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "unlock_timestamp": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Lockup"
+        }
+    }
+}

@@ -22,7 +22,8 @@
         },
         "abci": {
           "$ref": "#/definitions/tendermint.types.ABCIParams",
-          "additionalProperties": false
+          "additionalProperties": false,
+          "description": "Since: cosmos-sdk 0.50"
         }
       },
       "additionalProperties": false,

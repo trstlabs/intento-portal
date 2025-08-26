@@ -1,0 +1,121 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryShowCommitmentsResponse",
+    "definitions": {
+        "QueryShowCommitmentsResponse": {
+            "properties": {
+                "commitments": {
+                    "$ref": "#/definitions/elys.commitment.Commitments",
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Show Commitments Response"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.commitment.Commitments": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "committed_tokens": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.CommittedTokens"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "claimed": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "vesting_tokens": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.VestingTokens"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Commitments",
+            "description": "GenesisState defines the commitment module's genesis state."
+        },
+        "elys.commitment.CommittedTokens": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                },
+                "lockups": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.Lockup"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Committed Tokens"
+        },
+        "elys.commitment.Lockup": {
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "unlock_timestamp": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Lockup"
+        },
+        "elys.commitment.VestingTokens": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "string"
+                },
+                "claimed_amount": {
+                    "type": "string"
+                },
+                "num_blocks": {
+                    "type": "string"
+                },
+                "start_block": {
+                    "type": "string"
+                },
+                "vest_started_timestamp": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Vesting Tokens"
+        }
+    }
+}

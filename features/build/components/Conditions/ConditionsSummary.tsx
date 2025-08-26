@@ -4,7 +4,7 @@ import {
   Inline,
 } from 'junoblocks'
 import React from 'react'
-import { ExecutionConditions, ExecutionConfiguration, Comparison, FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration, Comparison, FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 interface ConditionsSummaryProps {
   conditions?: ExecutionConditions
@@ -189,7 +189,7 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
             {configuration.stopOnTimeout && (
               <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Stop when execution times out</Text>
             )}
-            {configuration.fallbackToOwnerBalance && (
+            {configuration.walletFallback && (
               <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Use owner balance as fallback for Intento fees</Text>
             )}
           </Column>

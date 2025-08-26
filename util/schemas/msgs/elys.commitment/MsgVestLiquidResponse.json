@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgVestLiquidResponse",
+    "definitions": {
+        "MsgVestLiquidResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Vest Liquid Response"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgFundFairburnPoolResponse",
+    "definitions": {
+        "MsgFundFairburnPoolResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Fund Fairburn Pool Response",
+            "description": "MsgFundFairburnPoolResponse defines the Msg/MsgFundFairburnPool response type."
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryParamsRequest",
+    "definitions": {
+        "QueryParamsRequest": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Params Request",
+            "description": "QueryParamsRequest is request type for the Query/Params RPC method."
+        }
+    }
+}

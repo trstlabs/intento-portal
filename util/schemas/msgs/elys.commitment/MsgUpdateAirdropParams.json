@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateAirdropParams",
+    "definitions": {
+        "MsgUpdateAirdropParams": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "enable_claim": {
+                    "type": "boolean"
+                },
+                "start_airdrop_claim_height": {
+                    "type": "string"
+                },
+                "end_airdrop_claim_height": {
+                    "type": "string"
+                },
+                "start_kol_claim_height": {
+                    "type": "string"
+                },
+                "end_kol_claim_height": {
+                    "type": "string"
+                },
+                "start_reward_program_claim_height": {
+                    "type": "string"
+                },
+                "end_reward_program_claim_height": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Airdrop Params"
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+  "$ref": "#/definitions/MsgUpdateRateLimit",
+  "definitions": {
+    "MsgUpdateRateLimit": {
+      "properties": {
+        "signer": {
+          "type": "string",
+          "description": "signer defines the x/gov module account address or other authority signing the message"
+        },
+        "denom": {
+          "type": "string",
+          "description": "Denom for the rate limit, as it appears on the rate limited chain When rate limiting a non-native token, this will be an ibc denom"
+        },
+        "channelOrClientId": {
+          "type": "string",
+          "description": "ChannelId for the rate limit, on the side of the rate limited chain"
+        },
+        "maxPercentSend": {
+          "type": "string",
+          "description": "MaxPercentSend defines the threshold for outflows The threshold is defined as a percentage (e.g. 10 indicates 10%)"
+        },
+        "maxPercentRecv": {
+          "type": "string",
+          "description": "MaxPercentSend defines the threshold for inflows The threshold is defined as a percentage (e.g. 10 indicates 10%)"
+        },
+        "durationHours": {
+          "type": "string",
+          "description": "DurationHours specifies the number of hours before the rate limit is reset (e.g. 24 indicates that the rate limit is reset each day)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Update Rate Limit",
+      "description": "Gov tx to update an existing rate limit"
+    }
+  }
+}

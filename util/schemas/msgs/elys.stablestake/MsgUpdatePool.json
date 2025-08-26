@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdatePool",
+    "definitions": {
+        "MsgUpdatePool": {
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "interest_rate_max": {
+                    "type": "string"
+                },
+                "interest_rate_min": {
+                    "type": "string"
+                },
+                "interest_rate_increase": {
+                    "type": "string"
+                },
+                "interest_rate_decrease": {
+                    "type": "string"
+                },
+                "health_gain_factor": {
+                    "type": "string"
+                },
+                "max_leverage_ratio": {
+                    "type": "string"
+                },
+                "pool_id": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Pool"
+        }
+    }
+}

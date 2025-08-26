@@ -100,7 +100,7 @@ export default function Submit() {
     username,
     address,
     openView
-  } = useChain('intentotestnet')
+  } = useChain(process.env.NEXT_PUBLIC_INTO_REGISTRY_NAME)
 
   // Watch for address changes and trigger the mutation
   const { mutate: afterConnectWallet = () => { } } = useAfterConnectWallet() || {}
@@ -248,7 +248,7 @@ export default function Submit() {
             feeFunds: parsedData?.feeFunds || undefined,
             configuration: parsedData?.configuration || undefined,
             conditions: parsedData?.conditions || undefined,
-            hostedIcaConfig: parsedData?.hostedIcaConfig || undefined,
+            trustlessAgent: parsedData?.trustlessAgent || undefined,
             icaAddressForAuthZ: parsedData?.icaAddressForAuthZ || undefined,
             connectionId: parsedData?.connectionId || undefined,
             hostConnectionId: parsedData?.hostConnectionId || undefined
@@ -341,7 +341,7 @@ export default function Submit() {
           </div>
 
           {/* Wallet Button */}
-          {!flowInput?.hostedIcaConfig || flowInput?.hostedIcaConfig?.feeCoinLimit?.denom == 'uinto' && <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
+          {!flowInput?.trustlessAgent || flowInput?.trustlessAgent?.feeLimit?.[0]?.denom == 'uinto' && <div style={{ width: isSmallOrMediumScreen ? '100%' : '300px', marginLeft: isSmallOrMediumScreen ? '0' : '20px' }}>
             <WalletButton
               onClick={openView}
               connected={walletStatusesConnected && isClientConnected}

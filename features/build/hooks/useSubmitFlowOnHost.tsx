@@ -62,18 +62,18 @@ export const useSubmitFlowOnHost = ({
       }
       return intoWallet.address;
     }
-    
+
     if (value === 'Your Address') {
       if (!address) {
         throw new Error('Your Address placeholder found but no IBC wallet connected');
       }
       return address;
     }
-    
+
     if (Array.isArray(value)) {
       return value.map(processValue);
     }
-    
+
     if (value !== null && typeof value === 'object') {
       const result: Record<string, any> = {};
       for (const [key, val] of Object.entries(value)) {
@@ -81,7 +81,7 @@ export const useSubmitFlowOnHost = ({
       }
       return result;
     }
-    
+
     return value;
   };
 
@@ -111,12 +111,12 @@ export const useSubmitFlowOnHost = ({
         const flowStartTime = flowInput.startTime ? Math.floor(flowInput.startTime / 1000) : now;
         const flowDuration = flowInput.duration ? Math.ceil(flowInput.duration / 1000) : 0;
         // Set expiration to flow end time + 1 days buffer (in seconds)
-        const expirationTime = flowStartTime + flowDuration + ( 24 * 60 * 60);
+        const expirationTime = flowStartTime + flowDuration + (24 * 60 * 60);
 
         // Determine grantee address - use propGrantee if provided, otherwise fall back to flowInput values
         const granteeAddress = propGrantee ||
           flowInput.icaAddressForAuthZ ||
-          flowInput.hostedIcaConfig?.hostedAddress;
+          flowInput.trustlessAgent?.agentAddress;
 
         if (!granteeAddress) {
           const errorMsg = 'No grantee address available for authz grants. Please check your connection and try again.';
@@ -163,7 +163,7 @@ export const useSubmitFlowOnHost = ({
         return messages.map(msgStr => {
           try {
             const msg = typeof msgStr === 'string' ? JSON.parse(msgStr) : msgStr;
-            
+
             // Handle nested messages in MsgExec
             if (msg.typeUrl === '/cosmos.authz.v1beta1.MsgExec' && msg.value?.msgs) {
               return {
@@ -172,10 +172,10 @@ export const useSubmitFlowOnHost = ({
                 msgs: transformMessages(msg.value.msgs),
               };
             }
-            
+
             // Process the message to replace any placeholders
             const processedMsg = processValue(msg);
-            
+
             // If the message is already in the correct format, return it as is
             if (processedMsg['@type'] || processedMsg.typeUrl) {
               // Ensure typeUrl is replaced with @type if needed
@@ -212,22 +212,24 @@ export const useSubmitFlowOnHost = ({
             ? Math.floor((Date.now() + flowInput.startTime) / 1000)
             : "0",
           interval: flowInput.interval ? `${Math.ceil(flowInput.interval / 1000)}s` : '0',
-          hosted_account: flowInput.hostedIcaConfig?.hostedAddress || "",
+          trustless_agent: flowInput.trustlessAgent?.agentAddress || "",
           cid: flowInput.connectionId || "",
           stop_on_fail: flowInput.configuration.stopOnFailure.toString(),
           stop_on_timeout: flowInput.configuration.stopOnTimeout.toString(),
           stop_on_success: flowInput.configuration.stopOnSuccess.toString(),
-          fallback: flowInput.configuration.fallbackToOwnerBalance.toString(),
+          fallback: flowInput.configuration.walletFallback.toString(),
           update_disabled: flowInput.configuration.updatingDisabled.toString(),
           save_responses: flowInput.configuration.saveResponses.toString(),
           conditions: flowInput.conditions,
-          hosted_fee_limit: flowInput.hostedIcaConfig?.feeCoinLimit.amount+"uinto",//flowInput.hostedIcaConfig?.feeCoinLimit.denom,
+          fee_limit: flowInput.trustlessAgent?.feeLimit
+            ?.map(f => `${f.amount}${f.denom}`)
+            .join(','),
           label: flowInput.label,
         },
       })
 
       // Use provided fee or fallback to the one from flowInput
-      const feeAmount = propFee?.amount || flowInput.hostedIcaConfig?.feeCoinLimit?.amount?.toString() || '0'
+      const feeAmount = propFee?.amount || flowInput.trustlessAgent?.feeLimit?.[0]?.amount?.toString() || '0'
       const feeDenom = propFee?.denom || ibcAssetInfo.denom
 
       // Create MsgTransfer to send tokens to the host chain

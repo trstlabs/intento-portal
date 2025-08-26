@@ -38,15 +38,15 @@
         },
         "title": {
           "type": "string",
-          "description": "title is the title of the proposal."
+          "description": "title is the title of the proposal. Since: cosmos-sdk 0.47"
         },
         "summary": {
           "type": "string",
-          "description": "summary is the summary of the proposal"
+          "description": "summary is the summary of the proposal Since: cosmos-sdk 0.47"
         },
         "expedited": {
           "type": "boolean",
-          "description": "expedited defines if the proposal is expedited or not"
+          "description": "expedited defines if the proposal is expedited or not Since: cosmos-sdk 0.50"
         }
       },
       "additionalProperties": false,

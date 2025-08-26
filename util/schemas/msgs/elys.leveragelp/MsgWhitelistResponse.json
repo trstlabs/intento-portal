@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgWhitelistResponse",
+    "definitions": {
+        "MsgWhitelistResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Whitelist Response"
+        }
+    }
+}

@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgSubmitQueryResponseResponse",
+    "definitions": {
+        "MsgSubmitQueryResponseResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Submit Query Response Response",
+            "description": "MsgSubmitQueryResponseResponse defines the MsgSubmitQueryResponse response type."
+        }
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyTx",
+    "definitions": {
+        "LegacyTx": {
+            "properties": {
+                "nonce": {
+                    "type": "string",
+                    "description": "nonce corresponds to the account nonce (transaction sequence)."
+                },
+                "gas_price": {
+                    "type": "string",
+                    "description": "gas_price defines the value for each gas unit"
+                },
+                "gas": {
+                    "type": "string",
+                    "description": "gas defines the gas limit defined for the transaction."
+                },
+                "to": {
+                    "type": "string",
+                    "description": "to is the hex formatted address of the recipient"
+                },
+                "value": {
+                    "type": "string",
+                    "description": "value defines the unsigned integer value of the transaction amount."
+                },
+                "data": {
+                    "type": "string",
+                    "description": "data is the data payload bytes of the transaction.",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "v": {
+                    "type": "string",
+                    "description": "v defines the signature value",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "r": {
+                    "type": "string",
+                    "description": "r defines the signature value",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                },
+                "s": {
+                    "type": "string",
+                    "description": "s define the signature value",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Tx",
+            "description": "LegacyTx is the transaction data of regular Ethereum transactions. NOTE: All non-protected transactions (i.e non EIP155 signed) will fail if the AllowUnprotectedTxs parameter is disabled."
+        }
+    }
+}

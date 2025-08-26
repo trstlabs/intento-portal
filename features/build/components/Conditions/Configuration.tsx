@@ -6,7 +6,7 @@ import {
   Tooltip,
 } from 'junoblocks'
 import React, { useState } from 'react'
-import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 type ConfigurationProps = {
   config: ExecutionConfiguration
@@ -69,7 +69,7 @@ export const Configuration = ({
     // Create a deep copy of the config to avoid mutation issues
     const newConfig = {
       ...config,
-      fallbackToOwnerBalance: !config.fallbackToOwnerBalance
+      walletFallback: !config.walletFallback
     }
     onChange(newConfig)
   }
@@ -201,7 +201,7 @@ export const Configuration = ({
                   id="fallback"
                   name="fallback"
                   onChange={() => fallback()}
-                  checked={config.fallbackToOwnerBalance}
+                  checked={config.walletFallback}
                   optionLabels={['no fallback', 'fallback']}
                 />
               }

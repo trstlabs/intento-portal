@@ -76,10 +76,10 @@ export const executeSubmitFlow = async ({
     feeFunds = [flowInput.feeFunds]
   }
   // if (flowInput.connectionId && flowInput.hostConnectionId) {
-  //   flowInput.hostedIcaConfig = undefined
+  //   flowInput.trustlessAgent = undefined
   // }
   const msgSubmitFlow =
-    intento.intent.v1beta1.MessageComposer.withTypeUrl.submitFlow({
+    intento.intent.v1.MessageComposer.withTypeUrl.submitFlow({
       owner,
       msgs,
       label: flowInput.label ? flowInput.label : '',
@@ -95,11 +95,11 @@ export const executeSubmitFlow = async ({
           stopOnSuccess: false,
           stopOnFailure: false,
           stopOnTimeout: false,
-          fallbackToOwnerBalance: true,
+          walletFallback: true,
         },
       feeFunds,
       conditions: flowInput.conditions,
-      hostedIcaConfig: flowInput.hostedIcaConfig,
+      trustlessAgent: flowInput.trustlessAgent,
     })
   console.log('Submitting msgSubmitFlow ⬇')
   console.log(msgSubmitFlow)

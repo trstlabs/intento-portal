@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateTakeProfitPrice",
+    "definitions": {
+        "MsgUpdateTakeProfitPrice": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Take Profit Price"
+        }
+    }
+}

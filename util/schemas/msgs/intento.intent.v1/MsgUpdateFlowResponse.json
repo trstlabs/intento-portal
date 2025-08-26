@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateFlowResponse",
+    "definitions": {
+        "MsgUpdateFlowResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Flow Response",
+            "description": "MsgUpdateTxResponse defines the MsgUpdateTx response type"
+        }
+    }
+}

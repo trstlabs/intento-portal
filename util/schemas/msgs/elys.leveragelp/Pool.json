@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/Pool",
+    "definitions": {
+        "Pool": {
+            "properties": {
+                "amm_pool_id": {
+                    "type": "string"
+                },
+                "health": {
+                    "type": "string"
+                },
+                "leveraged_lp_amount": {
+                    "type": "string"
+                },
+                "leverage_max": {
+                    "type": "string"
+                },
+                "max_leveragelp_ratio": {
+                    "type": "string"
+                },
+                "asset_leverage_amounts": {
+                    "items": {
+                        "$ref": "#/definitions/elys.leveragelp.AssetLeverageAmount"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Pool"
+        },
+        "elys.leveragelp.AssetLeverageAmount": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "leveraged_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Asset Leverage Amount"
+        }
+    }
+}

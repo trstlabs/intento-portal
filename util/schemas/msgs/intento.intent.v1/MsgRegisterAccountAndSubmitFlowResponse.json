@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgRegisterAccountAndSubmitFlowResponse",
+    "definitions": {
+        "MsgRegisterAccountAndSubmitFlowResponse": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Register Account And Submit Flow Response",
+            "description": "MsgRegisterAccountAndSubmitFlowResponse defines the MsgSubmitTx response type"
+        }
+    }
+}

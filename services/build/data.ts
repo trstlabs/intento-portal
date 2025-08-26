@@ -1,9 +1,9 @@
 import { Grant } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
 import {
-  QueryHostedAccountResponse,
-  QueryHostedAccountsResponse,
+  QueryTrustlessAgentResponse,
+  QueryTrustlessAgentsResponse,
   QueryInterchainAccountFromAddressResponse,
-} from 'intentojs/dist/codegen/intento/intent/v1beta1/query'
+} from 'intentojs/dist/codegen/intento/intent/v1/query'
 import { cosmos } from 'intentojs'
 import { QueryGranteeGrantsRequest } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/query'
 
@@ -20,7 +20,7 @@ export const getICA = async ({
 }: ICAQueryInput) => {
   try {
     const response: QueryInterchainAccountFromAddressResponse =
-      await rpcClient.intento.intent.v1beta1.interchainAccountFromAddress({
+      await rpcClient.intento.intent.v1.interchainAccountFromAddress({
         owner,
         connectionId,
       })
@@ -34,29 +34,29 @@ export const getICA = async ({
   }
 }
 
-export const getHostedAccounts = async ({ rpcClient }) => {
+export const getTrustlessAgents = async ({ rpcClient }) => {
   try {
-    const response: QueryHostedAccountsResponse =
-      await rpcClient.intento.intent.v1beta1.hostedAccounts({})
+    const response: QueryTrustlessAgentsResponse =
+      await rpcClient.intento.intent.v1.trustlessAgents({})
 
-    return response.hostedAccounts
+    return response.trustlessAgents
   } catch (e) {
     if (e.message.includes('account found')) {
       return []
     } else {
-      console.error('err(getHostedAccounts):', e)
+      console.error('err(getTrustlessAgents):', e)
     }
   }
 }
 
-export const getHostedAccount = async ({ rpcClient, address }) => {
+export const getTrustlessAgent = async ({ rpcClient, address }) => {
   try {
-    const response: QueryHostedAccountResponse =
-      await rpcClient.intento.intent.v1beta1.hostedAccount({ address })
+    const response: QueryTrustlessAgentResponse =
+      await rpcClient.intento.intent.v1.trustlessAgent({ address })
 
     return response
   } catch (e) {
-    console.error('err(getHostedAccount):', e, address)
+    console.error('err(getTrustlessAgent):', e, address)
   }
 }
 

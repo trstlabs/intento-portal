@@ -11,7 +11,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Prune Allowances",
-      "description": "MsgPruneAllowances prunes expired fee allowances."
+      "description": "MsgPruneAllowances prunes expired fee allowances. Since cosmos-sdk 0.50"
     }
   }
 }

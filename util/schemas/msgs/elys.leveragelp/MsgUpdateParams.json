@@ -1,0 +1,64 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgUpdateParams",
+    "definitions": {
+        "MsgUpdateParams": {
+            "properties": {
+                "authority": {
+                    "type": "string",
+                    "description": "authority is the address that controls the module (defaults to x/gov unless overwritten)."
+                },
+                "params": {
+                    "$ref": "#/definitions/elys.leveragelp.Params",
+                    "additionalProperties": false,
+                    "description": "NOTE: All parameters must be supplied."
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Update Params"
+        },
+        "elys.leveragelp.Params": {
+            "properties": {
+                "leverage_max": {
+                    "type": "string"
+                },
+                "max_open_positions": {
+                    "type": "string"
+                },
+                "pool_open_threshold": {
+                    "type": "string"
+                },
+                "safety_factor": {
+                    "type": "string"
+                },
+                "whitelisting_enabled": {
+                    "type": "boolean"
+                },
+                "epoch_length": {
+                    "type": "string"
+                },
+                "fallback_enabled": {
+                    "type": "boolean"
+                },
+                "number_per_block": {
+                    "type": "string",
+                    "description": "Number of positions to process per block"
+                },
+                "enabled_pools": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "exit_buffer": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params",
+            "description": "Params defines the parameters for the module."
+        }
+    }
+}

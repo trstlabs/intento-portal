@@ -1,4 +1,4 @@
-export { FlowInfosModule,FlowInfoBreakdown } from './components'
+export { FlowsModule,FlowBreakdown } from './components'
 
 export type { SortDirections, SortParameters } from './hooks/useSortFlows'
 export { useSortFlows } from './hooks/useSortFlows'

@@ -1,5 +1,5 @@
 import { AppLayout, NavigationSidebar } from 'components'
-import { FlowInfoBreakdown } from '../../features/flows'
+import { FlowBreakdown } from '../../features/flows'
 import {
   Button,
   ChevronIcon,
@@ -14,9 +14,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
 import { APP_NAME } from 'util/constants'
-import { useFlowInfo } from '../../hooks/useFlowInfo'
+import { useFlow } from '../../hooks/useFlow'
 import { useIBCAssetInfoFromConnection } from '../../hooks/useIBCAssetInfo'
-import { useGetHostedICAByHostedAddress } from '../../hooks/useICA'
+import { useGetTrustlessAgentICAByTrustlessAgentAddress } from '../../hooks/useICA'
 
 export default function Flow() {
   const {
@@ -25,16 +25,24 @@ export default function Flow() {
 
   const isMobile = useMedia('sm')
 
-  const [flowInfo, isLoading] = useFlowInfo(id)
-  const [hostedICA, _isHostedICALoading] = useGetHostedICAByHostedAddress(flowInfo?.hostedIcaConfig?.hostedAddress)
+  const [flow, isLoading] = useFlow(id)
+  const [trustlessAgentICA, _isTrustlessAgentICALoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flow?.trustlessAgent?.agentAddress)
 
-  const connectionId = flowInfo ? (
-    flowInfo.icaConfig?.connectionId && flowInfo.icaConfig.connectionId !== '' 
-      ? flowInfo.icaConfig.connectionId 
-      : flowInfo.hostedIcaConfig && hostedICA?.icaConfig?.connectionId 
-      ? hostedICA.icaConfig.connectionId 
-      : ''
+  const connectionId = flow ? (
+    flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== ''
+      ? flow.selfHostedIca.connectionId
+      : flow.trustlessAgent && trustlessAgentICA?.icaConfig?.connectionId
+        ? trustlessAgentICA.icaConfig.connectionId
+        : ''
   ) : ''
+
+  //can speed up connection id retrieval or display
+  // const connectionId = flow ? (
+  //   flow.trustlessAgent?.connectionId && flow.trustlessAgent.connectionId !== ''
+  //     ? flow.trustlessAgent.connectionId
+  //     : flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== ''
+  //       ? flow.selfHostedIca.connectionId
+  //       : trustlessAgentICA?.icaConfig?.connectionId || ''
 
   const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
@@ -72,10 +80,10 @@ export default function Flow() {
           />
         }
       >
-        {APP_NAME && flowInfo != undefined && (
+        {APP_NAME && flow != undefined && (
           <Head>
             <title>
-              {APP_NAME} — Flow {flowInfo.label || flowInfo.id}
+              {APP_NAME} — Flow {flow.label || flow.id}
             </title>
           </Head>
         )}
@@ -86,18 +94,18 @@ export default function Flow() {
           </StyledDiv>
         )}
 
-        {!isLoading &&
-          (flowInfo && flowInfo.feeAddress ? (
-            <>
-              <FlowInfoBreakdown flowInfo={flowInfo} ibcInfo={ibcInfo} />
-            </>
-          ) : (
-            <StyledDiv>
-              <Text variant="legend">
-                <>Flow not found in this space continuum 🌌 </>
-              </Text>{' '}
-            </StyledDiv>
-          ))}
+        {!isLoading && flow && flow.feeAddress &&
+          <>
+            <FlowBreakdown flow={flow} ibcInfo={ibcInfo} />
+          </>
+        }
+        {!isLoading && !flow && (
+          <StyledDiv>
+            <Text variant="legend">
+              <>Flow not found in this space continuum 🌌 </>
+            </Text>{' '}
+          </StyledDiv>
+        )}
       </AppLayout>
     </>
   )

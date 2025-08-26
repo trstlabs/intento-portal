@@ -1,6 +1,6 @@
 import { Text, Tooltip, Button, UnionIcon, Divider } from "junoblocks";
 import { Field } from "./Fields";
-import { ICQConfig } from "intentojs/dist/codegen/intento/intent/v1beta1/flow";
+import { ICQConfig } from "intentojs/dist/codegen/intento/intent/v1/flow";
 import Dropdown from "./Dropdown";
 import { TimeoutPolicy } from "intentojs/dist/codegen/stride/interchainquery/v1/genesis";
 import { ChainSelector } from "../ChainSelector/ChainSelector";

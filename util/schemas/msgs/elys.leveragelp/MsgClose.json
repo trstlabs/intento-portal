@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/MsgClose",
+    "definitions": {
+        "MsgClose": {
+            "properties": {
+                "creator": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "lp_amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Msg Close"
+        }
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyParams",
+    "definitions": {
+        "LegacyParams": {
+            "properties": {
+                "deposit_denom": {
+                    "type": "string"
+                },
+                "redemption_rate": {
+                    "type": "string"
+                },
+                "epoch_length": {
+                    "type": "string"
+                },
+                "interest_rate": {
+                    "type": "string"
+                },
+                "interest_rate_max": {
+                    "type": "string"
+                },
+                "interest_rate_min": {
+                    "type": "string"
+                },
+                "interest_rate_increase": {
+                    "type": "string"
+                },
+                "interest_rate_decrease": {
+                    "type": "string"
+                },
+                "health_gain_factor": {
+                    "type": "string"
+                },
+                "total_value": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Params"
+        }
+    }
+}

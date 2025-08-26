@@ -16,7 +16,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Update Params",
-      "description": "MsgUpdateParams is the Msg/UpdateParams request type."
+      "description": "MsgUpdateParams is the Msg/UpdateParams request type. Since: cosmos-sdk 0.47"
     },
     "cosmos.base.v1beta1.Coin": {
       "properties": {
@@ -72,21 +72,21 @@
         },
         "proposalCancelRatio": {
           "type": "string",
-          "description": "The cancel ratio which will not be returned back to the depositors when a proposal is cancelled."
+          "description": "The cancel ratio which will not be returned back to the depositors when a proposal is cancelled. Since: cosmos-sdk 0.50"
         },
         "proposalCancelDest": {
           "type": "string",
-          "description": "The address which will receive (proposal_cancel_ratio * deposit) proposal deposits. If empty, the (proposal_cancel_ratio * deposit) proposal deposits will be burned."
+          "description": "The address which will receive (proposal_cancel_ratio * deposit) proposal deposits. If empty, the (proposal_cancel_ratio * deposit) proposal deposits will be burned. Since: cosmos-sdk 0.50"
         },
         "expeditedVotingPeriod": {
           "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
           "type": "string",
-          "description": "Duration of the voting period of an expedited proposal.",
+          "description": "Duration of the voting period of an expedited proposal. Since: cosmos-sdk 0.50",
           "format": "regex"
         },
         "expeditedThreshold": {
           "type": "string",
-          "description": "Minimum proportion of Yes votes for proposal to pass. Default value: 0.67."
+          "description": "Minimum proportion of Yes votes for proposal to pass. Default value: 0.67. Since: cosmos-sdk 0.50"
         },
         "expeditedMinDeposit": {
           "items": {
@@ -110,13 +110,13 @@
         },
         "minDepositRatio": {
           "type": "string",
-          "description": "The ratio representing the proportion of the deposit value minimum that must be met when making a deposit. Default value: 0.01. Meaning that for a chain with a min_deposit of 100stake, a deposit of 1stake would be required."
+          "description": "The ratio representing the proportion of the deposit value minimum that must be met when making a deposit. Default value: 0.01. Meaning that for a chain with a min_deposit of 100stake, a deposit of 1stake would be required. Since: cosmos-sdk 0.50"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "title": "Params",
-      "description": "Params defines the parameters for the x/gov module."
+      "description": "Params defines the parameters for the x/gov module. Since: cosmos-sdk 0.47"
     }
   }
 }

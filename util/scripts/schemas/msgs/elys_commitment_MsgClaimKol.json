@@ -1,0 +1,18 @@
+{
+  "$ref": "#/definitions/MsgClaimKol",
+  "definitions": {
+    "MsgClaimKol": {
+      "properties": {
+        "claimAddress": {
+          "type": "string"
+        },
+        "refund": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "title": "Msg Claim Kol"
+    }
+  }
+}

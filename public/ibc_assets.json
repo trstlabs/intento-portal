@@ -1,20 +1,8 @@
 [
   {
-    "id": "Intento Testnet",
-    "name": "Intento Testnet",
-    "registry_name": "intentotestnet",
-    "symbol": "INTO",
-    "chain_id": "intento-ics-test-1",
-    "denom": "uinto",
-    "decimals": 6,
-    "denom_local": "uinto",
-    "logo_uri": "https://intento.zone/assets/images/icon.png",
-    "prefix": "into"
-  },
-  {
-    "id": "Cosmos Hub",
-    "name": "Cosmos Hub Local",
-    "registry_name": "cosmostest",
+    "id": "GAIA",
+    "name": "Cosmos Hub Devnet",
+    "registry_name": "cosmosdev",
     "symbol": "ATOM",
     "chain_id": "GAIA",
     "denom": "uatom",
@@ -26,40 +14,35 @@
     "connection_id": "connection-0",
     "counterparty_connection_id": "connection-0",
     "prefix": "cosmos",
-    "rpc": "https://gaia-rpc-t.trustlesshub.com"
+    "rpc": "https://rpc-cosmoshub-devnet.intento.zone"
   },
   {
-    "id": "Osmosis",
-    "name": "Osmosis Testnet",
+    "id": "intento-dev-1",
+    "name": "Intento Devnet",
+    "registry_name": "intentodevnet",
+    "symbol": "INTO",
+    "chain_id": "intento-dev-1",
+    "denom": "uinto",
+    "decimals": 6,
+    "denom_local": "uinto",
+    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/intentotestnet/images/into.png",
+    "prefix": "into"
+  },
+  {
+    "id": "OSMO",
+    "name": "Osmosis Devnet",
+    "registry_name": "",
     "symbol": "OSMO",
-    "chain_id": "osmo-test-5",
-    "registry_name": "osmosistestnet",
+    "chain_id": "OSMO",
     "denom": "uosmo",
     "decimals": 6,
-    "channel": "channel-8",
-    "channel_to_intento": "channel-10411",
-    "denom_local": "ibc/92E0120F15D037353CFB73C14651FC8930ADC05B93100FD7754D3A689E53B333",
+    "channel": "channel-141",
+    "channel_to_intento": "channel-141",
+    "denom_local": "",
     "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg",
-    "connection_id": "connection-2",
-    "counterparty_connection_id": "connection-4071",
+    "connection_id": "",
+    "counterparty_connection_id": "",
     "prefix": "osmo",
-    "rpc": "https://rpc.osmotest5.osmosis.zone"
-  },
-  {
-    "id": "Elys Testnet",
-    "name": "Elys Testnet",
-    "registry_name": "elystestnet",
-    "symbol": "ELYS",
-    "chain_id": "elysicstestnet-1",
-    "denom": "uelys",
-    "decimals": 6,
-    "channel": "channel-13",
-    "channel_to_intento": "channel-97",
-    "denom_local": "ibc/17409F270CB2FE874D5E3F339E958752DEC39319E5A44AD0399D2D1284AD499C",
-    "logo_uri": "https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png",
-    "connection_id": "connection-3",
-    "counterparty_connection_id": "connection-13",
-    "prefix": "elys",
-    "rpc": "https://rpc.testnet.elys.network"
+    "rpc": "https://rpc-osmosis-devnet.intento.zone"
   }
 ]

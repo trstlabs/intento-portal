@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/LegacyParams",
+    "definitions": {
+        "LegacyParams": {
+            "properties": {
+                "vesting_infos": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.VestingInfo"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "total_committed": {
+                    "items": {
+                        "$ref": "#/definitions/cosmos.base.v1beta1.Coin"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                },
+                "number_of_commitments": {
+                    "type": "string"
+                },
+                "enable_vest_now": {
+                    "type": "boolean"
+                },
+                "start_atom_stakers_height": {
+                    "type": "string"
+                },
+                "end_atom_stakers_height": {
+                    "type": "string"
+                },
+                "start_cadets_height": {
+                    "type": "string"
+                },
+                "end_cadets_height": {
+                    "type": "string"
+                },
+                "start_nft_holders_height": {
+                    "type": "string"
+                },
+                "end_nft_holders_height": {
+                    "type": "string"
+                },
+                "start_governors_height": {
+                    "type": "string"
+                },
+                "end_governors_height": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Legacy Params"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        },
+        "elys.commitment.VestingInfo": {
+            "properties": {
+                "base_denom": {
+                    "type": "string"
+                },
+                "vesting_denom": {
+                    "type": "string"
+                },
+                "num_blocks": {
+                    "type": "string"
+                },
+                "vest_now_factor": {
+                    "type": "string"
+                },
+                "num_max_vestings": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Vesting Info"
+        }
+    }
+}

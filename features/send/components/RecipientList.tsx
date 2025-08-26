@@ -28,7 +28,7 @@ import { useSubmitFlow } from '../../build/hooks'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { FlowInput } from '../../../types/trstTypes'
 import { Configuration } from '../../build/components/Conditions/Configuration'
-import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1beta1/flow'
+import { ExecutionConditions, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 export class RecipientInfo {
@@ -68,7 +68,7 @@ export const RecipientList = ({
     stopOnFailure: true,
     stopOnSuccess: false,
     stopOnTimeout: false,
-    fallbackToOwnerBalance: true,
+    walletFallback: true,
   }
   data.configuration = initConfig
   const initConditions: ExecutionConditions = {
@@ -407,7 +407,7 @@ export const RecipientList = ({
         isLoading={isExecutingSchedule}
         flowInput={{ ...flowInput, label: "Send Flow" }}
         isDialogShowing={isScheduleDialogShowing}
-        chainId={"intento-ics-test-1"}
+        chainId={process.env.NEXT_PUBLIC_INTO_CHAIN_ID}
         onRequestClose={() =>
           setScheduleDialogState({
             isShowing: false,

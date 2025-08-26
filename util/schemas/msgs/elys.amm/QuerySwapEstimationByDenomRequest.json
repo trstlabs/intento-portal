@@ -1,0 +1,40 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QuerySwapEstimationByDenomRequest",
+    "definitions": {
+        "QuerySwapEstimationByDenomRequest": {
+            "properties": {
+                "amount": {
+                    "$ref": "#/definitions/cosmos.base.v1beta1.Coin",
+                    "additionalProperties": false
+                },
+                "denom_in": {
+                    "type": "string"
+                },
+                "denom_out": {
+                    "type": "string"
+                },
+                "address": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Swap Estimation By Denom Request"
+        },
+        "cosmos.base.v1beta1.Coin": {
+            "properties": {
+                "denom": {
+                    "type": "string"
+                },
+                "amount": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Coin",
+            "description": "Coin defines a token with a denomination and an amount. NOTE: The amount field is an Int which implements the custom method signatures required by gogoproto."
+        }
+    }
+}

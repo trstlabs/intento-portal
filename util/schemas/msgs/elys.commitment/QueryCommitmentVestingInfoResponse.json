@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryCommitmentVestingInfoResponse",
+    "definitions": {
+        "QueryCommitmentVestingInfoResponse": {
+            "properties": {
+                "total": {
+                    "type": "string"
+                },
+                "vesting_details": {
+                    "items": {
+                        "$ref": "#/definitions/elys.commitment.VestingDetails"
+                    },
+                    "additionalProperties": false,
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Commitment Vesting Info Response"
+        },
+        "elys.commitment.VestingDetails": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "total_vesting": {
+                    "type": "string"
+                },
+                "claimed": {
+                    "type": "string"
+                },
+                "vested_so_far": {
+                    "type": "string"
+                },
+                "remaining_blocks": {
+                    "type": "string"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Vesting Details"
+        }
+    }
+}

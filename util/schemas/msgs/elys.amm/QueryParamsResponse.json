@@ -1,0 +1,75 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryParamsResponse",
+    "definitions": {
+        "QueryParamsResponse": {
+            "properties": {
+                "params": {
+                    "$ref": "#/definitions/elys.amm.Params",
+                    "additionalProperties": false,
+                    "description": "params holds all the parameters of this module."
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Params Response",
+            "description": "QueryParamsResponse is response type for the Query/Params RPC method."
+        },
+        "elys.amm.Params": {
+            "properties": {
+                "pool_creation_fee": {
+                    "type": "string"
+                },
+                "slippage_track_duration": {
+                    "type": "string",
+                    "description": "default 1 week: 604,800"
+                },
+                "base_assets": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "weight_breaking_fee_exponent": {
+                    "type": "string"
+                },
+                "weight_breaking_fee_multiplier": {
+                    "type": "string"
+                },
+                "weight_breaking_fee_portion": {
+                    "type": "string"
+                },
+                "weight_recovery_fee_portion": {
+                    "type": "string"
+                },
+                "threshold_weight_difference": {
+                    "type": "string"
+                },
+                "allowed_pool_creators": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "threshold_weight_difference_swap_fee": {
+                    "type": "string"
+                },
+                "lp_lockup_duration": {
+                    "type": "string"
+                },
+                "min_slippage": {
+                    "type": "string"
+                },
+                "allowed_upfront_swap_makers": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Params"
+        }
+    }
+}

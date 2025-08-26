@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/ICQConfig",
+    "definitions": {
+        "ICQConfig": {
+            "properties": {
+                "connection_id": {
+                    "type": "string"
+                },
+                "chain_id": {
+                    "type": "string"
+                },
+                "timeout_policy": {
+                    "enum": [
+                        "REJECT_QUERY_RESPONSE",
+                        "RETRY_QUERY_REQUEST",
+                        "EXECUTE_QUERY_CALLBACK"
+                    ],
+                    "type": "string",
+                    "title": "Timeout Policy"
+                },
+                "timeout_duration": {
+                    "pattern": "^([0-9]+\\.?[0-9]*|\\.[0-9]+)s$",
+                    "type": "string",
+                    "format": "regex"
+                },
+                "query_type": {
+                    "type": "string",
+                    "description": "e.g. store/bank/key store/staking/key"
+                },
+                "query_key": {
+                    "type": "string",
+                    "description": "key in the store that stores the query e.g. stakingtypes.GetValidatorKey(validatorAddressBz)"
+                },
+                "response": {
+                    "type": "string",
+                    "description": "should be reset after execution",
+                    "format": "binary",
+                    "binaryEncoding": "base64"
+                }
+            },
+            "additionalProperties": false,
+            "type": "object",
+            "title": "ICQ Config",
+            "description": "config for using interchain queries"
+        }
+    }
+}

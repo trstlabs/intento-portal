@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$ref": "#/definitions/QueryTotalRewardProgramClaimedRequest",
+    "definitions": {
+        "QueryTotalRewardProgramClaimedRequest": {
+            "additionalProperties": false,
+            "type": "object",
+            "title": "Query Total Reward Program Claimed Request"
+        }
+    }
+}

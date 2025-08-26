@@ -26,7 +26,7 @@
       "additionalProperties": false,
       "type": "object",
       "title": "Msg Set Send Enabled",
-      "description": "MsgSetSendEnabled is the Msg/SetSendEnabled request type. Only entries to add/update/delete need to be included. Existing SendEnabled entries that are not included in this message are left unchanged."
+      "description": "MsgSetSendEnabled is the Msg/SetSendEnabled request type. Only entries to add/update/delete need to be included. Existing SendEnabled entries that are not included in this message are left unchanged. Since: cosmos-sdk 0.47"
     },
     "cosmos.bank.v1beta1.SendEnabled": {
       "properties": {
