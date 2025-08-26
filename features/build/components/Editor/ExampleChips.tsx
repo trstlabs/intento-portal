@@ -159,7 +159,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
               responseKey: 'Amount.[0].Amount',
               msgsIndex: 1,
               msgKey: 'Amount',
-              valueType: 'sdk.Int',
+              valueType: 'math.Int',
             }
           ],
           comparisons: [{
@@ -167,7 +167,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
             responseKey: 'Amount.[0].Amount',
             operator: 4,
             operand: `1000000u${chainSymbol.toLowerCase()}`,
-            valueType: 'sdk.Int',
+            valueType: 'math.Int',
           }
           ],
         }
@@ -233,21 +233,21 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
               responseKey: "Amount.[0].Amount",
               msgsIndex: 1,
               msgKey: "Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             },
             {
               responseIndex: 0,
               responseKey: "Amount.[1].Amount",
               msgsIndex: 2,
               msgKey: "Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             },
             {
               responseIndex: 0,
               responseKey: "Amount.[2].Amount",
               msgsIndex: 3,
               msgKey: "Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             }
           ],
           comparisons: [
@@ -256,7 +256,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
               responseKey: "Amount.[0].Amount",
               operand: "1",
               operator: 4,
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             }
           ]
         }
@@ -333,28 +333,28 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
               responseKey: "Amount.[0].Amount",
               msgsIndex: 1,
               msgKey: "TokenIn.Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             },
             {
               responseIndex: 1,
               responseKey: "TokenOutAmount",
               msgsIndex: 2,
               msgKey: "Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             },
             {
               responseIndex: 0,
               responseKey: "Amount.[1].Amount",
               msgsIndex: 3,
               msgKey: "Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             },
             {
               responseIndex: 0,
               responseKey: "Amount.[2].Amount",
               msgsIndex: 4,
               msgKey: "Amount",
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             }
           ],
           comparisons: [
@@ -363,7 +363,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
               responseKey: "Amount.[0].Amount",
               operand: "1",
               operator: 4,
-              valueType: "sdk.Int"
+              valueType: "math.Int"
             }
           ]
         }
@@ -538,8 +538,91 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               />
             </>
           )}
-        </Inline>
-      )}
+          {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
+            <>  
+            <IntentTemlateChip
+              label="DCA Into Intento StreamSwap If Price < 0.10"
+              iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+              gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+              onClick={() => setAllMessages([
+                {
+                  typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+                  value: {
+                    grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
+                    msgs: [
+                      {
+                        typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                        value: {
+                          sender: 'Your Address',
+                          contract: 'osmo10wn49z4ncskjnmf8mq95uyfkj9kkveqx9jvxylccjs2w5lw4k6gsy4cj9l',
+                          msg: {
+                            subscribe: {
+                              stream_id: 8
+                            }
+                          },
+                          funds: [
+                            {
+                              denom: 'uusdc',
+                              amount: '1000000'
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              ], 'DCA Into Intento StreamSwap If Price < 0.10', 
+            {
+              conditions: {
+                feedbackLoops: [],
+                comparisons: [
+                  {
+                    flowId: "0",
+                    responseIndex: 0,
+                    responseKey: "current_streamed_price",
+                    valueType: "math.Dec",
+                    operator: 3,
+                    operand: "0.10",
+                    icqConfig: {
+                      connectionId: "connection-2",
+                      chainId: "osmosis-1",
+                      timeoutPolicy: 1,
+                      timeoutDuration: "30s",
+                      query_key: "AylrB+e1Er4B3oj5/0g/DtXcIqoRDNRL27tN6ekUl/fNAAZzdHJlYW0AAAAAAAAACA==",
+                      query_type: "store/wasm/key"
+                    }
+                  }
+                ],
+                stopOnSuccessOf: [],
+                stopOnFailureOf: [],
+                skipOnSuccessOf: [],
+                skipOnFailureOf: [],
+                useAndForComparisons: false
+              }
+            })}
+            />
+            <IntentTemlateChip
+                label="DCA 1 USDC to ATOM"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
+                onClick={() => setAllMessages([
+                  // Example: DCA flow: swap, send
+                  {
+                    typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
+                    value: {
+                      sender: 'Your Address',
+                      routes: [{ poolId: '1464', tokenOutDenom: 'uosmo' }, { poolId: '1265', tokenOutDenom: 'ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2' }],
+                      tokenIn: { denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', amount: '1000000' },
+                      tokenOutMinAmount: '1',
+                    },
+                  }
+                ], 'DCA into ATOM')}  
+            />
+            </>
+          )}
+        </Inline >
+      )
+}
     </>
   )
 }

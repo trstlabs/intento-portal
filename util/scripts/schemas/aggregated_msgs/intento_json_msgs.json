@@ -293,7 +293,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "operator": {
           "enum": [
@@ -438,7 +438,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "icqConfig": {
           "$ref": "#/definitions/intento.intent.v1.ICQConfig",
@@ -618,7 +618,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "operator": {
           "enum": [
@@ -763,7 +763,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "icqConfig": {
           "$ref": "#/definitions/intento.intent.v1.ICQConfig",
@@ -965,7 +965,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "operator": {
           "enum": [
@@ -1110,7 +1110,7 @@
         },
         "valueType": {
           "type": "string",
-          "description": "can be anything from sdk.Int, sdk.Coin, sdk.Coins, string, []string, []sdk.Int"
+          "description": "can be anything from math.Int, sdk.Coin, sdk.Coins, string, []string, []math.Int"
         },
         "icqConfig": {
           "$ref": "#/definitions/intento.intent.v1.ICQConfig",
