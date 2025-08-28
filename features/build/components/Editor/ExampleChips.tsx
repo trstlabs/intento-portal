@@ -538,7 +538,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               />
             </>
           )}
-          {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
+          {/* {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>  
             <IntentTemlateChip
               label="DCA Into Intento StreamSwap If Price < 0.10"
@@ -619,7 +619,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                 ], 'DCA into ATOM')}  
             />
             </>
-          )}
+          )} */}
         </Inline >
       )
 }
