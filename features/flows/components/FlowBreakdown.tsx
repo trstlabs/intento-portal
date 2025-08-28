@@ -44,7 +44,7 @@ import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { EditExecutionSection } from './EditExecutionSection'
-import { resolveDenoms } from '../../../util/conversion'
+import { convertFromMicroDenom, resolveDenoms } from '../../../util/conversion'
 
 
 type FlowBreakdownProps = {
@@ -598,7 +598,7 @@ export const FlowBreakdown = ({
                 </Text>
                 {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Fee Limit limits the amount of gas charged for your execution on the host chain by the Trustless Agent Interchain Account"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
                 {flow.trustlessAgent.feeLimit?.length > 0 && flow.trustlessAgent.feeLimit.map((feeLimit: any) => (
-                  <Text variant="caption" > {feeLimit.amount} {feeLimit.denom}</Text>
+                  <Text variant="caption" > {convertFromMicroDenom(feeLimit.amount)} {feeLimit.denom}</Text>
                 ))}
 
               </>
