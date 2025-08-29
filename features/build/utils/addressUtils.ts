@@ -34,18 +34,58 @@ export const replaceAddressFields = (obj: any, isLocal: boolean): any => {
     return result;
 };
 
+// Helper function to process denom fields and convert to micro units
+export const processDenomFields = (obj: any): any => {
+    if (!obj || typeof obj !== 'object') return obj;
+
+    // Handle arrays
+    if (Array.isArray(obj)) {
+        return obj.map(processDenomFields);
+    }
+
+    const result = { ...obj };
+
+    // Process denom and amount if denom exists and needs conversion
+    if ('denom' in result && typeof result.denom === 'string') {
+        const denom = result.denom;
+        if (denom === denom.toUpperCase() && !denom.startsWith('u') && !denom.startsWith('i')) {
+            // Convert symbol to micro-denom (e.g., 'INTO' -> 'uinto')
+            result.denom = 'u' + denom.toLowerCase();
+            
+            // Convert amount to micro units (10^6) if it exists
+            if ('amount' in result && typeof result.amount === 'string') {
+                const amount = parseFloat(result.amount);
+                if (!isNaN(amount)) {
+                    result.amount = Math.floor(amount * 1_000_000).toString();
+                }
+            }
+        }
+    }
+
+    // Recursively process nested objects
+    Object.keys(result).forEach(key => {
+        if (result[key] && typeof result[key] === 'object') {
+            result[key] = processDenomFields(result[key]);
+        }
+    });
+
+    return result;
+};
+
 // Function to process flow input messages
 export const processFlowInput = (flowInput: FlowInput, isLocal: boolean) => {
     if (!flowInput?.msgs) return flowInput;
+    
     return {
         ...flowInput,
         msgs: flowInput.msgs.map((msg: string) => {
             try {
                 const parsedMsg = JSON.parse(msg);
-
-                const processedMsg = replaceAddressFields(parsedMsg, isLocal);
-                return JSON.stringify(processedMsg, null, 2);
-
+                const withProcessedAddresses = replaceAddressFields(parsedMsg, isLocal);
+                const withProcessedDenoms = processDenomFields(withProcessedAddresses);
+                console.log(withProcessedDenoms)
+                console.log("PROCESSS")
+                return JSON.stringify(withProcessedDenoms, null, 2);
             } catch (e) {
                 console.error('Failed to process message:', e);
                 return msg; // Return original if parsing/processing fails

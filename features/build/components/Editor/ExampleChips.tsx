@@ -144,8 +144,8 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
             validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First',
             amount: {
-              denom: `u${chainSymbol.toLowerCase()}`,
-              amount: '10', // This will be replaced by the feedback loop
+              denom: `${chainSymbol}`,
+              amount: '1', // This will be replaced by the feedback loop
             },
           },
         },
@@ -449,8 +449,8 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                   fromAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
                   toAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
                   amount: [{
-                    denom: `u${chainSymbol.toLowerCase()}`,
-                    amount: '1000000'
+                    denom: `${chainSymbol}`,
+                    amount: '1'
                   }]
                 }
               }
@@ -497,7 +497,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     value: {
                       sender: 'Your Address',
                       routes: [{ poolId: '308', tokenOutDenom: 'ibc/9FF2B7A5F55038A7EE61F4FD6749D9A648B48E89830F2682B67B5DC158E2753C' }],
-                      tokenIn: { denom: 'uosmo', amount: '1000000' },
+                      tokenIn: { denom: 'OSMO', amount: '1' },
                       tokenOutMinAmount: '1',
                     },
                   }
