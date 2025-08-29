@@ -160,8 +160,8 @@ export const FlowHistory = ({
                       <Column>
                         {packetSequences != undefined && <Text variant="caption"> Packet Sequences: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
                           <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
-                            {Number(packetSequence)} 
-                          { i < packetSequences.length - 1 && <span>, </span>}
+                            {Number(packetSequence)}
+                            {i < packetSequences.length - 1 && <span>, </span>}
                           </Link>
 
                         ))}</Text>}
@@ -178,7 +178,7 @@ export const FlowHistory = ({
 
                       <Column>
                         <Text variant="caption">
-                          Executed: {executed || errors.find((error) => error.includes('unknown message type: failed unmarshal proto any')) && __TEST_MODE__ === true ? <>🟢</> :
+                          Executed: {executed  ? <>🟢</> :
                             (Date.now() - actualExecTime.valueOf() >
                               60000 && !timedOut ? (
                                 <>🔴</>
@@ -193,15 +193,14 @@ export const FlowHistory = ({
                             (err.includes('ABCI code: 2:'));
                           const isWasmError = err.includes('error handling packet on host chain') && transformedMsgs?.find((msg) => msg.includes('.wasm.')) &&
                             (err.includes('ABCI code: 5:'));
-                          const isTestnetError = err.includes('unknown message type: failed unmarshal proto any') && __TEST_MODE__ === true;
-                          if (!isTestnetError) return (
-                            <Column>
-                              <Text variant="legend" style={{ paddingTop: '4px' }}>
-                                {isAuthZError ? 'AuthZ permission lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesfull result' : err}
-                              </Text>
 
-                            </Column>
-                          );
+                          <Column>
+                            <Text variant="legend" style={{ paddingTop: '4px' }}>
+                              {isAuthZError ? 'AuthZ permission lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesfull result' : err}
+                            </Text>
+
+                          </Column>
+
                         })}
                         {timedOut && (
                           <Text variant="legend">
