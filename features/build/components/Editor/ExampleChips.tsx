@@ -538,8 +538,73 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               />
             </>
           )}
-          {/* {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
-            <>  
+          {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
+            <>
+              <IntentTemlateChip
+                label="DCA Into Intento StreamSwap If Price < 0.10ATOM"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+                    value: {
+                      grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
+                      msgs: [
+                        {
+                          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                          value: {
+                            sender: 'Your Address',
+                            contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
+                            msg: {
+                              subscribe: {
+                                stream_id: 1
+                              }
+                            },
+                            funds: [
+                              {
+                                denom: 'uatom',
+                                amount: '1000000'
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ], 'DCA Into Intento StreamSwap If Price < 0.10ATOM',
+                  {
+                    conditions: {
+                      feedbackLoops: [],
+                      comparisons: [
+                        {
+                          flowId: "0",
+                          responseIndex: 0,
+                          responseKey: "current_streamed_price",
+                          valueType: "math.Dec",
+                          operator: 3,
+                          operand: "0.10",
+                          icqConfig: {
+                            connectionId: "connection-2",
+                            chainId: "osmosis-1",
+                            timeoutPolicy: 1,
+                            timeoutDuration: "30s",
+                            query_key: "AylrB+e1Er4B3oj5/0g/DtXcIqoRDNRL27tN6ekUl/fNAAZzdHJlYW0AAAAAAAAACA==",
+                            query_type: "store/wasm/key"
+                          }
+                        }
+                      ],
+                      stopOnSuccessOf: [],
+                      stopOnFailureOf: [],
+                      skipOnSuccessOf: [],
+                      skipOnFailureOf: [],
+                      useAndForComparisons: false
+                    }
+                  })}
+              />
+            </>
+          )}
+          {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
+            <>   {/*
             <IntentTemlateChip
               label="DCA Into Intento StreamSwap If Price < 0.10"
               iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
@@ -600,8 +665,8 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                 useAndForComparisons: false
               }
             })}
-            />
-            <IntentTemlateChip
+            /> */}
+              <IntentTemlateChip
                 label="DCA 1 USDC to ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
@@ -616,13 +681,13 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                       tokenOutMinAmount: '1',
                     },
                   }
-                ], 'DCA into ATOM')}  
-            />
+                ], 'DCA into ATOM')}
+              />
             </>
-          )} */}
+          )}
         </Inline >
       )
-}
+      }
     </>
   )
 }
