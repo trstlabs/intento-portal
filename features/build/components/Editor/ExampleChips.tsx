@@ -484,7 +484,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               ], 'DCA into ELYS')}
             />
           )}
-          {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
+          {/*     {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
             <>
               <IntentTemlateChip
                 label="DCA 1 OSMO to ATOM"
@@ -537,8 +537,46 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                 ], 'DCA StreamSwap 48')}
               />
             </>
-          )}
+          )} */}
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
+            <>
+              <IntentTemlateChip
+                label="DCA Into Intento StreamSwap"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+                    value: {
+                      grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
+                      msgs: [
+                        {
+                          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                          value: {
+                            sender: 'Your Address',
+                            contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
+                            msg: {
+                              subscribe: {
+                                stream_id: 1
+                              }
+                            },
+                            funds: [
+                              {
+                                denom: 'ATOM',
+                                amount: '1'
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ], 'DCA Into Intento StreamSwap',
+                )}
+              />
+            </>
+          )}
+          {/* {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemlateChip
                 label="DCA Into Intento StreamSwap If Price < 0.10ATOM"
@@ -585,7 +623,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                           operand: "0.10",
                           icqConfig: {
                             connectionId: "connection-2",
-                            chainId: "osmosis-1",
+                            chainId: "cosmoshub-4",
                             timeoutPolicy: 1,
                             timeoutDuration: "30s",
                             query_key: "AylrB+e1Er4B3oj5/0g/DtXcIqoRDNRL27tN6ekUl/fNAAZzdHJlYW0AAAAAAAAACA==",
@@ -602,7 +640,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                   })}
               />
             </>
-          )}
+          )} */}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>   {/*
             <IntentTemlateChip
