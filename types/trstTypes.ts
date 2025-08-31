@@ -52,4 +52,5 @@ export interface MsgUpdateFlowParams {
   feeFunds?: Coin[]
   version?: string
   configuration?: ExecutionConfiguration
+  conditions?: ExecutionConditions
 }
