@@ -158,7 +158,7 @@ export const FlowHistory = ({
                       ))}
 
                       <Column>
-                        {packetSequences != undefined && <Text variant="caption"> Packet Sequences: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet Sequences: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
                           <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
                             {Number(packetSequence)}
                             {i < packetSequences.length - 1 && <span>, </span>}
