@@ -10,6 +10,7 @@ import { Coin } from 'intentojs/dist/codegen/cosmos/base/v1beta1/coin'
 import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
 import { MsgExec } from "cosmjs-types/cosmos/authz/v1beta1/tx";
 import { Any } from "cosmjs-types/google/protobuf/any";
+import { processDenomFields } from '../../features/build/utils/addressUtils';
 
 type ExecuteSubmitFlowArgs = {
   owner: string
@@ -194,6 +195,8 @@ export function transformAndEncodeMsgs({
       ownerAddress,
       ibcWalletAddress
     });
+    value = processDenomFields(value)
+    console.log(value)
     let typeUrl: string = parsedMsg['typeUrl'].toString();
     msgs.push(encodeMsg(typeUrl, value));
   }

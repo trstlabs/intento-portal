@@ -66,12 +66,12 @@ export const useGetTrustlessAgentICAByConnectionID = (connectionId: string) => {
   const { data: ica, isLoading } = useQuery(
     `trustlessAgent/${connectionId}`,
     async () => {
-      const hostedAccs = await getTrustlessAgents({ rpcClient })
-      const hostedAcc = hostedAccs?.find(
-        (account) => account.icaConfig.connectionId == connectionId
+      console.log(connectionId)
+      const trustlessAgents = await getTrustlessAgents({ rpcClient })
+      const trustlessAgent = trustlessAgents?.find(
+        (account) => account.icaConfig.connectionId == connectionId && process.env.NEXT_PUBLIC_AGENT_LIST.includes(account.agentAddress)
       )
-
-      return hostedAcc
+      return trustlessAgent
     },
     {
       enabled: Boolean(connectionId && rpcClient),
@@ -90,12 +90,12 @@ export const useGetTrustlessAgentICAByTrustlessAgentAddress = (address: string) 
   const { data: ica, isLoading } = useQuery(
     `trustlessAgentByAddress/${address}`,
     async () => {
-      const hostedAccs = await getTrustlessAgents({ rpcClient })
-      const hostedAcc = hostedAccs?.find(
+      const trustlessAgents = await getTrustlessAgents({ rpcClient })
+      const trustlessAgent = trustlessAgents?.find(
         (account) => account.agentAddress == address
       )
 
-      return hostedAcc
+      return trustlessAgent
     },
     {
       enabled: Boolean(address && rpcClient),

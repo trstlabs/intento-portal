@@ -33,6 +33,7 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
+import { Dollar } from '../../icons/Dollar'
 
 
 type NavigationSidebarProps = {
@@ -189,7 +190,18 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Button>
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
-      {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' ? (
+
+      <Link href="https://streamswap.io/cosmos/stream/ATOM/1" passHref>
+        <Button
+          as="a"
+          variant="menu"
+          size="large"
+          iconLeft={<Dollar />}
+        >
+          <Inline css={{ paddingLeft: '$4' }}> Get INTO via StreamSwap </Inline>
+        </Button>
+      </Link>
+      {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' && (
         <Link href="/claim" passHref>
           <Button
             as="a"
@@ -201,16 +213,8 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             <Inline css={{ paddingLeft: '$4' }}> Airdrop </Inline>
           </Button>
         </Link>
-      ) : <Link href="https://discord.gg/ME76AXcsMm" passHref>
-        <Button
-          as="a"
-          variant="menu"
-          size="large"
-          iconLeft={<PoolsIcon />}
-        >
-          <Inline css={{ paddingLeft: '$4' }}> Faucet </Inline>
-        </Button>
-      </Link>}
+      )
+      }
       {/*  <Link href={process.env.NEXT_PUBLIC_GOVERNANCE_LINK_URL} passHref>
         <Button
           as="a"

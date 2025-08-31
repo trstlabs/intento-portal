@@ -170,7 +170,7 @@ export const ChainSelectorList = ({
         }}
       >
         <Text variant="legend">
-          Connected testnet chains
+          Connected Chains
         </Text>{' '}
         {filteredIcaChainList.map((chainInfo) => {
           return (

@@ -44,7 +44,7 @@ import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { EditExecutionSection } from './EditExecutionSection'
-import { resolveDenoms } from '../../../util/conversion'
+import { convertMicroDenomToDenom, resolveDenoms } from '../../../util/conversion'
 
 
 type FlowBreakdownProps = {
@@ -580,11 +580,11 @@ export const FlowBreakdown = ({
               <>
                 <Tooltip
                   label={
-                    "Address of the Trustless Agent Interchain Account (ICA) that is used to execute flows on the target chain. A Trustless Agent Interchain Account has it's own fee configuration"
+                    "Address of the Trustless Agent that is used to execute flows on the target chain. A Trustless Agent is an Interchain Account with a fee configuration."
                   }
                 >
                   <Text variant="legend" color="secondary" align="left">
-                    Trustless Agent Interchain Account Address
+                    Trustless Agent Address
                   </Text></Tooltip>
 
                 <Text css={{ wordBreak: 'break-all' }} variant="body">
@@ -596,9 +596,9 @@ export const FlowBreakdown = ({
                     <b>View Configuration</b>
                   </a>
                 </Text>
-                {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Fee Limit limits the amount of gas charged for your execution on the host chain by the Trustless Agent Interchain Account"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
+                {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Setting a Fee Limit limits the fee charged for your execution on the host chain by the Trustless Agent"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
                 {flow.trustlessAgent.feeLimit?.length > 0 && flow.trustlessAgent.feeLimit.map((feeLimit: any) => (
-                  <Text variant="caption" > {feeLimit.amount} {feeLimit.denom}</Text>
+                  <Text variant="caption" > {convertMicroDenomToDenom(feeLimit.amount, 6)} {feeLimit.denom}</Text>
                 ))}
 
               </>
