@@ -57,7 +57,6 @@ function IntentTemlateChip({ label, iconUrl, gradient, onClick }) {
 }
 
 import { useControlTheme } from 'junoblocks'
-import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
 
 function Chip({ label, onClick, icon }) {
   const themeController = useControlTheme();
