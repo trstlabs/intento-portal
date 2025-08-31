@@ -76,3 +76,8 @@ util/scripts/wasmd-main
 util/scripts/ibc-go-main
 util/scripts/aggregated_msgs
 
+.env.prod.local
+.env.test.local
+.env.dev.local
+
+
