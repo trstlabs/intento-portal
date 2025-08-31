@@ -52,6 +52,7 @@ export const executeUpdateFlow = async ({
         ? flowParams.configuration
         : undefined,
       feeFunds: flowParams.feeFunds ? flowParams.feeFunds : [],
+      conditions: flowParams.conditions ? flowParams.conditions : undefined,
     })
   console.log('Submitting MsgUpdateFlow ⬇')
   console.log(msgUpdateFlow)

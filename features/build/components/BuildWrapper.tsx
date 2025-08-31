@@ -1,5 +1,5 @@
 import { styled } from 'junoblocks'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { BuildComponent } from './BuildComponent'
 import { generalExamples } from './ExampleMsgs'
 import { FlowInput } from '../../../types/trstTypes'
@@ -45,67 +45,66 @@ export const BuildWrapper = ({
   initialFlowInput.label = "My Flow"
 
   const router = useRouter();
-  const { flowInput, initialChainId: urlChainId } = router.query;
+  const [flowInputs, setFlowInputs] = useState([initialFlowInput]);
 
-  // Initialize with default flow input or from URL
-  const [flowInputs, setFlowInputs] = useState(() => {
+  // Handle URL parameters in a separate effect
+  useEffect(() => {
+    if (!router.isReady) return;
+
+    const { flowInput, initialChainId } = router.query;
+    
     try {
       if (flowInput && typeof flowInput === 'string') {
         const parsed = JSON.parse(flowInput);
-        // If we have an initialChainId from URL but not in the flowInput, update it
-        if (urlChainId) {
-          const updatedFlow = {
+        let updatedFlow;
+        
+        if (initialChainId && typeof initialChainId === 'string') {
+          updatedFlow = {
             ...parsed,
-            connectionId: urlChainId,
-            hostedIcaConfig: parsed.hostedIcaConfig ? parsed.hostedIcaConfig : {},
-            // Preserve the label from the parsed flow input if it exists
+            connectionId: initialChainId,
+            hostedIcaConfig: parsed.hostedIcaConfig || {},
             label: parsed.label || ""
           };
-          return [processFlowInput(updatedFlow, false)];
+          setFlowInputs([processFlowInput(updatedFlow, false)]);
+        } else {
+          updatedFlow = {
+            ...parsed,
+            label: parsed.label || ""
+          };
+          setFlowInputs([processFlowInput(updatedFlow, true)]);
         }
-        // Preserve the label from the parsed flow input if it exists
-        const flowWithLabel = {
-          ...parsed,
-          label: parsed.label || ""
-        };
-        return [processFlowInput(flowWithLabel, true)];
       }
     } catch (e) {
       console.error('Failed to parse flowInput from URL', e);
     }
-    return [initialFlowInput];
-  });
+  }, [router.isReady, router.query]);
 
 
-  const initialMessageValue = useRef(initialMessage).current
-  const initialExampleValue = useRef(initialExample).current
-  useEffect(
-    function setInitialIfProvided() {
-      if (initialMessageValue) {
-        flowInputs[0].msgs[0] = initialMessageValue
-        setFlowInputs(flowInputs)
-      } else if (initialExampleValue) {
-        const exampleIndex = initialExampleValue
-        flowInputs[0].msgs[0] = JSON.stringify(
-          generalExamples[exampleIndex],
-          null,
-          '\t'
-        )
-        setFlowInputs(flowInputs)
-      }
-    },
-    [initialExampleValue, setFlowInputs]
-  )
-
+  // Handle initial message or example from props
   useEffect(() => {
-    if (flowInput) {
-      const parsedInput = Array.isArray(flowInput) ? flowInput[0] : flowInput;
-      setFlowInputs([JSON.parse(parsedInput)]);
+    if (initialMessage) {
+      const newFlowInputs = [...flowInputs];
+      if (!newFlowInputs[0].msgs) {
+        newFlowInputs[0].msgs = [];
+      }
+      newFlowInputs[0].msgs[0] = initialMessage;
+      setFlowInputs(newFlowInputs);
+    } else if (initialExample) {
+      const newFlowInputs = [...flowInputs];
+      if (!newFlowInputs[0].msgs) {
+        newFlowInputs[0].msgs = [];
+      }
+      newFlowInputs[0].msgs[0] = JSON.stringify(
+        generalExamples[initialExample],
+        null,
+        '\t'
+      );
+      setFlowInputs(newFlowInputs);
     }
-  }, [flowInput]);
+  }, [initialMessage, initialExample]);
 
   // Get the initialChainId from URL or from the first flow input
-  const effectiveInitialChainId = typeof urlChainId === 'string' ? urlChainId : '';
+  const effectiveInitialChainId = flowInputs[0]?.connectionId || '';
 
   const displayFlowInput = flowInputs[0];
 

@@ -21,7 +21,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateFlowParams } from '../../../types/trstTypes'
-import { Flow, ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Flow, ExecutionConfiguration, Comparison } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -37,7 +37,7 @@ import { getDuration, getRelativeTime } from '../../../util/time'
 
 import { FlowHistory } from './FlowHistory'
 import { FlowTransformButton, transformFlowMsgs } from './FlowTransformButton'
-import { ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
+import { ComparisonForm, ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
 import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
 import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
@@ -78,6 +78,8 @@ export const FlowBreakdown = ({
     flow.endTime.getTime() >= flow.execTime.getTime() && flow.endTime.getTime() > Date.now()
   //send funds on host
   const [feeFundsHostChain, setFeeFundsHostChain] = useState('0.00')
+  const [editingComparisonIndex, setEditingComparisonIndex] = useState<number | null>(null)
+  const [pendingComparison, setPendingComparison] = useState<Comparison | null>(null)
 
   const [requestedSendFunds, setRequestedSendFunds] = useState(false)
   const {
@@ -215,8 +217,38 @@ export const FlowBreakdown = ({
       owner: flow.owner,
     }
 
-    setUpdatedFlowParams(params)
-    return setRequestedUpdateFlow(true)
+    setUpdatedFlowParams({
+      ...params,
+      configuration: config,
+    })
+    setRequestedUpdateFlow(true);
+  }
+
+  function handleComparisonChange(updatedComparison: Comparison) {
+    setPendingComparison(updatedComparison);
+  }
+
+  function handleSaveComparison(index: number) {
+    if (!pendingComparison) return;
+    
+    const updatedComparisons = [...(flow.conditions.comparisons || [])];
+    updatedComparisons[index] = pendingComparison;
+    
+    // Create a new conditions object with the updated comparisons
+    const updatedConditions = {
+      ...flow.conditions,
+      comparisons: updatedComparisons,
+    };
+    
+    // Update the flow parameters with the new conditions
+    setUpdatedFlowParams((prev) => ({
+      ...prev,
+      conditions: updatedConditions,
+    }));
+    
+    setRequestedUpdateFlow(true);
+    setPendingComparison(null);
+    setEditingComparisonIndex(null);
   }
 
   function setUpdateFlow(params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) {
@@ -793,45 +825,82 @@ export const FlowBreakdown = ({
         )}
 
 
-        {flow.conditions.comparisons && flow.conditions.comparisons.map((comparison) => (
+        {flow.conditions.comparisons && flow.conditions.comparisons.map((comparison: Comparison, index: number) => (
           <Row>
-            <Column gap={8} align="flex-start" justifyContent="flex-start">
+          
 
-              <>
-                <Tooltip
-                  label={
-                    "Compare responses to determine if execution should take place"
-                  }
-                >
-                  <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
-                    Comparison
-                  </Text>
-                </Tooltip>
+              <div style={{ width: '100%' }}>
+                {editingComparisonIndex === index ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', }}>
+                    <ComparisonForm
+                      comparison={pendingComparison || comparison}
+                      onChange={handleComparisonChange}
+                      setDisabled={() => setEditingComparisonIndex(null)}
+                    />
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setEditingComparisonIndex(null)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="primary"
+                        onClick={() => handleSaveComparison(index)}
+                      >
+                        Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', marginBottom: '10px' }}>
+                      <Tooltip label="Compare responses to determine if execution should take place">
+                        <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+                          Comparison
+                        </Text>
+                      </Tooltip>
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        onClick={() => setEditingComparisonIndex(index)}
+                      >
+                        Edit
+                      </Button>
+                    </div>
 
-                <>
-                  {comparison.flowId.toString() != "0" && (<Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">ID</Text>  {comparison.flowId.toString()}
-                  </Text>)}
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {comparison.responseIndex}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {comparison.responseKey}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Comparison Operator</Text>  {ComparisonOperatorLabels[comparison.operator]}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Comparison Operand</Text>  {comparison.operand}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Value Type</Text>   {comparison.valueType}
-                  </Text>
-                </>
-                {comparison.icqConfig && (icqConfig(comparison))}
-              </>
+                    <>
+                      {comparison.flowId.toString() != "0" && (
+                        <Text variant="body">
+                          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">ID</Text> {comparison.flowId.toString()}
+                        </Text>
+                      )}
+                      {comparison.responseIndex !== undefined && comparison.responseIndex !== 0 && (
+                        <Text variant="body">
+                          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Response Index</Text> {comparison.responseIndex}
+                        </Text>
+                      )}
+                      {comparison.responseKey && (
+                        <Text variant="body">
+                          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Response Key</Text> {comparison.responseKey}
+                        </Text>
+                      )}
+                      <Text variant="body">
+                        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Comparison Operator</Text> {ComparisonOperatorLabels[comparison.operator]}
+                      </Text>
+                      <Text variant="body">
+                        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Comparison Operand</Text> {comparison.operand}
+                      </Text>
+                      <Text variant="body">
+                        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
+                      </Text>
+                    </>
+                    {comparison.icqConfig && icqConfig(comparison)}
+                  </>
+                )}
+              </div>
 
-            </Column>
+          
           </Row>
         ))}
         {flow.conditions.feedbackLoops && flow.conditions.feedbackLoops.map((feedbackLoop) => (
@@ -1135,26 +1204,26 @@ export const FlowBreakdown = ({
         </Text>
       </Tooltip>
       <Text variant="body">
-        <Text variant="legend" color="secondary" align="left">Chain ID</Text>    {parent.icqConfig.chainId}
+        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Chain ID</Text>    {parent.icqConfig.chainId}
       </Text>
       <Text variant="body">
-        <Text variant="legend" color="secondary" align="left">Connection ID</Text>      {parent.icqConfig.connectionId}
+        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Connection ID</Text>      {parent.icqConfig.connectionId}
       </Text>
       <Text variant="body">
-        <Text variant="legend" color="secondary" align="left">Query Type</Text>  {parent.icqConfig.queryType}
+        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Query Type</Text>  {parent.icqConfig.queryType}
       </Text>
       <Text variant="body">
-        <Text variant="legend" color="secondary" align="left">Query Key</Text>  {parent.icqConfig.queryKey}
+        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Query Key</Text>  {parent.icqConfig.queryKey}
       </Text>
       <Text variant="body">
-        <Text variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(parent.icqConfig.timeoutDuration.seconds))}
+        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(parent.icqConfig.timeoutDuration.seconds))}
       </Text>
       <Text variant="body">
-        <Text variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[parent.icqConfig.timeoutPolicy]}
+        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[parent.icqConfig.timeoutPolicy]}
       </Text>
       {parent.icqConfig.response &&
         <Text variant="body">
-          <Text variant="legend" color="secondary" align="left">Response</Text>  {TimeoutPolicy[parent.icqConfig.response]}
+          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Response</Text>  {TimeoutPolicy[parent.icqConfig.response]}
         </Text>
       }
     </>
