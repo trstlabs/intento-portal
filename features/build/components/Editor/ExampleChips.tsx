@@ -57,6 +57,7 @@ function IntentTemlateChip({ label, iconUrl, gradient, onClick }) {
 }
 
 import { useControlTheme } from 'junoblocks'
+import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
 
 function Chip({ label, onClick, icon }) {
   const themeController = useControlTheme();
@@ -81,7 +82,7 @@ function Chip({ label, onClick, icon }) {
     <div
       style={{
         display: 'inline-flex',
-        alignItems: 'center',
+        alignItems: 'center with',
         fontSize: '11px',
         color,
         borderRadius: '13px',
@@ -135,14 +136,14 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
           value: {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First',
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address',
           },
         },
         {
           typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
           value: {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First',
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address',
             amount: {
               denom: `${chainSymbol}`,
               amount: '1', // This will be replaced by the feedback loop
@@ -211,7 +212,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
           }
         },
         {
@@ -220,7 +221,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
           }
         }
       ],
@@ -302,7 +303,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
           }
         },
         {
@@ -311,7 +312,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
           }
         },
         {
@@ -320,7 +321,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Please Delegate First'
+            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
           }
         }
       ],
@@ -546,30 +547,23 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
                 onClick={() => setAllMessages([
                   {
-                    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
                     value: {
-                      grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
-                      msgs: [
+                      sender: 'Your Address',
+                      contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
+                      msg: {
+                        subscribe: {
+                          stream_id: 1
+                        }
+                      },
+                      funds: [
                         {
-                          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                          value: {
-                            sender: 'Your Address',
-                            contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
-                            msg: {
-                              subscribe: {
-                                stream_id: 1
-                              }
-                            },
-                            funds: [
-                              {
-                                denom: 'ATOM',
-                                amount: '1'
-                              }
-                            ]
-                          }
+                          denom: 'ATOM',
+                          amount: '1'
                         }
                       ]
                     }
+
                   }
                 ], 'DCA Into Intento StreamSwap',
                 )}
@@ -584,27 +578,20 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
                 onClick={() => setAllMessages([
                   {
-                    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+
+                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
                     value: {
-                      grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
-                      msgs: [
+                      sender: 'Your Address',
+                      contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
+                      msg: {
+                        subscribe: {
+                          stream_id: 1
+                        }
+                      },
+                      funds: [
                         {
-                          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                          value: {
-                            sender: 'Your Address',
-                            contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
-                            msg: {
-                              subscribe: {
-                                stream_id: 1
-                              }
-                            },
-                            funds: [
-                              {
-                                denom: 'uatom',
-                                amount: '1000000'
-                              }
-                            ]
-                          }
+                          denom: 'ATOM',
+                          amount: '0.1'
                         }
                       ]
                     }
@@ -615,19 +602,18 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                       feedbackLoops: [],
                       comparisons: [
                         {
-                          flowId: "0",
                           responseIndex: 0,
                           responseKey: "current_streamed_price",
                           valueType: "math.Dec",
                           operator: 3,
                           operand: "0.10",
                           icqConfig: {
-                            connectionId: "connection-2",
+                            connectionId: "connection-0",
                             chainId: "cosmoshub-4",
-                            timeoutPolicy: 1,
-                            timeoutDuration: "30s",
-                            query_key: "AylrB+e1Er4B3oj5/0g/DtXcIqoRDNRL27tN6ekUl/fNAAZzdHJlYW0AAAAAAAAACA==",
-                            query_type: "store/wasm/key"
+                            timeoutPolicy: 2,
+                            timeoutDuration: Duration.fromPartial({ "seconds": BigInt(60) }),
+                            queryKey: "A0CFWoW4P4Z2JbZfNnUekldRdeEU0Dn1knIQCeolccCNAAZzdHJlYW0AAAAAAAAAAQ==",
+                            queryType: "store/wasm/key",
                           }
                         }
                       ],
@@ -642,68 +628,68 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
             </>
           )} */}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
-            <>   {/*
-            <IntentTemlateChip
-              label="DCA Into Intento StreamSwap If Price < 0.10"
-              iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-              gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
-              onClick={() => setAllMessages([
-                {
-                  typeUrl: '/cosmos.authz.v1beta1.MsgExec',
-                  value: {
-                    grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
-                    msgs: [
-                      {
-                        typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                        value: {
-                          sender: 'Your Address',
-                          contract: 'osmo10wn49z4ncskjnmf8mq95uyfkj9kkveqx9jvxylccjs2w5lw4k6gsy4cj9l',
-                          msg: {
-                            subscribe: {
-                              stream_id: 8
-                            }
-                          },
-                          funds: [
-                            {
-                              denom: 'uusdc',
-                              amount: '1000000'
-                            }
-                          ]
-                        }
-                      }
-                    ]
-                  }
-                }
-              ], 'DCA Into Intento StreamSwap If Price < 0.10', 
-            {
-              conditions: {
-                feedbackLoops: [],
-                comparisons: [
+            <>
+              {/* <IntentTemlateChip
+                label="DCA Into Intento StreamSwap If Price < 0.10"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+                onClick={() => setAllMessages([
                   {
-                    flowId: "0",
-                    responseIndex: 0,
-                    responseKey: "current_streamed_price",
-                    valueType: "math.Dec",
-                    operator: 3,
-                    operand: "0.10",
-                    icqConfig: {
-                      connectionId: "connection-2",
-                      chainId: "osmosis-1",
-                      timeoutPolicy: 1,
-                      timeoutDuration: "30s",
-                      query_key: "AylrB+e1Er4B3oj5/0g/DtXcIqoRDNRL27tN6ekUl/fNAAZzdHJlYW0AAAAAAAAACA==",
-                      query_type: "store/wasm/key"
+                    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+                    value: {
+                      grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
+                      msgs: [
+                        {
+                          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                          value: {
+                            sender: 'Your Address',
+                            contract: 'osmo10wn49z4ncskjnmf8mq95uyfkj9kkveqx9jvxylccjs2w5lw4k6gsy4cj9l',
+                            msg: {
+                              subscribe: {
+                                stream_id: 8
+                              }
+                            },
+                            funds: [
+                              {
+                                denom: 'uusdc',
+                                amount: '1000000'
+                              }
+                            ]
+                          }
+                        }
+                      ]
                     }
                   }
-                ],
-                stopOnSuccessOf: [],
-                stopOnFailureOf: [],
-                skipOnSuccessOf: [],
-                skipOnFailureOf: [],
-                useAndForComparisons: false
-              }
-            })}
-            /> */}
+                ], 'DCA Into Intento StreamSwap If Price < 0.10',
+                  {
+                    conditions: {
+                      feedbackLoops: [],
+                      comparisons: [
+                        {
+                          flowId: "0",
+                          responseIndex: 0,
+                          responseKey: "current_streamed_price",
+                          valueType: "math.Dec",
+                          operator: 3,
+                          operand: "0.10",
+                          icqConfig: {
+                            connectionId: "connection-2",
+                            chainId: "osmosis-1",
+                            timeoutPolicy: 1,
+                            timeoutDuration: "30s",
+                            queryKey: "AylrB+e1Er4B3oj5/0g/DtXcIqoRDNRL27tN6ekUl/fNAAZzdHJlYW0AAAAAAAAACA==",
+                            queryType: "store/wasm/key"
+                          }
+                        }
+                      ],
+                      stopOnSuccessOf: [],
+                      stopOnFailureOf: [],
+                      skipOnSuccessOf: [],
+                      skipOnFailureOf: [],
+                      useAndForComparisons: false
+                    }
+                  })}
+              /> */}
               <IntentTemlateChip
                 label="DCA 1 USDC to ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
