@@ -695,33 +695,25 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
                 onClick={() => setAllMessages([
                   {
-                    typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
                     value: {
-                      grantee: 'osmo1vca5pkkdgt42hj5mjkclqqfla9dgkrhdjeyq3am8a69s4a774nzqvgsjpn',
-                      msgs: [
+                      sender: 'Your Address',
+                      contract: 'osmo10wn49z4ncskjnmf8mq95uyfkj9kkveqx9jvxylccjs2w5lw4k6gsy4cj9l',
+                      msg: {
+                        subscribe: {
+                          stream_id: 8
+                        }
+                      },
+                      funds: [
                         {
-                          typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                          value: {
-                            sender: 'Your Address',
-                            contract: 'osmo10wn49z4ncskjnmf8mq95uyfkj9kkveqx9jvxylccjs2w5lw4k6gsy4cj9l',
-                            msg: {
-                              subscribe: {
-                                stream_id: 8
-                              }
-                            },
-                            funds: [
-                              {
-                                denom: 'uusdc',
-                                amount: '1000000'
-                              }
-                            ]
-                          }
+                          denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
+                          amount: '1000000'
                         }
                       ]
                     }
                   }
                 ], 'DCA Into Intento StreamSwap ',
-                 )}
+                )}
               />
               <IntentTemlateChip
                 label="DCA 1 USDC to ATOM"
