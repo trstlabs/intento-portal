@@ -698,7 +698,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
                     value: {
                       sender: 'Your Address',
-                      contract: 'osmo10wn49z4ncskjnmf8mq95uyfkj9kkveqx9jvxylccjs2w5lw4k6gsy4cj9l',
+                      contract: 'osmo1994s0ea4z2lqrh5gl8l5s0cw6hwz92s3pn2yhkamfh57j9yh7lxssnr80s',
                       msg: {
                         subscribe: {
                           stream_id: 8
