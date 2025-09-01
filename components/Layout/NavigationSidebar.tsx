@@ -191,16 +191,20 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
 
-      <Link href="https://streamswap.io/cosmos/stream/ATOM/1" passHref>
+      <Link
+        href="https://userbob.com/tools/splitView?url1=https%3A%2F%2Ffrontier.streamswap.io%2Fcosmos%2Fstream%2FATOM%2F1&url2=https%3A%2F%2Fstreamswap.io%2Fosmosis%2Fstream%2FUSDC%2F8&direction=vertical&split1=50"
+        passHref
+      >
         <Button
           as="a"
           variant="menu"
           size="large"
           iconLeft={<Dollar />}
         >
-          <Inline css={{ paddingLeft: '$4' }}> Get INTO via StreamSwap </Inline>
+          <Inline css={{ paddingLeft: '$4' }}> Check out INTO StreamSwap </Inline>
         </Button>
       </Link>
+
       {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' && (
         <Link href="/claim" passHref>
           <Button
