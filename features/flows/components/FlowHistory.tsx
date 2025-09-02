@@ -25,13 +25,16 @@ import { Link } from '@interchain-ui/react'
 type FlowHistoryProps = {
   id: string
   transformedMsgs?: string[]
+  rpc?: string
+  trustlessAgentAddress?: string
 }
 
 export const FlowHistory = ({
   id,
-  transformedMsgs
+  transformedMsgs,
+  rpc,
+  trustlessAgentAddress
 }: FlowHistoryProps) => {
-
 
 
 
@@ -157,11 +160,51 @@ export const FlowHistory = ({
                         </Column>
                       ))}
 
+
+
                       <Column>
-                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet Sequences: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                        <Text variant="caption">
+                          Executed: {executed ? <>🟢</> :
+                            (Date.now() - actualExecTime.valueOf() >
+                              60000 && !timedOut ? (
+                                <>🔴</>
+                              ) || errors[0] : (timedOut ?
+                                <>⏱️</> : <>⌛</>
+                            ))}
+                        </Text>
+                        {errors.map((err, _) => {
+                          // Check for AuthZ permission errors
+                          const isAuthZError = err.includes('error handling packet on host chain') &&
+                            (err.includes('ABCI code: 2:'));
+                          const isWasmError = err.includes('error handling packet on host chain') && transformedMsgs?.find((msg) => msg.includes('.wasm.')) &&
+                            (err.includes('ABCI code: 5:'));
+
+                          return (
+                            <Column key={_}>
+                              <Text variant="legend" style={{ paddingTop: '4px' }}>
+                                {isAuthZError ? 'AuthZ permission lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
+                              </Text>
+                            </Column>
+                          );
+                        })}
+                        {timedOut && (
+                          <Text variant="legend">
+                            Timed out relaying IBC packets for this execution
+                          </Text>
+                        )}
+                      </Column>
+                      <Column>
+                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Received {packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                          <Link key={i} href={`${rpc}/tx_search?query="recv_packet.packet_sequence=${packetSequence} AND recv_packet.packet_src_port='icacontroller-${trustlessAgentAddress}'"`} target="_blank">
+                            {Number(packetSequence)}
+                            {i < packetSequences.length - 1 ? ', ' : ''}
+                          </Link>
+
+                        ))}</Text>}
+                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Acknowledgement {packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
                           <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
                             {Number(packetSequence)}
-                            {i < packetSequences.length - 1 && <span>, </span>}
+                            {i < packetSequences.length - 1 ? ', ' : ''}
                           </Link>
 
                         ))}</Text>}
@@ -175,39 +218,6 @@ export const FlowHistory = ({
                         ))}
                       </Column>
 
-
-                      <Column>
-                        <Text variant="caption">
-                          Executed: {executed  ? <>🟢</> :
-                            (Date.now() - actualExecTime.valueOf() >
-                              60000 && !timedOut ? (
-                                <>🔴</>
-                              ) || errors[0] : (timedOut ?
-                                <>⏱️</> : <>⌛</>
-                            ))}
-                        </Text>
-
-                        {errors.map((err, _) => {
-                          // Check for AuthZ permission errors
-                          const isAuthZError = err.includes('error handling packet on host chain') &&
-                            (err.includes('ABCI code: 2:'));
-                          const isWasmError = err.includes('error handling packet on host chain') && transformedMsgs?.find((msg) => msg.includes('.wasm.')) &&
-                            (err.includes('ABCI code: 5:'));
-
-                          <Column>
-                            <Text variant="legend" style={{ paddingTop: '4px' }}>
-                              {isAuthZError ? 'AuthZ permission lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesfull result' : err}
-                            </Text>
-
-                          </Column>
-
-                        })}
-                        {timedOut && (
-                          <Text variant="legend">
-                            Timed out relaying IBC packets for this execution
-                          </Text>
-                        )}
-                      </Column>
                       {msgResponses.map((msg: any, i) => (
                         <div key={i}>
                           <Card css={{ padding: '$6', marginTop: '$4' }}>
