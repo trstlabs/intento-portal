@@ -1068,9 +1068,11 @@ export const FlowBreakdown = ({
             </>
           )
         }
-        <FlowHistory
+        <FlowHistory 
+          rpc={ibcInfo?.rpc || process.env.NEXT_PUBLIC_INTO_RPC}
           id={flow.id.toString()}
           transformedMsgs={transformedMsgs}
+          trustlessAgentAddress={flow?.trustlessAgent?.agentAddress || ""}
         />
 
 
