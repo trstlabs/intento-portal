@@ -6,7 +6,8 @@ import {
     Spinner,
     styled,
     useMedia,
-    Text
+    Text,
+
 } from 'junoblocks'
 import Head from 'next/head'
 import Link from 'next/link'
@@ -15,7 +16,8 @@ import React from 'react'
 import { APP_NAME } from 'util/constants'
 
 import { useClaimRecord, useTotalClaimable } from '../../hooks/useClaimRecord'
-import ViewAirdropEligibility from '../../features/claim/components/eligibility'
+import ClaimAirdrop from '../../features/claim/components/claim'
+
 
 export default function Claim() {
     const isMobile = useMedia('sm')
@@ -88,9 +90,9 @@ export default function Claim() {
                 }
 
                 {claimRecord && total && (
-                    process.env.NEXT_PUBLIC_AIRDROP_ENABLED == "true" &&
+                    process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" &&
 
-                    <ViewAirdropEligibility claimRecord={claimRecord} claimRecordLoaded={!isLoading && !isTotalLoading} total={Number(total)} />
+                    <ClaimAirdrop claimRecord={claimRecord} claimRecordLoaded={!isLoading && !isTotalLoading} total={Number(10000)} />
 
 
                 )}
