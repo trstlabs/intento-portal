@@ -18,32 +18,40 @@ export const useConnectIBCWallet = (
   const mainWallet = useRecoilValue(walletState)
 
   const safeChainId = chainId ?? ''
-
   // Effect to handle main wallet changes
   useEffect(() => {
-    if (mainWallet.status === WalletStatusType.connected && mainWallet.address && chainId != ibcWallet.chainId) {
-      // When main wallet changes, reset IBC wallet if it was connected
-      setWalletState(prev => ({
-        ...prev,
-        status: WalletStatusType.idle, // Reset to idle state when main wallet changes
-        address: '',
-        client: null,
-        assets: undefined
-      }));
+    // Only reset if the main wallet is connected and we have a different chainId
+    if (mainWallet.status === WalletStatusType.connected && 
+        mainWallet.address && 
+        chainId && 
+        chainId !== process.env.NEXT_PUBLIC_INTO_CHAIN_ID &&
+        // Only reset if we're actually changing to a different chain
+        (ibcWallet.chainId !== chainId || ibcWallet.status === WalletStatusType.error)) {
+      
+      // Only reset if the current IBC wallet is connected to a different chain
+      if (ibcWallet.chainId && ibcWallet.chainId !== chainId) {
+        setWalletState(prev => ({
+          ...prev,
+          status: WalletStatusType.idle,
+          address: '',
+          client: null,
+          assets: undefined
+        }));
 
-      // Invalidate any queries that depend on the wallet
-      try {
-        queryClient.invalidateQueries({
-          predicate: (query) =>
-            Array.isArray(query.queryKey) &&
-            query.queryKey[0] === 'wallet' &&
-            query.queryKey[1] === 'grants'
-        });
-      } catch (error) {
-        console.error('Error invalidating wallet queries:', error);
+        // Invalidate any queries that depend on the wallet
+        try {
+          queryClient.invalidateQueries({
+            predicate: (query) =>
+              Array.isArray(query.queryKey) &&
+              query.queryKey[0] === 'wallet' &&
+              query.queryKey[1] === 'grants'
+          });
+        } catch (error) {
+          console.error('Error invalidating wallet queries:', error);
+        }
       }
     }
-  }, [mainWallet.address, mainWallet.status, queryClient]);
+  }, [mainWallet.address, mainWallet.status, chainId, ibcWallet.chainId, ibcWallet.status, queryClient]);
 
   // Call all hooks unconditionally at the top level
   const assetInfo = useIBCAssetInfoByChainID(safeChainId)
