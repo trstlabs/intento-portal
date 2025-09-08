@@ -1,16 +1,16 @@
 //import { ethers } from "ethers";
 
-import { replacePlaceholders } from './replacePlaceholders';
+import { replacePlaceholders } from './replacePlaceholders'
 import { SigningStargateClient } from '@cosmjs/stargate'
-import { fromBech32, toBech32, toUtf8 } from '@cosmjs/encoding'
+import { toUtf8 } from '@cosmjs/encoding'
 import { intento } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { FlowInput } from '../../types/trstTypes'
 import { Coin } from 'intentojs/dist/codegen/cosmos/base/v1beta1/coin'
-import { MsgExecuteContract } from "cosmjs-types/cosmwasm/wasm/v1/tx";
-import { MsgExec } from "cosmjs-types/cosmos/authz/v1beta1/tx";
-import { Any } from "cosmjs-types/google/protobuf/any";
-import { processDenomFields } from '../../features/build/utils/addressUtils';
+import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
+import { MsgExec } from 'cosmjs-types/cosmos/authz/v1beta1/tx'
+import { Any } from 'cosmjs-types/google/protobuf/any'
+import { processDenomFields } from '../../features/build/utils/addressUtils'
 
 type ExecuteSubmitFlowArgs = {
   owner: string
@@ -47,15 +47,16 @@ export const executeSubmitFlow = async ({
   let msgs: Any[] = []
 
   // Process messages and replace any placeholder addresses
-  const inputMsgs = Array.isArray(flowInput.msgs) ? flowInput.msgs : [flowInput.msgs];
+  const inputMsgs = Array.isArray(flowInput.msgs)
+    ? flowInput.msgs
+    : [flowInput.msgs]
   msgs = transformAndEncodeMsgs({
     flowInputMsgs: inputMsgs,
     client,
     msgs: [],
     ownerAddress: owner,
-    ibcWalletAddress
-  });
-
+    ibcWalletAddress,
+  })
 
   if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ !== '') {
     msgs = msgs.map((msg) => {
@@ -65,20 +66,18 @@ export const executeSubmitFlow = async ({
           msgs: [msg], // wrap individually
           grantee: flowInput.icaAddressForAuthZ,
         },
-      };
-      return client.registry.encodeAsAny(execMsg);
-    });
+      }
+      return client.registry.encodeAsAny(execMsg)
+    })
   }
 
-  console.log('Processed messages:', msgs);
-  
+  console.log('Processed messages:', msgs)
+
   let feeFunds: Coin[] = []
   if (Number(flowInput.feeFunds?.amount) > 0) {
     feeFunds = [flowInput.feeFunds]
   }
-  // if (flowInput.connectionId && flowInput.hostConnectionId) {
-  //   flowInput.trustlessAgent = undefined
-  // }
+
   const msgSubmitFlow =
     intento.intent.v1.MessageComposer.withTypeUrl.submitFlow({
       owner,
@@ -87,23 +86,22 @@ export const executeSubmitFlow = async ({
       duration,
       interval,
       startAt,
-      connectionId: /* flowInput.connectionId ? flowInput.connectionId :  */'',
+      connectionId: /* flowInput.connectionId ? flowInput.connectionId :  */ '',
       configuration: flowInput.configuration
         ? flowInput.configuration
         : {
-          saveResponses: false,
-          updatingDisabled: false,
-          stopOnSuccess: false,
-          stopOnFailure: false,
-          stopOnTimeout: false,
-          walletFallback: true,
-        },
+            saveResponses: false,
+            updatingDisabled: false,
+            stopOnSuccess: false,
+            stopOnFailure: false,
+            stopOnTimeout: false,
+            walletFallback: true,
+          },
       feeFunds,
       conditions: flowInput.conditions,
       trustlessAgent: flowInput.trustlessAgent,
     })
-  console.log('Submitting msgSubmitFlow ⬇')
-  console.log(msgSubmitFlow)
+
   const result = await validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitFlow], {
       amount: [],
@@ -111,28 +109,8 @@ export const executeSubmitFlow = async ({
     })
   )
 
-  // 🧠 Prepare and send proof
-  const proof = {
-    address: toQuestAddress(owner),
-    txHash: result.transactionHash,
-    flowLabel: flowInput.label,
-    timestamp: Math.floor(Date.now() / 1000),
-  }
-  console.log(proof)
-
-  await fetch('/.netlify/functions/log-proof', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.TRIGGERPORTAL_SECRET!,
-    },
-
-    body: JSON.stringify(proof),
-  })
-
   return result
 }
-
 
 interface TransformAndEncodeMsgsParams {
   flowInputMsgs: string[]
@@ -147,65 +125,57 @@ export function transformAndEncodeMsgs({
   client,
   msgs = [],
   ownerAddress,
-  ibcWalletAddress
+  ibcWalletAddress,
 }: TransformAndEncodeMsgsParams): Any[] {
-
   function encodeMsg(typeUrl: string, value: any): Any {
     // CosmWasm MsgExecuteContract
     if (typeUrl === '/cosmwasm.wasm.v1.MsgExecuteContract') {
-      const msgObject = value['msg'];
-      const msgBytes: Uint8Array = toUtf8(JSON.stringify(msgObject));
+      const msgObject = value['msg']
+      const msgBytes: Uint8Array = toUtf8(JSON.stringify(msgObject))
       const wasmMsg = MsgExecuteContract.fromPartial({
         sender: value.sender,
         contract: value.contract,
         msg: msgBytes,
         funds: value.funds || [],
-      });
+      })
       return Any.fromPartial({
         typeUrl,
         value: MsgExecuteContract.encode(wasmMsg).finish(),
-      });
+      })
     }
     // MsgExec (authz)
     if (typeUrl === '/cosmos.authz.v1beta1.MsgExec') {
       const innerMsgs = value.msgs.map((authzMsg: any) => {
-        return encodeMsg(authzMsg.typeUrl, authzMsg.value);
-      });
+        return encodeMsg(authzMsg.typeUrl, authzMsg.value)
+      })
       const msgExec = MsgExec.fromPartial({
         grantee: value.grantee,
         msgs: innerMsgs,
-      });
+      })
       return Any.fromPartial({
         typeUrl,
         value: MsgExec.encode(msgExec).finish(),
-      });
+      })
+
     }
 
-    // Fallback
     return client.registry.encodeAsAny({
       typeUrl,
       value,
-    });
+    })
   }
 
   for (let msgJSON of flowInputMsgs) {
-    let parsedMsg = JSON.parse(msgJSON);
+    let parsedMsg = JSON.parse(msgJSON)
     let value = replacePlaceholders({
       value: parsedMsg['value'],
       ownerAddress,
-      ibcWalletAddress
-    });
+      ibcWalletAddress,
+    })
     value = processDenomFields(value)
-    console.log(value)
-    let typeUrl: string = parsedMsg['typeUrl'].toString();
-    msgs.push(encodeMsg(typeUrl, value));
+    let typeUrl: string = parsedMsg['typeUrl'].toString()
+    msgs.push(encodeMsg(typeUrl, value))
   }
 
-  return msgs;
-}
-
-
-function toQuestAddress(address: string): string {
-  const { data } = fromBech32(address)
-  return toBech32('archway', data)
+  return msgs
 }

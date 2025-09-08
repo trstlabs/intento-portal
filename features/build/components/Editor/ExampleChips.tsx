@@ -57,7 +57,6 @@ function IntentTemlateChip({ label, iconUrl, gradient, onClick }) {
 }
 
 import { useControlTheme } from 'junoblocks'
-import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
 
 function Chip({ label, onClick, icon }) {
   const themeController = useControlTheme();
@@ -690,6 +689,32 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     }
                   })}
               /> */}
+              <IntentTemlateChip
+                label="DCA Into Intento StreamSwap"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                    value: {
+                      sender: 'Your Address',
+                      contract: 'osmo1994s0ea4z2lqrh5gl8l5s0cw6hwz92s3pn2yhkamfh57j9yh7lxssnr80s',
+                      msg: {
+                        subscribe: {
+                          stream_id: 8
+                        }
+                      },
+                      funds: [
+                        {
+                          denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
+                          amount: '1000000'
+                        }
+                      ]
+                    }
+                  }
+                ], 'DCA Into Intento StreamSwap ',
+                )}
+              />
               <IntentTemlateChip
                 label="DCA 1 USDC to ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"

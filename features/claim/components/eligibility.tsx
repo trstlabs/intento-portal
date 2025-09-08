@@ -1,8 +1,73 @@
-import React from "react";
-import { Card, CardContent, convertMicroDenomToDenom, Text } from "junoblocks"; // Replace with actual `junoblocks` imports
-
+import React, { useEffect, useState } from "react";
+import { CardContent, convertMicroDenomToDenom, Text, Button } from "junoblocks";
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
+import { X, Share, Info, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Global } from '@emotion/react';
+import { useIntentoRpcClient } from '../../../hooks/useRPCClient';
+import Link from 'next/link'
+
+// Global styles for the pulse animation
+const GlobalStyles = () => (
+  <Global
+    styles={{
+      '@keyframes pulse': {
+        '0%': { transform: 'scale(1)' },
+        '50%': { transform: 'scale(1.05)' },
+        '100%': { transform: 'scale(1)' }
+      },
+      '.token-amount': {
+        animation: 'pulse 2s infinite'
+      }
+    }}
+  />
+);
+
+// Inline styles
+const styles = {
+  animatedCard: {
+    background: 'linear-gradient(145deg, #1e1e2d, #252538)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '16px',
+    overflow: 'hidden',
+    transition: 'all 0.3s ease',
+    width: '100%',
+    ':hover': {
+      transform: 'translateY(-4px)',
+      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+    }
+  } as React.CSSProperties,
+  tokenAmount: {
+    fontSize: '2.5rem',
+    fontWeight: 700,
+    background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    margin: '1rem 0',
+  } as React.CSSProperties,
+  statCard: {
+    background: 'rgba(255, 255, 255, 0.03)',
+    borderRadius: '12px',
+    padding: '1rem',
+    margin: '0.5rem 0'
+  } as React.CSSProperties,
+  socialButton: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0.5rem',
+    gap: '0.5rem',
+    padding: '0.5rem 1rem',
+    borderRadius: '8px',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: 'rgba(255, 255, 255, 0.05)',
+    color: 'white',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    fontSize: '0.875rem'
+  } as React.CSSProperties
+};
 
 export declare type ViewAirdropEligibilityProps = {
   claimRecord: ClaimRecord;
@@ -18,59 +83,209 @@ export enum ClaimFlow {
   UNRECOGNIZED = -1
 }
 
-const ViewAirdropEligibility = ({ claimRecord, total }: ViewAirdropEligibilityProps) => {
+
+
+const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) => {
+
+  const [difference, setDifference] = useState<number>(0);
+
+
+  const rpcClient = useIntentoRpcClient();
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!rpcClient) return;
+
+      try {
+
+        const initialModuleBalance = 89973272000000; // 89,973,272,000,000 in micro units
+        // Address to query
+        const address = 'into1m5dncvfv7lvpvycr23zja93fecun2kcvdnvuvq';
+
+        // Get the balance (replace 'uinto' with the actual denom if different)
+        const coin = await rpcClient?.cosmos.bank.v1beta1?.balance({ address, denom: 'uinto' });
+        console.log("coin", coin);
+        if (coin) {
+          // Calculate the difference from target amount
+          const diff = initialModuleBalance - 69973272000000;//Number(coin.balance.amount);
+          const percentage = ((diff / initialModuleBalance) * 100).toFixed(1);
+          setDifference(Number(percentage));
+        }
+      } catch (err) {
+        console.error('Error fetching balance:', err);
+
+      }
+    };
+
+    fetchBalance();
+  }, [rpcClient]);
 
 
   return (
-    <div >
-
+    <>
+      <GlobalStyles />
       <div>
-        {!claimRecord || !total || claimRecord.address === "" ? (
-          <div>
-            <Text variant="header">Check Airdrop</Text>
-            <Text variant="body" style={{ color: "gray" }}>
-              No airdrop claims available for this address.
-            </Text>
-          </div>
-        ) : (
-          <div>
-            {Number(claimRecord.maximumClaimableAmount?.amount) >= 0 && (
-              <div>
-                {/* Claim Message */}
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <PageHeader
-                    title="Your Airdrop"
-                    subtitle={""}
-                  />
+
+        <div>
+          {!claimRecord || claimRecord.address === "" ? (
+            <div>
+              <Text variant="header">Check Airdrop</Text>
+              <Text variant="body" style={{ color: "gray", marginBottom: '1rem' }}>
+                No airdrop claims available for this address.
+              </Text>
+            </div>
+          ) : (
+            <div>
+              {Number(claimRecord.maximumClaimableAmount?.amount) >= 0 && (
+                <div>
+                  {/* Claim Message */}
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <PageHeader
+                      title="Your Airdrop"
+                      subtitle={""}
+                    />
+
+                  </div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <div style={styles.animatedCard}>
+                      <CardContent style={{ padding: '2rem' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                          <motion.div
+                            animate={{ scale: [1, 1.1, 1] }}
+                            transition={{ duration: 2, repeat: Infinity }}
+                          >
+                            <Text variant="header" css={{ fontSize: '2rem', marginBottom: '1rem' }}>
+                              🎉 Congratulations! 🎉
+                            </Text>
+                          </motion.div>
+                          <Text variant="body" css={{ color: '#a0aec0', marginBottom: '2rem' }}>
+                            You're eligible to claim your airdrop rewards!
+                          </Text>
+
+                          <div style={styles.tokenAmount} className="token-amount">
+                            {convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO
+                          </div>
+
+                          {process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" ? <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
+                            <Link href="/claim_record"><Button
+
+                              size="large"
+                              variant="primary"
+                              style={{ padding: '0.75rem 2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                            >
+                              Claim Now
+                              <ArrowRight size={20} />
+                            </Button></Link>
+                          </div> : <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
+                            <Text variant="body" css={{ color: '#a0aec0', marginBottom: '2rem' }}>
+                              Claiming is not available yet.
+                            </Text>
+                          </div>
+                          }
+                          <div style={{ marginTop: '2rem', textAlign: 'left' }}>
+                            <Text variant="subtitle" css={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                              <Info size={18} /> Your Airdrop Details
+                            </Text>
+
+                            <div style={styles.statCard}>
+                              <Text variant="caption" css={{ color: '#a0aec0' }}>Wallet Address</Text>
+                              <Text css={{ wordBreak: 'break-all' }}>{claimRecord.address}</Text>
+                            </div>
+
+                            <div style={styles.statCard}>
+                              <Text variant="caption" css={{ color: '#a0aec0' }}>Maximum Claimable Amount </Text>
+                              <Text>{convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO</Text>
+                            </div>
+
+                            <div style={styles.statCard}>
+                              <Text variant="caption" css={{ color: '#a0aec0' }}>Tokens Claimed </Text>
+                              <div style={{ height: '8px', background: '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
+                                <div style={{ width: `${difference}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '4px' }}></div>
+                              </div>
+                              {process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" && <Text variant="caption">{100 - difference}% of total airdrop will be clawed back</Text>}
+                            </div>
+                          </div>
+
+                          <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+                            <Text variant="subtitle" css={{ marginBottom: '1rem' }}>Share the good news!</Text>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                              <button
+                                style={{
+                                  ...styles.socialButton,
+                                  transition: 'all 0.2s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(-2px)';
+                                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = '';
+                                  e.currentTarget.style.background = '';
+                                }}
+                                onClick={() => {
+                                  const text = `I am eligable for ${convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO in the Intento airdrop! 🚀 Join me in the @IntentoZone ecosystem. #INTOAirdrop #Crypto`;
+                                  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+                                }}
+                              >
+                                <X size={18} /> Share on Twitter
+                              </button>
+
+                              <button
+                                style={{
+                                  ...styles.socialButton,
+                                  transition: 'all 0.2s ease',
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.transform = 'translateY(-2px)';
+                                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.transform = '';
+                                  e.currentTarget.style.background = '';
+                                }}
+                                onClick={async () => {
+                                  try {
+                                    await navigator.share({
+                                      title: 'INTO Airdrop',
+                                      text: `I just claimed my ${convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6)} $INTO airdrop!`,
+                                      url: 'https://intento.network/airdrop',
+                                    });
+                                  } catch (err) {
+                                    console.log('Error sharing:', err);
+                                  }
+                                }}
+                              >
+                                <Share size={18} /> Share via
+                              </button>
+                            </div>
+                          </div>
+
+                          <div style={{ marginTop: '2rem', background: 'rgba(59, 130, 246, 0.1)', padding: '1rem', borderRadius: '8px' }}>
+                            <Text variant="subtitle" css={{ marginBottom: '0.5rem' }}>💡 What is the INTO token?</Text>
+                            <Text variant="caption" css={{ color: '#a0aec0' }}>
+                              INTO powers the Intento ecosystem. Use it for governance, staking, and orchestrating flows at a discount.
+                              <a href="https://docs.intento.zone/getting-started/into-token" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', marginLeft: '0.5rem' }}>Learn more</a>
+                            </Text>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </div>
+                  </motion.div>
+
+
 
                 </div>
-
-                <Card variant="secondary" disabled style={{ padding: "16px" }}>
-                  <CardContent>
-                    <Text style={{ padding: "8px" }} >
-                      <p>Congrats! You are eligible for airdrop rewards! 🎉</p>
-                    </Text>
-                    <Text style={{ padding: "8px" }} >
-                      <p>For address: {claimRecord.address} </p>
-                      <p style={{ paddingTop: "12px" }}>
-                        Maximum Tokens Claimable:{" "}
-                        <span style={{ fontSize: "1.5em", fontWeight: "bold", color: "#ff5733" }}>
-                          {convertMicroDenomToDenom(total, 6)} INTO
-                        </span>{" "}
-                        🎉
-                      </p>
-                    </Text>
-                  </CardContent>
-                </Card>
-
-
-
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div >
+    </>
   );
 };
 

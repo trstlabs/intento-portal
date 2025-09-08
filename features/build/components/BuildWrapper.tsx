@@ -61,8 +61,8 @@ export const BuildWrapper = ({
         if (initialChainId && typeof initialChainId === 'string') {
           updatedFlow = {
             ...parsed,
-            connectionId: initialChainId,
-            hostedIcaConfig: parsed.hostedIcaConfig || {},
+            //connectionId: initialChainId,
+            trustlessAgent: parsed.trustlessAgent || {},
             label: parsed.label || ""
           };
           setFlowInputs([processFlowInput(updatedFlow, false)]);

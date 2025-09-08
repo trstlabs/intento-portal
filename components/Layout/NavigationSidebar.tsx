@@ -33,7 +33,6 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
-import { Dollar } from '../../icons/Dollar'
 
 
 type NavigationSidebarProps = {
@@ -191,16 +190,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
       </Link>
       <Inline css={{ paddingBottom: '$6' }} />
 
-      <Link href="https://streamswap.io/cosmos/stream/ATOM/1" passHref>
-        <Button
-          as="a"
-          variant="menu"
-          size="large"
-          iconLeft={<Dollar />}
-        >
-          <Inline css={{ paddingLeft: '$4' }}> Get INTO via StreamSwap </Inline>
-        </Button>
-      </Link>
       {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' && (
         <Link href="/claim" passHref>
           <Button

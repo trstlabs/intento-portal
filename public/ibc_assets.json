@@ -31,7 +31,7 @@
   {
     "id": "OSMO",
     "name": "Osmosis Devnet",
-    "registry_name": "",
+    "registry_name": "osmosisdev",
     "symbol": "OSMO",
     "chain_id": "OSMO",
     "denom": "uosmo",
