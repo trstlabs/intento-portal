@@ -145,7 +145,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
     },
     preferredSignType: (_chain: any) => {
       // `preferredSignType` determines which signer is preferred for `getOfflineSigner` method. By default `amino`. It might affect the `OfflineSigner` used in `signingStargateClient` and `signingCosmwasmClient`. But if only one signer is provided, `getOfflineSigner` will always return this signer, `preferredSignType` won't affect anything.
-      return 'amino'
+      return process.env.NEXT_PUBLIC_PREFERRED_SIGN_AMINO ? 'amino' : 'direct'
     },
   }
 
