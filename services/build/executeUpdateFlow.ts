@@ -4,6 +4,7 @@ import { validateTransactionSuccess } from '../../util/validateTx'
 import { intento } from 'intentojs'
 import { MsgUpdateFlowParams } from '../../types/trstTypes'
 import { transformAndEncodeMsgs } from './executeSubmitFlow'
+import { removeEmptyProperties } from '../../util/conversion'
 
 type executeUpdateFlowArgs = {
   flowParams: MsgUpdateFlowParams
@@ -57,7 +58,7 @@ export const executeUpdateFlow = async ({
   console.log('Submitting MsgUpdateFlow ⬇')
   console.log(msgUpdateFlow)
   return validateTransactionSuccess(
-    await client.signAndBroadcast(flowParams.owner, [msgUpdateFlow], {
+    await client.signAndBroadcast(flowParams.owner, [removeEmptyProperties(msgUpdateFlow)], {
       amount: [],
       gas: '200000',
     })

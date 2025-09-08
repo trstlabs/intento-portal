@@ -29,10 +29,11 @@ import { wallets as keplrWallets } from '@cosmos-kit/keplr'
 import { wallets as metamaskWallets } from "@cosmos-kit/cosmos-extension-metamask";
 import { wallets as cosmostationWallets } from '@cosmos-kit/cosmostation'
 import { wallets as leapWallets } from '@cosmos-kit/leap'
+import { wallets as ledgerWallets } from "@cosmos-kit/ledger";
 
 import { assets, chains } from 'chain-registry'
 import {
-  getIntentoSigningClientOptions
+  getIntentoSigningClientOptions,
 } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
@@ -43,6 +44,7 @@ import { useEffect, useState, Suspense } from 'react';
 
 import Head from 'next/head';
 import { IBCAssetInfo } from '../hooks/useChainList'
+import { InfoDialog } from '../components/InfoDialog'
 
 const toasterClassName = css({
   [media.sm]: {
@@ -52,7 +54,7 @@ const toasterClassName = css({
   },
 }).toString();
 
-const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets, ...metamaskWallets]
+const wallets = [...keplrWallets, ...cosmostationWallets, ...leapWallets, ...metamaskWallets, ...ledgerWallets]
 var chainList = chains
 function IntentoPortalApp({ Component, pageProps }: AppProps) {
   const [dataPushed, setDataPushed] = useState(false);
@@ -139,12 +141,11 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
 
   const signerOptions: SignerOptions = {
     signingStargate: (_chain: any) => {
-
       return getIntentoSigningClientOptions({ defaultTypes })
     },
     preferredSignType: (_chain: any) => {
       // `preferredSignType` determines which signer is preferred for `getOfflineSigner` method. By default `amino`. It might affect the `OfflineSigner` used in `signingStargateClient` and `signingCosmwasmClient`. But if only one signer is provided, `getOfflineSigner` will always return this signer, `preferredSignType` won't affect anything.
-      return 'direct'
+      return 'amino'
     },
   }
 
@@ -210,7 +211,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
                       },
                     }}
                   />
-                  {__TEST_MODE__ && <TestnetDialog />}
+                  {__TEST_MODE__ ? <TestnetDialog /> : <InfoDialog />}
                 </ErrorBoundary>
               </NextJsAppRoot>
             </ChainProvider>}
