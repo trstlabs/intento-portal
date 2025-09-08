@@ -83,8 +83,6 @@ export const processFlowInput = (flowInput: FlowInput, isLocal: boolean) => {
                 const parsedMsg = JSON.parse(msg);
                 const withProcessedAddresses = replaceAddressFields(parsedMsg, isLocal);
                 const withProcessedDenoms = processDenomFields(withProcessedAddresses);
-                console.log(withProcessedDenoms)
-                console.log("PROCESSS")
                 return JSON.stringify(withProcessedDenoms, null, 2);
             } catch (e) {
                 console.error('Failed to process message:', e);

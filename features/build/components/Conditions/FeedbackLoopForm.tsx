@@ -36,7 +36,7 @@ export const FeedbackLoopForm = ({ feedbackLoop, onChange, setDisabled }: Feedba
     onChange(undefined)
     setDisabled()
   }
-  const valueTypeOptions = ['string', 'math.Int', 'sdk.Coin', 'sdk.Coins', '[]string', '[]math.Int']
+  const valueTypeOptions = ['string', 'math.Int', 'sdk.Coin', 'sdk.Coins', '[]string', '[]math.Int', 'math.Dec']
   return (
     <Card
       variant="secondary"

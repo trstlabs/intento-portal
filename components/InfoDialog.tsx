@@ -2,32 +2,32 @@ import { Button, Dialog, DialogContent, DialogHeader, Text } from 'junoblocks'
 import { useEffect, useState } from 'react'
 import { APP_NAME } from '../util/constants'
 
-export const TestnetDialog = () => {
+export const InfoDialog = () => {
   const [isShowing, setShowing] = useState(false)
 
   useEffect(() => {
-    const hasSeenDemo = localStorage.getItem('hasSeenDemo')
-    if (hasSeenDemo !== 'true') {
+    const hasSeenDisclaimer = localStorage.getItem('hasSeenDisclaimer')
+    if (hasSeenDisclaimer !== 'true') {
       setShowing(true)
     }
   }, [])
 
   const requestClose = () => {
-    localStorage.setItem('hasSeenDemo', 'true')
+    localStorage.setItem('hasSeenDisclaimer', 'true')
     setShowing(false)
   }
 
   return (
     <Dialog isShowing={isShowing} onRequestClose={requestClose}>
       <DialogHeader paddingBottom="$10">
-        <Text variant="header">Demo mode</Text>
+        <Text variant="header">Disclaimer</Text>
       </DialogHeader>
-      <DialogContent>
-      </DialogContent>
       <DialogContent css={{ paddingBottom: '$12' }}>
         <Text css={{ paddingBottom: '$12' }} variant="body">
-          This app is currently operating in demo mode. The app serves only the
-          presentation and testing purposes. You will not be able to interact with mainnet chains.
+          {APP_NAME} is a decentralized application. We do not control or
+          guarantee the outcome of any transactions made through this app.
+          By continuing, you acknowledge that you are solely responsible for
+          your actions. Use at your own risk.
         </Text>
 
         <Button css={{ width: '100%' }} size="large" onClick={requestClose}>

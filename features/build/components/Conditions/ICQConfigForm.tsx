@@ -26,15 +26,6 @@ export const ICQConfigForm = ({ icqConfig, onChange, setDisabled }: ICQConfigPro
     onChange(newValue); // Call the onChange prop with the new values
   };
   const emptyFields = () => {
-    // const newValue = {
-    //   chainId: "",
-    //   connectionId: "",
-    //   timeoutPolicy: -1,
-    //   timeoutDuration: Duration.fromPartial({ "seconds": BigInt(0) }),
-    //   queryType: "",
-    //   queryKey: ""
-
-    // }
     onChange(undefined)
     setDisabled()
   }
