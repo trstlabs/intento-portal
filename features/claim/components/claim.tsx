@@ -1,54 +1,58 @@
 import React, { useState } from "react";
-import { Button, CardContent, convertMicroDenomToDenom, Text } from "junoblocks";
+import { Button, CardContent, convertMicroDenomToDenom, Text, useControlTheme } from "junoblocks";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, ChevronDown, ChevronUp, Check, AlertTriangle } from 'lucide-react';
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
 
-// Inline styles
-const styles = {
+// Get styles based on theme
+const getStyles = (isDarkMode: boolean) => ({
   animatedCard: {
-    background: 'linear-gradient(145deg, #1e1e2d, #252538)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: isDarkMode ? '#2d3748' : '#ffffff',
+    border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0',
     borderRadius: '16px',
     overflow: 'hidden',
     transition: 'all 0.3s ease',
     width: '100%',
     ':hover': {
       transform: 'translateY(-4px)',
-      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+      boxShadow: isDarkMode 
+        ? '0 10px 25px rgba(0, 0, 0, 0.3)'
+        : '0 10px 25px rgba(0, 0, 0, 0.1)'
     }
   } as React.CSSProperties,
   tokenAmount: {
     fontSize: '2.5rem',
     fontWeight: 700,
-    background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+    background: isDarkMode 
+      ? 'linear-gradient(90deg, #60a5fa, #a78bfa)'
+      : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     margin: '1rem 0',
   } as React.CSSProperties,
   statCard: {
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: isDarkMode ? '#2d3748' : '#f7fafc',
     borderRadius: '12px',
     padding: '1rem',
     margin: '0.5rem 0',
-    border: '1px solid rgba(255, 255, 255, 0.05)'
+    border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0'
   } as React.CSSProperties,
   taskItem: {
-    background: 'rgba(255, 255, 255, 0.02)',
+    background: isDarkMode ? '#2d3748' : '#f7fafc',
     borderRadius: '12px',
     padding: '1rem',
     margin: '0.5rem 0',
-    border: '1px solid rgba(255, 255, 255, 0.02)',
+    border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0',
     transition: 'all 0.2s ease',
     ':hover': {
-      background: 'rgba(255, 255, 255, 0.05)',
-      borderColor: 'rgba(59, 130, 246, 0.3)'
+      background: isDarkMode ? '#4a5568' : '#edf2f7',
+      borderColor: isDarkMode ? '#60a5fa' : '#3b82f6'
     }
   } as React.CSSProperties,
   progressBar: {
     height: '8px',
-    background: 'rgba(255, 255, 255, 0.1)',
+    background: isDarkMode ? '#4a5568' : '#e2e8f0',
     borderRadius: '4px',
     margin: '1rem 0',
     overflow: 'hidden'
@@ -56,11 +60,13 @@ const styles = {
   progressFill: (percentage: number) => ({
     height: '100%',
     width: `${percentage}%`,
-    background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+    background: isDarkMode 
+      ? 'linear-gradient(90deg, #60a5fa, #a78bfa)'
+      : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
     borderRadius: '4px',
     transition: 'width 0.5s ease'
   }) as React.CSSProperties
-};
+});
 
 export declare type ClaimAirdropProps = {
   claimRecord: ClaimRecord;
@@ -77,6 +83,9 @@ export enum ClaimFlow {
 }
 
 const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRecordLoaded }) => {
+  const themeController = useControlTheme();
+  const isDarkMode = themeController.theme.name === 'dark';
+  const styles = getStyles(isDarkMode);
   // const [showFlow, setShowFlow] = useState(false);
   const [showClaimMessage, setShowClaimMessage] = useState(true);
   /*   const [showFlowList, setShowFlowList] = useState(false); */

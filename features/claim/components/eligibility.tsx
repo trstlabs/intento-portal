@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CardContent, convertMicroDenomToDenom, Text, Button } from "junoblocks";
+import { CardContent, convertMicroDenomToDenom, Text, Button, useControlTheme } from "junoblocks";
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
 import { X, Share, Info, ArrowRight } from 'lucide-react';
@@ -24,33 +24,38 @@ const GlobalStyles = () => (
   />
 );
 
-// Inline styles
-const styles = {
+// Get styles based on theme
+const getStyles = (isDarkMode: boolean) => ({
   animatedCard: {
-    background: 'linear-gradient(145deg, #1e1e2d, #252538)',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
+    background: isDarkMode ? '#2d3748' : '#ffffff',
+    border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0',
     borderRadius: '16px',
     overflow: 'hidden',
     transition: 'all 0.3s ease',
     width: '100%',
     ':hover': {
       transform: 'translateY(-4px)',
-      boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+      boxShadow: isDarkMode 
+        ? '0 10px 25px rgba(0, 0, 0, 0.3)'
+        : '0 10px 25px rgba(0, 0, 0, 0.1)'
     }
   } as React.CSSProperties,
   tokenAmount: {
     fontSize: '2.5rem',
     fontWeight: 700,
-    background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
+    background: isDarkMode 
+      ? 'linear-gradient(90deg, #60a5fa, #a78bfa)'
+      : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
     WebkitBackgroundClip: 'text',
     WebkitTextFillColor: 'transparent',
     margin: '1rem 0',
   } as React.CSSProperties,
   statCard: {
-    background: 'rgba(255, 255, 255, 0.03)',
+    background: isDarkMode ? '#2d3748' : '#f7fafc',
     borderRadius: '12px',
     padding: '1rem',
-    margin: '0.5rem 0'
+    margin: '0.5rem 0',
+    border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0'
   } as React.CSSProperties,
   socialButton: {
     display: 'inline-flex',
@@ -60,14 +65,17 @@ const styles = {
     gap: '0.5rem',
     padding: '0.5rem 1rem',
     borderRadius: '8px',
-    border: '1px solid rgba(255, 255, 255, 0.1)',
-    background: 'rgba(255, 255, 255, 0.05)',
-    color: 'white',
+    border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0',
+    background: isDarkMode ? '#2d3748' : '#f7fafc',
+    color: isDarkMode ? '#f7fafc' : '#1a202c',
     cursor: 'pointer',
     transition: 'all 0.2s ease',
-    fontSize: '0.875rem'
+    fontSize: '0.875rem',
+    ':hover': {
+      background: isDarkMode ? '#4a5568' : '#edf2f7'
+    }
   } as React.CSSProperties
-};
+});
 
 export declare type ViewAirdropEligibilityProps = {
   claimRecord: ClaimRecord;
@@ -86,6 +94,9 @@ export enum ClaimFlow {
 
 
 const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) => {
+  const themeController = useControlTheme();
+  const isDarkMode = themeController.theme.name === 'dark';
+  const styles = getStyles(isDarkMode);
 
   const [difference, setDifference] = useState<number>(0);
 
@@ -204,10 +215,10 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
 
                             <div style={styles.statCard}>
                               <Text variant="caption" css={{ color: '#a0aec0' }}>Tokens Claimed </Text>
-                              <div style={{ height: '8px', background: '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
+                              <div style={{ height: '8px', background: isDarkMode ? '#ffffff' : '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
                                 <div style={{ width: `${difference}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '4px' }}></div>
                               </div>
-                              {process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" && <Text variant="caption">{100 - difference}% of total airdrop will be clawed back</Text>}
+                              {process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" && <Text variant="caption">As it stands, {100 - difference}% of the total airdrop will be clawed back to the community pool</Text>}
                             </div>
                           </div>
 
@@ -228,7 +239,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                                   e.currentTarget.style.background = '';
                                 }}
                                 onClick={() => {
-                                  const text = `I am eligable for ${convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO in the Intento airdrop! 🚀 Join me in the @IntentoZone ecosystem. #INTOAirdrop #Crypto`;
+                                  const text = `I am eligible for ${convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} $INTO in the Intento airdrop! 🚀 Join me in the @IntentoZone ecosystem. #airdrop #crypto`;
                                   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
                                 }}
                               >
