@@ -1,4 +1,4 @@
-import { AppLayout } from 'components'
+import { AppLayout, PageHeader } from 'components'
 import { Button, Column, IconWrapper, Inline, media, Spinner, styled, Text } from 'junoblocks'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
@@ -14,10 +14,10 @@ export default function FlowsByOwner() {
   const [paginationKey, setPaginationKey] = useState<Uint8Array | undefined>(undefined)
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
-  
+
   const [allFlows, isLoading] = useFlows(flowsPerPage, paginationKey)
   const [filteredFlows, setFilteredFlows] = useState<Array<Flow>>([])
-  
+
   useEffect(() => {
     if (allFlows?.flows) {
       setFilteredFlows(
@@ -27,7 +27,7 @@ export default function FlowsByOwner() {
       )
     }
   }, [allFlows, owner])
-  
+
   const shouldShowFetchingState = (isLoading || isRefreshing) && filteredFlows.length === 0
   const hasNextPage = Boolean(allFlows?.pagination?.nextKey && allFlows.pagination.nextKey.length > 0)
   const hasPrevPage = paginationHistory.length > 0
@@ -58,14 +58,14 @@ export default function FlowsByOwner() {
 
   return (
     <AppLayout>
-      <Column css={{ paddingBottom: '$16' }}>
-        <Text variant="header" css={{ marginBottom: '$8', fontSize: 24 }}>
-          Flows by {typeof owner === 'string' ? `${owner.substring(0, 10)}...${owner.slice(-4)}` : '...'}
-        </Text>
-        <Text variant="body" css={{ marginBottom: '$12', color: '$textColors$secondary' }}>
-          Viewing all flows created by this address
-        </Text>
-      </Column>
+      <PageHeader
+        title="Your Flows"
+        subtitle={
+          <>
+            View all flows created by {typeof owner === 'string' ? `${owner.substring(0, 10)}...${owner.slice(-4)}` : '...'}
+          </>
+        }
+      />
 
       {shouldShowFetchingState ? (
         <Column justifyContent="center" align="center" css={{ paddingTop: '$24' }}>
