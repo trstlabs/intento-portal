@@ -175,7 +175,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                             </Text>
                           </motion.div>
                           <Text variant="body" css={{ color: '#a0aec0', marginBottom: '2rem' }}>
-                            You're eligible to claim your airdrop rewards!
+                            You're eligible for airdrop rewards!
                           </Text>
 
                           <div style={styles.tokenAmount} className="token-amount">
@@ -218,7 +218,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               <div style={{ height: '8px', background: isDarkMode ? '#ffffff' : '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
                                 <div style={{ width: `${difference}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '4px' }}></div>
                               </div>
-                              {process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" && <Text variant="caption">As it stands, {100 - difference}% of the total airdrop will be clawed back to the community pool</Text>}
+                              <Text variant="caption">As it stands, {100 - difference}% of the total airdrop will be clawed back to the community pool</Text>
                             </div>
                           </div>
 
