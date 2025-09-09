@@ -18,8 +18,8 @@ const getChainIcon = (chainSymbol: string): string => {
 }
 
 
-// IntentTemlateChip: visually distinct chip for preset flows
-function IntentTemlateChip({ label, iconUrl, gradient, onClick }) {
+// IntentTemplateChip: visually distinct chip for preset flows
+function IntentTemplateChip({ label, iconUrl, gradient, onClick }) {
   const themeController = useControlTheme();
   const isDark = themeController.theme.name === 'dark';
   // Optionally darken the gradient for dark mode, or just use the same gradient
@@ -176,7 +176,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
   }
 
   return (
-    <IntentTemlateChip
+    <IntentTemplateChip
       label={`Autocompound ${chainSymbol} if >1`}
       iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
@@ -265,7 +265,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
   }
 
   return (
-    <IntentTemlateChip
+    <IntentTemplateChip
       label="Compound EDEN, EDEBB & Reinvest USDC Rewards"
       iconUrl={getChainIcon('ELYS')}
       gradient="linear-gradient(90deg,rgb(59, 202, 183) 0%, #736efe 100%)"
@@ -372,7 +372,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
   }
 
   return (
-    <IntentTemlateChip
+    <IntentTemplateChip
       label="Compound Staking Rewards"
       iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
       gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
@@ -438,7 +438,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
     <>
       {setAllMessages && index === 0 && (
         <Inline css={{ marginBottom: '$4', flexWrap: 'wrap', gap: '$2' }}>
-          <IntentTemlateChip
+          <IntentTemplateChip
             label={`Stream 1 ${chainSymbol}`}
             iconUrl={getChainIcon(chainSymbol)}
             gradient="linear-gradient(90deg, #7f7fd5 0%, #86a8e7 50%,rgb(176, 145, 234) 100%)"
@@ -466,7 +466,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
             <ElysCompoundRewardsChip setAllMessages={setAllMessages} />
           )}
           {chainSymbol === 'ELYS' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
-            <IntentTemlateChip
+            <IntentTemplateChip
               label="DCA 1 USDC to ELYS"
               iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
               gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
@@ -486,7 +486,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           )}
           {/*     {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
             <>
-              <IntentTemlateChip
+              <IntentTemplateChip
                 label="DCA 1 OSMO to ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
@@ -503,7 +503,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                   }
                 ], 'DCA into ATOM')}
               />
-              <IntentTemlateChip
+              <IntentTemplateChip
                 label="Subscribe to StreamSwap ssINJTEST"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
@@ -540,8 +540,8 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           )} */}
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
-              <IntentTemlateChip
-                label="DCA Into Intento StreamSwap"
+              <IntentTemplateChip
+                label="DCA Into StreamSwap 1"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
                 onClick={() => setAllMessages([
@@ -564,14 +564,14 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     }
 
                   }
-                ], 'DCA Into Intento StreamSwap',
+                ], 'DCA Into StreamSwap 1',
                 )}
               />
             </>
           )}
           {/* {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
-              <IntentTemlateChip
+              <IntentTemplateChip
                 label="DCA Into Intento StreamSwap If Price < 0.10ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
@@ -628,7 +628,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           )} */}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
-              {/* <IntentTemlateChip
+              {/* <IntentTemplateChip
                 label="DCA Into Intento StreamSwap If Price < 0.10"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
@@ -689,8 +689,8 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     }
                   })}
               /> */}
-              <IntentTemlateChip
-                label="DCA Into Intento StreamSwap"
+              <IntentTemplateChip
+                label="DCA Into StreamSwap 8"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
                 onClick={() => setAllMessages([
@@ -712,10 +712,10 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                       ]
                     }
                   }
-                ], 'DCA Into Intento StreamSwap ',
+                ], 'DCA Into StreamSwap 8',
                 )}
               />
-              <IntentTemlateChip
+              <IntentTemplateChip
                 label="DCA 1 USDC to ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
@@ -731,6 +731,50 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     },
                   }
                 ], 'DCA into ATOM')}
+              />
+              <IntentTemplateChip
+                label="DCA into INTO"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
+                    value: {
+                      sender: 'Your Address',
+                      poolId: '3138',
+                      tokenIn: {
+                        denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', // USDC IBC denom
+                        amount: '1000000', // 1 USDC in micro units
+                      },
+                      tokenOutMinAmount: '1', // price < 0.01 USDC
+                      routes: [
+                        { poolId: '3138', tokenOutDenom: 'ibc/BE072C03DA544CF282499418E7BC64D38614879B3EE95F9AD91E6C37267D4836' } // token1 denom
+                      ]
+                    }
+                  }
+                ], 'DCA into INTO')}
+              />
+              <IntentTemplateChip
+                label="DCA into INTO if price < 0.01"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
+                    value: {
+                      sender: 'Your Address',
+                      poolId: '3138',
+                      tokenIn: {
+                        denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', // USDC IBC denom
+                        amount: '1000000', // 1 USDC in micro units
+                      },
+                      tokenOutMinAmount: '100000000', // price < 0.01 USDC
+                      routes: [
+                        { poolId: '3138', tokenOutDenom: 'ibc/BE072C03DA544CF282499418E7BC64D38614879B3EE95F9AD91E6C37267D4836' } // token1 denom
+                      ]
+                    }
+                  }
+                ], 'DCA into INTO if price < 0.01')}
               />
             </>
           )}
