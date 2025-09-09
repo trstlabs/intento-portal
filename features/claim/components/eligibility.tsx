@@ -107,7 +107,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
         console.log("coin", coin);
         if (coin) {
           // Calculate the difference from target amount
-          const diff = initialModuleBalance - 69973272000000;//Number(coin.balance.amount);
+          const diff = initialModuleBalance - Number(coin.balance.amount);
           const percentage = ((diff / initialModuleBalance) * 100).toFixed(1);
           setDifference(Number(percentage));
         }
