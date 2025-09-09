@@ -81,7 +81,7 @@ export default function Claim() {
                 {claimRecord != "" && !claimRecord &&
                     <StyledDiv>
                         <Text variant="legend">
-                            <>Connect an address to view your actions. </>
+                            <>Connect an address to view your claim amount. </>
                         </Text>{' '}
                     </StyledDiv>
 
