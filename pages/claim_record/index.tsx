@@ -92,7 +92,7 @@ export default function Claim() {
                 {claimRecord && total && (
                     process.env.NEXT_PUBLIC_CLAIM_ENABLED == "true" &&
 
-                    <ClaimAirdrop claimRecord={claimRecord} claimRecordLoaded={!isLoading && !isTotalLoading} total={Number(10000)} />
+                    <ClaimAirdrop claimRecord={claimRecord} claimRecordLoaded={!isLoading && !isTotalLoading} total={Number(total)} />
 
 
                 )}
