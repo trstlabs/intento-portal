@@ -735,7 +735,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               <IntentTemplateChip
                 label="DCA into INTO"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
+                gradient="linear-gradient(90deg,rgb(67, 175, 233) 0%,rgb(56, 175, 249) 100%)"
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
@@ -757,7 +757,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               <IntentTemplateChip
                 label="DCA into INTO if price < 0.01"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
+                gradient="linear-gradient(90deg,rgb(67, 142, 233) 0%,rgb(56, 95, 249) 100%)"
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
