@@ -21,8 +21,11 @@ export const executeClaimClaimable = async ({
     await client.signAndBroadcast(
       address,
       [claimMsg],
-      'auto',
-      'claim from Intento Portal'
+      {
+        amount: [],
+        gas: '200000',
+      },
+      'Claim from Intento Portal'
     )
   )
 }
