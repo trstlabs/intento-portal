@@ -1,11 +1,11 @@
 import { AppLayout, PageHeader } from 'components'
 import { Button, Column, IconWrapper, Inline, media, Spinner, styled, Text } from 'junoblocks'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
-import { useFlows } from 'hooks/useFlow'
+import { useCallback, useState } from 'react'
+import { useFlowsByOwner } from 'hooks/useFlow'
 import { FlowCard } from '../../../features/flows/components/FlowCard'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+
 
 export default function FlowsByOwner() {
   const router = useRouter()
@@ -15,21 +15,11 @@ export default function FlowsByOwner() {
   const [paginationHistory, setPaginationHistory] = useState<Uint8Array[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
 
-  const [allFlows, isLoading] = useFlows(flowsPerPage, paginationKey)
-  const [filteredFlows, setFilteredFlows] = useState<Array<Flow>>([])
-
-  useEffect(() => {
-    if (allFlows?.flows) {
-      setFilteredFlows(
-        allFlows.flows.filter(
-          (flow) => flow.owner === owner
-        )
-      )
-    }
-  }, [allFlows, owner])
+  const [allFlows, isLoading] = useFlowsByOwner(flowsPerPage, paginationKey, owner as string)
+  const filteredFlows = allFlows?.flows || []
 
   const shouldShowFetchingState = (isLoading || isRefreshing) && filteredFlows.length === 0
-  const hasNextPage = Boolean(allFlows?.pagination?.nextKey && allFlows.pagination.nextKey.length > 0)
+  const hasNextPage = Boolean(allFlows?.pagination?.nextKey && allFlows.pagination.nextKey.length > 0 && filteredFlows.length > 0)
   const hasPrevPage = paginationHistory.length > 0
 
   // Handle pagination
