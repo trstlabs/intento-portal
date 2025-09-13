@@ -49,7 +49,6 @@ export const useFlows = (limit: number, key: any) => {
                 ? '/cosmos.authz.v1beta1.MsgExec'
                 : wrappedMsg.typeUrl
 
-
             return {
               value: msg.value,
               valueDecoded: msg,
@@ -74,9 +73,11 @@ export const useFlows = (limit: number, key: any) => {
   return [data, isLoading] as const
 }
 
-export const useFlowsByOwner = (limit: number, key: any) => {
+export const useFlowsByOwner = (limit: number, key: any, address?: string) => {
   const client = useIntentoRpcClient()
-  const { address } = useRecoilValue(walletState)
+  if (!address) {
+    address = useRecoilValue(walletState).address
+  }
   const { data, isLoading } = useQuery(
     'useFlowsByOwner',
     async () => {
@@ -102,7 +103,7 @@ export const useFlowsByOwner = (limit: number, key: any) => {
             const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
             wrappedMsg.typeUrl =
               wrappedMsg.typeUrl ==
-                '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+              '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
                 ? '/cosmos.authz.v1beta1.MsgExec'
                 : wrappedMsg.typeUrl
             return {
@@ -135,21 +136,20 @@ export const useFlow = (id) => {
       if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
       }
-      const flow = (await client.intento.intent.v1.flow({ id }))
-        .flow
+      const flow = (await client.intento.intent.v1.flow({ id })).flow
       return {
         ...flow,
         msgs: flow.msgs.map((msg) => {
           const wrappedMsg = GlobalDecoderRegistry.wrapAny(msg)
           wrappedMsg.typeUrl =
             wrappedMsg.typeUrl ==
-              '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
+            '/cosmos.authz.v1beta1.QueryGranteeGrantsRequest'
               ? '/cosmos.authz.v1beta1.MsgExec'
               : wrappedMsg.typeUrl
           return {
             value: wrappedMsg.value,
             valueDecoded: msg,
-            typeUrl: /* msg.typeUrl ||  */wrappedMsg.typeUrl,
+            typeUrl: /* msg.typeUrl ||  */ wrappedMsg.typeUrl,
           }
         }),
       }
@@ -180,11 +180,10 @@ export const useFlowHistory = (id, limit: number, key: Uint8Array) => {
         countTotal: true,
       })
 
-      const flowHistoryResponse =
-        await client.intento.intent.v1.flowHistory({
-          id: id,
-          pagination: pageRequest,
-        })
+      const flowHistoryResponse = await client.intento.intent.v1.flowHistory({
+        id: id,
+        pagination: pageRequest,
+      })
       return flowHistoryResponse
     },
     {
