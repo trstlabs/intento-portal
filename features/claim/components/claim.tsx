@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import Link from 'next/link';
 import { Button, CardContent, convertMicroDenomToDenom, Text, useControlTheme } from "junoblocks";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, ChevronDown, ChevronUp, Check, AlertTriangle } from 'lucide-react';
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
+import { useClaimClaimable } from '../hooks/useClaimClaimable';
 
 // Get styles based on theme
 const getStyles = (isDarkMode: boolean) => ({
@@ -16,7 +18,7 @@ const getStyles = (isDarkMode: boolean) => ({
     width: '100%',
     ':hover': {
       transform: 'translateY(-4px)',
-      boxShadow: isDarkMode 
+      boxShadow: isDarkMode
         ? '0 10px 25px rgba(0, 0, 0, 0.3)'
         : '0 10px 25px rgba(0, 0, 0, 0.1)'
     }
@@ -24,7 +26,7 @@ const getStyles = (isDarkMode: boolean) => ({
   tokenAmount: {
     fontSize: '2.5rem',
     fontWeight: 700,
-    background: isDarkMode 
+    background: isDarkMode
       ? 'linear-gradient(90deg, #60a5fa, #a78bfa)'
       : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
     WebkitBackgroundClip: 'text',
@@ -60,7 +62,7 @@ const getStyles = (isDarkMode: boolean) => ({
   progressFill: (percentage: number) => ({
     height: '100%',
     width: `${percentage}%`,
-    background: isDarkMode 
+    background: isDarkMode
       ? 'linear-gradient(90deg, #60a5fa, #a78bfa)'
       : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
     borderRadius: '4px',
@@ -90,6 +92,9 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
   const [showClaimMessage, setShowClaimMessage] = useState(true);
   /*   const [showFlowList, setShowFlowList] = useState(false); */
   const [expandedFlows, setExpandedFlows] = useState<Record<number, boolean>>({});
+  const { mutate: claimAll } = useClaimClaimable({
+    // Add any required configuration here
+  });
 
   const toggleFlowExpand = (flowIndex: number) => {
     setExpandedFlows((prev) => ({
@@ -218,7 +223,16 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
               </AnimatePresence>
 
               <div style={{ marginTop: '2.5rem' }}>
-                <Text variant="header" style={{ marginBottom: '1.5rem' }}>Your Tasks</Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <Text variant="header">Your Tasks</Text>
+                  <Button
+                    variant="primary"
+                    onClick={() => claimAll()}
+                    disabled={claimRecord.status.find((status) => status.actionCompleted === true) === undefined}
+                  >
+                    Claim All
+                  </Button>
+                </div>
                 <div style={{ marginTop: '1rem' }}>
                   {Object.entries(claimRecord.status).map(([_, status], index) => {
                     const isCompleted = status.actionCompleted;
@@ -304,7 +318,27 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 </Text>
 
                                 <div style={{ marginTop: '1rem' }}>
-                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600 }}>
+                                  {index === 0 && (
+                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                      Select Intento as the source chain to claim tokens directly to your wallet.
+                                    </Text>
+                                  )}
+                                  {index === 1 && (
+                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                      Select any other chain to use an Interchain Account. Note that the interchain account must be funded with enough tokens to cover the initial claimable amount.
+                                    </Text>
+                                  )}
+                                  {index === 2 && (
+                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                      This requires an active governance proposal. Check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active.
+                                    </Text>
+                                  )}
+                                  {index === 3 && (
+                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                      Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards.
+                                    </Text>
+                                  )}
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, marginTop: '1rem' }}>
                                     Vesting Schedule ({status.vestingPeriodsClaimed.length} periods)
                                   </Text>
                                   <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.5rem 0' }}>
@@ -343,14 +377,14 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                             left: 0,
                                             right: 0,
                                             bottom: 0,
-                                            background: 'repeating-linear-gradient(45deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px, rgba(255, 255, 255, 0.1) 3px, rgba(255, 255, 255, 0.1) 6px)',
+                                            background: 'repeating-linear-gradient(45deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 6px)',
                                             opacity: 0.3
                                           }} />
                                         ) : null}
                                         <Text variant="caption" style={{
                                           fontSize: '10px',
                                           fontWeight: 600,
-                                          color: claimed ? 'white' : 'rgba(255, 255, 255, 0.7)'
+                                          color: claimed ? 'white' : status.vestingPeriodsCompleted[period] ? '#4ade80' : 'rgba(255, 255, 255, 0.7)'
                                         }}>
                                           {period + 1}
                                         </Text>
@@ -358,22 +392,46 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                     ))}
                                   </div>
                                   <Text variant="caption" style={{ color: '#a0aec0', marginTop: '0.5rem', display: 'block' }}>
-                                    {status.vestingPeriodsClaimed.filter(Boolean).length} of {status.vestingPeriodsClaimed.length} periods claimed
+                                    {status.vestingPeriodsCompleted.filter(Boolean).length} of {status.vestingPeriodsCompleted.length} periods completed
                                   </Text>
+
                                 </div>
 
                                 {!isCompleted && (
-                                  <Button
-                                    variant="primary"
-                                    size="small"
-                                    style={{ marginTop: '1rem', width: '100%' }}
-                                    onClick={() => {
-                                      // Handle task action
-                                      console.log('Starting task:', ClaimFlow[index]);
-                                    }}
-                                  >
-                                    Start Task
-                                  </Button>
+                                  <div style={{ width: '100%' }}>
+                                    {index <= 1 ? (
+                                      <Link href="/build" passHref>
+                                        <Button
+                                          as="a"
+                                          variant="primary"
+                                          size="small"
+                                          style={{ marginTop: '1rem', width: '100%', textDecoration: 'none' }}
+                                          onClick={() => {
+                                            console.log('Starting task:', ClaimFlow[index]);
+                                          }}
+                                        >
+                                          Go to Build Page
+                                        </Button>
+                                      </Link>
+                                    ) : (
+                                      <a
+                                        href={index === 2
+                                          ? 'https://explorer.intento.zone/intento-mainnet/gov'
+                                          : 'https://explorer.intento.zone/intento-mainnet/staking'}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ textDecoration: 'none' }}
+                                      >
+                                        <Button
+                                          variant="primary"
+                                          size="small"
+                                          style={{ marginTop: '1rem', width: '100%' }}
+                                        >
+                                          {index === 2 ? 'View Proposals' : 'Stake Tokens'}
+                                        </Button>
+                                      </a>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             </motion.div>

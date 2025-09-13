@@ -71,7 +71,7 @@ export const useClaimClaimable = ({
                 toast.custom((t) => (
                     <Toast
                         icon={<ErrorIcon color="error" />}
-                        title="Oops send error!"
+                        title="Oops claim error!"
                         body={errorMessage}
                         buttons={
                             <Button
