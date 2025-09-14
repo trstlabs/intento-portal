@@ -11,6 +11,7 @@ import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import { MsgExec } from 'cosmjs-types/cosmos/authz/v1beta1/tx'
 import { Any } from 'cosmjs-types/google/protobuf/any'
 import { processDenomFields } from '../../features/build/utils/addressUtils'
+import { removeEmptyProperties } from '../../util/conversion'
 
 type ExecuteSubmitFlowArgs = {
   owner: string
@@ -78,7 +79,7 @@ export const executeSubmitFlow = async ({
     feeFunds = [flowInput.feeFunds]
   }
 
-  const msgSubmitFlow =
+  let msgSubmitFlow =
     intento.intent.v1.MessageComposer.withTypeUrl.submitFlow({
       owner,
       msgs,
@@ -101,6 +102,10 @@ export const executeSubmitFlow = async ({
       conditions: flowInput.conditions,
       trustlessAgent: flowInput.trustlessAgent,
     })
+
+  if (process.env.NEXT_PUBLIC_PREFERRED_SIGN_AMINO == 'true') {
+    msgSubmitFlow = removeEmptyProperties(msgSubmitFlow)
+  }
 
   const result = await validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitFlow], {
@@ -156,7 +161,6 @@ export function transformAndEncodeMsgs({
         typeUrl,
         value: MsgExec.encode(msgExec).finish(),
       })
-
     }
 
     return client.registry.encodeAsAny({
