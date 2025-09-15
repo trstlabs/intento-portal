@@ -78,7 +78,7 @@ export declare type ClaimAirdropProps = {
 
 export enum ClaimFlow {
   "Local Flow" = 0,
-  "Interchain Account Flow" = 1,
+  "IBC Flow" = 1,
   "Governance Vote" = 2,
   "Stake Tokens" = 3,
   UNRECOGNIZED = -1
@@ -228,7 +228,11 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                   <Button
                     variant="primary"
                     onClick={() => claimAll()}
-                    disabled={claimRecord.status.find((status) => status.actionCompleted === true) === undefined}
+                    disabled={!claimRecord.status.some(status => 
+                      status.vestingPeriodsCompleted.some((completed, i) => 
+                        completed === true && status.vestingPeriodsClaimed[i] === false
+                      )
+                    )}
                   >
                     Claim All
                   </Button>
@@ -320,22 +324,22 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 <div style={{ marginTop: '1rem' }}>
                                   {index === 0 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select Intento as the source chain to claim tokens directly to your wallet.
+                                      Select Intento as the source chain to claim tokens directly to your wallet. After execution, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select any other chain to use an Interchain Account. Note that the interchain account must be funded with enough tokens to cover the initial claimable amount.
+                                      Select any other chain to execute over IBC via a Trustless Agent. After succesful acknolwedgement of the execution on the host chain, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   {index === 2 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      This requires an active governance proposal. Check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active.
+                                      This requires an active governance proposal. Check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active. After voting, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   {index === 3 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards.
+                                      Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards. After staking, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, marginTop: '1rem' }}>
