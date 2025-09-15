@@ -50,6 +50,34 @@ export const formatDenom = (denom: string): string => {
   return denom.toUpperCase()
 }
 
+interface IBCAssetInfo {
+  denom: string;
+  denom_local: string;
+  symbol: string;
+  [key: string]: any;
+}
+
+export function resolveDenomSync(denom: string, ibcAssets?: IBCAssetInfo[]): string {
+  if (!denom.toLowerCase().startsWith('ibc/')) return formatDenom(denom);
+  
+  // If IBC assets list is provided, try to find a match
+  if (ibcAssets?.length) {
+    const matchingAsset = ibcAssets.find(
+      (asset) =>
+        asset.denom === denom ||
+        asset.denom_local === denom ||
+        (denom.startsWith('ibc/') && asset.denom.endsWith(denom.split('/').pop()!))
+    );
+
+    if (matchingAsset) {
+      return matchingAsset.symbol;
+    }
+  }
+
+  // Fallback to just formatting the denom if no match found
+  return formatDenom(denom);
+}
+
 export async function resolveDenom(denom: string): Promise<string> {
   if (!denom.toLowerCase().startsWith('ibc/')) return formatDenom(denom)
   // First check if we have the denom in our IBC asset list

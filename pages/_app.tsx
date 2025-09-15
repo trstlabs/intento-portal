@@ -88,7 +88,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
       })
 
       for (let asset of ibcAssetList) {
-        if (asset.name.toLowerCase().includes("devnet")) {
+        if (asset.registry_name.toLowerCase().includes("devnet")) {
 
           const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
           chains.push({
@@ -100,9 +100,6 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
             chain_id: asset.chain_id,
             bech32_prefix: asset.prefix,
             logo_URIs: { svg: asset.logo_uri },
-            // daemon_name: 'trstd',
-            // node_home: '$HOME/.trstd',
-            // key_algos: ['secp256k1'],
             slip44: 118,
             fees: {
               fee_tokens: [
