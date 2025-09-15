@@ -12,7 +12,7 @@ import Link from 'next/link'
 
 import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { useIBCAssetInfoFromConnection } from '../../../hooks/useIBCAssetInfo'
-import { useGetConnectionIDFromHostAddress } from '../../../hooks/useICA'
+import { useGetTrustlessAgentICAByTrustlessAgentAddress } from '../../../hooks/useICA'
 
 
 export declare type flowWithDetails = {
@@ -55,8 +55,16 @@ export const FlowCard = ({ flow }: flowWithDetails) => {
     )
   }
   //const flowAmino = Flow.toAmino(flow)
-  const [hostedConnectionID, _] = useGetConnectionIDFromHostAddress(flow.trustlessAgent?.agentAddress)
-  const ibcInfo = useIBCAssetInfoFromConnection(flow.selfHostedIca.connectionId || hostedConnectionID)
+   const [trustlessAgentICA, _isTrustlessAgentICALoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flow?.trustlessAgent?.agentAddress)
+ 
+  const connectionId = flow ? (
+    flow.selfHostedIca?.connectionId && flow.selfHostedIca.connectionId !== ''
+      ? flow.selfHostedIca.connectionId
+      : flow.trustlessAgent && trustlessAgentICA?.icaConfig?.connectionId
+        ? trustlessAgentICA.icaConfig.connectionId
+        : ""
+  ) : ""
+  const ibcInfo = useIBCAssetInfoFromConnection(connectionId)
 
   const now = Date.now()
   const endTime = flow.endTime?.getTime()
