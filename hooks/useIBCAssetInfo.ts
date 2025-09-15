@@ -25,7 +25,7 @@ export const useIBCAssetInfoByChainID = (id: string) => {
 export const useIBCAssetInfoFromConnection = (ibcConnectionID: string) => {
   const [assetList] = useIBCAssetList()
 
-  const defaultAsset = assetList?.find((asset) => asset.id == "Intento")
+  const defaultAsset = assetList?.find((asset) => asset.name.toLowerCase().includes("intento"))
   const memoizedAsset = useMemo(
     () => getIBCAssetInfo('connection_id', ibcConnectionID, assetList),
     [assetList, ibcConnectionID]

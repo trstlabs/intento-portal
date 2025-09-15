@@ -11,7 +11,7 @@ import {
 import React from 'react'
 
 import { GlobalDecoderRegistry } from 'intentojs'
-import { convertMicroDenomToDenom, formatDenom } from 'util/conversion'
+import { convertMicroDenomToDenom, resolveDenomSync } from 'util/conversion'
 import { useFlowHistory } from '../../../hooks/useFlow'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
@@ -19,6 +19,7 @@ import { getRelativeTime } from '../../../util/time'
 import { __TEST_MODE__ } from '../../../util/constants'
 import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { Link } from '@interchain-ui/react'
+import { useIBCAssetList } from '../../../hooks/useChainList'
 
 
 
@@ -45,6 +46,7 @@ export const FlowHistory = ({
   const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`flowHistory/${id.toString()}/${paginationKey}`], 15);
 
+  const [ibcAssetList, _] = useIBCAssetList()
 
   // Clear flowHistory when id changes
   useEffect(() => {
@@ -155,7 +157,7 @@ export const FlowHistory = ({
                         <Column>
                           <Text variant="caption">
                             Exec Fee:{' '}
-                            {convertMicroDenomToDenom(fee.amount, 6)} {formatDenom(fee.denom)}
+                            {convertMicroDenomToDenom(fee.amount, 6)} {resolveDenomSync(fee.denom, ibcAssetList)}
                           </Text>
                         </Column>
                       ))}
