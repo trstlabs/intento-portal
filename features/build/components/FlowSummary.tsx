@@ -143,7 +143,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                     </Column>
 
                     {/* Authorization Check */}
-                    {chainId && grantee && flowInput.msgs && flowInput.msgs.length > 0 && flowInput.connectionId && (
+                    {flowInput.msgs && flowInput.msgs.length > 0 && flowInput.connectionId && (
                         <AuthzGrantCheck
                             flowInput={flowInput}
                             chainId={chainId}

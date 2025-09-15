@@ -96,7 +96,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   })
 
   // Show connection UI if not connected
-  if (!ibcState.address || ibcState.status !== WalletStatusType.connecting && ibcState.status !== WalletStatusType.connected) {
+  if (!ibcState.address || ibcState.status !== WalletStatusType.connecting && ibcState.status !== WalletStatusType.connected || !grantee) {
     return (
       <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
         <Inline justifyContent="space-between">
