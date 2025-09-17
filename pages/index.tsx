@@ -396,10 +396,12 @@ export default function Home() {
               />
             ))
           ) : (
-            // Show message when no flows found (only after loading is complete)
-            <Column css={{ gridColumn: '1 / -1', textAlign: 'center', padding: '$12 $6' }}>
-              <Text variant="secondary">No flows found</Text>
-            </Column>
+            allFlows?.flows?.length === 0 && !isMyFlowsLoading && !isLoading && !isRefreshing && !isSorting  && (
+              // Show message when no flows found (only after loading is complete)
+              <Column css={{ gridColumn: '1 / -1', textAlign: 'center', padding: '$12 $6' }}>
+                <Text variant="secondary">No flows found</Text>
+              </Column>
+            )
           )}
         </StyledDivForFlowsGrid>
 
