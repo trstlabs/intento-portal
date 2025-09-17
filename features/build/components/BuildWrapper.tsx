@@ -10,12 +10,13 @@ type BuildWrapperProps = {
   /* will be used if provided on first render instead of internal state */
   initialExample?: string
   initialMessage?: string
-  mode?: string
+  initialChainID?: string
 }
 
 export const BuildWrapper = ({
   initialExample,
   initialMessage,
+  initialChainID,
 }: BuildWrapperProps) => {
   useRouter() // For router functionality
   let initialFlowInput = new FlowInput()
@@ -45,7 +46,28 @@ export const BuildWrapper = ({
   initialFlowInput.label = "My Flow"
 
   const router = useRouter();
-  const [flowInputs, setFlowInputs] = useState([initialFlowInput]);
+  // Load saved flow from localStorage if available
+  const [flowInputs, setFlowInputs] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const savedFlow = localStorage.getItem('savedFlow');
+        if (!savedFlow) return [initialFlowInput];
+        
+        // Handle case where it's already an object
+        if (typeof savedFlow === 'object') {
+          return [savedFlow];
+        }
+        
+        // Handle string case
+        const parsed = JSON.parse(savedFlow);
+        return [parsed];
+      } catch (error) {
+        console.error('Error parsing saved flow:', error);
+        return [initialFlowInput];
+      }
+    }
+    return [initialFlowInput];
+  });
 
   // Handle URL parameters in a separate effect
   useEffect(() => {
@@ -101,19 +123,35 @@ export const BuildWrapper = ({
       );
       setFlowInputs(newFlowInputs);
     }
+    
   }, [initialMessage, initialExample]);
 
-  // Get the initialChainId from URL or from the first flow input
-  const effectiveInitialChainId = flowInputs[0]?.connectionId || '';
-
   const displayFlowInput = flowInputs[0];
+
+  // Save flow to localStorage whenever it changes
+  useEffect(() => {
+    if (typeof window !== 'undefined' && flowInputs[0]) {
+      try {
+        localStorage.setItem('savedFlow', JSON.stringify(flowInputs[0]));
+      } catch (error) {
+        console.error('Error saving flow to localStorage:', error);
+      }
+    }
+  }, [flowInputs]);
+
+  // Clear saved flow when component unmounts (optional, uncomment if needed)
+  // useEffect(() => {
+  //   return () => {
+  //     localStorage.removeItem('savedFlow');
+  //   };
+  // }, []);
 
   return (
     <StyledDivForWrapper>
       <BuildComponent
         flowInput={displayFlowInput}
         onFlowChange={(flow) => setFlowInputs([flow])}
-        initialChainId={effectiveInitialChainId}
+        initialChainId={initialChainID}
       />
     </StyledDivForWrapper>
   )

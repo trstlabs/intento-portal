@@ -396,7 +396,7 @@ export const BuildComponent = ({
 
   const shouldDisableSubmitButton =
 
-    (flowInput.msgs[0] &&
+    (flowInput.msgs?.[0] &&
       flowInput.msgs[0].length == 0 &&
       JSON.parse(flowInput.msgs[0])['typeUrl'].length < 5)
 
@@ -520,7 +520,7 @@ export const BuildComponent = ({
           Define what to execute
         </Text>{' '}
       </Inline>
-      {flowInput.msgs.map((msg, index) => (
+      {flowInput.msgs?.map((msg, index) => (
         <div key={index}>
            <JsonFormWrapper
             index={index}
