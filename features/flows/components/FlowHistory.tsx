@@ -196,14 +196,14 @@ export const FlowHistory = ({
                         )}
                       </Column>
                       <Column>
-                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Received {packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Received: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
                           <Link key={i} href={`${rpc}/tx_search?query="recv_packet.packet_sequence=${packetSequence} AND recv_packet.packet_src_port='icacontroller-${trustlessAgentAddress}'"`} target="_blank">
                             {Number(packetSequence)}
                             {i < packetSequences.length - 1 ? ', ' : ''}
                           </Link>
 
                         ))}</Text>}
-                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Acknowledgement {packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Acknowledgement{packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
                           <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
                             {Number(packetSequence)}
                             {i < packetSequences.length - 1 ? ', ' : ''}
