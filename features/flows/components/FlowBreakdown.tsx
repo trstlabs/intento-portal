@@ -211,7 +211,7 @@ export const FlowBreakdown = ({
   }
 
   function handleUpdateFlowConfigClick(config: ExecutionConfiguration) {
-    let params: MsgUpdateFlowParams = {
+    const params: MsgUpdateFlowParams = {
       id: Number(flow.id),
       configuration: config,
       owner: flow.owner,
@@ -239,12 +239,17 @@ export const FlowBreakdown = ({
       ...flow.conditions,
       comparisons: updatedComparisons,
     };
+    const params: MsgUpdateFlowParams = {
+      id: Number(flow.id),
+      owner: flow.owner,
+      msgs: transformedMsgs,//TODO: remove this
+    }
     
     // Update the flow parameters with the new conditions
-    setUpdatedFlowParams((prev) => ({
-      ...prev,
+    setUpdatedFlowParams({
+      ...params,
       conditions: updatedConditions,
-    }));
+    });
     
     setRequestedUpdateFlow(true);
     setPendingComparison(null);

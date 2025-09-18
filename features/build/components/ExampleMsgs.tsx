@@ -2,7 +2,7 @@ export const wasmExamples = [
   {
     typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
     value: {
-      sender: 'into1....',
+      sender: 'Your Address.',
       contract: 'into1....',
       msg: {
         swap_and_send_to: {
@@ -22,7 +22,7 @@ export const wasmExamples = [
   {
     typeUrl: '/cosmwasm.wasm.v1.MsgInstantiateContract',
     value: {
-      sender: 'into1....',
+      sender: 'Your Address.',
       admin: 'into1....',
       codeId: '0',
       label: 'my contract',
@@ -158,7 +158,7 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
     value: {
-      sender: 'into1....',
+      sender: 'Your Address.',
       routes: [{
         poolId: "1", tokenOutDenom: "uinto"
       }],
@@ -169,7 +169,7 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountOut',
     value: {
-      sender: 'into1....',
+      sender: 'Your Address.',
       tokenInMaxAmount: '1000000',
       tokenOut: { denom: "uinto", amount: "1000000" },
     },
@@ -177,7 +177,7 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgJoinPool',
     value: {
-      sender: 'into1....',
+      sender: 'Your Address.',
       poolId: 'into1...',
       shareOutAmount: '1000000',
     },
@@ -185,7 +185,7 @@ export const osmoExamples = [
   {
     typeUrl: '/osmosis.gamm.v1beta1.MsgExitPool',
     value: {
-      sender: 'into1....',
+      sender: 'Your Address.',
       poolId: 'into1...',
       shareInAmount: '1000000',
       tokenOutMins: [{ denom: "uinto", amount: "1000000" }],
@@ -245,5 +245,14 @@ export const elysExamples = [
       validatorAddress: 'intovaloper1...',
     },
   },
-  
+
+]
+
+export const intentoExamples = [
+  {
+    typeUrl: '/intento.claim.v1.MsgClaimClaimable',
+    value: {
+      sender: 'Your Address'
+    }
+  }
 ]

@@ -328,7 +328,7 @@ function addBase64Padding(str: string): string {
           onChange={(e) => {
             handleFieldsChange({
               timeoutPolicy: Number(e.target.value),
-              timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
+              timeoutDuration: Duration.fromPartial({ "seconds": BigInt(60) }),
             });
           }}
           disabled={false}
