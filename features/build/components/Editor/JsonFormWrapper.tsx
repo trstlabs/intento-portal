@@ -106,6 +106,7 @@ export const JsonFormWrapper = ({
             <ExampleChips
               chainSymbol={chainSymbol}
               setExample={setExample}
+              messageIndex={index}
             />
             <Divider offsetY="$6" />
             <div style={{ margin: '$4', padding: '$4' }}>

@@ -109,18 +109,6 @@ export const generalExamples = [
     },
   },
   {
-    typeUrl: '/cosmos.distribution.v1beta1.MsgFundCommunityPool',
-    value: {
-      amount: [
-        {
-          amount: '1000000',
-          denom: 'uinto',
-        },
-      ],
-      depositor: 'into1....',
-    },
-  },
-  {
     typeUrl: '/cosmos.authz.v1beta1.MsgRevoke',
     value: {
       granter: 'into1....',
@@ -149,6 +137,22 @@ export const generalExamples = [
     value: {
       delegatorAddress: 'into1....',
       validatorAddress: 'intovaloper1...',
+    },
+  },
+  {
+    typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
+    value: {
+      sender: 'into1....',
+      receiver: 'into1....',
+      amount: '1000000',
+      denom: 'uinto',
+      sourcePort: 'transfer',
+      sourceChannel: 'channel-0',
+      timeoutHeight: {
+        revisionNumber: "0", // 0 for current version
+        revisionHeight: "0", // 0 for no timeout
+      },
+      timeoutTimestamp: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 60 * 24).toString(),// 1 day from now
     },
   },
 

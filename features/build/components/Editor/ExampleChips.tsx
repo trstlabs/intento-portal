@@ -399,7 +399,13 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
   )
 }
 
-export function ExampleChips({ chainSymbol, setExample }) {
+type ExampleChipsProps = {
+  chainSymbol: string
+  setExample: (index: number, example: any) => void
+  messageIndex: number
+}
+
+export function ExampleChips({ chainSymbol, setExample, messageIndex = 0 }: ExampleChipsProps) {
   return (
     <>
       {setExample && (
@@ -411,7 +417,7 @@ export function ExampleChips({ chainSymbol, setExample }) {
               <Chip
                 label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
                 icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-                onClick={() => setExample(0, example)}
+                onClick={() => setExample(messageIndex, example)}
               />
             </span>
           ))}
@@ -421,7 +427,7 @@ export function ExampleChips({ chainSymbol, setExample }) {
               <Chip
                 label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
                 icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                onClick={() => setExample(0, example)}
+                onClick={() => setExample(messageIndex, example)}
               />
             </span>
           ))}
@@ -431,7 +437,7 @@ export function ExampleChips({ chainSymbol, setExample }) {
               <Chip
                 label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
                 icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/cosmwasmtestnet/images/cosmwasm.svg"
-                onClick={() => setExample(0, example)}
+                onClick={() => setExample(messageIndex, example)}
               />
             </span>
           ))}
@@ -441,7 +447,7 @@ export function ExampleChips({ chainSymbol, setExample }) {
               <Chip
                 label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
                 icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
-                onClick={() => setExample(0, example)}
+                onClick={() => setExample(messageIndex, example)}
               />
             </span>
           ))}
@@ -450,7 +456,7 @@ export function ExampleChips({ chainSymbol, setExample }) {
               <Chip
                 label={example.typeUrl.split('.').find((data) => data.includes('Msg'))?.slice(3).replace(/([A-Z])/g, ' $1').trim()}
                 icon="https://raw.githubusercontent.com/cosmos/chain-registry/master/intento/images/into.svg"
-                onClick={() => setExample(0, example)}
+                onClick={() => setExample(messageIndex, example)}
               />
             </span>
           ))}
