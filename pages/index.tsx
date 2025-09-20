@@ -289,7 +289,7 @@ export default function Home() {
       }
       <StyledDivForFlowsGrid>
         <>
-          {Boolean(allFlows?.flows.length) ? (
+          {Boolean(allFlows?.flows.length) && (
             <Inline
               gap={4}
               css={{
@@ -302,7 +302,9 @@ export default function Home() {
                 Flows
               </Text>
             </Inline>
-          ) : (
+          )
+          }
+          {!Boolean(allFlows?.flows.length) &&  allFlows?.flows?.length === 0 && !isMyFlowsLoading && !isLoading && !isRefreshing && !isSorting  && (
             <Text variant="caption" css={{ padding: '$4' }}>
               {' '}
               No Flows found
