@@ -70,8 +70,18 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
 
   // Helper function to format a comparison description
   const formatComparison = (comp: Comparison): string => {
+    // Check if this is an ICQ config comparison
+    if (comp.icqConfig) {
+      const { queryType, connectionId } = comp.icqConfig;
+      const queryTypeName = queryType?.split('/')[1] || 'query';
+      return `Check if ${queryTypeName} query response on connection ${connectionId} is ${getOperatorDescription(comp.operator)} ${comp.operand}`;
+    }
+
     // Extract the field name from the path for more readable output
-    const sourceParts = comp.responseKey.split('.');
+    const sourceParts = comp.responseKey?.split('.') || [];
+    if (sourceParts.length === 0) {
+      return `Check if condition is ${getOperatorDescription(comp.operator)} ${comp.operand}`;
+    }
 
     // Check for array notation like [0]
     let sourceField = sourceParts[sourceParts.length - 1];
@@ -90,7 +100,7 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
 
     if (isAmountField) {
       // Try to extract the amount and denom from the operand
-      const match = comp.operand.match(/([\d.]+)\s*([a-zA-Z]+)/);
+      const match = comp.operand?.match(/([\d.]+)\s*([a-zA-Z]+)/);
       if (match) {
         const [_, amount, denom] = match;
         return `Check if amount${sourceIndex >= 0 ? ` (item ${sourceIndex})` : ''} from message ${comp.responseIndex + 1} response is ${getOperatorDescription(comp.operator)} ${amount} ${denom.toUpperCase()}`;
