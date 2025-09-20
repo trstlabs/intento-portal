@@ -20,12 +20,6 @@ function getInitialMessageFromSearchParams() {
   return message ? (message as string) : undefined
 }
 
-function getInitialChainIDFromSearchParams() {
-  const params = new URLSearchParams(location.search)
-  const chainID = params.get('initialChainId')
-  return chainID ? (chainID as string) : ""
-}
-
 export default function Build() {
   return (
     <AppLayout>
@@ -44,7 +38,6 @@ export default function Build() {
         <BuildWrapper
           initialExample={getInitialExampleFromSearchParams()}
           initialMessage={getInitialMessageFromSearchParams()}
-          initialChainID={getInitialChainIDFromSearchParams()}
         />
       </StyledContainer>
     </AppLayout>

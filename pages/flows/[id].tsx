@@ -95,14 +95,12 @@ export default function Flow() {
         )}
 
         {!isLoading && flow && flow.feeAddress &&
-          <>
-            <FlowBreakdown flow={flow} ibcInfo={ibcInfo} />
-          </>
+          <FlowBreakdown flow={flow} ibcInfo={ibcInfo} />
         }
         {!isLoading && !flow && (
           <StyledDiv>
             <Text variant="legend">
-              <>Flow not found in this space continuum 🌌 </>
+              <>Flow not found yet in this space continuum 🌌 </>
             </Text>{' '}
           </StyledDiv>
         )}

@@ -21,6 +21,7 @@ export class FlowInput {
   hostConnectionId?: string
   email?: string
   alertType?: string
+  chainId?: string
 }
 
 export type SelectChainInfo = {
