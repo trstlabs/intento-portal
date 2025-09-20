@@ -474,7 +474,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           <IntentTemplateChip
             label={`Stream 1 ${chainSymbol}`}
             iconUrl={getChainIcon(chainSymbol)}
-            gradient="linear-gradient(90deg, #7f7fd5 0%, #86a8e7 50%,rgb(176, 145, 234) 100%)"
+            gradient="linear-gradient(90deg,rgb(94, 94, 178) 0%,rgb(123, 134, 218) 100%)"
             onClick={() => setAllMessages([
               {
                 typeUrl: '/cosmos.bank.v1beta1.MsgSend',
@@ -502,7 +502,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
             <IntentTemplateChip
               label="DCA 1 USDC to ELYS"
               iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-              gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
+              gradient="linear-gradient(90deg, #3b7a7a 0%, #4fc3f7 100%)"
               onClick={() => setAllMessages([
                 // Example: Swap, Stake, Withdraw for autocompound
                 {
@@ -520,9 +520,9 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemplateChip
-                label="DCA Into StreamSwap 1"
+                label="DCA into StreamSwap 1"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
@@ -543,7 +543,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     }
 
                   }
-                ], 'DCA Into StreamSwap 1',
+                ], 'DCA into StreamSwap 1',
                 )}
               />
             </>
@@ -551,9 +551,9 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemplateChip
-                label="DCA Into StreamSwap 8"
+                label="DCA into StreamSwap 8"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #6a82fb 0%, #fc5c7d 100%)"
+                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
@@ -573,13 +573,13 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                       ]
                     }
                   }
-                ], 'DCA Into StreamSwap 8',
+                ], 'DCA into StreamSwap 8',
                 )}
               />
               <IntentTemplateChip
-                label="DCA 1 USDC to ATOM"
+                label="DCA into ATOM"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #43e97b 0%, #38f9d7 100%)"
+                gradient="linear-gradient(90deg, #5a4fcf 0%, #8a7aff 100%)"
                 onClick={() => setAllMessages([
                   // Example: DCA flow: swap, send
                   {
@@ -596,7 +596,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
               <IntentTemplateChip
                 label="DCA into INTO"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg,rgb(67, 175, 233) 0%,rgb(56, 175, 249) 100%)"
+                gradient="linear-gradient(90deg, #0c76af 0%, #38aff9 100%)"
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
