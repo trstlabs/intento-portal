@@ -233,13 +233,13 @@ export const SubmitFlowDialog = ({
 
                 <Column css={{ padding: '$2', gap: '$4' }}>
                   <Inline justifyContent="space-between" >
-                    <Text variant="body">Deduct from wallet</Text>
+                    <Text variant="body">Use wallet funds</Text>
                     <ToggleSwitch
                       id="deduct-fees"
                       name="deduct-fees"
                       checked={checkedFeeAcc}
                       onChange={handleChangeFeeAcc}
-                      optionLabels={['Deduct from wallet', 'Attach to flow']}
+                      optionLabels={['Use wallet funds', 'Attach to flow']}
                     />
                   </Inline>
 
