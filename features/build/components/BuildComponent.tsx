@@ -11,7 +11,7 @@ import {
   PlusIcon,
 
 } from 'junoblocks'
-import React, { HTMLProps, useEffect, useState, useRef, useMemo } from 'react'
+import React, { HTMLProps, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import {
   useSubmitFlow,
   useRegisterAccount,
@@ -46,13 +46,11 @@ import { processFlowInput } from '../utils/addressUtils'
 type FlowsInputProps = {
   flowInput: FlowInput
   onFlowChange: (flowInput: FlowInput) => void
-  initialChainId?: string
 } & HTMLProps<HTMLInputElement>
 
 export const BuildComponent = ({
   flowInput,
   onFlowChange,
-  initialChainId,
 }: FlowsInputProps) => {
   const inputRef = useRef<HTMLInputElement>()
 
@@ -61,8 +59,8 @@ export const BuildComponent = ({
   const [chainName, setChainName] = useState('')
 
   const [chainSymbol, setChainSymbol] = useState('INTO')
-  const [chainId, setChainId] = useState(process.env.NEXT_PUBLIC_INTO_CHAIN_ID || "")
-  const [chainIsConnected, setChainIsConnected] = useState(false)
+  const [chainId, setChainId] = useState(flowInput.chainId || process.env.NEXT_PUBLIC_INTO_CHAIN_ID)
+  const [hasConnectionID, setHasConnectionID] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
   const [_isJsonValid, setIsJsonValid] = useState(true)
@@ -75,7 +73,7 @@ export const BuildComponent = ({
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
     chainId,
     icaAddress,
-    chainIsConnected
+    hasConnectionID
   )
   const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByConnectionID(flowInput.connectionId)
   const [trustlessAgentICA, _istrustlessAgentICALoading] = useGetTrustlessAgentICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId)
@@ -156,7 +154,7 @@ export const BuildComponent = ({
         console.log(error)
       },
     },
-    !chainIsConnected
+    !hasConnectionID
   )
 
 
@@ -203,83 +201,126 @@ export const BuildComponent = ({
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
-    let msgs = flowInput.msgs
-    msgs[index] = msg
-    let updatedFlowInput = {
+    const newMsgs = [...flowInput.msgs];
+    newMsgs[index] = msg;
+    const updatedFlowInput = {
       ...flowInput,
-      msgs,
-    }
-    onFlowChange(updatedFlowInput)
-  }
+      msgs: newMsgs,
+    };
+    onFlowChange(updatedFlowInput);
+  };
 
-  async function handleChainChange(
-    chainId: string,
+  const handleChainChange = useCallback(async (
     connectionId: string,
     hostConnectionId: string,
+    newChainId: string,
     newPrefix: string,
     newDenom: string,
     name: string,
     chainSymbol: string
-  ) {
-    // alert(denom + newDenom)
-    let updatedFlowInput = flowInput
-    updatedFlowInput.connectionId = connectionId
-    updatedFlowInput.hostConnectionId = hostConnectionId
-    flowInput.msgs.map((editMsg, editIndex) => {
-      if (editMsg.includes(prefix + '1...')) {
-        updatedFlowInput.msgs[editIndex] = editMsg.replaceAll(
-          prefix + '1...',
-          newPrefix + '1...'
-        )
+  ) => {
+    // Create a new flow input with updated connection details
+    const updatedFlowInput = {
+      ...flowInput,
+      connectionId,
+      hostConnectionId,
+      msgs: [...flowInput.msgs]
+    };
 
+    const isIntoChain = newChainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID;
+    // Process messages with new prefix and denom
+    updatedFlowInput.msgs = updatedFlowInput.msgs.map((msg) => {
+      try {
+        let processedMsg = msg;
+    
+        // Handle prefix replacement
+        if (processedMsg.includes(prefix + "1...")) {
+          processedMsg = processedMsg.replaceAll(
+            prefix + "1...",
+            newPrefix + "1..."
+          );
+    
+          const processedInput = processFlowInput(
+            { ...updatedFlowInput, msgs: [processedMsg] },
+            isIntoChain
+          );
+    
+          processedMsg = processedInput.msgs[0].replaceAll(denom, newDenom);
+        }
+    
+        // Handle address placeholder replacement
+        const oldAddress = isIntoChain ? "Your Intento Address" : "Your Address";
+        const newAddress = isIntoChain ? "Your Intento Address" : "Your Address";
+        // In case you need to normalize from one to the other
+        processedMsg = processedMsg.replaceAll(oldAddress, newAddress);
+    
+        return processedMsg;
+      } catch (e) {
+        console.error("Error processing message:", e);
+        return msg; // Fallback to original
       }
-      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
-        updatedFlowInput = processFlowInput(updatedFlowInput, true)
-      } else {
-        updatedFlowInput = processFlowInput(updatedFlowInput, false)
+    });
+    
+    const hasConnectionId = Boolean(connectionId);
+
+    // Batch state updates to minimize re-renders
+    Promise.resolve().then(() => {
+      setDenom(newDenom);
+      setChainName(name);
+      setChainSymbol(chainSymbol);
+      setChainId(newChainId);
+      setPrefix(newPrefix);
+      setHasConnectionID(hasConnectionId);
+      setChainHasIAModule(isIntoChain);
+    });
+
+    // Update the flow with the new values
+    onFlowChange(updatedFlowInput);
+
+    // Connect external wallet if needed
+    if (hasConnectionId) {
+      try {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        if (connectExternalWallet) {
+          console.log(chainId)
+          connectExternalWallet(null);
+        }
+      } catch (e) {
+        console.error('Error connecting external wallet:', e);
       }
-      updatedFlowInput.msgs[editIndex] = updatedFlowInput.msgs[
-        editIndex
-      ].replaceAll(denom, newDenom)
-    })
-    console.log(updatedFlowInput)
-    onFlowChange(updatedFlowInput)
-    setDenom(newDenom)
-    setChainName(name)
-    setChainSymbol(chainSymbol)
-    setChainId(chainId)
-    setPrefix(newPrefix)
-    let chainIsConnected = connectionId != undefined && connectionId != ''
-    setChainIsConnected(chainIsConnected)
-    setChainHasIAModule(chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID)
-
-
-    if (!chainIsConnected) {
-      return
     }
-    await Promise.resolve().then(() => setTimeout(() => {}, 200))
-    connectExternalWallet(null)
-  }
+    }, [prefix, denom, connectExternalWallet, flowInput, onFlowChange]);
+
+  const prevDenomRef = useRef(denom);
+  const prevIcaAddressRef = useRef(icaAddress);
+  const prevChainIdRef = useRef(chainId);
+  const prevTrustlessAgentRef = useRef(trustlessAgent);
+  const prevTrustlessAgentICARef = useRef(trustlessAgentICA);
 
   useEffect(() => {
-    if (icaAddress && icaAddress != "" && denom) {
+    if (icaAddress && icaAddress !== "" && denom && 
+        (icaAddress !== prevIcaAddressRef.current || denom !== prevDenomRef.current)) {
       refetchICA();
+      prevIcaAddressRef.current = icaAddress;
+      prevDenomRef.current = denom;
     }
-  }, [denom, icaAddress]);
+  }, [denom, icaAddress, refetchICA]);
 
   useEffect(() => {
-    if ((trustlessAgent) && chainId) {
+    if (trustlessAgent && chainId && 
+        (trustlessAgent !== prevTrustlessAgentRef.current || chainId !== prevChainIdRef.current)) {
       refetchTrustlessAgentICA();
+      prevTrustlessAgentRef.current = trustlessAgent;
+      prevChainIdRef.current = chainId;
     }
-
-  }, [chainId, trustlessAgent]);
+  }, [chainId, trustlessAgent, refetchTrustlessAgentICA]);
 
   useEffect(() => {
-    if (trustlessAgentICA) {
-      refetchAuthZForTrustlessAgentICA()
+    if (trustlessAgentICA && trustlessAgentICA !== prevTrustlessAgentICARef.current) {
+      refetchAuthZForTrustlessAgentICA();
+      prevTrustlessAgentICARef.current = trustlessAgentICA;
     }
-
-  }, [trustlessAgentICA]);
+  }, [trustlessAgentICA, refetchAuthZForTrustlessAgentICA]);
 
   function setExample(index: number, msgObject: any) {
     try {
@@ -287,7 +328,7 @@ export const BuildComponent = ({
       let newMsg = msg.replaceAll('uinto', denom)
       newMsg = newMsg.replaceAll('into', prefix)
       let processedMsg: string
-  
+
       if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, true)
         processedMsg = newInput.msgs[0]
@@ -295,7 +336,7 @@ export const BuildComponent = ({
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, false)
         processedMsg = newInput.msgs[0]
       }
-  
+
       // Create a new copy of flowInput and msgs array
       const updatedFlowInput = {
         ...flowInput,
@@ -303,10 +344,10 @@ export const BuildComponent = ({
         label: '' // Clear the label when selecting an example
       }
       updatedFlowInput.msgs[index] = processedMsg
-  
+
       // Remove any undefined values in msgs array
       updatedFlowInput.msgs = updatedFlowInput.msgs.filter((msg) => msg !== undefined)
-  
+
       onFlowChange(updatedFlowInput)
     } catch (e) {
       alert(e)
@@ -325,7 +366,7 @@ export const BuildComponent = ({
         msg = msg.replaceAll('into', prefix);
         return msg;
       });
-      
+
       // Always ensure conditions is an object, even if empty
       const conditions = extra?.conditions || {
         feedbackLoops: [],
@@ -336,13 +377,13 @@ export const BuildComponent = ({
         skipOnFailureOf: [],
         useAndForComparisons: false
       };
-      
+
       let updatedFlowInput = {
         ...flowInput,
         msgs: processedMsgs,
         conditions
       };
-      
+
       if (label) {
         updatedFlowInput.label = label;
       }
@@ -431,12 +472,12 @@ export const BuildComponent = ({
                 Chain
               </Text>{' '}
               <ChainSelector
-                initialChainId={initialChainId}
+                initialChainId={flowInput.chainId}
                 onChange={(update) => {
                   handleChainChange(
-                    update.chainId,
                     update.connectionId,
                     update.hostConnectionId,
+                    update.chainId,
                     update.prefix,
                     update.denom,
                     update.name,
@@ -444,34 +485,10 @@ export const BuildComponent = ({
                   )
                 }}
               />{' '}
-              {/* {
-               !icaAddress &&
-                chainIsConnected &&
-                !isIcaLoading &&
-                flowInput.connectionId != '' && (
-                  <>
-                    <Button
-                      css={{
-                        margin: '$2',
-                        overflow: 'hidden',
-                        float: 'left',
-                      }}
-                      variant="secondary"
-                      onClick={() => handleRegisterAccountClick()}
-                    >
-                      {' '}
-                      {isExecutingRegisterICA ? (
-                        <Spinner instant />
-                      ) : (
-                        'Self-Host ICA'
-                      )}
-                    </Button>
-                  </>
-                )
-              } */}
+
             </Row>
             {chainName &&
-              chainIsConnected &&
+              hasConnectionID &&
               (isIcaLoading ? (
                 <Spinner size={18} style={{ margin: 0 }} />
               ) : (
@@ -522,7 +539,7 @@ export const BuildComponent = ({
       </Inline>
       {flowInput.msgs?.map((msg, index) => (
         <div key={index}>
-           <JsonFormWrapper
+          <JsonFormWrapper
             index={index}
             chainSymbol={chainSymbol}
             msg={msg}

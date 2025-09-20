@@ -10,13 +10,11 @@ type BuildWrapperProps = {
   /* will be used if provided on first render instead of internal state */
   initialExample?: string
   initialMessage?: string
-  initialChainID?: string
 }
 
 export const BuildWrapper = ({
   initialExample,
   initialMessage,
-  initialChainID,
 }: BuildWrapperProps) => {
   useRouter() // For router functionality
   let initialFlowInput = new FlowInput()
@@ -44,6 +42,7 @@ export const BuildWrapper = ({
   initialFlowInput.conditions = initConditions
   // Set a default label for new flows
   initialFlowInput.label = "My Flow"
+  initialFlowInput.chainId = process.env.NEXT_PUBLIC_INTO_CHAIN_ID || ""
 
   const router = useRouter();
   // Load saved flow from localStorage if available
@@ -72,56 +71,52 @@ export const BuildWrapper = ({
   // Handle URL parameters in a separate effect
   useEffect(() => {
     if (!router.isReady) return;
-
     const { flowInput, initialChainId } = router.query;
-    
+    if (!flowInput || typeof flowInput !== 'string') return;
+  
     try {
-      if (flowInput && typeof flowInput === 'string') {
-        const parsed = JSON.parse(flowInput);
-        let updatedFlow;
-        
-        if (initialChainId && typeof initialChainId === 'string') {
-          updatedFlow = {
-            ...parsed,
-            //connectionId: initialChainId,
-            trustlessAgent: parsed.trustlessAgent || {},
-            label: parsed.label || ""
-          };
-          setFlowInputs([processFlowInput(updatedFlow, false)]);
-        } else {
-          updatedFlow = {
-            ...parsed,
-            label: parsed.label || ""
-          };
-          setFlowInputs([processFlowInput(updatedFlow, true)]);
-        }
-      }
+      const parsed = JSON.parse(flowInput);
+  
+      setFlowInputs(prev => {
+        const current = prev[0];
+        if (JSON.stringify(parsed) === JSON.stringify(current)) return prev;
+  
+        const updatedFlow = {
+          ...parsed,
+          trustlessAgent: parsed.trustlessAgent || {},
+          label: parsed.label || "",
+          chainId: (initialChainId as string) || parsed.chainId,
+        };
+  
+        return [processFlowInput(updatedFlow, !initialChainId)];
+      });
     } catch (e) {
       console.error('Failed to parse flowInput from URL', e);
     }
   }, [router.isReady, router.query]);
+  
 
 
   // Handle initial message or example from props
   useEffect(() => {
     if (initialMessage) {
-      const newFlowInputs = [...flowInputs];
-      if (!newFlowInputs[0].msgs) {
-        newFlowInputs[0].msgs = [];
-      }
-      newFlowInputs[0].msgs[0] = initialMessage;
-      setFlowInputs(newFlowInputs);
+      setFlowInputs(prev => {
+        const newFlowInputs = [...prev];
+        if (!newFlowInputs[0].msgs) newFlowInputs[0].msgs = [];
+        newFlowInputs[0].msgs[0] = initialMessage;
+        return newFlowInputs;
+      });
     } else if (initialExample) {
-      const newFlowInputs = [...flowInputs];
-      if (!newFlowInputs[0].msgs) {
-        newFlowInputs[0].msgs = [];
-      }
-      newFlowInputs[0].msgs[0] = JSON.stringify(
-        generalExamples[initialExample],
-        null,
-        '\t'
-      );
-      setFlowInputs(newFlowInputs);
+      setFlowInputs(prev => {
+        const newFlowInputs = [...prev];
+        if (!newFlowInputs[0].msgs) newFlowInputs[0].msgs = [];
+        newFlowInputs[0].msgs[0] = JSON.stringify(
+          generalExamples[initialExample],
+          null,
+          '\t'
+        );
+        return newFlowInputs;
+      });
     }
     
   }, [initialMessage, initialExample]);
@@ -151,7 +146,6 @@ export const BuildWrapper = ({
       <BuildComponent
         flowInput={displayFlowInput}
         onFlowChange={(flow) => setFlowInputs([flow])}
-        initialChainId={initialChainID}
       />
     </StyledDivForWrapper>
   )

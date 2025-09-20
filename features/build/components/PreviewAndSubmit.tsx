@@ -81,10 +81,10 @@ import {
     const resolvedDenomsCache = useRef<Record<string, { symbol: string; denom: string } | string>>({})
   
     // Get IBC asset info for the current chain
-    const chainInfo = useChainInfoByChainID(initialChainId || '')
+    const chainInfo = useChainInfoByChainID(initialChainId)
     // Get the base denom from chain info or use an empty string
     // const baseDenom = chainInfo?.denom || chainInfo?.denom_local || ''
-    const ibcAssetInfo = useIBCAssetInfoByChainID(initialChainId || '')
+    const ibcAssetInfo = useIBCAssetInfoByChainID(initialChainId)
   
     // Theme controller
     const themeController = useControlTheme()

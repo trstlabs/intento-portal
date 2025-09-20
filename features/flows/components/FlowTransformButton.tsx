@@ -49,7 +49,8 @@ export const FlowTransformButton = ({ flow, initialChainID }: FlowTransformButto
             configuration: flow.configuration,
             connectionId: flow.selfHostedIca.connectionId,
             trustlessAgent: flow.trustlessAgent,
-            label: flow.label
+            label: flow.label,
+            chainId: initialChainID
 
         };
         console.log(flowInput)
@@ -58,15 +59,19 @@ export const FlowTransformButton = ({ flow, initialChainID }: FlowTransformButto
     };
 
     const handleClick = async () => {
-        let flowInput = await transformFlow(flow);
-        flowInput = convertBigIntToString(flowInput);
-        router.push({
-            pathname: '/build',
-            query: { 
-                flowInput: JSON.stringify(flowInput),
-                ...(initialChainID && { initialChainId: initialChainID })
-            }
-        });
+        try {
+            let flowInput = await transformFlow(flow);
+            flowInput = convertBigIntToString(flowInput);
+            
+            const query: any = { flowInput: JSON.stringify(flowInput) };
+          
+            await router.replace({
+                pathname: '/build',
+                query,
+            }, undefined, { shallow: true });
+        } catch (error) {
+            console.error('Error transforming flow:', error);
+        }
     };
 
     return <Button variant="secondary" iconRight={<CopyIcon />} onClick={handleClick}>Copy and Create</Button>;
