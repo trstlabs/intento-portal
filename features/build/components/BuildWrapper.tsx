@@ -153,5 +153,5 @@ export const BuildWrapper = ({
 
 const StyledDivForWrapper = styled('div', {
   borderRadius: '16px',
-  backgroundColor: '$backgroundColors$base !important',
+  //backgroundColor: '$backgroundColors$base !important',
 })

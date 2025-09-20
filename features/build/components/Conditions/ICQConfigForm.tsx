@@ -256,7 +256,7 @@ function addBase64Padding(str: string): string {
       <Divider offsetTop="$10" offsetBottom="$5" />
       <Tooltip label={"Perform an interchain query for conditions"}>
         <Text variant="header" color="secondary" align="center" css={{ marginBottom: "$2", marginTop: "$12" }}>
-          Interchain Query 🔍
+          Interchain Query
         </Text>
       </Tooltip>
       <div style={{ display: 'flex', justifyContent: 'end' }}>

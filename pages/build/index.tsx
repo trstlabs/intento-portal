@@ -29,7 +29,7 @@ export default function Build() {
           subtitle={
             <>
               Create flows on connected chains and submit messages for execution as Intento Flows with condition-based logic.{' '}
-              <Text as="a" href="https://docs.intento.zone/using-flows/intento-portal" target="_blank" variant="body">
+              <Text as="a" href="https://docs.intento.zone/guides/portal/overview" target="_blank" variant="body">
                 Learn more in the docs
               </Text>
             </>

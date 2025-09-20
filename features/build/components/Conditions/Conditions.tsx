@@ -231,7 +231,7 @@ export const Conditions = ({
                 <Tooltip
                   label={
                     "Depend execution on result of other flows"}>
-                  <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Stoplights🚦 </Text>
+                  <Text variant="header" color="secondary" align="center" css={{ marginBottom: '$12', marginTop: '$12' }}>Stoplights </Text>
                 </Tooltip>
                 {/* <Text variant="body"> Depend execution on result of other intent-based flows</Text> */}
                 {/* Add more UI elements to handle other properties of ExecutionConditions */}
