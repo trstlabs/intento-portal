@@ -16,6 +16,7 @@ import {
   IconWrapper,
   Chevron,
   Union,
+  useMedia,
 } from 'junoblocks'
 import Link from 'next/link'
 import React from 'react'
@@ -43,6 +44,7 @@ import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
+import { Share, X } from 'lucide-react'
 import { EditExecutionSection } from './EditExecutionSection'
 import { convertMicroDenomToDenom, resolveDenoms } from '../../../util/conversion'
 
@@ -230,10 +232,10 @@ export const FlowBreakdown = ({
 
   function handleSaveComparison(index: number) {
     if (!pendingComparison) return;
-    
+
     const updatedComparisons = [...(flow.conditions.comparisons || [])];
     updatedComparisons[index] = pendingComparison;
-    
+
     // Create a new conditions object with the updated comparisons
     const updatedConditions = {
       ...flow.conditions,
@@ -244,13 +246,13 @@ export const FlowBreakdown = ({
       owner: flow.owner,
       msgs: transformedMsgs,//TODO: remove this
     }
-    
+
     // Update the flow parameters with the new conditions
     setUpdatedFlowParams({
       ...params,
       conditions: updatedConditions,
     });
-    
+
     setRequestedUpdateFlow(true);
     setPendingComparison(null);
     setEditingComparisonIndex(null);
@@ -287,8 +289,7 @@ export const FlowBreakdown = ({
     setUpdatedFlowParams(updateParams);
     setRequestedUpdateFlow(true);
   }
-
-
+  const isMobile = useMedia('sm')
   const shouldDisableUpdateFlowButton = false // !updatedFlowParams || !updatedFlowParams.id
 
   // Debounce timer reference
@@ -450,13 +451,59 @@ export const FlowBreakdown = ({
       {/* </Row> */}
       <>
         <Inline
-          css={{ margin: '$6' }}
-
-          justifyContent="flex-end">
-          <Button as="a" css={{ marginRight: '$4' }}
+          css={{
+            margin: '$6',
+            gap: '$4'
+          }}
+          justifyContent="flex-end"
+        >
+          <Button
+            as="a"
             variant="secondary"
             target="__blank"
-            rel="noopener noreferrer" iconRight={<Alert />} href={`/alert?flowID=${flow.id}`} >Alerts</Button>
+            rel="noopener noreferrer"
+            iconRight={<Alert />}
+            href={`/alert?flowID=${flow.id}`}
+          >
+            Alerts
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={async () => {
+              const flowDetails = `Check out this flow on INTO Protocol: Flow ${flow.label ? flow.label : `Flow ${flow.id}`}`;
+              const shareUrl = `${window.location.origin}/flows/${flow.id}`;
+
+              if (navigator.share) {
+                try {
+                  await navigator.share({
+                    title: `Flow ${flow.label ? flow.label : `Flow ${flow.id}`}`,
+                    text: flowDetails,
+                    url: shareUrl,
+                  });
+                } catch (err) {
+                  console.error('Error sharing:', err);
+                }
+              } else {
+                await navigator.clipboard.writeText(`${flowDetails}\n${shareUrl}`);
+                alert('Link copied to clipboard!');
+              }
+            }}
+
+          >
+            Share <Share size={16} />
+          </Button>
+          {isMobile ? null : <Button
+            variant="secondary"
+            onClick={() => {
+              const flowDetails = `Check out this flow on Intento: Flow ${flow.label ? flow.label : `Flow ${flow.id}`}`;
+              const shareUrl = `${window.location.origin}/flows/${flow.id}`;
+
+              const twitterUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(flowDetails)}&url=${encodeURIComponent(shareUrl)}`;
+              window.open(twitterUrl, '_blank', 'noopener,noreferrer');
+            }}
+          >
+            Share on Twitter <X size={16} />
+          </Button>}
           <FlowTransformButton flow={flow} initialChainID={chainId} />
         </Inline>
         <Row>
@@ -832,80 +879,80 @@ export const FlowBreakdown = ({
 
         {flow.conditions.comparisons && flow.conditions.comparisons.map((comparison: Comparison, index: number) => (
           <Row>
-          
 
-              <div style={{ width: '100%' }}>
-                {editingComparisonIndex === index ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', }}>
-                    <ComparisonForm
-                      comparison={pendingComparison || comparison}
-                      onChange={handleComparisonChange}
-                      setDisabled={() => setEditingComparisonIndex(null)}
-                    />
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
-                      <Button
-                        variant="ghost"
-                        onClick={() => setEditingComparisonIndex(null)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="primary"
-                        onClick={() => handleSaveComparison(index)}
-                      >
-                        Save Changes
-                      </Button>
-                    </div>
+
+            <div style={{ width: '100%' }}>
+              {editingComparisonIndex === index ? (
+                <div style={{ display: 'flex', flexDirection: 'column', }}>
+                  <ComparisonForm
+                    comparison={pendingComparison || comparison}
+                    onChange={handleComparisonChange}
+                    setDisabled={() => setEditingComparisonIndex(null)}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px' }}>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setEditingComparisonIndex(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => handleSaveComparison(index)}
+                    >
+                      Save Changes
+                    </Button>
                   </div>
-                ) : (
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', marginBottom: '10px' }}>
+                    <Tooltip label="Compare responses to determine if execution should take place">
+                      <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+                        Comparison
+                      </Text>
+                    </Tooltip>
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      onClick={() => setEditingComparisonIndex(index)}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+
                   <>
-                    <div style={{ display: 'flex', marginBottom: '10px' }}>
-                      <Tooltip label="Compare responses to determine if execution should take place">
-                        <Text variant="title" align="left" style={{ fontWeight: '600' }}>
-                          Comparison
-                        </Text>
-                      </Tooltip>
-                      <Button
-                        variant="ghost"
-                        size="small"
-                        onClick={() => setEditingComparisonIndex(index)}
-                      >
-                        Edit
-                      </Button>
-                    </div>
-
-                    <>
-                      {comparison.flowId.toString() != "0" && (
-                        <Text variant="body">
-                          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">ID</Text> {comparison.flowId.toString()}
-                        </Text>
-                      )}
-                      {comparison.responseIndex !== undefined && comparison.responseIndex !== 0 && (
-                        <Text variant="body">
-                          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Response Index</Text> {comparison.responseIndex}
-                        </Text>
-                      )}
-                      {comparison.responseKey && (
-                        <Text variant="body">
-                          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Response Key</Text> {comparison.responseKey}
-                        </Text>
-                      )}
+                    {comparison.flowId.toString() != "0" && (
                       <Text variant="body">
-                        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Comparison Operator</Text> {ComparisonOperatorLabels[comparison.operator]}
+                        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">ID</Text> {comparison.flowId.toString()}
                       </Text>
+                    )}
+                    {comparison.responseIndex !== undefined && comparison.responseIndex !== 0 && (
                       <Text variant="body">
-                        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Comparison Operand</Text> {comparison.operand}
+                        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response Index</Text> {comparison.responseIndex}
                       </Text>
+                    )}
+                    {comparison.responseKey && (
                       <Text variant="body">
-                        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
+                        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response Key</Text> {comparison.responseKey}
                       </Text>
-                    </>
-                    {comparison.icqConfig && icqConfig(comparison)}
+                    )}
+                    <Text variant="body">
+                      <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Comparison Operator</Text> {ComparisonOperatorLabels[comparison.operator]}
+                    </Text>
+                    <Text variant="body">
+                      <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Comparison Operand</Text> {comparison.operand}
+                    </Text>
+                    <Text variant="body">
+                      <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
+                    </Text>
                   </>
-                )}
-              </div>
+                  {comparison.icqConfig && icqConfig(comparison)}
+                </>
+              )}
+            </div>
 
-          
+
           </Row>
         ))}
         {flow.conditions.feedbackLoops && flow.conditions.feedbackLoops.map((feedbackLoop) => (
@@ -1073,7 +1120,7 @@ export const FlowBreakdown = ({
             </>
           )
         }
-        <FlowHistory 
+        <FlowHistory
           rpc={ibcInfo?.rpc || process.env.NEXT_PUBLIC_INTO_RPC}
           id={flow.id.toString()}
           transformedMsgs={transformedMsgs}
@@ -1211,26 +1258,26 @@ export const FlowBreakdown = ({
         </Text>
       </Tooltip>
       <Text variant="body">
-        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Chain ID</Text>    {parent.icqConfig.chainId}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Chain ID</Text>    {parent.icqConfig.chainId}
       </Text>
       <Text variant="body">
-        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Connection ID</Text>      {parent.icqConfig.connectionId}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Connection ID</Text>      {parent.icqConfig.connectionId}
       </Text>
       <Text variant="body">
-        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Query Type</Text>  {parent.icqConfig.queryType}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Type</Text>  {parent.icqConfig.queryType}
       </Text>
       <Text variant="body">
-        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Query Key</Text>  {parent.icqConfig.queryKey}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Key</Text>  {parent.icqConfig.queryKey}
       </Text>
       <Text variant="body">
-        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(parent.icqConfig.timeoutDuration.seconds))}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(parent.icqConfig.timeoutDuration.seconds))}
       </Text>
       <Text variant="body">
-        <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[parent.icqConfig.timeoutPolicy]}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[parent.icqConfig.timeoutPolicy]}
       </Text>
       {parent.icqConfig.response &&
         <Text variant="body">
-          <Text style={{marginTop: '16px'}} variant="legend" color="secondary" align="left">Response</Text>  {TimeoutPolicy[parent.icqConfig.response]}
+          <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response</Text>  {parent.icqConfig.response}
         </Text>
       }
     </>
@@ -1267,19 +1314,19 @@ type InfoHeaderProps = {
 
 
 const InfoHeader = ({ id, good }: InfoHeaderProps) => (
-  <Inline justifyContent="flex-start" css={{ padding: '$16 0 $14' }}>
-    <Inline gap={6}>
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2rem 0', width: '100%' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
       <Link href="/flows" passHref>
         <Button as="a" variant="ghost" size="large" iconLeft={<WalletIcon />}>
-          <Inline css={{ paddingLeft: '$4' }}>All Flows</Inline>
+          <span style={{ paddingLeft: '1rem' }}>All Flows</span>
         </Button>
       </Link>
       <ChevronIcon rotation="180deg" css={{ color: '$colors$dark' }} />
-    </Inline>
-    <Text variant="caption" color="secondary">
-      {good && <>🟢</>} Flow {id}
-    </Text>
-  </Inline>
+      <Text variant="caption" color="secondary">
+        {good && <>🟢</>} Flow {id}
+      </Text>
+    </div>
+  </div>
 )
 
 const StyledInput = styled('input', {
