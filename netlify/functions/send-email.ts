@@ -166,7 +166,7 @@ export const handler: Handler = async (event, _context) => {
     const apiBase = process.env.NEXT_PUBLIC_INTO_API
 
     const [flowDetails, flowHistory] = await Promise.all([
-      fetch(`${apiBase}/intento/intent/v1/flows/${flowID}`)
+      fetch(`${apiBase}/intento/intent/v1/flow/${flowID}`)
         .then((res) => res.json())
         .catch(() => null),
       fetch(`${apiBase}/intento/intent/v1/flow-history/${flowID}`)
