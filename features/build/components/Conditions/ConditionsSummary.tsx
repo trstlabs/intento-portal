@@ -20,12 +20,15 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
   const getOperatorDescription = (operator: number): string => {
     switch (operator) {
       case 0: return 'equals';
-      case 1: return 'not equals';
-      case 2: return 'less than';
-      case 3: return 'less than or equal';
-      case 4: return 'greater than';
+      case 1: return 'contains';
+      case 2: return 'not contains';
+      case 3: return 'smaller than';
+      case 4: return 'larger than';
       case 5: return 'greater than or equal';
-      case 6: return 'contains';
+      case 6: return 'smaller than or equal';
+      case 7: return 'starts with';
+      case 8: return 'ends with';
+      case 9: return 'not equal';
       default: return 'unknown operator';
     }
   };
