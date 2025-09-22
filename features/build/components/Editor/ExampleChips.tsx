@@ -19,7 +19,7 @@ const getChainIcon = (chainSymbol: string): string => {
 
 
 // IntentTemplateChip: visually distinct chip for preset flows
-function IntentTemplateChip({ label, iconUrl, gradient, onClick }) {
+function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, disabled = false }) {
   const themeController = useControlTheme();
   const isDark = themeController.theme.name === 'dark';
   // Optionally darken the gradient for dark mode, or just use the same gradient
@@ -34,7 +34,7 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick }) {
     })
     : gradient;
   return (
-    <div 
+    <div
       style={{
         display: 'inline-flex',
         alignItems: 'center',
@@ -44,30 +44,100 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick }) {
         fontWeight: 700,
         padding: '0.6em 1.3em',
         margin: '0.3em 0.4em',
-        cursor: 'pointer',
+        cursor: soon ? 'not-allowed' : 'pointer',
         boxShadow: isDark ? '0 2px 16px 0 rgba(30,40,70,0.18)' : '0 2px 12px 0 rgba(80,80,200,0.10)',
         border: 'none',
         transition: 'all 0.12s cubic-bezier(.4,0,.2,1), transform 0.1s ease',
         background: isDark ? darkGradient : gradient,
         transform: 'scale(1)',
+        position: 'relative',
+        overflow: 'hidden',
+        opacity: soon || disabled ? 0.5 : 1,
+        pointerEvents: soon ? 'none' : 'auto',
+        filter: disabled ? 'grayscale(1)' : 'none'
       }}
       onClick={onClick}
       onMouseOver={e => {
         (e.currentTarget as HTMLDivElement).style.transform = 'scale(1.05)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = isDark 
-          ? '0 4px 20px 0 rgba(30,40,70,0.25)' 
+        (e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+          ? '0 4px 20px 0 rgba(30,40,70,0.25)'
           : '0 4px 16px 0 rgba(80,80,200,0.15)';
       }}
       onMouseOut={e => {
         (e.currentTarget as HTMLDivElement).style.transform = 'scale(1)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = isDark 
-          ? '0 2px 16px 0 rgba(30,40,70,0.18)' 
+        (e.currentTarget as HTMLDivElement).style.boxShadow = isDark
+          ? '0 2px 16px 0 rgba(30,40,70,0.18)'
           : '0 2px 12px 0 rgba(80,80,200,0.10)';
       }}
     >
+      {soon && (
+        <div style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          background: 'rgba(0,0,0,0.6)',
+          color: 'white',
+          fontSize: '0.7em',
+          padding: '0.2em 0.6em',
+          borderBottomLeftRadius: '8px',
+          fontWeight: 600,
+          letterSpacing: '0.5px',
+          transform: 'translateY(-100%)',
+          animation: 'slideDown 0.2s ease-out forwards',
+        }}>
+          SOON
+        </div>
+      )}
       <Inline>
-        {iconUrl && <img src={iconUrl} alt="Icon" style={{ marginRight: '0.7em', height: '2em', borderRadius: '50%', background: isDark ? 'rgba(80,90,120,0.18)' : 'rgba(255,255,255,0.2)' }} />}
-        <span style={{ fontWeight: 700, fontSize: '1.1em', letterSpacing: 1 }}>{label}</span>
+        {iconUrl && <img src={iconUrl} alt="Icon" style={{
+          marginRight: '0.7em',
+          height: '2em',
+          borderRadius: '50%',
+          background: isDark ? 'rgba(80,90,120,0.18)' : 'rgba(255,255,255,0.2)',
+          filter: soon ? 'grayscale(0.8)' : 'none',
+          opacity: soon ? 0.8 : 1
+        }} />}
+        <span style={{
+          fontWeight: 700,
+          fontSize: '1.1em',
+          letterSpacing: 1,
+          opacity: soon ? 0.8 : 1,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.3em'
+        }}>
+          {label}
+          {soon && <><Clock size={14} style={{ marginLeft: '0.2em' }} /> <div style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            background: 'rgba(0,0,0,0.7)',
+            color: 'white',
+            fontSize: '0.7em',
+            padding: '0.2em 0.6em',
+            borderBottomLeftRadius: '8px',
+            fontWeight: 600,
+            letterSpacing: '0.5px',
+          }}>
+            SOON
+          </div></>}
+          {disabled && (
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              background: 'rgba(0,0,0,0.7)',
+              color: 'white',
+              fontSize: '0.7em',
+              padding: '0.2em 0.6em',
+              borderBottomLeftRadius: '8px',
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+            }}>
+              CURRENTLY NOT AVAILABLE
+            </div>
+          )}
+        </span>
       </Inline>
     </div>
   )
@@ -75,6 +145,7 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick }) {
 
 import { useControlTheme } from 'junoblocks'
 import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
+import { Clock } from 'lucide-react'
 
 function Chip({ label, onClick, icon }) {
   const themeController = useControlTheme();
@@ -153,14 +224,14 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
           value: {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address',
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
           },
         },
         {
           typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
           value: {
             delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address',
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
             amount: {
               denom: `${chainSymbol}`,
               amount: '1', // This will be replaced by the feedback loop
@@ -168,13 +239,13 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           },
         },
       ],
-      `Autocompound ${chainSymbol} if ${chainSymbol} >1`,
+      `Autocompound ${chainSymbol} if ${chainSymbol} rewards > 1`,
       {
         conditions: {
           feedbackLoops: [
             {
               responseIndex: 0,
-              responseKey: 'Amount.[0].Amount',
+              responseKey: 'Amount.[-1].Amount',
               msgsIndex: 1,
               msgKey: 'Amount',
               valueType: 'math.Int',
@@ -182,10 +253,10 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           ],
           comparisons: [{
             responseIndex: 0,
-            responseKey: 'Amount.[0].Amount',
-            operator: 4,
+            responseKey: 'Amount',
+            operator: 1,
             operand: `1000000u${chainSymbol.toLowerCase()}`,
-            valueType: 'math.Int',
+            valueType: 'sdk.Coins',
           }
           ],
         }
@@ -195,10 +266,11 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
 
   return (
     <IntentTemplateChip
-      label={`Autocompound ${chainSymbol} if >1`}
+      label={`Autocompound if rewards > 1 ${chainSymbol}`}
       iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
       onClick={handleClick}
+      soon={chainSymbol === 'ATOM'}
     />
   )
 }
@@ -229,7 +301,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
           }
         },
         {
@@ -238,7 +310,7 @@ const ElysCompoundRewardsChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
           }
         }
       ],
@@ -320,7 +392,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
           }
         },
         {
@@ -329,7 +401,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
           }
         },
         {
@@ -338,7 +410,7 @@ const ElysAutoCompoundChip = ({ setAllMessages }) => {
             amount: "1",
             creator: "Your Address",
             asset: "uedenb",
-            validatorAddress: validatorAddress ? validatorAddress : '⚠️ Not found. Stake tokens or replace this with a validator operator address'
+            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
           }
         }
       ],
@@ -467,6 +539,9 @@ export function ExampleChips({ chainSymbol, setExample, messageIndex = 0 }: Exam
 }
 
 export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
+  const { validators } = useValidators(chainSymbol)
+  const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
+
   return (
     <>
       {setAllMessages && index === 0 && (
@@ -520,8 +595,71 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemplateChip
-                label="DCA into StreamSwap 1"
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                label="Swap ATOM for BTC if price < $5"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                onClick={() => setAllMessages([
+                  {
+
+                  }
+                ], 'Swap ATOM for INTO if $ATOM = $5',
+                )}
+                soon={true}
+              />
+              <IntentTemplateChip
+                label="Compound if ATOM ≥ $4"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                onClick={() =>  setAllMessages(
+                  [
+                    {
+                      typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
+                      value: {
+                        delegatorAddress: 'Your Address',
+                        validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
+                      },
+                    },
+                    {
+                      typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
+                      value: {
+                        delegatorAddress: 'Your Address',
+                        validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
+                        amount: {
+                          denom: `${chainSymbol}`,
+                          amount: '1', // This will be replaced by the feedback loop
+                        },
+                      },
+                    },
+                  ],
+                  'Compound if ATOM ≥ $4',
+                  {
+                    conditions: {
+                      comparisons: [
+                        {
+                          responseIndex: 0,
+                          responseKey: "",
+                          operand: "4.000000000000000000",
+                          operator: 5,
+                          valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
+                          icqConfig: {
+                            connectionId: "connection-1",
+                            chainId: "osmosis-1",
+                            timeoutPolicy: 2,
+                            timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
+                            queryType: "store/twap/key",
+                            queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
+                          }
+                        }
+                      ],
+                    }
+                  }
+                )}
+                soon={false}
+              />
+
+              <IntentTemplateChip
+                label="DCA into StreamSwap"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
                   {
@@ -531,7 +669,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                       contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
                       msg: {
                         subscribe: {
-                          stream_id: 1
+                          stream_id: 3
                         }
                       },
                       funds: [
@@ -543,8 +681,9 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     }
 
                   }
-                ], 'DCA into StreamSwap 1',
+                ], 'DCA into StreamSwap',
                 )}
+                disabled={true}
               />
             </>
           )}
@@ -574,7 +713,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                     }
                   }
                 ], 'DCA into StreamSwap 8',
-                )}
+                )} disabled={true}
               />
               <IntentTemplateChip
                 label="DCA into ATOM"
@@ -648,7 +787,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                           connectionId: "connection-1",
                           chainId: "osmosis-1",
                           timeoutPolicy: 2,
-                          timeoutDuration: Duration.fromPartial({ "seconds": BigInt(60) }),
+                          timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
                           queryType: "store/twap/key",
                           queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDMxMzh8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
                         }
