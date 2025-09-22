@@ -115,7 +115,7 @@ export const useFlowsByOwner = (limit: number, key: any, address?: string) => {
         }
       })
 
-      return { flows: flows, pagination: resp.pagination }
+      return { flows: flows, pagination: resp.pagination, total: resp.pagination.total }
     },
     {
       enabled: Boolean(client && client.intento),

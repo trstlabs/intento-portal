@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { CardContent, convertMicroDenomToDenom, Text, Button, useControlTheme } from "junoblocks";
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
-import { X, Share, Info, ArrowRight } from 'lucide-react';
+import { X, Share, Info, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Global } from '@emotion/react';
 import { useIntentoRpcClient } from '../../../hooks/useRPCClient';
@@ -25,7 +25,7 @@ const GlobalStyles = () => (
 );
 
 // Get styles based on theme
-const getStyles = (isDarkMode: boolean) => ({
+export const getStyles = (isDarkMode: boolean) => ({
   animatedCard: {
     background: isDarkMode ? '#2d3748' : '#ffffff',
     border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0',
@@ -119,7 +119,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
         if (coin) {
           // Calculate the difference from target amount
           const diff = initialModuleBalance - Number(coin.balance.amount);
-          const percentage = ((diff / initialModuleBalance) * 100).toFixed(1);
+          const percentage = ((diff / initialModuleBalance) * 100).toFixed(2);
           setDifference(Number(percentage));
         }
       } catch (err) {
@@ -190,7 +190,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               style={{ padding: '0.75rem 2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
                             >
                               Claim Now
-                              <ArrowRight size={20} />
+                              <ChevronRight size={20} />
                             </Button></Link>
                           </div> : <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
                             <Text variant="body" css={{ color: '#a0aec0', marginBottom: '2rem' }}>

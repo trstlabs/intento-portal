@@ -3,7 +3,7 @@ import { Button, Column, IconWrapper, Inline, media, Spinner, styled, Text } fro
 import { useCallback, useState } from 'react'
 import { useFlows } from 'hooks/useFlow'
 import { FlowCard } from '../../features/flows/components/FlowCard'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function Flows() {
   const flowsPerPage = 20;
@@ -84,7 +84,7 @@ export default function Flows() {
                   isRefreshing ? (
                     <IconWrapper icon={<Spinner instant />} />
                   ) : (
-                    <IconWrapper icon={<ArrowLeft />} />
+                    <IconWrapper icon={<ChevronLeft />} />
                   )
                 }
               >
@@ -99,7 +99,7 @@ export default function Flows() {
                   isRefreshing ? (
                     <IconWrapper icon={<Spinner instant />} />
                   ) : (
-                    <IconWrapper icon={<ArrowRight />} />
+                    <IconWrapper icon={<ChevronRight />} />
                   )
                 }
               >

@@ -25,7 +25,7 @@ import { useFlows, useFlowsByOwner } from 'hooks/useFlow'
 import { FlowCard } from '../features/flows/components/FlowCard'
 import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { APP_NAME } from '../util/constants'
 import Head from 'next/head'
 
@@ -260,7 +260,7 @@ export default function Home() {
               <Text variant="caption" css={{ padding: '$4' }}>
                 {' '}
                 {myFlows.length > 1 ? (
-                  <span> Your Flows({myFlows.length})</span>
+                  <span> Your Flows({flows.total.toString()})</span>
                 ) : (
                   <span> Your Flow (1)</span>
                 )}
@@ -353,7 +353,7 @@ export default function Home() {
                 isRefreshing ? (
                   <IconWrapper icon={<Spinner instant />} />
                 ) : (
-                  <IconWrapper icon={<ArrowLeft />} />
+                  <IconWrapper icon={<ChevronLeft />} />
                 )
               }
             >
@@ -368,7 +368,7 @@ export default function Home() {
                 isRefreshing ? (
                   <IconWrapper icon={<Spinner instant />} />
                 ) : (
-                  <IconWrapper icon={<ArrowRight />} />
+                  <IconWrapper icon={<ChevronRight />} />
                 )
               }
             >

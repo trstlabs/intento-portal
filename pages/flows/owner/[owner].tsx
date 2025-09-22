@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import { useFlowsByOwner } from 'hooks/useFlow'
 import { FlowCard } from '../../../features/flows/components/FlowCard'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 
 export default function FlowsByOwner() {
@@ -87,7 +87,7 @@ export default function FlowsByOwner() {
                   isRefreshing ? (
                     <IconWrapper icon={<Spinner instant />} />
                   ) : (
-                    <IconWrapper icon={<ArrowLeft />} />
+                    <IconWrapper icon={<ChevronLeft />} />
                   )
                 }
               >
@@ -102,7 +102,7 @@ export default function FlowsByOwner() {
                   isRefreshing ? (
                     <IconWrapper icon={<Spinner instant />} />
                   ) : (
-                    <IconWrapper icon={<ArrowRight />} />
+                    <IconWrapper icon={<ChevronRight />} />
                   )
                 }
               >
