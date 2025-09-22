@@ -38,7 +38,7 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
     <Card
       variant="secondary"
       disabled
-      css={{ padding: '$2', margin: '$2' , marginTop: '$6' }}
+      css={{ padding: '$2', margin: '$2', marginTop: '$6' }}
     >
 
       <Tooltip
@@ -82,7 +82,7 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
         label="Comparison Operator"
         tooltip="How to compare"
         value={comparison?.operator ?? ComparisonOperator.UNRECOGNIZED}
-        onChange={(e) => handleFieldChange('operator', e.target.value)}
+        onChange={(e) => handleFieldChange('operator', Number(e.target.value))}
 
         options={ComparisonOperatorLabels}
 
@@ -92,7 +92,7 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
         tooltip="What to compare with"
         type="string"
         value={comparison?.operand}
-        onChange={(e) => handleFieldChange('operand', e.target.value)}
+        onChange={(e) => handleFieldChange('operand', Number(e.target.value))}
 
       />
       <Field
