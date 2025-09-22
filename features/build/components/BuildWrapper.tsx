@@ -127,7 +127,10 @@ export const BuildWrapper = ({
   useEffect(() => {
     if (typeof window !== 'undefined' && flowInputs[0]) {
       try {
-        localStorage.setItem('savedFlow', JSON.stringify(flowInputs[0]));
+        const jsonString = JSON.stringify(flowInputs[0], (_key, value) => {
+          return typeof value === 'bigint' ? value.toString() : value;
+        });
+        localStorage.setItem('savedFlow', jsonString);
       } catch (error) {
         console.error('Error saving flow to localStorage:', error);
       }
