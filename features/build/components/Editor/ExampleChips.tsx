@@ -538,10 +538,31 @@ export function ExampleChips({ chainSymbol, setExample, messageIndex = 0 }: Exam
   )
 }
 
-export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
+interface FlowInput {
+  startTime?: number;
+  duration?: number;
+}
+
+interface ExampleFlowChipsProps {
+  chainSymbol: string;
+  setAllMessages?: (messages: any[], label?: string, conditions?: any) => void;
+  index: number;
+  flowInput?: FlowInput;
+}
+
+export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput = {} }: ExampleFlowChipsProps) {
   const { validators } = useValidators(chainSymbol)
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
 
+  // Calculate flow end time in nanoseconds since epoch
+  const nowInMilliseconds = Date.now()
+  const flowStartTime = flowInput?.startTime ?? nowInMilliseconds
+  const flowDuration = flowInput?.duration ?? 0
+  const flowEndTimeInMilliseconds = flowStartTime + flowDuration
+  // Convert to nanoseconds by multiplying by 1,000,000 and add 1 hour buffer (in nanoseconds)
+  const oneHourInNanos = BigInt(60 * 60 * 1_000_000_000) // 1 hour in nanoseconds
+  const flowEndTimeInNanos = BigInt(flowEndTimeInMilliseconds) * BigInt(1_000_000) + oneHourInNanos
+  const timeoutTimestamp = flowEndTimeInNanos.toString()
   return (
     <>
       {setAllMessages && index === 0 && (
@@ -595,22 +616,61 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemplateChip
-                label="Swap ATOM for BTC if price < $5"
+                label="Swap ATOM for BTC if ATOM ≥ $5"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
                   {
-
+                    typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
+                    value: {
+                      sourcePort: "transfer",
+                      sourceChannel: "channel-141",
+                      token: {
+                        denom: "ATOM",
+                        amount: "1"
+                      },
+                      sender: "cosmos12flwnsyfvk6hpwy7t3xt83cc8wwx5kw9kdcguq",
+                      receiver: "osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u",
+                      timeoutHeight: {
+                        revisionNumber: "0",
+                        revisionHeight: "0"
+                      },
+                      timeoutTimestamp: timeoutTimestamp,
+                      memo: `{"wasm":{"contract":"osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u","msg":{"swap_and_action":{"user_swap":{"swap_exact_asset_in":{"swap_venue_name":"osmosis-poolmanager","operations":[{"pool":"611","denom_in":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","denom_out":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4"},{"pool":"1096","denom_in":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4","denom_out":"uosmo"},{"pool":"712","denom_in":"uosmo","denom_out":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F"},{"pool":"1868","denom_in":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F","denom_out":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF"}]}},"min_asset":{"native":{"denom":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF","amount":"1"}},"timeout_timestamp":${timeoutTimestamp},"post_swap_action":{"transfer":{"to_address":"osmo12flwnsyfvk6hpwy7t3xt83cc8wwx5kw97ktc2j"}},"affiliates":[]}}}}`
+                    }
                   }
-                ], 'Swap ATOM for INTO if $ATOM = $5',
+                ],
+                  'Swap ATOM for BTC if $ATOM ≥ $5',
+                  {
+                    conditions: {
+                      comparisons: [
+                        {
+                          responseIndex: 0,
+                          responseKey: "",
+                          operand: "5.000000000000000000",
+                          operator: 5,
+                          valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
+                          icqConfig: {
+                            connectionId: "connection-1",
+                            chainId: "osmosis-1",
+                            timeoutPolicy: 2,
+                            timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
+                            queryType: "store/twap/key",
+                            queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
+                          }
+                        }
+                      ],
+                      feedbackLoops: []
+                    }
+                  }
                 )}
-                soon={true}
+                soon={false}
               />
               <IntentTemplateChip
                 label="Compound if ATOM ≥ $4"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
-                onClick={() =>  setAllMessages(
+                onClick={() => setAllMessages(
                   [
                     {
                       typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
@@ -651,10 +711,11 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                           }
                         }
                       ],
+                      feedbackLoops: []
                     }
                   }
                 )}
-                soon={false}
+                soon={true}
               />
 
               <IntentTemplateChip
@@ -792,10 +853,35 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index }) {
                           queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDMxMzh8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
                         }
                       }
-                    ]
+                    ],
+                    feedbackLoops: []
                   }
                 }
                 )}
+              />
+              <IntentTemplateChip
+                label="BTC Trend detection"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
+                onClick={() => setAllMessages([
+                ], 'BTC Trend detection')}
+                soon={true}
+              />
+              <IntentTemplateChip
+                label="Spot vs TWAP arbitrage"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
+                onClick={() => setAllMessages([
+                ], 'Spot vs TWAP arbitrage')}
+                soon={true}
+              />
+              <IntentTemplateChip
+                label="TWAP-based DCA"
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
+                onClick={() => setAllMessages([
+                ], 'TWAP-based DCA')}
+                soon={true}
               />
             </>
           )}
