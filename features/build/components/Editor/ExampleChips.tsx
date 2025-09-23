@@ -616,7 +616,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemplateChip
-                label="Swap ATOM for BTC if ATOM ≥ $5"
+                label="Swap ATOM for BTC if ATOM < $5"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
@@ -640,7 +640,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                     }
                   }
                 ],
-                  'Swap ATOM for BTC if ATOM ≥ $5',
+                  'Swap ATOM for BTC if ATOM < $5',
                   {
                     conditions: {
                       comparisons: [
@@ -648,7 +648,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                           responseIndex: 0,
                           responseKey: "",
                           operand: "5.000000000000000000",
-                          operator: 5,
+                          operator: 3,
                           valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
                           icqConfig: {
                             connectionId: "connection-1",
