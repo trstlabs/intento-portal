@@ -88,7 +88,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   const { mutate: handleCreateAuthzGrant, isLoading: isExecutingAuthzGrant } = useCreateAuthzGrant({
     grantee,
     grantInfos: [...(missingGrants || []), ...(expiredGrants || [])],
-    expirationDurationMs: (flowInput.duration || 0) + 86400000, // Add 1 day buffer
+    expirationDurationMs: (flowInput.startTime && flowInput.startTime > Date.now() ? flowInput.startTime - Date.now() : 0) + (flowInput.duration || 0) + 86400000,
     coin: { denom: 'uinto', amount: '0' } as Coin,
     onSuccess: () => {
       refetch?.()
