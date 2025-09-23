@@ -92,7 +92,7 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
         tooltip="What to compare with"
         type="string"
         value={comparison?.operand}
-        onChange={(e) => handleFieldChange('operand', Number(e.target.value))}
+        onChange={(e) => handleFieldChange('operand', e.target.value)}
 
       />
       <Field
