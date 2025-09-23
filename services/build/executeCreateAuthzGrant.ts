@@ -31,7 +31,6 @@ export const executeCreateAuthzGrant = async ({
     seconds: BigInt(Math.floor((Date.now() / 1000 + expirationDurationMs / 1000))),
     nanos: 0
   } : undefined
-  console.log(expiration)
 
   for (let typeUrl of typeUrls) {
     const msgAuthzGrant = MsgGrant.fromPartial({

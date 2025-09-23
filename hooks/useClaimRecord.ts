@@ -38,42 +38,6 @@ export const useClaimRecord = () => {
   return [data, isLoading] as const
 }
 
-export const useClaimRecordForAddress = (address: string) => {
-  let addrToClaim = address
-  const client = useIntentoRpcClient()
-  if (address == '') {
-    const { address } = useRecoilValue(walletState)
-    addrToClaim = address
-  }
-  const { data, isLoading } = useQuery(
-    ['claimAddr', addrToClaim],
-    async () => {
-      if (!addrToClaim || !client || !client.intento) {
-        throw new Error('Invalid address or wallet not connected')
-      }
-      try {
-        const claimRecordResp = await client.intento.claim.v1.claimRecord({
-          address: addrToClaim,
-        })
-        const claimRecord = claimRecordResp ? claimRecordResp.claimRecord : ''
-        return claimRecord
-      } catch (error) {
-        console.error('Error fetching claim record:', error)
-        return '' // Return empty string in case of error
-      }
-    },
-    {
-      enabled: !!addrToClaim && !!client?.intento,
-      refetchOnMount: false,
-      refetchInterval: false,
-      staleTime: 60000, // Cache data for 60 seconds
-      cacheTime: 300000, // Cache data for 5 minutes
-    }
-  )
-
-  return [data, isLoading] as const
-}
-
 export const useTotalClaimable = () => {
   const client = useIntentoRpcClient()
   const { address } = useRecoilValue(walletState)

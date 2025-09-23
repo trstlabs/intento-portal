@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { CardContent, convertMicroDenomToDenom, Text, Button, useControlTheme } from "junoblocks";
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
 import { PageHeader } from "../../../components";
-import { X, Share, Info, ChevronRight } from 'lucide-react';
+import { Share, Info, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Global } from '@emotion/react';
 import { useIntentoRpcClient } from '../../../hooks/useRPCClient';
 import Link from 'next/link'
+import { XTwitter } from "../../../icons/XTwitter";
 
 // Global styles for the pulse animation
 const GlobalStyles = () => (
@@ -35,7 +36,7 @@ export const getStyles = (isDarkMode: boolean) => ({
     width: '100%',
     ':hover': {
       transform: 'translateY(-4px)',
-      boxShadow: isDarkMode 
+      boxShadow: isDarkMode
         ? '0 10px 25px rgba(0, 0, 0, 0.3)'
         : '0 10px 25px rgba(0, 0, 0, 0.1)'
     }
@@ -43,7 +44,7 @@ export const getStyles = (isDarkMode: boolean) => ({
   tokenAmount: {
     fontSize: '2.5rem',
     fontWeight: 700,
-    background: isDarkMode 
+    background: isDarkMode
       ? 'linear-gradient(90deg, #60a5fa, #a78bfa)'
       : 'linear-gradient(90deg, #3b82f6, #8b5cf6)',
     WebkitBackgroundClip: 'text',
@@ -111,15 +112,15 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
 
         const initialModuleBalance = 89973272000000; // 89,973,272,000,000 in micro units
         // Address to query
-        const address = 'into1m5dncvfv7lvpvycr23zja93fecun2kcvdnvuvq';
+        const moduleAccAddress = 'into1m5dncvfv7lvpvycr23zja93fecun2kcvdnvuvq';
 
         // Get the balance (replace 'uinto' with the actual denom if different)
-        const coin = await rpcClient?.cosmos.bank.v1beta1?.balance({ address, denom: 'uinto' });
+        const coin = await rpcClient?.cosmos.bank.v1beta1?.balance({ address: moduleAccAddress, denom: 'uinto' });
         console.log("coin", coin);
         if (coin) {
           // Calculate the difference from target amount
           const diff = initialModuleBalance - Number(coin.balance.amount);
-          const percentage = ((diff / initialModuleBalance) * 100).toFixed(2);
+          const percentage = ((diff / initialModuleBalance) * 100).toFixed(3);
           setDifference(Number(percentage));
         }
       } catch (err) {
@@ -243,7 +244,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                                   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
                                 }}
                               >
-                                <X size={18} /> Share on Twitter
+                                <XTwitter size={18} /> Post
                               </button>
 
                               <button
