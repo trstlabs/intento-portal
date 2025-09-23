@@ -112,7 +112,7 @@ export function EditExecutionSection({
   const [startAt, setStartAt] = useState<Date | null>(updatedFlowParams.startAt ? new Date(updatedFlowParams.startAt) : null)
   const [interval, setIntervalValue] = useState<number>(updatedFlowParams.interval || intervalOptions[0].value)
   const [endTime, setEndTime] = useState<Date | null>(updatedFlowParams.endTime ? new Date(updatedFlowParams.endTime) : null)
-  const [endTimeInterval, setEndTimeInterval] = useState<number>(updatedFlowParams.endTime ? Date.now() - updatedFlowParams.endTime : intervalOptions[2].value)
+  const [endTimeInterval, setEndTimeInterval] = useState<number>(updatedFlowParams.endTime ? Date.now() - updatedFlowParams.endTime : 0)
 
   const handleEndTimeChange = (date: Date) => {
     setEndTime(date)
@@ -251,6 +251,7 @@ export function EditExecutionSection({
               marginLeft: '8px'
             }}
           >
+            <option value={0}>Select</option>
             {intervalOptions.slice(2).map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
