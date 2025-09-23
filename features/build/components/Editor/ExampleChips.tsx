@@ -245,7 +245,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           feedbackLoops: [
             {
               responseIndex: 0,
-              responseKey: 'Amount.[-1].Amount',
+              responseKey: 'Amount.[0].Amount',
               msgsIndex: 1,
               msgKey: 'Amount',
               valueType: 'math.Int',
