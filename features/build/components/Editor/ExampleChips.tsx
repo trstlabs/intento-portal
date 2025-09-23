@@ -557,7 +557,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
   // Calculate flow end time in nanoseconds since epoch
   const nowInMilliseconds = Date.now()
   const flowStartTime = flowInput?.startTime ?? nowInMilliseconds
-  const flowDuration = flowInput?.duration ?? 0
+  const flowDuration = flowInput?.duration ?? 24 * 60 * 60 * 1_000 * 31 // 24 hours in milliseconds * 31 days //temporary workaround
   const flowEndTimeInMilliseconds = flowStartTime + flowDuration
   // Convert to nanoseconds by multiplying by 1,000,000 and add 1 hour buffer (in nanoseconds)
   const oneHourInNanos = BigInt(60 * 60 * 1_000_000_000) // 1 hour in nanoseconds
