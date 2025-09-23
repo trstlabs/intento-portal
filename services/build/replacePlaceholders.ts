@@ -1,42 +1,94 @@
 // Utility to recursively replace placeholders in message values
 // Used by transformAndEncodeMsgs and can be reused elsewhere
-
+import { fromBech32, toBech32 } from '@cosmjs/encoding'
 export interface ReplacePlaceholdersParams {
-  value: any;
-  ownerAddress?: string;
-  ibcWalletAddress?: string;
+  value: any
+  ownerAddress?: string
+  ibcWalletAddress?: string
 }
 
 /**
  * Recursively replaces 'Your Intento Address' and 'Your Address' placeholders in the provided value.
  * Throws if the required addresses are missing.
  */
-export function replacePlaceholders({ value, ownerAddress, ibcWalletAddress }: ReplacePlaceholdersParams): any {
+export function replacePlaceholders({
+  value,
+  ownerAddress,
+  ibcWalletAddress,
+}: ReplacePlaceholdersParams): any {
   if (value === 'Your Intento Address') {
     if (!ownerAddress) {
-      throw new Error('Your Intento Address placeholder found but no owner address provided');
+      throw new Error(
+        'Your Intento Address placeholder found but no owner address provided'
+      )
     }
-    return ownerAddress;
+    return ownerAddress
   }
 
   if (value === 'Your Address') {
     if (!ibcWalletAddress) {
-      throw new Error('Your Address placeholder found but no IBC wallet connected');
+      throw new Error(
+        'Your Address placeholder found but no IBC wallet connected'
+      )
     }
-    return ibcWalletAddress;
+    return ibcWalletAddress
+  }
+
+  if (
+    typeof value === 'string' &&
+    value.startsWith('Your ') &&
+    value.endsWith(' Address')
+  ) {
+    if (!ibcWalletAddress) {
+      throw new Error('Address placeholder found but no IBC wallet connected')
+    }
+
+    // Extract the chain symbol from the placeholder
+    const prefix = value.replace('Your ', '').replace(' Address', '')
+    if (!prefix) {
+      throw new Error('Invalid address placeholder format')
+    }
+
+    const { data } = fromBech32(ibcWalletAddress)
+    return toBech32(prefix, data)
   }
 
   if (Array.isArray(value)) {
-    return value.map((v) => replacePlaceholders({ value: v, ownerAddress, ibcWalletAddress }));
+    return value.map((v) =>
+      replacePlaceholders({ value: v, ownerAddress, ibcWalletAddress })
+    )
   }
 
   if (value !== null && typeof value === 'object') {
-    const result: Record<string, any> = {};
+    const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(value)) {
-      result[key] = replacePlaceholders({ value: val, ownerAddress, ibcWalletAddress });
+      // Special handling for memo field which is a JSON string
+      if (key === 'memo' && typeof val === 'string') {
+        try {
+          // Parse the memo as JSON and process any placeholders in it
+          const memoObj = JSON.parse(val)
+          const processedMemo = replacePlaceholders({
+            value: memoObj,
+            ownerAddress,
+            ibcWalletAddress,
+          })
+          result[key] = JSON.stringify(processedMemo)
+          continue
+        } catch (e) {
+          // If parsing fails, treat it as a regular string
+          console.warn('Failed to parse memo as JSON:', e)
+        }
+      }
+      
+      // Recursively process other object properties
+      result[key] = replacePlaceholders({
+        value: val,
+        ownerAddress,
+        ibcWalletAddress,
+      })
     }
-    return result;
+    return result
   }
 
-  return value;
+  return value
 }
