@@ -253,10 +253,10 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           ],
           comparisons: [{
             responseIndex: 0,
-            responseKey: 'Amount',
-            operator: 1,
+            responseKey: 'Amount.[0].Amount',
+            operator: 4,
             operand: `1000000u${chainSymbol.toLowerCase()}`,
-            valueType: 'sdk.Coins',
+            valueType: 'math.Int',
           }
           ],
         }
