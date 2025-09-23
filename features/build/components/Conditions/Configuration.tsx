@@ -10,12 +10,14 @@ import { ExecutionConfiguration } from 'intentojs/dist/codegen/intento/intent/v1
 
 type ConfigurationProps = {
   config: ExecutionConfiguration
+  useAndForComparisons: boolean
   disabled?: boolean
-  onChange: (config: ExecutionConfiguration) => void
+  onChange: (config: ExecutionConfiguration, useAndForComparisons: boolean) => void
 }
 
 export const Configuration = ({
   config,
+  useAndForComparisons,
   disabled,
   onChange,
 }: ConfigurationProps) => {
@@ -27,7 +29,7 @@ export const Configuration = ({
       ...config,
       saveResponses: !config.saveResponses
     }
-    onChange(newConfig)
+    onChange(newConfig, useAndForComparisons)
   }
 
   function updatingDisabled() {
@@ -36,7 +38,7 @@ export const Configuration = ({
       ...config,
       updatingDisabled: !config.updatingDisabled
     }
-    onChange(newConfig)
+    onChange(newConfig, useAndForComparisons)
   }
 
   function stopOnFail() {
@@ -45,7 +47,7 @@ export const Configuration = ({
       ...config,
       stopOnFailure: !config.stopOnFailure
     }
-    onChange(newConfig)
+    onChange(newConfig, useAndForComparisons)
   }
 
   function stopOnSuccess() {
@@ -54,7 +56,7 @@ export const Configuration = ({
       ...config,
       stopOnSuccess: !config.stopOnSuccess
     }
-    onChange(newConfig)
+    onChange(newConfig, useAndForComparisons)
   }
 
   function stopOnTimeout() {
@@ -63,7 +65,7 @@ export const Configuration = ({
       ...config,
       stopOnTimeout: !config.stopOnTimeout
     }
-    onChange(newConfig)
+    onChange(newConfig, useAndForComparisons)
   }
   function fallback() {
     // Create a deep copy of the config to avoid mutation issues
@@ -71,7 +73,10 @@ export const Configuration = ({
       ...config,
       walletFallback: !config.walletFallback
     }
-    onChange(newConfig)
+    onChange(newConfig, useAndForComparisons)
+  }
+  function useAnd() {
+    onChange(config, !useAndForComparisons)
   }
 
   return (
@@ -209,13 +214,27 @@ export const Configuration = ({
                 Wallet Fallback
               </Button></Tooltip>
 
-            {/*       {isConfigItemsShowing && (
-        <ConfigurationDialog
-          activeConfig={selectedConfig.name}
-          onSelect={(slct) => handleSelectConfig(slct)}
-          css={{ padding: '$2 $4 $2' }}
-        />
-      )} */}
+            <Tooltip
+              label={
+                'If set to true, will use AND for comparisons. On default execution happends when any condition returns true.'
+              }
+            ><Button
+              variant="ghost"
+              size="large"
+              css={{ columnGap: '$4', margin: '$2' }}
+              onClick={() => useAnd()}
+              iconLeft={
+                <ToggleSwitch
+                  id="and"
+                  name="and"
+                  onChange={() => useAnd()}
+                  checked={useAndForComparisons}
+                  optionLabels={['and', 'or']}
+                />
+              }
+            >
+                Use AND for Comparisons
+              </Button></Tooltip>
           </CardContent>
         </Card >
       )}

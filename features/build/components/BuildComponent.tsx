@@ -395,9 +395,13 @@ export const BuildComponent = ({
     }
   }
 
-  function setConfig(updatedConfig: ExecutionConfiguration) {
+  function setConfig(updatedConfig: ExecutionConfiguration, useAndForComparisons: boolean) {
     let updatedFlowInput = flowInput
     updatedFlowInput.configuration = updatedConfig
+    updatedFlowInput.conditions = {
+      ...updatedFlowInput.conditions,
+      useAndForComparisons
+    }
     onFlowChange(updatedFlowInput)
   }
 
@@ -612,6 +616,7 @@ export const BuildComponent = ({
         </Inline>
         <Configuration
           config={flowInput.configuration}
+          useAndForComparisons={flowInput.conditions?.useAndForComparisons}
           disabled={!icaAddress && !chainHasIAModule}
           onChange={setConfig}
         />

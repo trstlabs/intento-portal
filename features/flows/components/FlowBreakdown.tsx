@@ -22,7 +22,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateFlowParams } from '../../../types/trstTypes'
-import { Flow, ExecutionConfiguration, Comparison } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { Flow, ExecutionConfiguration, Comparison, ICQConfig } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 
 
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
@@ -44,9 +44,10 @@ import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
-import { Share, X } from 'lucide-react'
+import { Share } from 'lucide-react'
 import { EditExecutionSection } from './EditExecutionSection'
 import { convertMicroDenomToDenom, resolveDenoms } from '../../../util/conversion'
+import { XTwitter } from '../../../icons/XTwitter'
 
 
 type FlowBreakdownProps = {
@@ -212,7 +213,7 @@ export const FlowBreakdown = ({
     setRequestedUpdateFlow(true);
   }
 
-  function handleUpdateFlowConfigClick(config: ExecutionConfiguration) {
+  function handleUpdateFlowConfigClick(config: ExecutionConfiguration, useAndForComparisons: boolean) {
     const params: MsgUpdateFlowParams = {
       id: Number(flow.id),
       configuration: config,
@@ -222,6 +223,10 @@ export const FlowBreakdown = ({
     setUpdatedFlowParams({
       ...params,
       configuration: config,
+      conditions: {
+        ...flow.conditions,
+        useAndForComparisons
+      }
     })
     setRequestedUpdateFlow(true);
   }
@@ -502,7 +507,7 @@ export const FlowBreakdown = ({
               window.open(twitterUrl, '_blank', 'noopener,noreferrer');
             }}
           >
-            Share on Twitter <X size={16} />
+            Post <XTwitter width="16" height="16" />
           </Button>}
           <FlowTransformButton flow={flow} initialChainID={chainId} />
         </Inline>
@@ -947,7 +952,7 @@ export const FlowBreakdown = ({
                       <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
                     </Text>
                   </>
-                  {comparison.icqConfig && icqConfig(comparison)}
+                  {comparison.icqConfig && icqConfig(comparison.icqConfig)}
                 </>
               )}
             </div>
@@ -992,7 +997,7 @@ export const FlowBreakdown = ({
               <Text variant="body">
                 <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
               </Text>
-              {feedbackLoop.icqConfig && (icqConfig(feedbackLoop))
+              {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))
               }
             </Column>
           </Row>
@@ -1154,6 +1159,7 @@ export const FlowBreakdown = ({
         </Inline>
         {editConfig ?
           <Configuration config={flow.configuration}
+            useAndForComparisons={flow.conditions?.useAndForComparisons}
             disabled={false}
             onChange={handleUpdateFlowConfigClick} />
           :
@@ -1248,7 +1254,7 @@ export const FlowBreakdown = ({
     </Row>
   }
 
-  function icqConfig(parent): React.ReactNode {
+  function icqConfig(icqConfig: ICQConfig): React.ReactNode {
     return <>
       <Tooltip
         label={"Perform an interchain query for conditions"}
@@ -1258,27 +1264,28 @@ export const FlowBreakdown = ({
         </Text>
       </Tooltip>
       <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Chain ID</Text>    {parent.icqConfig.chainId}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Chain ID</Text>    {icqConfig.chainId}
       </Text>
       <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Connection ID</Text>      {parent.icqConfig.connectionId}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Connection ID</Text>      {icqConfig.connectionId}
       </Text>
       <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Type</Text>  {parent.icqConfig.queryType}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Type</Text>  {icqConfig.queryType}
       </Text>
       <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Key</Text>  {parent.icqConfig.queryKey}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Key</Text>  {icqConfig.queryKey}
       </Text>
       <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(parent.icqConfig.timeoutDuration.seconds))}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(icqConfig.timeoutDuration.seconds))}
       </Text>
       <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[parent.icqConfig.timeoutPolicy]}
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[icqConfig.timeoutPolicy]}
       </Text>
-      {parent.icqConfig.response &&
-        <Text variant="body">
-          <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response</Text>  {parent.icqConfig.response}
-        </Text>
+      {icqConfig.response.length > 0 &&
+        <div style={{ marginTop: '16px' }}>
+          <Text variant="legend" color="secondary" align="left">Response</Text>
+          <Text>{JSON.stringify(icqConfig.response)}</Text>
+        </div>
       }
     </>
   }

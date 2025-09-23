@@ -456,12 +456,16 @@ import {
     }, [trustlessAgentICA]);
   
   
-    function setConfig(updatedConfig: ExecutionConfiguration) {
+    function setConfig(updatedConfig: ExecutionConfiguration, useAndForComparisons: boolean) {
       // Create a deep copy of the flowInput to avoid mutation issues
       const updatedFlowInput = {
         ...flowInput,
         configuration: {
           ...updatedConfig
+        },
+        conditions: {
+          ...flowInput.conditions,
+          useAndForComparisons
         }
       }
       onFlowChange(updatedFlowInput)
@@ -635,6 +639,7 @@ import {
                 </Inline>
                 <Configuration
                   config={flowInput.configuration}
+                  useAndForComparisons={flowInput.conditions?.useAndForComparisons}
                   disabled={false}
                   onChange={setConfig}
                 />
@@ -660,6 +665,7 @@ import {
                 </Inline>
                 <Configuration
                   config={flowInput.configuration}
+                  useAndForComparisons={flowInput.conditions?.useAndForComparisons}
                   disabled={false}
                   onChange={setConfig}
                 />

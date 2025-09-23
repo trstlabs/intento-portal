@@ -5,6 +5,7 @@ import {
 } from 'junoblocks'
 import React from 'react'
 import { ExecutionConditions, ExecutionConfiguration, Comparison, FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1/flow'
+import { convertMicroDenomToDenom, resolveDenomSync } from '../../../../util/conversion'
 
 interface ConditionsSummaryProps {
   conditions?: ExecutionConditions
@@ -106,7 +107,7 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
       const match = comp.operand?.match(/([\d.]+)\s*([a-zA-Z]+)/);
       if (match) {
         const [_, amount, denom] = match;
-        return `Check if amount${sourceIndex >= 0 ? ` (item ${sourceIndex})` : ''} from message ${comp.responseIndex + 1} response is ${getOperatorDescription(comp.operator)} ${amount} ${denom.toUpperCase()}`;
+        return `Check if amount${sourceIndex >= 0 ? ` (item ${sourceIndex})` : ''} from message ${comp.responseIndex + 1} response is ${getOperatorDescription(comp.operator)} ${convertMicroDenomToDenom(amount, 6)} ${resolveDenomSync(denom)}`;
       }
     }
 
@@ -139,6 +140,11 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
               • {formatComparison(comp)}
             </Text>
           ))}
+          {conditions.useAndForComparisons && (
+            <Inline css={{ paddingLeft: '$4' }}>
+             {conditions.useAndForComparisons ? <Text variant="body" color="tertiary" css={{ fontWeight: 'medium', fontSize: '12px' }}>  • Use AND for comparisons </Text> : <Text variant="body" color="tertiary" css={{ fontWeight: 'medium', fontSize: '12px' }}>  • Use OR for comparisons </Text>}
+            </Inline>
+          )}
         </Column>
       )}
 
@@ -178,6 +184,7 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
                 <Text variant="body" color="tertiary" css={{ fontSize: '12px' }}>{conditions.skipOnFailureOf.join(', ')}</Text>
               </Inline>
             )}
+
           </Column>
         )
       )}
@@ -188,7 +195,7 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
           <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>Configuration</Text>
           <Column css={{ gap: '$1' }}>
             {configuration.saveResponses && (
-              <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Save responses for future flows</Text>
+              <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Save responses for conditional logic</Text>
             )}
             {configuration.updatingDisabled && (
               <Text variant="body" color="tertiary" css={{ paddingLeft: '$4', fontSize: '12px' }}>• Flow settings cannot be updated</Text>

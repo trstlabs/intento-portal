@@ -162,10 +162,14 @@ export const RecipientList = ({
   }
 
 
-  const handleConfigClick = (config: ExecutionConfiguration) => {
+  const handleConfigClick = (config: ExecutionConfiguration, useAndForComparisons: boolean) => {
 
     let newData = data
     newData.configuration = config
+    newData.conditions = {
+      ...newData.conditions,
+      useAndForComparisons
+    }
     setflowInput(newData)
     console.log(newData)
   }
@@ -377,7 +381,7 @@ export const RecipientList = ({
           </div>
         ))}
       </Card>
-      <Configuration config={flowInput.configuration} onChange={handleConfigClick} />
+      <Configuration config={flowInput.configuration} useAndForComparisons={flowInput.conditions?.useAndForComparisons} onChange={handleConfigClick} />
       <Inline
         css={{ margin: '$4 $6 $8', padding: '$5 $5 $8', justifyContent: 'end' }}
       >
