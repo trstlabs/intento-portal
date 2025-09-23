@@ -77,8 +77,8 @@ export declare type ClaimAirdropProps = {
 };
 
 export enum ClaimFlow {
-  "Local Flow" = 0,
-  "IBC Flow" = 1,
+  "Flow on Intento" = 0,
+  "Flow using IBC" = 1,
   "Governance Vote" = 2,
   "Stake Tokens" = 3,
   UNRECOGNIZED = -1
@@ -133,6 +133,13 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
   const totalClaimable = convertMicroDenomToDenom(total, 6).toFixed(2);
   const perTaskReward = totalTasks > 0 ? convertMicroDenomToDenom(total / totalTasks, 6).toFixed(2) : 0;
 
+  const vestingInfo = [
+    { name: 'Flow on Intento', duration: '4 days', cycles: '1-day cycles' },
+    { name: 'Flow using IBC', duration: '8 days', cycles: '2-day cycles' },
+    { name: 'Governance Vote', duration: '12 days', cycles: '3-day cycles' },
+    { name: 'Staking INTO', duration: '20 days', cycles: '5-day cycles' }
+  ];
+  console.log(total);
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       {(!claimRecord || !total || claimRecord.address === "") ? (
@@ -146,6 +153,8 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
         <div>
           {Number(claimRecord.maximumClaimableAmount?.amount) >= 0 && (
             <div>
+
+
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: '1.5rem' }}>
                 <PageHeader
                   title="Your Airdrop Journey"
@@ -228,8 +237,8 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                   <Button
                     variant="primary"
                     onClick={() => claimAll()}
-                    disabled={!claimRecord.status.some(status => 
-                      status.vestingPeriodsCompleted.some((completed, i) => 
+                    disabled={!claimRecord.status.some(status =>
+                      status.vestingPeriodsCompleted.some((completed, i) =>
                         completed === true && status.vestingPeriodsClaimed[i] === false
                       )
                     )}
@@ -447,7 +456,52 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                 </div>
               </div>
             </div>
-          )}
+          )
+          }
+          {/* Vesting Breakdown Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 2 }}
+          >
+            <div style={{
+              backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.5)' : 'rgba(226, 232, 240, 0.5)',
+              borderRadius: '12px',
+              padding: '1.25rem',
+              marginBottom: '1.5rem',
+              border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`
+            }}>
+              <Text variant="subtitle" style={{
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                color: isDarkMode ? '#e2e8f0' : '#1e293b',
+                fontWeight: 600
+              }}>
+                <Info size={18} />
+                Vesting Breakdown
+              </Text>
+              <div style={{ display: 'grid', gap: '0.75rem' }}>
+                {vestingInfo.map((item, index) => (
+                  <div key={index} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.5rem 0',
+                    borderBottom: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
+                    ...(index === vestingInfo.length - 1 && { borderBottom: 'none' })
+                  }}>
+                    <Text variant="body" style={{ color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>{item.name}</Text>
+                    <div style={{ display: 'flex', gap: '1rem' }}>
+                      <Text variant="body" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>{item.duration}</Text>
+                      <Text variant="body" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>({item.cycles})</Text>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         </div>
       )}
     </div>
