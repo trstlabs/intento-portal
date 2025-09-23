@@ -333,17 +333,17 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 <div style={{ marginTop: '1rem' }}>
                                   {index === 0 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select Intento as the source chain to claim tokens directly to your wallet. After execution, the action will be completed and you automatically receive 20% of these INTO tokens.
+                                      Select Intento as the source chain on the Build page and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". After succesful execution, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select any other chain to execute over IBC via a Trustless Agent. After succesful acknolwedgement of the execution on the host chain, the action will be completed and you automatically receive 20% of these INTO tokens.
+                                      Select any other chain to execute over IBC via a Trustless Agent. After succesful execution of the flow on the target chain, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   {index === 2 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      This requires an active governance proposal. Check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active. After voting, the action will be completed and you automatically receive 20% of these INTO tokens.
+                                      This requires a governance proposal to be active. Stay involved on X and Discord and check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active. After voting, the action will be completed and you automatically receive 20% of these INTO tokens.
                                     </Text>
                                   )}
                                   {index === 3 && (
