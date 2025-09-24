@@ -202,7 +202,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                         <div style={styles.statCard}>
                           <Text variant="subtitle" css={{ marginBottom: '0.5rem' }}>💡 How It Works</Text>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1rem', display: 'block' }}>
-                            Complete the tasks below to unlock your full airdrop of {totalClaimable} INTO. Each completed task rewards you with {perTaskReward} INTO. For each task, 20% is added to your balance immediately, and the remainder vest over several days.
+                            Complete the tasks below to unlock your full airdrop of {totalClaimable} INTO. Each completed task rewards you with {perTaskReward} INTO. For each task, 20% is added to your balance immediately, and the remainder vests over several days.
                           </Text>
 
                           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
@@ -333,12 +333,12 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 <div style={{ marginTop: '1rem' }}>
                                   {index === 0 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select Intento as the source chain on the Build page and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". After succesful execution, the action will be completed and you immediately receive 20%.
+                                      Select Intento as the source chain on the Build page and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". After successful execution, the action will be completed and you immediately receive 20%.
                                     </Text>
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select any other chain to execute over IBC via a Trustless Agent. After succesful execution of the flow on the target chain, the action will be completed and you immediately receive 20%.
+                                      Select any other chain to execute over IBC via a Trustless Agent. After successful execution of the flow on the target chain, the action will be completed and you immediately receive 20%.
                                     </Text>
                                   )}
                                   {index === 2 && (
