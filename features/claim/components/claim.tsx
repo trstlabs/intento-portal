@@ -333,22 +333,22 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 <div style={{ marginTop: '1rem' }}>
                                   {index === 0 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select Intento as the source chain on the Build page and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". After successful execution, the action will be completed and you immediately receive 20%.
+                                      On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> set Intento as the chain and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow, the action will be completed.
                                     </Text>
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Select any other chain to execute over IBC via a Trustless Agent. After successful execution of the flow on the target chain, the action will be completed and you immediately receive 20%.
+                                      On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> select any chain other than Intento to execute over IBC via a Trustless Agent. Tip: use a template like "Stream ATOM" or "DCA into INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow on the target chain, the action will be completed.
                                     </Text>
                                   )}
                                   {index === 2 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      This requires a governance proposal to be active. Stay involved on X and Discord and check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active. After voting, the action will be completed and you immediately receive 20%.
+                                      This requires a governance proposal to be active. Stay involved on X and Discord and check the <Link href="https://explorer.intento.zone/intento-mainnet/gov" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposals</Link> to see what's currently active. After voting, the action will be completed.
                                     </Text>
                                   )}
                                   {index === 3 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards. After staking, the action will be completed and you immediately receive 20%.
+                                      Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards. After staking, the action will be completed.
                                     </Text>
                                   )}
                                   <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, marginTop: '1rem' }}>
