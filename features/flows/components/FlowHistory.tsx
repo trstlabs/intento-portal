@@ -120,6 +120,7 @@ export const FlowHistory = ({
                   {
                     execFee,
                     actualExecTime,
+                    scheduledExecTime,
                     msgResponses,
                     executed,
                     errors,
@@ -141,18 +142,15 @@ export const FlowHistory = ({
                           At {getRelativeTime(actualExecTime.getTime())}{' '}
                         </Text>
                       </Column>
-                      {/*  {actualExecTime.getSeconds() -
-                            scheduledExecTime.getSeconds() >=
-                            5 && (
-                            <Column>
-                              <Text variant="caption">
-                                Actual send time was{' '}
-                                {actualExecTime.getSeconds() -
-                                  scheduledExecTime.getSeconds()}{' '}
-                                seconds later than scheduled
-                              </Text>
-                            </Column>
-                          )} */}
+                      {actualExecTime.getTime() -
+                        scheduledExecTime.getTime() >=
+                        60000 && (
+                          <Column>
+                            <Text variant="caption" style={{ fontStyle: 'italic' }}>
+                              Planned for {scheduledExecTime.toLocaleString()}. Execution was delayed due to a halt in block production.
+                            </Text>
+                          </Column>
+                        )}
                       {execFee && execFee.length > 0 && execFee.map((fee) => (
                         <Column>
                           <Text variant="caption">
