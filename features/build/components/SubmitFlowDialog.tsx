@@ -72,10 +72,11 @@ export const SubmitFlowDialog = ({
   const [executionParams, setExecutionParams] = useState({
     startAt: 0,
     interval: 86400000, // 1 day in ms
-    endTime: Date.now() + 7 * 86400000, // 7 days from now
+    endTime: Date.now() + 7 * 86400000 + 900000, // 7 days from now + 15 minutes
   })
 
   function setUpdateExecutionParams(params: { startAt?: number; interval?: number; endTime?: number }) {
+    console.log(params)
     setExecutionParams((prev) => ({ ...prev, ...params }))
   }
 
@@ -95,7 +96,7 @@ export const SubmitFlowDialog = ({
 
   // Calculate duration based on whether we have a future start time
   const now = Date.now()
-  const startTime = executionParams.startAt > now ? executionParams.startAt : now
+  const startTime = executionParams.startAt !== 0 ? executionParams.startAt : now
   const duration = executionParams.endTime - startTime
   const interval = executionParams.interval
 
@@ -191,7 +192,7 @@ export const SubmitFlowDialog = ({
                 flowInput={{
                   ...flowInput,
                   label: flowLabel,
-                  startTime: executionParams.startAt > now ? executionParams.startAt - now : 0,
+                  startTime:executionParams.startAt !== 0 ? executionParams.startAt - now : 0,
                   duration,
                   interval
                 }}
@@ -207,7 +208,7 @@ export const SubmitFlowDialog = ({
               />
             )}
             <Card
-              css={{ margin: '$3', borderRadius: '12px' }}
+              css={{ margin: '$3', borderRadius: '8px' }}
               variant="secondary" disabled
             >
 
@@ -218,65 +219,66 @@ export const SubmitFlowDialog = ({
 
             </Card>
 
-            <>              <CardContent size="large" css={{ padding: '$3' }}>
+            <>
+              <CardContent size="large" css={{ padding: '$3' }}>
 
 
-              <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
-                <Tooltip
-                  label="Funds to set aside for execution to the flow account. Fee funds are returned after commission fee."
-                  aria-label="Fund Flow - Intento (Optional)"
-                >
-                  <Text align="center" variant="body" css={{ fontWeight: 'bold' }}>
-                    Fee Funds
-                  </Text>
-                </Tooltip>
+                <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
+                  <Tooltip
+                    label="Funds to set aside for execution to the flow account. Fee funds are returned after commission fee."
+                    aria-label="Fund Flow - Intento (Optional)"
+                  >
+                    <Text align="center" variant="body" css={{ fontWeight: 'bold' }}>
+                      Fee Funds
+                    </Text>
+                  </Tooltip>
 
-                <Column css={{ padding: '$2', gap: '$4' }}>
-                  <Inline justifyContent="space-between" >
-                    <Text variant="body">Use wallet funds</Text>
-                    <ToggleSwitch
-                      id="deduct-fees"
-                      name="deduct-fees"
-                      checked={checkedFeeAcc}
-                      onChange={handleChangeFeeAcc}
-                      optionLabels={['Use wallet funds', 'Attach to flow']}
-                    />
-                  </Inline>
-
-                  {!checkedFeeAcc && (
-                    <>
-                      <TokenSelector
-                        tokenSymbol={feeFundsSymbol}
-                        onChange={(updateToken) => {
-                          setFeeFundsSymbol(updateToken.tokenSymbol)
-                        }}
-                        disabled={false}
-                        size={'large'}
+                  <Column css={{ padding: '$2', gap: '$4' }}>
+                    <Inline justifyContent="space-between" >
+                      <Text variant="body">Use wallet funds</Text>
+                      <ToggleSwitch
+                        id="deduct-fees"
+                        name="deduct-fees"
+                        checked={checkedFeeAcc}
+                        onChange={handleChangeFeeAcc}
+                        optionLabels={['Use wallet funds', 'Attach to flow']}
                       />
-                      <Inline justifyContent="space-between" >
-                        <Text variant="body">Amount to attach</Text>
-                        <Inline>
-                          <Text variant="body" color="tertiary">
-                            <StyledInput
-                              step=".01"
-                              placeholder="0.00"
-                              type="number"
-                              value={feeFunds}
-                              onChange={({ target: { value } }) =>
-                                setFeeAmount(Number(value))
-                              }
-                              css={{ textAlign: 'right', width: '100px' }}
-                            />
+                    </Inline>
 
-                            {feeFundsSymbol}
-                          </Text>
+                    {!checkedFeeAcc && (
+                      <>
+                        <TokenSelector
+                          tokenSymbol={feeFundsSymbol}
+                          onChange={(updateToken) => {
+                            setFeeFundsSymbol(updateToken.tokenSymbol)
+                          }}
+                          disabled={false}
+                          size={'large'}
+                        />
+                        <Inline justifyContent="space-between" >
+                          <Text variant="body">Amount to attach</Text>
+                          <Inline>
+                            <Text variant="body" color="tertiary">
+                              <StyledInput
+                                step=".01"
+                                placeholder="0.00"
+                                type="number"
+                                value={feeFunds}
+                                onChange={({ target: { value } }) =>
+                                  setFeeAmount(Number(value))
+                                }
+                                css={{ textAlign: 'right', width: '100px' }}
+                              />
+
+                              {feeFundsSymbol}
+                            </Text>
+                          </Inline>
                         </Inline>
-                      </Inline>
-                    </>
-                  )}
+                      </>
+                    )}
+                  </Column>
                 </Column>
-              </Column>
-            </CardContent></>
+              </CardContent></>
 
 
             <Inline justifyContent="space-between" align="center">
@@ -337,7 +339,7 @@ const StyledInputWithBorder = styled('input', {
   fontSize: '12px',
   color: 'inherit',
   borderRadius: '$2',
-  border: '2px solid $borderColors$inactive',
+  border: '1px solid $borderColors$inactive',
   padding: '$3',
   margin: '$2',
 })

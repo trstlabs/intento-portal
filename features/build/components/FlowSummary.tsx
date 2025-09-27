@@ -47,7 +47,6 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     if (startTime > 0) {
         recurrences++
     }
-
     // Format time display
     const formatTimeDisplay = (ms: number): string => {
         if (ms === 0) return 'None'
@@ -80,7 +79,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     // For start time, show relative time from now
     const displayStartTime = startTime > 0
         ? formatTimeDisplay(startTime)
-        : 'On First Run'
+        : startTime === 0 ? 'On First Run' : "Invalid"
 
     const displayInterval = interval > 0 ? formatTimeDisplay(interval) : 'None'
     const displayDuration = duration > 0 ? formatTimeDisplay(duration) : 'None'
@@ -125,7 +124,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                             <Text variant="body" color="tertiary">~ {expectedFee} {displaySymbol}</Text>
                         </Inline>
 
-                        {useMsgExec !== false && (
+                        {useMsgExec != false && (
                             <Tooltip label="Wrap the flow for the execution so the Intento Interchain Account can securely execute your message">
                                 <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
                                     <Text variant="body">Wrap for ICA</Text>

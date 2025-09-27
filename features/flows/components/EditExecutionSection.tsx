@@ -4,11 +4,12 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { useState, useEffect } from 'react'
 
 const StyledDatePicker = styled(DatePicker, {
-  width: '200px',
-  padding: '8px 12px',
+  width: '165px',
+  height: '32px',
+  padding: '8px 6px',
   borderRadius: '4px',
   border: '1px solid $borderColors$selected',
-  fontSize: '14px',
+  fontSize: '10px',
   color: '$colors$dark',
   backgroundColor: '$colors$light10',
   '&:focus': {
@@ -104,13 +105,13 @@ export function EditExecutionSection({
   const StyledGrid = styled('div', {
     display: 'grid',
     gridTemplateColumns: '1fr',
-    gap: '$4',
+    gap: '$6',
   })
 
   const themeController = useControlTheme()
   // Local state for editing
   const [startAt, setStartAt] = useState<Date | null>(updatedFlowParams.startAt ? new Date(updatedFlowParams.startAt) : null)
-  const [interval, setIntervalValue] = useState<number>(updatedFlowParams.interval || intervalOptions[0].value)
+  const [interval, setInterval] = useState<number>(updatedFlowParams.interval || intervalOptions[0].value)
   const [endTime, setEndTime] = useState<Date | null>(updatedFlowParams.endTime ? new Date(updatedFlowParams.endTime) : null)
   // Duration in ms between start and end when using the "End after" select
   const [endTimeInterval, setEndTimeInterval] = useState<number>(0)
@@ -124,34 +125,40 @@ export function EditExecutionSection({
 
     setEndTimeInterval(value)
 
-    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + 900000 //+15min
+    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + interval
 
     const newEndTime = new Date(start + value)
     setEndTime(newEndTime)
     updateField('endTime', newEndTime)
 
   }
-  const [isOnNextRun, setIsOnNextRun] = useState<boolean>(false)
-
+  
   useEffect(() => {
     if (updatedFlowParams.startAt) {
       setStartAt(new Date(updatedFlowParams.startAt))
     }
     if (updatedFlowParams.interval) {
-      setIntervalValue(updatedFlowParams.interval)
+      setInterval(updatedFlowParams.interval)
     }
     if (updatedFlowParams.endTime) {
-      const startMs = updatedFlowParams.startAt ?? Date.now()
+      const startMs = updatedFlowParams.startAt ?? interval
       const diff = Math.max(0, updatedFlowParams.endTime - startMs)
       setEndTime(new Date(updatedFlowParams.endTime))
       setEndTimeInterval(diff)
     }
   }, [updatedFlowParams])
 
-  const handleOnNextRunClick = () => {
-    setIsOnNextRun(true)
-    setStartAt(null) // Set to null to indicate On First Run
-    updateField('startAt', 0) // Set to 0 as requested
+  const handleRightAwayClick = () => {
+  
+    const tenMinutesFromNow = new Date(new Date().getTime() + (10 * 60 * 1000));
+    setStartAt(tenMinutesFromNow)
+    updateField('startAt', tenMinutesFromNow)
+  }
+
+  const handleNoneClick = () => {
+  
+    setStartAt(null)
+    updateField('startAt', 0)
   }
 
   const updateField = (field: string, value: any) => {
@@ -160,6 +167,7 @@ export function EditExecutionSection({
       if (value !== undefined && value !== null) {
         params[field] = field === 'startAt' ? (value instanceof Date ? value.getTime() : value) : value;
       }
+      console.log(params)
       setUpdateFlow(params);
     }
   };
@@ -169,13 +177,13 @@ export function EditExecutionSection({
     <StyledDiv>
       <StyledGrid>
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '50px' }}>Start</Text>
-          <Inline gap={2}>
+          <Text variant="caption" style={{ minWidth: '45px' }}>Start</Text>
+          <Inline gap={1}>
             <StyledDatePicker
               selected={startAt}
               onChange={(date: Date) => {
                 setStartAt(date)
-                setIsOnNextRun(false)
+           
                 updateField('startAt', date)
               }}
               placeholderText="On First Run"
@@ -187,13 +195,23 @@ export function EditExecutionSection({
             />
             <Button
               style={
-                { marginLeft: '8px' }
+                { marginLeft: '2px' }
               }
               variant="secondary"
-              onClick={handleOnNextRunClick}
-              disabled={isOnNextRun}
+              onClick={handleRightAwayClick}
+              disabled={false}
             >
               Now
+            </Button>
+            <Button
+              style={
+                { marginLeft: '2px' }
+              }
+              variant="secondary"
+              onClick={handleNoneClick}
+              disabled={startAt == null}
+            >
+              None
             </Button>
           </Inline>
         </Inline>
@@ -201,7 +219,7 @@ export function EditExecutionSection({
 
 
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '50px' }}>End</Text>
+          <Text variant="caption" style={{ minWidth: '45px' }}>End</Text>
           <StyledDatePicker
             selected={endTime}
             onChange={handleEndTimeChange}
@@ -222,10 +240,10 @@ export function EditExecutionSection({
               padding: '8px',
               borderRadius: '4px',
               border: (endTime && startAt && endTime.getTime() === startAt.getTime() + endTimeInterval) ? '2px solid $borderColors$selected' : '0.5px solid $borderColors$inactive',
-              fontSize: '12px',
+              fontSize: '10px',
               color: themeController?.theme.name === 'dark' ? '#ffffff' : '#000000',
               backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff',
-              marginLeft: '8px'
+              marginLeft: '1px'
             }}
           >
             <option value={0}>Select</option>
@@ -242,20 +260,20 @@ export function EditExecutionSection({
 
         </Inline>
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '50px' }}>Interval</Text>
+          <Text variant="caption" style={{ minWidth: '45px' }}>Interval</Text>
           <select
             value={interval}
             onChange={e => {
               const value = Number(e.target.value)
-              setIntervalValue(value)
+              setInterval(value)
               updateField('interval', value)
             }}
             style={{
-              width: '200px',
+              width: '165px',
               padding: '6px 12px',
               borderRadius: '4px',
               border: '1px solid $borderColors$inactive',
-              fontSize: '14px',
+              fontSize: '12px',
               color: themeController?.theme.name === 'dark' ? '#ffffff' : '#000000',
               backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff',
             }}
