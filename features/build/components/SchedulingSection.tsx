@@ -67,7 +67,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
   const [editDurationValue, setEditDurationValue] = useState('30 days')
 
   const [displayStartTime, setDisplayStartTime] = useState(
-    flowInput.startTime && flowInput.startTime > 0 ? formatTimeDisplay(flowInput.startTime) : 'Right Away'
+    flowInput.startTime && flowInput.startTime > 0 ? formatTimeDisplay(flowInput.startTime) : 'On First Run'
   )
   const [editStartTime, setEditStartTime] = useState(false)
   const [editStartTimeValue, setEditStartTimeValue] = useState('1 hour')
@@ -163,7 +163,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
 
   // Format time display based on milliseconds
   function formatTimeDisplay(ms: number): string {
-    if (ms === 0) return 'Right Away'
+    if (ms === 0) return 'On First Run'
     
     const seconds = Math.floor(ms / 1000)
     
@@ -245,7 +245,7 @@ export const SchedulingSection = ({ flowInput, chainSymbol, onFlowChange, onFeeC
 
   function handleRemoveStartTime() {
     setStartTime(0)
-    setDisplayStartTime('Right Away')
+    setDisplayStartTime('On First Run')
   }
 
   function convertTime(input: string): number {

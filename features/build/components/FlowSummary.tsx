@@ -80,7 +80,7 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     // For start time, show relative time from now
     const displayStartTime = startTime > 0
         ? formatTimeDisplay(startTime)
-        : 'Right Away'
+        : 'On First Run'
 
     const displayInterval = interval > 0 ? formatTimeDisplay(interval) : 'None'
     const displayDuration = duration > 0 ? formatTimeDisplay(duration) : 'None'

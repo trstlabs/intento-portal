@@ -81,11 +81,15 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
     // Reset form values when jsonValue changes (e.g., when switching between editor and advanced mode)
     useEffect(() => {
         if (jsonValue !== prevJsonValue) {
-            setValues(parseJsonValue(jsonValue));
+            const parsed = parseJsonValue(jsonValue);
+            // Only update local state if there is a real structural change
+            if (JSON.stringify(parsed) !== JSON.stringify(values)) {
+                setValues(parsed);
+                setErrors({});
+            }
             setPrevJsonValue(jsonValue);
-            setErrors({});
         }
-    }, [jsonValue, prevJsonValue]);
+    }, [jsonValue, prevJsonValue, values]);
 
     const validationSchema = yup.object().shape(createValidationSchema(properties));
 
@@ -158,33 +162,30 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             clearTimeout(debounceTimerRef.current);
         }
 
-        // Set a new debounce timer
+        // Set a new debounce timer to validate and propagate changes upward
         debounceTimerRef.current = setTimeout(() => {
-            setValues(currentValues => {
-                // Create a deep copy of the current JSON value or initialize a new one
-                let currentJson;
-                try {
-                    currentJson = jsonValue ? JSON.parse(jsonValue) : { value: {} };
-                } catch (e) {
-                    currentJson = { value: {} };
-                }
+            // Use the most recent values from state by reading jsonValue and merging, but
+            // avoid a setValues call here to prevent extra rerenders while typing.
+            let currentJson;
+            try {
+                currentJson = jsonValue ? JSON.parse(jsonValue) : { value: {} };
+            } catch (e) {
+                currentJson = { value: {} };
+            }
 
-                // Update the value while preserving other properties
-                const updatedJSON = {
-                    ...currentJson,
-                    value: currentValues
-                };
+            // Build the updated JSON with the current in-memory values
+            const updatedJSON = {
+                ...currentJson,
+                value: (prev => prev)(values)
+            };
 
-                const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
+            const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
 
-                // Validate and update
-                validateValues(currentValues);
-                onChange?.(updatedJsonString);
-
-                return currentValues;
-            });
+            // Validate and update
+            validateValues((prev => prev)(values));
+            onChange?.(updatedJsonString);
         }, 300); // 300ms debounce
-    }, [jsonValue, onChange, validateValues]);
+    }, [jsonValue, onChange, validateValues, values]);
 
     // Clean up timer on unmount
     React.useEffect(() => {
@@ -194,9 +195,6 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             }
         };
     }, []);
-
-
-
 
     const handleNewFieldKeyChange = useCallback((path, value) => {
         setNewFieldKeys((prevKeys) => ({
@@ -328,4 +326,3 @@ function formatMainTitle(title) {
 }
 
 export default JsonFormEditor;
-
