@@ -2,20 +2,25 @@ import { useQuery } from 'react-query'
 import { cosmos } from 'intentojs'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo } from './useChainList'
-import { ibcWalletState, WalletStatusType } from '../state/atoms/walletAtoms'
+import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useRecoilValue } from 'recoil'
 
 export const useValidators = (chainSymbol: string) => {
     // Get the IBC asset info for the chain
     const assetInfo = useIBCAssetInfo(chainSymbol) as IBCAssetInfo | undefined
-    const { address, status } = useRecoilValue(ibcWalletState)
+    const { address: ibcAddress, status: ibcStatus } = useRecoilValue(ibcWalletState)
+    const { address: intoAddress, status: intoStatus } = useRecoilValue(walletState)
     // Get the RPC endpoint from the asset info
-    const rpcEndpoint = assetInfo?.rpc
-
+    const rpcEndpoint = assetInfo?.rpc || process.env.NEXT_PUBLIC_INTO_RPC
+    let address = intoAddress
+    if (chainSymbol !== 'INTO') {
+        address = ibcAddress
+    }
 
     const { data, isLoading } = useQuery(
         ['validators', chainSymbol, address],
         async () => {
+            console.log(address, assetInfo, rpcEndpoint)
             if (!rpcEndpoint) {
                 console.error(`No RPC endpoint found for chain: ${chainSymbol}`)
                 return []
@@ -24,7 +29,7 @@ export const useValidators = (chainSymbol: string) => {
             const client = await cosmos.ClientFactory.createRPCQueryClient({
                 rpcEndpoint,
             })
-
+            console.log("validators")
             const response = await client.cosmos.staking.v1beta1.delegatorValidators({
                 delegatorAddr: address,
                 pagination: undefined,
@@ -37,8 +42,9 @@ export const useValidators = (chainSymbol: string) => {
             return validators
         },
         {
-            enabled: Boolean(assetInfo && rpcEndpoint && address && address.length > 40 && status === WalletStatusType.connected),
-            refetchOnMount: 'always'
+            enabled: Boolean(assetInfo && rpcEndpoint && address && (intoStatus === WalletStatusType.connected || ibcStatus === WalletStatusType.connected)),
+            refetchOnMount: 'always',
+            refetchInterval: 30000
         }
     )
 
