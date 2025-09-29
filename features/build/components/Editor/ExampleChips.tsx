@@ -245,7 +245,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           feedbackLoops: [
             {
               responseIndex: 0,
-              responseKey: 'Amount.[0].Amount',
+              responseKey: 'Amount.[-1].Amount',
               msgsIndex: 1,
               msgKey: 'Amount',
               valueType: 'math.Int',
@@ -253,7 +253,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           ],
           comparisons: [{
             responseIndex: 0,
-            responseKey: 'Amount.[0].Amount',
+            responseKey: 'Amount.[-1].Amount',
             operator: 4,
             operand: `1000000u${chainSymbol.toLowerCase()}`,
             valueType: 'math.Int',
@@ -270,7 +270,6 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
       iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
       onClick={handleClick}
-      soon={chainSymbol === 'ATOM'}
     />
   )
 }
@@ -667,7 +666,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                 soon={false}
               />
               <IntentTemplateChip
-                label="Compound if ATOM ≥ $4"
+                label="Compound if ATOM < $5"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages(
@@ -691,15 +690,24 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                       },
                     },
                   ],
-                  'Compound if ATOM ≥ $4',
+                  'Compound if ATOM < $5',
                   {
                     conditions: {
+                      feedbackLoops: [
+                        {
+                          responseIndex: 0,
+                          responseKey: 'Amount.[-1].Amount',
+                          msgsIndex: 1,
+                          msgKey: 'Amount',
+                          valueType: 'math.Int',
+                        }
+                      ],
                       comparisons: [
                         {
                           responseIndex: 0,
                           responseKey: "",
-                          operand: "4.000000000000000000",
-                          operator: 5,
+                          operand: "5.000000000000000000",
+                          operator: 3,
                           valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
                           icqConfig: {
                             connectionId: "connection-1",
@@ -710,12 +718,10 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                             queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
                           }
                         }
-                      ],
-                      feedbackLoops: []
+                      ]
                     }
                   }
                 )}
-                soon={true}
               />
 
               <IntentTemplateChip
