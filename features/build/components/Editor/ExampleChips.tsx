@@ -245,18 +245,18 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
           feedbackLoops: [
             {
               responseIndex: 0,
-              responseKey: 'Amount.[-1].Amount',
+              responseKey: 'Amount.[-1]',
               msgsIndex: 1,
               msgKey: 'Amount',
-              valueType: 'math.Int',
+              valueType: 'sdk.Coin',
             }
           ],
           comparisons: [{
             responseIndex: 0,
-            responseKey: 'Amount.[-1].Amount',
+            responseKey: 'Amount.[-1]',
             operator: 4,
             operand: `1000000u${chainSymbol.toLowerCase()}`,
-            valueType: 'math.Int',
+            valueType: 'sdk.Coin',
           }
           ],
         }
@@ -696,10 +696,10 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                       feedbackLoops: [
                         {
                           responseIndex: 0,
-                          responseKey: 'Amount.[-1].Amount',
+                          responseKey: 'Amount.[-1]',
                           msgsIndex: 1,
                           msgKey: 'Amount',
-                          valueType: 'math.Int',
+                          valueType: 'sdk.Coin',
                         }
                       ],
                       comparisons: [

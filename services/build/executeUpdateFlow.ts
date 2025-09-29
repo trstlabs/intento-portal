@@ -45,7 +45,7 @@ export const executeUpdateFlow = async ({
         ? BigInt(Number(flowParams.endTime/ 1000).toFixed(0))
         : BigInt(0),
       label: flowParams.label ? flowParams.label : '',
-      interval: flowParams.interval ? flowParams.interval.toString() + 's' : '',
+      interval: flowParams.interval ? flowParams.interval.toString() + 'ms' : '',
       startAt: flowParams.startAt
         ? BigInt(Number(flowParams.startAt/ 1000).toFixed(0) )
         : BigInt(0),

@@ -36,7 +36,7 @@ export const useUpdateFlow = ({
     const setTransactionState = useSetRecoilState(transactionStatusState)
     const [_, popConfetti] = useRecoilState(particleState)
 
-    const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
+    const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`, 'flowId/'+flowParams.id])
     return useMutation(
         'updateFlow',
         async () => {
