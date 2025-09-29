@@ -182,7 +182,7 @@ export const FlowHistory = ({
                           return (
                             <Column key={_}>
                               <Text variant="legend" style={{ paddingTop: '4px' }}>
-                                {isAuthZError ? 'AuthZ permission lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
+                                {isAuthZError ? 'AuthZ authorization lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
                               </Text>
                             </Column>
                           );
