@@ -336,9 +336,19 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                       On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> set Intento as the chain and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow, the action will be completed.
                                     </Text>
                                   )}
+                                  {index === 0 && (
+                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode (use at your own risk): <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Task 1 — a simple flow streaming to any address, including your own.
+                                    </Text>
+                                  )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
                                       On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> select any chain other than Intento to execute over IBC via a Trustless Agent. Tip: use a template like "Stream ATOM" or "DCA into INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow on the target chain, the action will be completed.
+                                    </Text>
+                                  )}
+                                  {index === 1 && (
+                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                      <strong>Ledger Users:</strong> Try our Amino signing fallback: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can use the <strong>Stream ATOM</strong> or <strong>Stream OSMO</strong> template for Task 2. Alternatively, <Link href="https://tokenstream.fun" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>tokenstream.fun</Link> — our Skip:Go-powered DeFi app for token streaming and DCA — has similar Ledger support to the Skip:Go widget. Streaming a token on Osmosis or Cosmos Hub to any token on any chain there will complete the IBC flow task.
                                     </Text>
                                   )}
                                   {index === 2 && (

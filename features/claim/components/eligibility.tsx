@@ -219,7 +219,12 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               <div style={{ height: '8px', background: isDarkMode ? '#ffffff' : '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
                                 <div style={{ width: `${difference}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '4px' }}></div>
                               </div>
-                              <Text variant="caption">As it stands, {100 - difference}% of the total airdrop will be clawed back to the community pool</Text>
+                              <Text variant="caption" css={{ display: 'block', marginBottom: '0.25rem' }}>
+                                Note: This does not account for tokens that are vested but not yet claimed by users.
+                              </Text>
+                              <Text variant="caption" css={{ display: 'block' }}>
+                                As it stands, {(100 - difference).toFixed(3)}% of the total airdrop will be clawed back to the community pool. These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
+                              </Text>
                             </div>
                           </div>
 
