@@ -52,6 +52,7 @@ const StyledDatePicker = styled(DatePicker, {
 })
 
 const intervalOptions = [
+  { label: 'None', value: 0 },
   { label: '30 minutes', value: 30 * 60 * 1000 },
   { label: '1 hour', value: 60 * 60 * 1000 },
   { label: '2 hours', value: 2 * 60 * 60 * 1000 },
@@ -132,7 +133,7 @@ export function EditExecutionSection({
     updateField('endTime', newEndTime)
 
   }
-  
+
   useEffect(() => {
     if (updatedFlowParams.startAt) {
       setStartAt(new Date(updatedFlowParams.startAt))
@@ -149,14 +150,14 @@ export function EditExecutionSection({
   }, [updatedFlowParams])
 
   const handleRightAwayClick = () => {
-  
+
     const tenMinutesFromNow = new Date(new Date().getTime() + (10 * 60 * 1000));
     setStartAt(tenMinutesFromNow)
     updateField('startAt', tenMinutesFromNow)
   }
 
   const handleNoneClick = () => {
-  
+
     setStartAt(null)
     updateField('startAt', 0)
   }
@@ -183,7 +184,7 @@ export function EditExecutionSection({
               selected={startAt}
               onChange={(date: Date) => {
                 setStartAt(date)
-           
+
                 updateField('startAt', date)
               }}
               placeholderText="On First Run"
@@ -216,7 +217,36 @@ export function EditExecutionSection({
           </Inline>
         </Inline>
 
-
+        <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
+          <Text variant="caption" style={{ minWidth: '45px' }}>Interval</Text>
+          <select
+            value={interval}
+            onChange={e => {
+              const value = Number(e.target.value)
+              setInterval(value)
+              updateField('interval', value)
+            }}
+            style={{
+              width: '165px',
+              padding: '6px 12px',
+              borderRadius: '4px',
+              border: '1px solid $borderColors$inactive',
+              fontSize: '12px',
+              color: themeController?.theme.name === 'dark' ? '#ffffff' : '#000000',
+              backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff',
+            }}
+          >
+            {intervalOptions.map(option => (
+              <option
+                key={option.value}
+                value={option.value}
+                style={{ color: themeController?.theme.name === 'dark' ? '#ffffff' : '#000000', backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff' }}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </Inline>
 
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
           <Text variant="caption" style={{ minWidth: '45px' }}>End</Text>
@@ -259,36 +289,7 @@ export function EditExecutionSection({
           </select>
 
         </Inline>
-        <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
-          <Text variant="caption" style={{ minWidth: '45px' }}>Interval</Text>
-          <select
-            value={interval}
-            onChange={e => {
-              const value = Number(e.target.value)
-              setInterval(value)
-              updateField('interval', value)
-            }}
-            style={{
-              width: '165px',
-              padding: '6px 12px',
-              borderRadius: '4px',
-              border: '1px solid $borderColors$inactive',
-              fontSize: '12px',
-              color: themeController?.theme.name === 'dark' ? '#ffffff' : '#000000',
-              backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff',
-            }}
-          >
-            {intervalOptions.map(option => (
-              <option
-                key={option.value}
-                value={option.value}
-                style={{ color: themeController?.theme.name === 'dark' ? '#ffffff' : '#000000', backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff' }}
-              >
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </Inline>
+
       </StyledGrid>
       {updateOnButtonClick && (
         <Button
