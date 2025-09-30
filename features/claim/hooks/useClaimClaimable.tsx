@@ -31,7 +31,7 @@ export const useClaimClaimable = ({
     const { client, address, status } = useRecoilValue(walletState)
     const setTransactionState = useSetRecoilState(transactionStatusState)
 
-    const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
+    const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`, `claimRecord/${address}`])
     const [_, popConfetti] = useRecoilState(particleState)
     return useMutation(
         'sendTokens',
@@ -53,6 +53,7 @@ export const useClaimClaimable = ({
         },
         {
             onSuccess() {
+                refetchQueries()
                 toast.custom((t) => (
                     <Toast
                         icon={<IconWrapper icon={<Valid />} color="primary" />}
@@ -63,7 +64,6 @@ export const useClaimClaimable = ({
                 ))
                 popConfetti(true)
                 setTimeout(() => popConfetti(false), 3000)
-                refetchQueries()
             },
             onError(e) {
                 const errorMessage = formatSdkErrorMessage(e)
