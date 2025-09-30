@@ -110,9 +110,12 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             onValidate?.(false);
         }
     };
-
-    // Debounce timer for form updates
     const debounceTimerRef = React.useRef<NodeJS.Timeout>();
+    // Add this near your state:
+    const valuesRef = React.useRef(values);
+    useEffect(() => {
+        valuesRef.current = values;
+    }, [values]);
 
     const handleChange = useCallback((key, value) => {
         // Update local state immediately for responsive UI
@@ -121,7 +124,6 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             let current = newValues;
             const keys = key.split('.');
 
-            // Navigate to the target property
             for (let i = 0; i < keys.length - 1; i++) {
                 const k = keys[i];
                 if (k.includes('[')) {
@@ -132,7 +134,6 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
                         current[arrKey] = [];
                     }
 
-                    // Create a new array to trigger React's state update
                     current[arrKey] = [...current[arrKey]];
                     if (!current[arrKey][arrIndex]) {
                         current[arrKey][arrIndex] = {};
@@ -146,11 +147,9 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
                 }
             }
 
-
-            // Only update if the value has actually changed
             const lastKey = keys[keys.length - 1];
             if (current[lastKey] === value) {
-                return prevValues; // No change needed
+                return prevValues; // No change
             }
 
             current[lastKey] = value;
@@ -162,30 +161,19 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             clearTimeout(debounceTimerRef.current);
         }
 
-        // Set a new debounce timer to validate and propagate changes upward
+        // Debounce validation + parent onChange
         debounceTimerRef.current = setTimeout(() => {
-            // Use the most recent values from state by reading jsonValue and merging, but
-            // avoid a setValues call here to prevent extra rerenders while typing.
-            let currentJson;
-            try {
-                currentJson = jsonValue ? JSON.parse(jsonValue) : { value: {} };
-            } catch (e) {
-                currentJson = { value: {} };
-            }
-
-            // Build the updated JSON with the current in-memory values
             const updatedJSON = {
-                ...currentJson,
-                value: (prev => prev)(values)
+                value: valuesRef.current,
             };
-
             const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
 
-            // Validate and update
-            validateValues((prev => prev)(values));
+           
+            validateValues(valuesRef.current);
             onChange?.(updatedJsonString);
-        }, 300); // 300ms debounce
-    }, [jsonValue, onChange, validateValues, values]);
+        }, 300);
+    }, [onChange, validateValues]);
+    
 
     // Clean up timer on unmount
     React.useEffect(() => {
