@@ -1,17 +1,15 @@
 import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow';
-import { useRouter } from 'next/router';
 import { FlowInput } from '../../../types/trstTypes';
 import { Button, CopyIcon } from 'junoblocks';
 import { fetchFlowMsgs } from '../../../hooks/useGetMsgsFromAPI';
 
 
 type FlowTransformButtonProps = {
-  flow: any
-  initialChainID?: string
+    flow: any
+    initialChainID?: string
 }
 
 export const FlowTransformButton = ({ flow, initialChainID }: FlowTransformButtonProps) => {
-    const router = useRouter();
     const convertBigIntToString = (obj) => {
         if (typeof obj !== 'object' || obj === null) {
             return obj;
@@ -62,13 +60,13 @@ export const FlowTransformButton = ({ flow, initialChainID }: FlowTransformButto
         try {
             let flowInput = await transformFlow(flow);
             flowInput = convertBigIntToString(flowInput);
-            
+
             const query: any = { flowInput: JSON.stringify(flowInput) };
-          
-            await router.replace({
-                pathname: '/build',
-                query,
-            }, undefined, { shallow: true });
+
+            const url = `/build?${new URLSearchParams(query).toString()}`;
+
+            // Open in a new tab
+            window.open(url, "_blank", "noopener,noreferrer");
         } catch (error) {
             console.error('Error transforming flow:', error);
         }
@@ -80,55 +78,55 @@ const cleanMessageObject = (
     obj: any,
     seen = new WeakSet(),
     isInsideMsg = false
-  ): any => {
+): any => {
     if (obj === null || typeof obj !== "object") return obj;
-  
+
     if (seen.has(obj)) return undefined;
     seen.add(obj);
-  
+
     if (Array.isArray(obj)) {
-      return obj
-        .map((item) => cleanMessageObject(item, seen, isInsideMsg))
-        .filter((v) => v !== undefined);
+        return obj
+            .map((item) => cleanMessageObject(item, seen, isInsideMsg))
+            .filter((v) => v !== undefined);
     }
-  
+
     // Preserve protobuf-style object with typeUrl/value
     if (obj.typeUrl && "value" in obj) {
-      return {
-        typeUrl: obj.typeUrl,
-        value: cleanMessageObject(obj.value, seen, isInsideMsg),
-      };
+        return {
+            typeUrl: obj.typeUrl,
+            value: cleanMessageObject(obj.value, seen, isInsideMsg),
+        };
     }
-  
+
     const result: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      if (value === null || value === undefined) continue;
-  
-      const isMsgKey = key === "msg";
-      const recurseInsideMsg = isInsideMsg || isMsgKey;
-      const newKey = recurseInsideMsg ? toSnakeCase(key) : key;
-  
-      if (
-        value &&
-        typeof value === "object" &&
-        "value" in value &&
-        Object.keys(value).length === 1
-      ) {
-        // Unwrap single-value object (likely protobuf-style)
-        const cleaned = cleanMessageObject(
-          value.value,
-          seen,
-          recurseInsideMsg
-        );
-        if (cleaned !== undefined) result[newKey] = cleaned;
-      } else {
-        const cleaned = cleanMessageObject(value, seen, recurseInsideMsg);
-        if (cleaned !== undefined) result[newKey] = cleaned;
-      }
+        if (value === null || value === undefined) continue;
+
+        const isMsgKey = key === "msg";
+        const recurseInsideMsg = isInsideMsg || isMsgKey;
+        const newKey = recurseInsideMsg ? toSnakeCase(key) : key;
+
+        if (
+            value &&
+            typeof value === "object" &&
+            "value" in value &&
+            Object.keys(value).length === 1
+        ) {
+            // Unwrap single-value object (likely protobuf-style)
+            const cleaned = cleanMessageObject(
+                value.value,
+                seen,
+                recurseInsideMsg
+            );
+            if (cleaned !== undefined) result[newKey] = cleaned;
+        } else {
+            const cleaned = cleanMessageObject(value, seen, recurseInsideMsg);
+            if (cleaned !== undefined) result[newKey] = cleaned;
+        }
     }
-  
+
     return result;
-  };
+};
 export async function transformFlowMsgs(flow) {
     let msgs: string[] = [];
 
@@ -138,15 +136,15 @@ export async function transformFlowMsgs(flow) {
         if (Array.isArray(msgsObj)) {
             msgsObj.forEach((msgObj: any, index) => {
                 try {
-                   // console.log("Original message:", JSON.stringify(msgObj, null, 2));
+                    // console.log("Original message:", JSON.stringify(msgObj, null, 2));
 
                     // First normalize amount fields
                     msgObj = normalizeAmountField(msgObj);
 
                     // Clean and transform the message object
                     msgObj = cleanMessageObject(msgObj);
-                    
-// Handle MsgExecuteContract with base64 encoded msg
+
+                    // Handle MsgExecuteContract with base64 encoded msg
                     if (msgObj.typeUrl?.includes("MsgExecuteContract") &&
                         msgObj.msg && typeof msgObj.msg === 'string') {
                         try {
@@ -177,7 +175,7 @@ export async function transformFlowMsgs(flow) {
                         (_, value) => (typeof value === "bigint" ? value.toString() : value),
                         2
                     );
-                   // console.log("Transformed message:", msg);
+                    // console.log("Transformed message:", msg);
                     msgs[index] = msg;
                 } catch (error) {
                     console.error(`Error processing message at index ${index}:`, error);
