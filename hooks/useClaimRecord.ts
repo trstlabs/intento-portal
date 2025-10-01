@@ -10,7 +10,7 @@ export const useClaimRecord = () => {
   const client = useIntentoRpcClient()
   const { address } = useRecoilValue(walletState)
   const { data, isLoading } = useQuery(
-    ['claim', address],
+    `claimRecord/${address}`,
     async () => {
       if (!address || !client || !client.intento) {
         throw new Error('Invalid address or wallet not connected')
