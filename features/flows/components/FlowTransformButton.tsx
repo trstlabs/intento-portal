@@ -86,7 +86,19 @@ const cleanMessageObject = (
 
     if (Array.isArray(obj)) {
         return obj
-            .map((item) => cleanMessageObject(item, seen, isInsideMsg))
+            .map((item) => {
+                // Unwrap single-value objects in arrays (e.g., routes with only "value" key)
+                if (
+                    item &&
+                    typeof item === "object" &&
+                    "value" in item &&
+                    Object.keys(item).length === 1 &&
+                    !item.typeUrl // Don't unwrap if it has typeUrl (protobuf message)
+                ) {
+                    return cleanMessageObject(item.value, seen, isInsideMsg);
+                }
+                return cleanMessageObject(item, seen, isInsideMsg);
+            })
             .filter((v) => v !== undefined);
     }
 
