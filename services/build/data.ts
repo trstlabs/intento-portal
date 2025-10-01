@@ -5,7 +5,7 @@ import {
   QueryInterchainAccountFromAddressResponse,
 } from 'intentojs/dist/codegen/intento/intent/v1/query'
 import { cosmos } from 'intentojs'
-import { QueryGranteeGrantsRequest } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/query'
+import { QueryGranterGrantsRequest } from 'cosmjs-types/cosmos/authz/v1beta1/query'
 
 export interface ICAQueryInput {
   owner: string
@@ -81,14 +81,15 @@ export const getAuthZGrantsForGrantee = async ({
     const cosmosClient = await cosmos.ClientFactory.createRPCQueryClient({
       rpcEndpoint: rpc,
     })
-    const req = QueryGranteeGrantsRequest.fromPartial({
-      grantee,
+    const req = QueryGranterGrantsRequest.fromPartial({
+      granter,
       pagination: undefined,
     })
-    const resp = await cosmosClient.cosmos.authz.v1beta1.granteeGrants(req)
+    const resp = await cosmosClient.cosmos.authz.v1beta1.granterGrants(req)
+    console.log(resp)
     let granterGrants: GrantResponse[] = []
     for (const grant of resp.grants) {
-      if (grant.granter == granter) {
+      if (grant.grantee == grantee) {
         const msgTypeUrl =
           'msg' in grant.authorization
             ? grant.authorization.msg
