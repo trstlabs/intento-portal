@@ -131,7 +131,7 @@ export const useFlowsByOwner = (limit: number, key: any, address?: string) => {
 export const useFlow = (id) => {
   const client = useIntentoRpcClient()
   const { data, isLoading } = useQuery(
-    ['flowId', id],
+    `flowId/${id}`,
     async () => {
       if (!id || !client || !client.intento) {
         throw new Error('Invalid ID or client not available')
