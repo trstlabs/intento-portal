@@ -28,13 +28,15 @@ type FlowHistoryProps = {
   transformedMsgs?: string[]
   rpc?: string
   trustlessAgentAddress?: string
+  showCreateGrants?: (show: boolean) => void
 }
 
 export const FlowHistory = ({
   id,
   transformedMsgs,
   rpc,
-  trustlessAgentAddress
+  trustlessAgentAddress,
+  showCreateGrants
 }: FlowHistoryProps) => {
 
 
@@ -147,7 +149,7 @@ export const FlowHistory = ({
                         60000 && (
                           <Column>
                             <Text variant="caption" style={{ fontStyle: 'italic' }}>
-                              Planned for {scheduledExecTime.toLocaleString()}. Execution was delayed due to a halt in block production.
+                              Planned for {scheduledExecTime.toLocaleString()}. Execution was delayed (possibly due to a halt in block production or IBC relayer downtime).
                             </Text>
                           </Column>
                         )}
@@ -184,6 +186,16 @@ export const FlowHistory = ({
                               <Text variant="legend" style={{ paddingTop: '4px' }}>
                                 {isAuthZError ? 'AuthZ authorization lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
                               </Text>
+                              {isAuthZError && (
+                                <Inline css={{ marginTop: '$2' }}>
+                                  <Button size="small" onClick={() => showCreateGrants?.(true)}>
+                                    Create Grants
+                                  </Button>
+                                  <Button variant="ghost" size="small" onClick={() => showCreateGrants?.(false)}>
+                                    Hide
+                                  </Button>
+                                </Inline>
+                              )}
                             </Column>
                           );
                         })}
@@ -212,7 +224,7 @@ export const FlowHistory = ({
                         {queryResponses.map((queryResponse) => (
                           <Column>
                             <Text variant="caption">
-                              Query Response:  {queryResponse}
+                              Query Response:  {queryResponse.length > 30 ? JSON.stringify(queryResponse).substring(0, 30) + '...' : JSON.stringify(queryResponse)}
                             </Text>
                           </Column>
                         ))}

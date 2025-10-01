@@ -48,6 +48,7 @@ import { Share } from 'lucide-react'
 import { EditExecutionSection } from './EditExecutionSection'
 import { convertMicroDenomToDenom, resolveDenoms } from '../../../util/conversion'
 import { XTwitter } from '../../../icons/XTwitter'
+import { AuthzGrantCheck } from '../../build/components/AuthzGrantCheck'
 
 
 type FlowBreakdownProps = {
@@ -75,6 +76,7 @@ export const FlowBreakdown = ({
   const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
     flow.feeAddress
   )
+  const [createGrants, setCreateGrants] = useState(false)
   const isActive =
     flow.endTime &&
     flow.execTime &&
@@ -732,50 +734,45 @@ export const FlowBreakdown = ({
                     )}
                   </Inline>
                   <Inline gap={2}>
-                    <Text css={{ wordBreak: 'break-word' }} variant="body">
-                      <JsonViewer jsonValue={transformedMsgs[msgIndex] ? safeJsonParse(transformedMsgs[msgIndex])?.value : msg.valueDecoded} />
-                      {/* <pre
-                        style={{
-                          display: 'inline-block',
-                          whiteSpace: 'pre-wrap',
-                          overflow: 'hidden',
-                          float: 'left',
-                          fontSize: '0.8rem',
-                        }}
-                      >
-
-                        {StringifyBigints(msg.valueDecoded)}
-
-                      </pre> */}
-                    </Text>
+                    {editorIndex == msgIndex && editMsgs && editMsgs[msgIndex] ? (
+                      <div style={{ width: '100%' }}>
+                        <JsonFormWrapper
+                          index={msgIndex}
+                          chainSymbol={"INTO"}
+                          msg={editMsgs[msgIndex]}
+                          handleRemoveMsg={handleRemoveMsg}
+                          handleChangeMsg={handleChangeMsg}
+                          setIsJsonValid={setIsJsonValid}
+                        />
+                        <Button
+                          css={{ marginTop: '$8', margin: '$2' }}
+                          variant="secondary"
+                          size="small"
+                          disabled={shouldDisableUpdateFlowButton}
+                          onClick={handleUpdateFlowClick}
+                        >
+                          {isExecutingUpdateFlow && <Spinner instant />}{' '}
+                          {'Update Message'}
+                        </Button>
+                      </div>
+                    ) : (
+                      <div style={{ width: '100%' }}>
+                        <JsonViewer
+                          jsonValue={
+                            transformedMsgs[msgIndex]
+                              ? safeJsonParse(transformedMsgs[msgIndex])?.value
+                              : msg.valueDecoded
+                          }
+                        />
+                      </div>
+                    )}
                   </Inline>
                 </>
 
-                {editorIndex == msgIndex && editMsgs && editMsgs[msgIndex] &&
-                  <>
 
-                    <JsonFormWrapper
-                      index={msgIndex}
-                      chainSymbol={"INTO"}
-                      msg={editMsgs[msgIndex]}
-                      handleRemoveMsg={handleRemoveMsg}
-                      handleChangeMsg={handleChangeMsg}
-                      setIsJsonValid={setIsJsonValid}
-                    />
-                    <Button
-                      css={{ marginTop: '$8', margin: '$2' }}
-                      variant="secondary"
-                      size="small"
-                      disabled={shouldDisableUpdateFlowButton}
-                      onClick={handleUpdateFlowClick}
-                    >
-                      {isExecutingUpdateFlow && <Spinner instant />}{' '}
-                      {'Update Message'}
-                    </Button>
-                  </>
-                }
               </Column>
             </Row>
+
           </div>
         ))}
 
@@ -1130,9 +1127,29 @@ export const FlowBreakdown = ({
           id={flow.id.toString()}
           transformedMsgs={transformedMsgs}
           trustlessAgentAddress={flow?.trustlessAgent?.agentAddress || ""}
+          showCreateGrants={(show: boolean) => setCreateGrants(show)}
         />
 
-
+        {createGrants && <AuthzGrantCheck
+          flowInput={{
+            msgs: transformedMsgs || [],
+            duration: flow.endTime.getTime() - (flow.startTime ? flow.startTime.getTime() : Number(flow.interval?.seconds) * 1000),
+            startTime: flow.startTime ? flow.startTime.getTime() : 0,
+            interval: flow.interval ? Number(flow.interval.seconds) * 1000 : undefined,
+            configuration: flow.configuration,
+            conditions: flow.conditions,
+            trustlessAgent: flow.trustlessAgent,
+            // icaAddressForAuthZ: flow.icaAddressForAuthZ,
+            connectionId: flow.trustlessAgent?.connectionId,
+            // hostConnectionId: flow.trustlessAgent?.connectionId,
+            chainId: chainId,
+          }}
+          grantee={flow.trustlessAgent?.agentAddress || ""}
+          chainId={chainId}
+          refetchAuthzGrants={() => { }}
+          isAuthzGrantsLoading={false}
+        />
+        }
       </>
     </>
   )
