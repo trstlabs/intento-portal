@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import * as yup from 'yup';
-import { styled, Text,/*  Button, PlusIcon, Inline  */ } from 'junoblocks';
+import { styled, Text } from 'junoblocks';
 import { ErrorStack } from './Validation';
+import get from "lodash/get";
+import set from "lodash/set";
 
 // Utility to create the validation schema from properties
 const createValidationSchema = (properties) => {
@@ -63,7 +65,7 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
     const properties = schemaDefinition?.properties || schema?.properties || {};
 
     // Safely parse JSON and handle potential errors
-    const parseJsonValue = (value: string) => {
+    const parseJsonValue = useCallback((value: string) => {
         try {
             const parsed = value ? JSON.parse(value) : {};
             return parsed.value || {};
@@ -71,217 +73,188 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             console.error('Failed to parse JSON value:', e);
             return {};
         }
-    };
+    }, []);
 
-    const [values, setValues] = useState(() => parseJsonValue(jsonValue));
-    const [newFieldKeys, setNewFieldKeys] = useState({}); // State object for new field keys
+    // Local state for display - this is what the user sees and types into
+    const [localValues, setLocalValues] = useState(() => parseJsonValue(jsonValue));
     const [errors, setErrors] = useState({}); // State for validation errors
-    const [prevJsonValue, setPrevJsonValue] = useState(jsonValue);
+    
+    // Refs to track state without causing re-renders
+    const localValuesRef = useRef(localValues);
+    const isDirtyRef = useRef(false);
+    const isExternalUpdateRef = useRef(false);
 
-    // Reset form values when jsonValue changes (e.g., when switching between editor and advanced mode)
+    // Update ref whenever local values change
     useEffect(() => {
-        if (jsonValue !== prevJsonValue) {
-            const parsed = parseJsonValue(jsonValue);
-            // Only update local state if there is a real structural change
-            if (JSON.stringify(parsed) !== JSON.stringify(values)) {
-                setValues(parsed);
-                setErrors({});
-            }
-            setPrevJsonValue(jsonValue);
+        localValuesRef.current = localValues;
+    }, [localValues]);
+
+    // Sync with external changes (e.g., switching between editor modes)
+    useEffect(() => {
+        const parsed = parseJsonValue(jsonValue);
+        const currentLocal = localValuesRef.current;
+        
+        // Only update if this is an external change (not from our own commit)
+        // and the values are actually different
+        if (!isDirtyRef.current && JSON.stringify(parsed) !== JSON.stringify(currentLocal)) {
+            isExternalUpdateRef.current = true;
+            setLocalValues(parsed);
+            setErrors({});
         }
-    }, [jsonValue, prevJsonValue, values]);
+    }, [jsonValue, parseJsonValue]);
 
-    const validationSchema = yup.object().shape(createValidationSchema(properties));
-
-    // Remove the old useEffect that was causing duplicate updates
+    // memoize validation schema so we don't rebuild on every keystroke
+    const validationSchema = useMemo(() => {
+        return yup.object().shape(createValidationSchema(properties));
+    }, [properties]);
 
     // Validation function
-    const validateValues = async (values) => {
+    const validateValues = useCallback(async (vals) => {
         try {
-            await validationSchema.validate(values, { abortEarly: false });
+            await validationSchema.validate(vals, { abortEarly: false });
             setErrors({});
             onValidate?.(true);
-        } catch (err) {
-            const formattedErrors = err.inner.reduce((acc, curr) => {
+            return true;
+        } catch (err: any) {
+            const formattedErrors = (err.inner || []).reduce((acc, curr) => {
                 acc[curr.path] = curr.message;
                 return acc;
-            }, {});
+            }, {} as Record<string, string>);
             setErrors(formattedErrors);
             onValidate?.(false);
+            return false;
         }
-    };
-    const debounceTimerRef = React.useRef<NodeJS.Timeout>();
-    // Add this near your state:
-    const valuesRef = React.useRef(values);
-    useEffect(() => {
-        valuesRef.current = values;
-    }, [values]);
+    }, [validationSchema, onValidate]);
 
-    const handleChange = useCallback((key, value) => {
-        // Update local state immediately for responsive UI
-        setValues(prevValues => {
-            const newValues = JSON.parse(JSON.stringify(prevValues));
-            let current = newValues;
-            const keys = key.split('.');
+    // Commit changes to parent
+    const commitChanges = useCallback(() => {
+        if (!isDirtyRef.current) return;
 
-            for (let i = 0; i < keys.length - 1; i++) {
-                const k = keys[i];
-                if (k.includes('[')) {
-                    const [arrKey, index] = k.split('[');
-                    const arrIndex = parseInt(index.replace(']', ''), 10);
+        const currentValues = localValuesRef.current;
+        let currentJson: Record<string, any>;
+        
+        try {
+            currentJson = jsonValue ? JSON.parse(jsonValue) : { value: {} };
+        } catch {
+            currentJson = { value: {} };
+        }
+        
+        const updatedJSON = {
+            ...currentJson,
+            value: currentValues,
+        };
+        
+        const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
+        
+        // Validate and propagate
+        validateValues(currentValues);
+        onChange?.(updatedJsonString);
+        
+        // Mark as clean
+        isDirtyRef.current = false;
+    }, [jsonValue, onChange, validateValues]);
 
-                    if (!Array.isArray(current[arrKey])) {
-                        current[arrKey] = [];
-                    }
-
-                    current[arrKey] = [...current[arrKey]];
-                    if (!current[arrKey][arrIndex]) {
-                        current[arrKey][arrIndex] = {};
-                    }
-                    current = current[arrKey][arrIndex];
-                } else {
-                    if (!current[k]) {
-                        current[k] = isNaN(keys[i + 1]) ? {} : [];
-                    }
-                    current = current[k];
-                }
-            }
-
-            const lastKey = keys[keys.length - 1];
-            if (current[lastKey] === value) {
-                return prevValues; // No change
-            }
-
-            current[lastKey] = value;
-            return newValues;
+    // Handle input changes - update local state immediately
+    const handleChange = useCallback((fieldPath: string, newValue: any) => {
+        setLocalValues(prev => {
+            const updated = { ...prev } as any;
+            set(updated, fieldPath, newValue);
+            return updated;
         });
+        
+        // Mark as dirty
+        isDirtyRef.current = true;
+    }, []);
 
-        // Clear any pending debounce
-        if (debounceTimerRef.current) {
-            clearTimeout(debounceTimerRef.current);
-        }
+    // Handle blur - commit changes when user leaves a field
+    const handleBlur = useCallback(() => {
+        commitChanges();
+    }, [commitChanges]);
 
-        // Debounce validation + parent onChange
-        debounceTimerRef.current = setTimeout(() => {
-            const updatedJSON = {
-                value: valuesRef.current,
-            };
-            const updatedJsonString = JSON.stringify(updatedJSON, null, 2);
-
-           
-            validateValues(valuesRef.current);
-            onChange?.(updatedJsonString);
-        }, 300);
-    }, [onChange, validateValues]);
-    
-
-    // Clean up timer on unmount
-    React.useEffect(() => {
-        return () => {
-            if (debounceTimerRef.current) {
-                clearTimeout(debounceTimerRef.current);
+    // Setup cleanup handlers for page navigation, visibility changes, etc.
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'hidden') {
+                commitChanges();
             }
         };
-    }, []);
 
-    const handleNewFieldKeyChange = useCallback((path, value) => {
-        setNewFieldKeys((prevKeys) => ({
-            ...prevKeys,
-            [path]: value,
-        }));
-    }, []);
+        const handleBeforeUnload = () => {
+            commitChanges();
+        };
 
-    const renderField = useCallback((key, value, baseName = '') => {
-        const fieldName = baseName ? `${baseName}.${key}` : key;
-        // const newFieldKey = newFieldKeys[fieldName] || '';
+        // Commit on scroll (debounced via the scroll end)
+        let scrollTimeout: NodeJS.Timeout;
+        const handleScroll = () => {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                commitChanges();
+            }, 150);
+        };
 
-        if (typeof value === 'object' && !Array.isArray(value)) {
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('scroll', handleScroll, true);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('scroll', handleScroll, true);
+            clearTimeout(scrollTimeout);
+            // Final commit on unmount
+            commitChanges();
+        };
+    }, [commitChanges]);
+
+    // Render a single field
+    const renderField = (key: string, fieldPath: string = key) => {
+        const value = get(localValues, fieldPath);
+
+        if (value && typeof value === 'object' && !Array.isArray(value)) {
             return (
-                <StyledField key={fieldName}>
+                <StyledField key={fieldPath}>
                     <StyledObjectLabel>{formatMainTitle(key)}</StyledObjectLabel>
-                    {Object.keys(value).map((subKey) => renderField(subKey, value[subKey], fieldName))}
-                    {/* <StyledField>
-                        <Inline>
-                            <StyledInput
-                                type="text"
-                                placeholder="New field"
-                                value={newFieldKey}
-                                onChange={(e) => handleNewFieldKeyChange(fieldName, e.target.value)}
-                            />
-                            {newFieldKey &&
-                                <Button
-                                    variant="secondary"
-                                    size="small"
-                                    iconLeft={<PlusIcon />}
-                                    onClick={() => {
-                                        if (newFieldKey) {
-                                            handleChange(`${fieldName}.${newFieldKey}`, '');
-                                            handleNewFieldKeyChange(fieldName, ''); // Reset new field key
-                                        }
-                                    }}
-                                >
-                                    Add new field
-                                </Button>}
-                        </Inline>
-                    </StyledField> */}
+                    {Object.keys(value).map((subKey) => 
+                        renderField(subKey, `${fieldPath}.${subKey}`)
+                    )}
                 </StyledField>
             );
         } else if (Array.isArray(value)) {
             return (
-                <StyledField key={fieldName}>
+                <StyledField key={fieldPath}>
                     <StyledObjectLabel>{formatMainTitle(key)}</StyledObjectLabel>
                     {value.map((item, index) => (
-                        <StyledField key={index}>
-                            {Object.keys(item).map((subKey) => renderField(subKey, item[subKey], `${fieldName}[${index}]`))}
+                        <StyledField key={`${fieldPath}[${index}]`}>
+                            {Object.keys(item).map((subKey) => 
+                                renderField(subKey, `${fieldPath}[${index}].${subKey}`)
+                            )}
                         </StyledField>
                     ))}
-                    {/* <StyledField>
-                        <Inline>
-                            <StyledInput
-                                type="text"
-                                placeholder="New field"
-                                value={newFieldKey}
-                                onChange={(e) => handleNewFieldKeyChange(fieldName, e.target.value)}
-                            />
-                            {newFieldKey && <Button
-                                variant="secondary"
-                                size="small"
-                                iconLeft={<PlusIcon />}
-                                onClick={() => {
-                                    if (newFieldKey) {
-                                        handleChange(`${fieldName}[${value.length}].${newFieldKey}`, '');
-                                        handleNewFieldKeyChange(fieldName, ''); // Reset new field key
-                                    }
-                                }}
-                            >
-                                Add new field
-                            </Button>}
-                        </Inline>
-                    </StyledField> */}
                 </StyledField>
             );
         } else {
             return (
-                <StyledField key={fieldName}>
-                    <StyledLabel htmlFor={fieldName}>{formatMainTitle(key)}</StyledLabel>
+                <StyledField key={fieldPath}>
+                    <StyledLabel htmlFor={fieldPath}>{formatMainTitle(key)}</StyledLabel>
                     <StyledInput
-                        id={fieldName}
-                        name={fieldName}
+                        id={fieldPath}
+                        name={fieldPath}
                         type="text"
-                        onChange={(e) => handleChange(fieldName, e.target.value)}
-                        value={value || ''}
+                        onChange={(e) => handleChange(fieldPath, e.target.value)}
+                        onBlur={handleBlur}
+                        value={value ?? ''}
                     />
-                    {errors[fieldName] && <StyledErrorText>{errors[fieldName]}</StyledErrorText>}
+                    {errors[fieldPath] && <StyledErrorText>{errors[fieldPath]}</StyledErrorText>}
                 </StyledField>
             );
         }
-    }, [handleChange, handleNewFieldKeyChange, newFieldKeys, errors]);
+    };
 
     return (
         <StyledDivForContainer>
             <ErrorStack validationErrors={validationErrors} />
             <StyledFormWrapper>
-                {Object.keys(values).map((key) => renderField(key, values[key]))}
+                {Object.keys(localValues).map((key) => renderField(key, key))}
             </StyledFormWrapper>
         </StyledDivForContainer>
     );
