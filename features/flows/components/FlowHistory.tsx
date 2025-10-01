@@ -146,7 +146,7 @@ export const FlowHistory = ({
                       </Column>
                       {actualExecTime.getTime() -
                         scheduledExecTime.getTime() >=
-                        60000 && (
+                        120000 && (
                           <Column>
                             <Text variant="caption" style={{ fontStyle: 'italic' }}>
                               Planned for {scheduledExecTime.toLocaleString()}. Execution was delayed (possibly due to a halt in block production or IBC relayer downtime).
