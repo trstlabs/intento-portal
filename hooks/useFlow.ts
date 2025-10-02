@@ -75,11 +75,11 @@ export const useFlows = (limit: number, key: any) => {
 
 export const useFlowsByOwner = (limit: number, key: any, address?: string) => {
   const client = useIntentoRpcClient()
-  if (!address) {
-    address = useRecoilValue(walletState).address
-  }
+  // Always call hooks unconditionally
+  const wallet = useRecoilValue(walletState)
+  const owner = address ?? wallet?.address
   const { data, isLoading } = useQuery(
-    'useFlowsByOwner',
+    ['useFlowsByOwner', owner, limit, key],
     async () => {
       const pageRequest = PageRequest.fromPartial({
         limit: BigInt(limit),
@@ -90,7 +90,7 @@ export const useFlowsByOwner = (limit: number, key: any, address?: string) => {
 
       let resp: QueryFlowsResponse =
         await client.intento.intent.v1.flowsForOwner({
-          owner: address,
+          owner: owner,
           pagination: pageRequest,
         })
 
@@ -118,7 +118,7 @@ export const useFlowsByOwner = (limit: number, key: any, address?: string) => {
       return { flows: flows, pagination: resp.pagination, total: resp.pagination.total }
     },
     {
-      enabled: Boolean(client && client.intento),
+      enabled: Boolean(client && client.intento && owner),
       refetchOnMount: 'always',
       staleTime: 10000,
       cacheTime: 60000,
