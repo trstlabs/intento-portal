@@ -249,8 +249,8 @@ export const BuildComponent = ({
         }
     
         // Handle address placeholder replacement
-        const oldAddress = isIntoChain ? "Your Intento Address" : "Your Address";
-        const newAddress = isIntoChain ? "Your Intento Address" : "Your Address";
+        const oldAddress = isIntoChain ? "Your Intento address" : "Your address";
+        const newAddress = isIntoChain ? "Your Intento address" : "Your address";
         // In case you need to normalize from one to the other
         processedMsg = processedMsg.replaceAll(oldAddress, newAddress);
     

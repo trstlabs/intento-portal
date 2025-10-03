@@ -1,6 +1,6 @@
 import { FlowInput } from "../../../types/trstTypes";
 
-// Helper function to replace address fields with 'Your Address'
+// Helper function to replace address fields with 'Your address'
 export const replaceAddressFields = (obj: any, isLocal: boolean): any => {
     if (!obj || typeof obj !== 'object') return obj;
 
@@ -16,9 +16,9 @@ export const replaceAddressFields = (obj: any, isLocal: boolean): any => {
     addressFields.forEach(field => {
         if (result[field] && typeof result[field] === 'string') {
             if (isLocal) {
-                result[field] = 'Your Intento Address';
+                result[field] = 'Your Intento address';
             } else {
-                result[field] = 'Your Address';
+                result[field] = 'Your address';
             }
         }
 

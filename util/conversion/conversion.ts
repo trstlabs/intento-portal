@@ -1,4 +1,5 @@
 import { Coin } from 'intentojs/dist/codegen/cosmos/base/v1beta1/coin'
+import { useIBCAssetList } from '../../hooks/useChainList'
 
 export const protectAgainstNaN = (value: number) => (isNaN(value) ? 0 : value)
 
@@ -125,10 +126,9 @@ export async function resolveDenom(denom: string): Promise<string> {
   }
 }
 
-export async function resolveDenoms(coins: Coin[]): Promise<Coin[]> {
-  await Promise.all(
-    coins.map(async (coin) => (coin.denom = await resolveDenom(coin.denom)))
-  )
+export function resolveDenoms(coins: Coin[]): Coin[] {
+  const ibcAssets = useIBCAssetList()[0] 
+  coins.map((coin) => (coin.denom = resolveDenomSync(coin.denom, ibcAssets)))
   return coins
 }
 

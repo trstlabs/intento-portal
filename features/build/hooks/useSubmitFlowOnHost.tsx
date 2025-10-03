@@ -56,9 +56,9 @@ export const useSubmitFlowOnHost = ({
 
   // Helper function to process values and replace placeholders
   const processValue = (value: any): any => {
-    if (value === 'Your Intento Address') {
+    if (value === 'Your Intento address') {
       if (!intoWallet?.address) {
-        throw new Error('Your Intento Address placeholder found but no owner address provided');
+        throw new Error('Your Intento address placeholder found but no owner address provided');
       }
       return intoWallet.address;
     }

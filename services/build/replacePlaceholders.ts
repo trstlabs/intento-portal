@@ -8,7 +8,7 @@ export interface ReplacePlaceholdersParams {
 }
 
 /**
- * Recursively replaces 'Your Intento Address' and 'Your Address' placeholders in the provided value.
+ * Recursively replaces 'Your Intento address' and 'Your Address' placeholders in the provided value.
  * Throws if the required addresses are missing.
  */
 export function replacePlaceholders({
@@ -16,19 +16,19 @@ export function replacePlaceholders({
   ownerAddress,
   ibcWalletAddress,
 }: ReplacePlaceholdersParams): any {
-  if (value === 'Your Intento Address') {
+  if (value === 'Your Intento address') {
     if (!ownerAddress) {
       throw new Error(
-        'Your Intento Address placeholder found but no owner address provided'
+        'Your Intento address placeholder found but no owner address provided'
       )
     }
     return ownerAddress
   }
 
-  if (value === 'Your Address') {
+  if (value === 'Your address') {
     if (!ibcWalletAddress) {
       throw new Error(
-        'Your Address placeholder found but no IBC wallet connected'
+        'Your address placeholder found but no IBC wallet connected'
       )
     }
     return ibcWalletAddress
@@ -37,20 +37,19 @@ export function replacePlaceholders({
   if (
     typeof value === 'string' &&
     value.startsWith('Your ') &&
-    value.endsWith(' Address')
+    value.endsWith(' address')
   ) {
     if (!ibcWalletAddress) {
       throw new Error('Address placeholder found but no IBC wallet connected')
     }
 
     // Extract the chain symbol from the placeholder
-    const prefix = value.replace('Your ', '').replace(' Address', '')
+    const prefix = value.replace('Your ', '').replace(' address', '')
     if (!prefix) {
       throw new Error('Invalid address placeholder format')
     }
-
     const { data } = fromBech32(ibcWalletAddress)
-    return toBech32(prefix, data)
+    return toBech32(prefix.toLowerCase(), data)
   }
 
   if (Array.isArray(value)) {
@@ -79,7 +78,7 @@ export function replacePlaceholders({
           console.warn('Failed to parse memo as JSON:', e)
         }
       }
-      
+
       // Recursively process other object properties
       result[key] = replacePlaceholders({
         value: val,

@@ -60,6 +60,7 @@ export const JsonFormWrapper = ({
     }
   })
   const [lastUpdated, setLastUpdated] = useState(Date.now())
+  const [showCustom, setShowCustom] = useState(false)
 
   // Update schema when msg changes
   useEffect(() => {
@@ -71,26 +72,28 @@ export const JsonFormWrapper = ({
   }, [msg, msgTypeNameFile])
 
   return (
-    <Column>
-      <Card
-        css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2' }}
-        variant="secondary"
-        disabled
-      >
+    <Card
+      css={{ margin: '$4', paddingLeft: '$8', paddingTop: '$2', width: '100%'}}
+      variant="secondary"
+      disabled
+    >
         <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
         <ExampleFlowChips
               chainSymbol={chainSymbol}
               setAllMessages={setAllMessages}
               index={index}
+              onCustom={() => setShowCustom(!showCustom)}
             />
-          {setExample && (
+          {showCustom && (
             <Inline css={{ justifyContent: 'space-between' }}>
-              <MessageSelector
-                msgTypeName={msgTypeName}
-                setSchema={setSchema}
-                setExample={setExample}
-                index={index}
-              />
+              {setExample && (
+                <MessageSelector
+                  msgTypeName={msgTypeName}
+                  setSchema={setSchema}
+                  setExample={setExample}
+                  index={index}
+                />
+              )}
               <Text variant="legend" color="disabled" align={'center'}>
                 <a
                   target={'_blank'}
@@ -103,11 +106,11 @@ export const JsonFormWrapper = ({
             </Inline>
           )}
           <Column>
-            <ExampleChips
+           { showCustom && <ExampleChips
               chainSymbol={chainSymbol}
               setExample={setExample}
               messageIndex={index}
-            />
+            />}
             <Divider offsetY="$6" />
             <div style={{ margin: '$4', padding: '$4' }}>
               <Inline css={{ justifyContent: 'space-between' }}>
@@ -167,6 +170,6 @@ export const JsonFormWrapper = ({
           </Column>
         </CardContent>
       </Card>
-    </Column>
+
   )
 }

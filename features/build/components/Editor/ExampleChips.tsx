@@ -1,5 +1,5 @@
 import React from 'react'
-import { Inline } from 'junoblocks'
+import { Inline, Tooltip } from 'junoblocks'
 import { generalExamples, wasmExamples, osmoExamples, elysExamples, intentoExamples } from '../ExampleMsgs'
 import { useValidators } from 'hooks/useValidators'
 
@@ -19,7 +19,7 @@ const getChainIcon = (chainSymbol: string): string => {
 
 
 // IntentTemplateChip: visually distinct chip for preset flows
-function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, disabled = false }) {
+function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, disabled = false, description, autoParse = false }: { label: string; iconUrl?: string; gradient: string; onClick?: () => void; soon?: boolean; disabled?: boolean; description?: string; autoParse?: boolean }) {
   const themeController = useControlTheme();
   const isDark = themeController.theme.name === 'dark';
   // Optionally darken the gradient for dark mode, or just use the same gradient
@@ -33,7 +33,7 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
       return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
     })
     : gradient;
-  return (
+  const ChipBody = (
     <div
       style={{
         display: 'inline-flex',
@@ -56,7 +56,7 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
         pointerEvents: soon ? 'none' : 'auto',
         filter: disabled ? 'grayscale(1)' : 'none'
       }}
-      onClick={onClick}
+      onClick={() => { onClick && onClick(); }}
       onMouseOver={e => {
         (e.currentTarget as HTMLDivElement).style.transform = 'scale(1.05)';
         (e.currentTarget as HTMLDivElement).style.boxShadow = isDark
@@ -107,6 +107,29 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
           gap: '0.3em'
         }}>
           {label}
+          {autoParse && (
+            <Tooltip
+              label="This template includes placeholders like 'Your … address'. On selection, they auto-fill with your connected address."
+              aria-label={`Auto-fill explanation for ${label}`}
+            >
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  marginLeft: 8,
+                  padding: '2px 6px',
+                  borderRadius: 10,
+                  background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.25)',
+                  color: isDark ? '#e2e8f0' : '#1a202c',
+                  fontSize: 10,
+                  fontWeight: 700
+                }}
+              >
+                ✨ auto
+              </span>
+            </Tooltip>
+          )}
           {soon && <><Clock size={14} style={{ marginLeft: '0.2em' }} /> <div style={{
             position: 'absolute',
             top: 0,
@@ -140,12 +163,25 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
         </span>
       </Inline>
     </div>
-  )
+  );
+
+  return description ? (
+    <Tooltip label={description} aria-label={`About ${label}`}>
+      <div style={{ display: 'inline-block', maxWidth: '100%' }}>
+        {ChipBody}
+      </div>
+    </Tooltip>
+  ) : (
+    <div style={{ display: 'inline-block', maxWidth: '100%' }}>
+      {ChipBody}
+    </div>
+  );
 }
 
 import { useControlTheme } from 'junoblocks'
 import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
 import { Clock } from 'lucide-react'
+import { useIBCAssetInfo } from '../../../../hooks/useIBCAssetInfo'
 
 function Chip({ label, onClick, icon }) {
   const themeController = useControlTheme();
@@ -213,7 +249,7 @@ function Chip({ label, onClick, icon }) {
 
 
 
-const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
+const AutoCompoundChip = ({ chainSymbol, setAllMessages, IBCAssetInfo }) => {
   const { validators } = useValidators(chainSymbol)
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
 
@@ -223,14 +259,14 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
         {
           typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
           value: {
-            delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
+            delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
             validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
           },
         },
         {
           typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
           value: {
-            delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
+            delegatorAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
             validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
             amount: {
               denom: `${chainSymbol}`,
@@ -267,6 +303,8 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
   return (
     <IntentTemplateChip
       label={`Autocompound if rewards > 1 ${chainSymbol}`}
+      autoParse
+      description="Autocompound if rewards > 1. Uses a feedback loop to check if rewards are > 1 and compound them. Will stop when rewards are < 1. Continous smart autocompounding coming soon."
       iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
       onClick={handleClick}
@@ -274,201 +312,9 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages }) => {
   )
 }
 
-const ElysCompoundRewardsChip = ({ setAllMessages }) => {
-  const { validators } = useValidators('ELYS')
-  const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
-
-  const handleClick = () => {
-
-    setAllMessages(
-      [
-        {
-          typeUrl: '/elys.estaking.MsgWithdrawElysStakingRewards',
-          value: { delegatorAddress: 'Your Address' }
-        },
-        {
-          typeUrl: '/elys.stablestake.MsgBond',
-          value: {
-            creator: 'Your Address',
-            poolId: '32767',
-            amount: "1"
-          }
-        },
-        {
-          typeUrl: '/elys.commitment.MsgStake',
-          value: {
-            amount: "1",
-            creator: "Your Address",
-            asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
-          }
-        },
-        {
-          typeUrl: '/elys.commitment.MsgStake',
-          value: {
-            amount: "1",
-            creator: "Your Address",
-            asset: "uedenb",
-            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
-          }
-        }
-      ],
-      'Compound EDEN, EDEBB & Reinvest USDC Rewards',
-      {
-        conditions: {
-          feedbackLoops: [
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[0].Amount",
-              msgsIndex: 1,
-              msgKey: "Amount",
-              valueType: "math.Int"
-            },
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[1].Amount",
-              msgsIndex: 2,
-              msgKey: "Amount",
-              valueType: "math.Int"
-            },
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[2].Amount",
-              msgsIndex: 3,
-              msgKey: "Amount",
-              valueType: "math.Int"
-            }
-          ],
-          comparisons: [
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[0].Amount",
-              operand: "1",
-              operator: 4,
-              valueType: "math.Int"
-            }
-          ]
-        }
-      }
-    )
-  }
-
-  return (
-    <IntentTemplateChip
-      label="Compound EDEN, EDEBB & Reinvest USDC Rewards"
-      iconUrl={getChainIcon('ELYS')}
-      gradient="linear-gradient(90deg,rgb(59, 202, 183) 0%, #736efe 100%)"
-      onClick={handleClick}
-    />
-  )
-}
-
-const ElysAutoCompoundChip = ({ setAllMessages }) => {
-  const { validators } = useValidators('ELYS')
-  const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
-
-  const handleClick = () => {
 
 
-    setAllMessages(
-      [
-        {
-          typeUrl: '/elys.estaking.MsgWithdrawElysStakingRewards',
-          value: { delegatorAddress: 'Your Address' }
-        },
-        {
-          typeUrl: '/elys.amm.MsgSwapExactAmountIn',
-          value: {
-            sender: 'Your Address',
-            routes: [{ poolId: '2', tokenOutDenom: 'uelys' }],
-            tokenIn: { "denom": "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349", "amount": "1" },
-            tokenOutMinAmount: '1',
-          },
-        },
-        {
-          typeUrl: '/elys.commitment.MsgStake',
-          value: {
-            amount: "1",
-            creator: "Your Address",
-            asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
-          }
-        },
-        {
-          typeUrl: '/elys.commitment.MsgStake',
-          value: {
-            amount: "1",
-            creator: "Your Address",
-            asset: "ueden",
-            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
-          }
-        },
-        {
-          typeUrl: '/elys.commitment.MsgStake',
-          value: {
-            amount: "1",
-            creator: "Your Address",
-            asset: "uedenb",
-            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️'
-          }
-        }
-      ],
-      'Compound Staking Rewards',
-      {
-        conditions: {
-          feedbackLoops: [
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[0].Amount",
-              msgsIndex: 1,
-              msgKey: "TokenIn.Amount",
-              valueType: "math.Int"
-            },
-            {
-              responseIndex: 1,
-              responseKey: "TokenOutAmount",
-              msgsIndex: 2,
-              msgKey: "Amount",
-              valueType: "math.Int"
-            },
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[1].Amount",
-              msgsIndex: 3,
-              msgKey: "Amount",
-              valueType: "math.Int"
-            },
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[2].Amount",
-              msgsIndex: 4,
-              msgKey: "Amount",
-              valueType: "math.Int"
-            }
-          ],
-          comparisons: [
-            {
-              responseIndex: 0,
-              responseKey: "Amount.[0].Amount",
-              operand: "1",
-              operator: 4,
-              valueType: "math.Int"
-            }
-          ]
-        }
-      }
-    )
-  }
 
-  return (
-    <IntentTemplateChip
-      label="Compound Staking Rewards"
-      iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-      gradient="linear-gradient(90deg, rgb(59, 202, 183) 0%, #736efe 100%)"
-      onClick={handleClick}
-    />
-  )
-}
 
 type ExampleChipsProps = {
   chainSymbol: string
@@ -547,12 +393,13 @@ interface ExampleFlowChipsProps {
   setAllMessages?: (messages: any[], label?: string, conditions?: any) => void;
   index: number;
   flowInput?: FlowInput;
+  onCustom?: () => void;
 }
 
-export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput = {} }: ExampleFlowChipsProps) {
+export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput = {}, onCustom }: ExampleFlowChipsProps) {
   const { validators } = useValidators(chainSymbol)
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
-
+  const IBCAssetInfo = useIBCAssetInfo(chainSymbol)
   // Calculate flow end time in nanoseconds since epoch
   const nowInMilliseconds = Date.now()
   const flowStartTime = flowInput?.startTime ?? nowInMilliseconds
@@ -570,12 +417,14 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
             label={`Stream 1 ${chainSymbol}`}
             iconUrl={getChainIcon(chainSymbol)}
             gradient="linear-gradient(90deg,rgb(94, 94, 178) 0%,rgb(123, 134, 218) 100%)"
+            autoParse
+            description={`Streams one ${chainSymbol} from your address to another address. You can adjust the amount after selecting.`}
             onClick={() => setAllMessages([
               {
                 typeUrl: '/cosmos.bank.v1beta1.MsgSend',
                 value: {
-                  fromAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
-                  toAddress: chainSymbol === 'INTO' ? 'Your Intento Address' : 'Your Address',
+                  fromAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
+                  toAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
                   amount: [{
                     denom: `${chainSymbol}`,
                     amount: '1'
@@ -585,37 +434,15 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
             ], `Stream ${chainSymbol}`)}
           />
           {(chainSymbol === 'ATOM' || chainSymbol === 'OSMO' || chainSymbol === 'INTO') && (
-            <AutoCompoundChip chainSymbol={chainSymbol} setAllMessages={setAllMessages} />
+            <AutoCompoundChip chainSymbol={chainSymbol} IBCAssetInfo={IBCAssetInfo} setAllMessages={setAllMessages} />
           )}
-          {chainSymbol === 'ELYS' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
-            <ElysAutoCompoundChip setAllMessages={setAllMessages} />
-          )}
-          {chainSymbol === 'ELYS' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
-            <ElysCompoundRewardsChip setAllMessages={setAllMessages} />
-          )}
-          {chainSymbol === 'ELYS' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'false' && (
-            <IntentTemplateChip
-              label="DCA 1 USDC to ELYS"
-              iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png"
-              gradient="linear-gradient(90deg, #3b7a7a 0%, #4fc3f7 100%)"
-              onClick={() => setAllMessages([
-                // Example: Swap, Stake, Withdraw for autocompound
-                {
-                  typeUrl: '/elys.amm.MsgSwapExactAmountIn',
-                  value: {
-                    sender: 'Your Address',
-                    routes: [{ poolId: '2', tokenOutDenom: 'uelys' }],
-                    tokenIn: { "denom": "ibc/F082B65C88E4B6D5EF1DB243CDA1D331D002759E938A0F5CD3FFDC5D53B3E349", "amount": "1000000" },
-                    tokenOutMinAmount: '1',
-                  },
-                }
-              ], 'DCA into ELYS')}
-            />
-          )}
+
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
               <IntentTemplateChip
                 label="Swap ATOM for BTC if ATOM < $5"
+                autoParse
+                description="Swaps 1 ATOM for BTC if ATOM < $5 via Osmosis. Uses a query to check the price of ATOM, this saves gas. "
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
@@ -628,14 +455,14 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                         denom: "ATOM",
                         amount: "1"
                       },
-                      sender: "Your Address",
+                      sender: `Your ${IBCAssetInfo.prefix} address`,
                       receiver: "osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u",
                       timeoutHeight: {
                         revisionNumber: "0",
                         revisionHeight: "0"
                       },
                       timeoutTimestamp: timeoutTimestamp,
-                      memo: `{"wasm":{"contract":"osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u","msg":{"swap_and_action":{"user_swap":{"swap_exact_asset_in":{"swap_venue_name":"osmosis-poolmanager","operations":[{"pool":"611","denom_in":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","denom_out":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4"},{"pool":"1096","denom_in":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4","denom_out":"uosmo"},{"pool":"712","denom_in":"uosmo","denom_out":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F"},{"pool":"1868","denom_in":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F","denom_out":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF"}]}},"min_asset":{"native":{"denom":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF","amount":"1"}},"timeout_timestamp":${timeoutTimestamp},"post_swap_action":{"transfer":{"to_address":"Your osmo Address"}},"affiliates":[]}}}}`
+                      memo: `{"wasm":{"contract":"osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u","msg":{"swap_and_action":{"user_swap":{"swap_exact_asset_in":{"swap_venue_name":"osmosis-poolmanager","operations":[{"pool":"611","denom_in":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","denom_out":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4"},{"pool":"1096","denom_in":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4","denom_out":"uosmo"},{"pool":"712","denom_in":"uosmo","denom_out":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F"},{"pool":"1868","denom_in":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F","denom_out":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF"}]}},"min_asset":{"native":{"denom":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF","amount":"1"}},"timeout_timestamp":${timeoutTimestamp},"post_swap_action":{"transfer":{"to_address":"Your osmo address"}},"affiliates":[]}}}}`
                     }
                   }
                 ],
@@ -667,6 +494,8 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
               />
               <IntentTemplateChip
                 label="Compound if ATOM < $5"
+                autoParse
+                description="Compounds 1 ATOM if ATOM < $5. Uses a query to check the price of ATOM, this saves gas."
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages(
@@ -674,14 +503,14 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                     {
                       typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
                       value: {
-                        delegatorAddress: 'Your Address',
+                        delegatorAddress: `Your ${IBCAssetInfo.prefix} address`,
                         validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
                       },
                     },
                     {
                       typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
                       value: {
-                        delegatorAddress: 'Your Address',
+                        delegatorAddress: `Your ${IBCAssetInfo.prefix} address`,
                         validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
                         amount: {
                           denom: `${chainSymbol}`,
@@ -726,13 +555,15 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
 
               <IntentTemplateChip
                 label="DCA into StreamSwap"
+                autoParse
+                description="DCA into StreamSwap to average your entry into the streaming event."
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
                     value: {
-                      sender: 'Your Address',
+                      sender: `Your ${IBCAssetInfo.prefix} address`,
                       contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
                       msg: {
                         subscribe: {
@@ -756,42 +587,19 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
           )}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
-              <IntentTemplateChip
-                label="DCA into StreamSwap 8"
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
-                onClick={() => setAllMessages([
-                  {
-                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                    value: {
-                      sender: 'Your Address',
-                      contract: 'osmo1994s0ea4z2lqrh5gl8l5s0cw6hwz92s3pn2yhkamfh57j9yh7lxssnr80s',
-                      msg: {
-                        subscribe: {
-                          stream_id: 8
-                        }
-                      },
-                      funds: [
-                        {
-                          denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
-                          amount: '1000000'
-                        }
-                      ]
-                    }
-                  }
-                ], 'DCA into StreamSwap 8',
-                )} disabled={true}
-              />
+
               <IntentTemplateChip
                 label="DCA into ATOM"
+                autoParse
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                description="Swaps 1 USDC into ATOM with no additional conditions. You can adjust the tokenIn and routes after selecting."
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #8a7aff 100%)"
                 onClick={() => setAllMessages([
                   // Example: DCA flow: swap, send
                   {
                     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
                     value: {
-                      sender: 'Your Address',
+                      sender: `Your ${IBCAssetInfo.prefix} address`,
                       routes: [{ poolId: '1464', tokenOutDenom: 'uosmo' }, { poolId: '1265', tokenOutDenom: 'ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2' }],
                       tokenIn: { denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', amount: '1000000' },
                       tokenOutMinAmount: '1',
@@ -803,11 +611,13 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                 label="DCA into INTO"
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg, #0c76af 0%, #38aff9 100%)"
+                autoParse
+                description="Swaps 1 USDC into INTO with no additional conditions. You can adjust the tokenIn and routes after selecting."
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
                     value: {
-                      sender: 'Your Address',
+                      sender: `Your ${IBCAssetInfo.prefix} address`,
                       poolId: '3138',
                       tokenIn: {
                         denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', // USDC IBC denom
@@ -823,13 +633,15 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
               />
               <IntentTemplateChip
                 label="DCA into INTO if price < 0.01"
+                autoParse
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                 gradient="linear-gradient(90deg,rgb(67, 142, 233) 0%,rgb(56, 95, 249) 100%)"
+                description="Swaps 1 USDC into INTO with a query for the last price. You can adjust the tokenIn and routes after selecting."
                 onClick={() => setAllMessages([
                   {
                     typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
                     value: {
-                      sender: 'Your Address',
+                      sender: `Your ${IBCAssetInfo.prefix} address`,
                       poolId: '3138',
                       tokenIn: {
                         denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', // USDC IBC denom
@@ -856,7 +668,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                           timeoutPolicy: 2,
                           timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
                           queryType: "store/twap/key",
-                          queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDMxMzh8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
+                          queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMzEzOHwiaWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
                         }
                       }
                     ],
@@ -889,11 +701,48 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                 ], 'TWAP-based DCA')}
                 soon={true}
               />
+              <IntentTemplateChip
+                label="DCA into StreamSwap"
+                autoParse
+                description="DCA into StreamSwap to average your entry into the streaming event."
+                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                    value: {
+                      sender: `Your ${IBCAssetInfo.prefix} address`,
+                      contract: 'osmo1994s0ea4z2lqrh5gl8l5s0cw6hwz92s3pn2yhkamfh57j9yh7lxssnr80s',
+                      msg: {
+                        subscribe: {
+                          stream_id: 8
+                        }
+                      },
+                      funds: [
+                        {
+                          denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
+                          amount: '1000000'
+                        }
+                      ]
+                    }
+                  }
+                ], 'DCA into StreamSwap 8',
+                )} disabled={true}
+              />
             </>
           )}
-        </Inline >
-      )
-      }
+          {/* Custom builder entry */}
+        </Inline>
+      )}
+      {/* Always show Custom chip (available for any index) */}
+      <Inline css={{ marginBottom: '$2', flexWrap: 'wrap', gap: '$2' }}>
+        <IntentTemplateChip
+          label="Custom"
+          gradient="linear-gradient(90deg, #4a5568 0%, #2d3748 100%)"
+          description="Start with a custom message type and fields."
+          onClick={() => onCustom && onCustom()}
+        />
+      </Inline>
     </>
   )
 }
