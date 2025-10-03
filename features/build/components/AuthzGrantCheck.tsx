@@ -198,9 +198,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
               • {expiredGrants.length} authorization{expiredGrants.length > 1 ? 's' : ''} will expire before flow ends
             </Text>
           )}
-
-          {/* Hide create authz grant button if fee denom starts with 'ibc' */}
-          {!flowInput.trustlessAgent?.feeLimit?.[0]?.denom?.toLowerCase().startsWith('ibc') && (
+          {(
             <Button
               variant="secondary"
               size="small"
