@@ -19,8 +19,7 @@ import { getRelativeTime } from '../../../util/time'
 import { __TEST_MODE__ } from '../../../util/constants'
 import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { Link } from '@interchain-ui/react'
-import { useIBCAssetList } from '../../../hooks/useChainList'
-
+import { IBCAssetInfo } from '../../../hooks/useChainList'
 
 
 type FlowHistoryProps = {
@@ -29,6 +28,7 @@ type FlowHistoryProps = {
   rpc?: string
   trustlessAgentAddress?: string
   showCreateGrants?: (show: boolean) => void
+  ibcAssetList?: IBCAssetInfo[]
 }
 
 export const FlowHistory = ({
@@ -36,7 +36,8 @@ export const FlowHistory = ({
   transformedMsgs,
   rpc,
   trustlessAgentAddress,
-  showCreateGrants
+  showCreateGrants,
+  ibcAssetList
 }: FlowHistoryProps) => {
 
 
@@ -48,7 +49,8 @@ export const FlowHistory = ({
   const [fetchedHistory, isHistoryLoading] = useFlowHistory(id.toString(), historyLimit, paginationKey);
   const refetchQueries = useRefetchQueries([`flowHistory/${id.toString()}/${paginationKey}`], 15);
 
-  const [ibcAssetList, _] = useIBCAssetList()
+  // Track which query response index is expanded
+  const [openQueryIdx, setOpenQueryIdx] = useState<number | null>(null)
 
   // Clear flowHistory when id changes
   useEffect(() => {
@@ -174,7 +176,7 @@ export const FlowHistory = ({
                                 <>⏱️</> : <>⌛</>
                             ))}
                         </Text>
-                        {errors.map((err, _) => {
+                        {errors.map((err, i) => {
                           // Check for AuthZ permission errors
                           const isAuthZError = err.includes('error handling packet on host chain') &&
                             (err.includes('ABCI code: 2:'));
@@ -182,17 +184,14 @@ export const FlowHistory = ({
                             (err.includes('ABCI code: 5:'));
 
                           return (
-                            <Column key={_}>
+                            <Column key={i}>
                               <Text variant="legend" style={{ paddingTop: '4px' }}>
                                 {isAuthZError ? 'AuthZ authorization lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
                               </Text>
-                              {isAuthZError && (
+                              {isAuthZError && index === 0 && (
                                 <Inline css={{ marginTop: '$2' }}>
-                                  <Button size="small" onClick={() => showCreateGrants?.(true)}>
-                                    Create Grants
-                                  </Button>
-                                  <Button variant="ghost" size="small" onClick={() => showCreateGrants?.(false)}>
-                                    Hide
+                                  <Button size="small" variant="secondary" onClick={() => showCreateGrants?.(true)}>
+                                    Authorization
                                   </Button>
                                 </Inline>
                               )}
@@ -221,11 +220,40 @@ export const FlowHistory = ({
 
                         ))}</Text>}
 
-                        {queryResponses.map((queryResponse) => (
-                          <Column>
-                            <Text variant="caption">
-                              Query Response:  {queryResponse.length > 30 ? JSON.stringify(queryResponse).substring(0, 30) + '...' : JSON.stringify(queryResponse)}
-                            </Text>
+                        {queryResponses.map((queryResponse, i) => (
+                          <Column key={i}>
+                            <Inline css={{ alignItems: 'center', gap: '$2' }}>
+                              <Text
+                                variant="caption"
+                                css={{ overflowWrap: 'anywhere', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}
+                              >
+                                Query Response: {(() => {
+                                  const str = JSON.stringify(queryResponse);
+                                  return str && str.length > 60 ? str.substring(0, 60) + '...' : str;
+                                })()}
+                              </Text>
+                              <Button
+                                variant="ghost"
+                                size="small"
+                                onClick={() => setOpenQueryIdx(openQueryIdx === i ? null : i)}
+                              >
+                                {openQueryIdx === i ? 'Hide' : 'Show full'}
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="small"
+                                onClick={() => navigator.clipboard.writeText(JSON.stringify(queryResponse, null, 2))}
+                              >
+                                Copy
+                              </Button>
+                            </Inline>
+                            {openQueryIdx === i && (
+                              <Card css={{ padding: '$4', marginTop: '$2', maxHeight: '320px', overflow: 'auto' }}>
+                                <pre style={{ margin: 0, fontSize: '12px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                                  {JSON.stringify(queryResponse, null, 2)}
+                                </pre>
+                              </Card>
+                            )}
                           </Column>
                         ))}
                       </Column>

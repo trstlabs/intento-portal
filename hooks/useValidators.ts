@@ -44,7 +44,8 @@ export const useValidators = (chainSymbol: string) => {
         {
             enabled: Boolean(assetInfo && rpcEndpoint && address && (intoStatus === WalletStatusType.connected || ibcStatus === WalletStatusType.connected)),
             refetchOnMount: 'always',
-            refetchInterval: 30000
+            refetchInterval: 30000,
+            refetchIntervalInBackground: true
         }
     )
 

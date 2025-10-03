@@ -32,7 +32,7 @@ import {
   useICATokenBalance,
 } from '../../../hooks/useICA'
 import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
-import { IBCAssetInfo } from '../../../hooks/useChainList'
+import { IBCAssetInfo, useIBCAssetList } from '../../../hooks/useChainList'
 import { useSendFundsOnHost, useUpdateFlow } from '../../build/hooks'
 import { getDuration, getRelativeTime } from '../../../util/time'
 
@@ -46,7 +46,7 @@ import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { Share } from 'lucide-react'
 import { EditExecutionSection } from './EditExecutionSection'
-import { convertMicroDenomToDenom, resolveDenoms } from '../../../util/conversion'
+import { convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
 import { XTwitter } from '../../../icons/XTwitter'
 import { AuthzGrantCheck } from '../../build/components/AuthzGrantCheck'
 
@@ -62,7 +62,8 @@ export const FlowBreakdown = ({
 }: //size = 'large',
   FlowBreakdownProps) => {
 
-  const [icaAddress, _] = useGetICA(flow.selfHostedIca?.connectionId, flow.owner)
+  const [icaAddress, _] = useGetICA(ibcInfo?.connection_id, flow.trustlessAgent?.agentAddress)
+
 
   const chainId = ibcInfo ? ibcInfo.chain_id : ''
   const denom = ibcInfo ? ibcInfo.denom : ''
@@ -370,15 +371,8 @@ export const FlowBreakdown = ({
     };
   }, []);
 
-  useEffect(() => {
-    const resolveFeeLimit = async () => {
-      if (flow.trustlessAgent) {
-        flow.trustlessAgent.feeLimit = await resolveDenoms(flow.trustlessAgent.feeLimit);
-      }
-    };
+  const [ibcAssetList ] = useIBCAssetList()
 
-    resolveFeeLimit();
-  }, [flow.trustlessAgent?.feeLimit]);
   function handleRemoveMsg(index: number) {
 
 
@@ -689,8 +683,13 @@ export const FlowBreakdown = ({
                 </Text>
                 {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Setting a Fee Limit limits the fee charged for your execution on the host chain by the Trustless Agent"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
                 {flow.trustlessAgent.feeLimit?.length > 0 && flow.trustlessAgent.feeLimit.map((feeLimit: any) => (
-                  <Text variant="caption" > {convertMicroDenomToDenom(feeLimit.amount, 6)} {feeLimit.denom}</Text>
+                  <Text variant="caption" > {convertMicroDenomToDenom(feeLimit.amount, 6)} {resolveDenomSync(feeLimit.denom, ibcAssetList)}</Text>
                 ))}
+                <Text variant="legend" color="secondary" align="left">
+                  Trustless Agent Interchain Account
+                </Text>
+
+                <Text variant="body">{icaAddress} </Text>
 
               </>
             )}
@@ -1122,14 +1121,6 @@ export const FlowBreakdown = ({
             </>
           )
         }
-        <FlowHistory
-          rpc={ibcInfo?.rpc || process.env.NEXT_PUBLIC_INTO_RPC}
-          id={flow.id.toString()}
-          transformedMsgs={transformedMsgs}
-          trustlessAgentAddress={flow?.trustlessAgent?.agentAddress || ""}
-          showCreateGrants={(show: boolean) => setCreateGrants(show)}
-        />
-
         {createGrants && <AuthzGrantCheck
           flowInput={{
             msgs: transformedMsgs || [],
@@ -1140,16 +1131,25 @@ export const FlowBreakdown = ({
             conditions: flow.conditions,
             trustlessAgent: flow.trustlessAgent,
             // icaAddressForAuthZ: flow.icaAddressForAuthZ,
-            connectionId: flow.trustlessAgent?.connectionId,
+            connectionId: ibcInfo?.connection_id,
             // hostConnectionId: flow.trustlessAgent?.connectionId,
             chainId: chainId,
           }}
-          grantee={flow.trustlessAgent?.agentAddress || ""}
+          grantee={icaAddress}
           chainId={chainId}
           refetchAuthzGrants={() => { }}
           isAuthzGrantsLoading={false}
         />
         }
+        <FlowHistory
+          rpc={ibcInfo?.rpc || process.env.NEXT_PUBLIC_INTO_RPC}
+          id={flow.id.toString()}
+          transformedMsgs={transformedMsgs}
+          trustlessAgentAddress={flow?.trustlessAgent?.agentAddress || ""}
+          showCreateGrants={(show: boolean) => setCreateGrants(show)}
+        />
+
+
       </>
     </>
   )
@@ -1298,12 +1298,6 @@ export const FlowBreakdown = ({
       <Text variant="body">
         <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[icqConfig.timeoutPolicy]}
       </Text>
-      {icqConfig.response.length > 0 &&
-        <div style={{ marginTop: '16px' }}>
-          <Text variant="legend" color="secondary" align="left">Response</Text>
-          <Text>{JSON.stringify(icqConfig.response)}</Text>
-        </div>
-      }
     </>
   }
 }

@@ -43,6 +43,7 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
         connectionId,
         rpcClient,
       })
+
       return resp
     },
     {
@@ -50,9 +51,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
         connectionId != undefined &&
         rpcClient &&
         !!accAddr &&
-        accAddr.length > 40
+        accAddr.length > 30
       ),
-      refetchOnMount: false,
+      refetchOnMount: true,
       staleTime: 60000,
       cacheTime: 300000,
     }
