@@ -325,7 +325,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages, IBCAssetInfo }) => {
     <IntentTemplateChip
       label={`Autocompound if rewards > 1 ${chainSymbol}`}
       autoParse
-      description="Autocompound if rewards > 1. Uses a feedback loop to check if rewards are > 1 and compound them. Will stop when rewards are < 1. Continous smart autocompounding coming soon."
+      description={`Autocompound if rewards > 1. Uses a feedback loop to check if rewards are more than 1 and compound them. Will stop when rewards are less than 1. You can change these inputs. Continous smart autocompounding coming soon. Validator address should start with ${IBCAssetInfo.prefix}1.`}
       iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
       onClick={handleClick}
@@ -494,7 +494,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                         {
                           responseIndex: 0,
                           responseKey: "",
-                          operand: "5.000000000000000000",
+                          operand: "5.0",
                           operator: 3,
                           valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
                           icqConfig: {
@@ -516,7 +516,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
               <IntentTemplateChip
                 label="Compound if ATOM < $5"
                 autoParse
-                description="Compounds 1 ATOM if ATOM < $5. Uses a query to check the price of ATOM, this saves gas."
+                description={`Compounds all withdrawn rewards ATOM if ATOM < $5. Uses a query to check the price of ATOM, this saves gas. Validator address should start with ${IBCAssetInfo.prefix}1.`}
                 iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
                 gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
                 onClick={() => setAllMessages(
@@ -556,7 +556,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                         {
                           responseIndex: 0,
                           responseKey: "",
-                          operand: "5.000000000000000000",
+                          operand: "5.0",
                           operator: 3,
                           valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
                           icqConfig: {
@@ -680,7 +680,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                       {
                         responseIndex: 0,
                         responseKey: "",
-                        operand: "0.010000000000000000",
+                        operand: "0.01",
                         operator: 3,
                         valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
                         icqConfig: {
