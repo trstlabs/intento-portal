@@ -1,7 +1,12 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Inline, Tooltip } from 'junoblocks'
 import { generalExamples, wasmExamples, osmoExamples, elysExamples, intentoExamples } from '../ExampleMsgs'
 import { useValidators } from 'hooks/useValidators'
+
+import { useControlTheme } from 'junoblocks'
+import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
+import { Clock } from 'lucide-react'
+import { useIBCAssetInfo } from '../../../../hooks/useIBCAssetInfo'
 
 // Map of chain symbols to their icon URLs
 const chainIcons = {
@@ -17,11 +22,32 @@ const getChainIcon = (chainSymbol: string): string => {
   return chainIcons[chainSymbol] || 'https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg'
 }
 
-
 // IntentTemplateChip: visually distinct chip for preset flows
 function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, disabled = false, description, autoParse = false }: { label: string; iconUrl?: string; gradient: string; onClick?: () => void; soon?: boolean; disabled?: boolean; description?: string; autoParse?: boolean }) {
   const themeController = useControlTheme();
   const isDark = themeController.theme.name === 'dark';
+  // State to manage which tooltip to show
+  // track which tooltip should be mounted
+  const [activeTooltip, setActiveTooltip] = useState<"auto" | "description" | null>(null);
+
+  useEffect(() => {
+    if (autoParse) {
+      setActiveTooltip("auto");
+      const timer = setTimeout(() => setActiveTooltip(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [autoParse]);
+
+
+
+  const handleMouseEnter = (tooltipType: 'auto' | 'description') => {
+    setActiveTooltip(tooltipType);
+  };
+
+  const handleMouseLeave = () => {
+    setActiveTooltip(null);
+  };
+
   // Optionally darken the gradient for dark mode, or just use the same gradient
   const darkGradient = gradient.includes('#')
     ? gradient.replace(/#[0-9a-fA-F]{6}/g, m => {
@@ -125,6 +151,8 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
                   fontSize: 10,
                   fontWeight: 700
                 }}
+                onMouseEnter={() => handleMouseEnter('auto')}
+                onMouseLeave={handleMouseLeave}
               >
                 ✨ auto
               </span>
@@ -165,23 +193,17 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
     </div>
   );
 
-  return description ? (
-    <Tooltip label={description} aria-label={`About ${label}`}>
-      <div style={{ display: 'inline-block', maxWidth: '100%' }}>
-        {ChipBody}
-      </div>
+  // only wrap in description Tooltip if auto one isn't active
+  return description && activeTooltip !== "auto" ? (
+    <Tooltip label={description}>
+      <div style={{ display: "inline-block", maxWidth: "100%" }}>{ChipBody}</div>
     </Tooltip>
   ) : (
-    <div style={{ display: 'inline-block', maxWidth: '100%' }}>
-      {ChipBody}
-    </div>
+    <div style={{ display: "inline-block", maxWidth: "100%" }}>{ChipBody}</div>
   );
 }
 
-import { useControlTheme } from 'junoblocks'
-import { Duration } from 'intentojs/dist/codegen/google/protobuf/duration'
-import { Clock } from 'lucide-react'
-import { useIBCAssetInfo } from '../../../../hooks/useIBCAssetInfo'
+
 
 function Chip({ label, onClick, icon }) {
   const themeController = useControlTheme();
@@ -245,7 +267,6 @@ function Chip({ label, onClick, icon }) {
     </div>
   );
 }
-
 
 
 
