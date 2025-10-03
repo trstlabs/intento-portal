@@ -147,7 +147,6 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
                   padding: '2px 6px',
                   borderRadius: 10,
                   background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.25)',
-                  color: isDark ? '#e2e8f0' : '#1a202c',
                   fontSize: 10,
                   fontWeight: 700
                 }}
