@@ -688,7 +688,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                           timeoutPolicy: 2,
                           timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
                           queryType: "store/twap/key",
-                          queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMzEzOHwiaWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
+                          queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDMxMzh8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
                         }
                       }
                     ],
