@@ -107,195 +107,198 @@ export const FlowHistory = ({
   return (
 
     <>
-      {flowHistory && flowHistory.length > 0 && (
 
-        <Row>
-          <Column gap={8} align="flex-start" justifyContent="flex-start">
-            <Inline>
 
-              <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
-                Execution History
-              </Text>
-            </Inline>
-            {flowHistory
-              ?.slice(0).filter((entry, index, self) => self.findIndex(e => e.scheduledExecTime === entry.scheduledExecTime) === index)
-              .map(
-                (
-                  {
-                    execFee,
-                    actualExecTime,
-                    scheduledExecTime,
-                    msgResponses,
-                    executed,
-                    errors,
-                    timedOut,
-                    queryResponses,
-                    packetSequences
-                  },
-                  index
-                ) => (
+      <Row>
+        <Column gap={8} align="flex-start" justifyContent="flex-start">
+          <Inline>
 
-                  <div key={index}>
-                    <Column
-                      gap={2}
-                      align="flex-start"
-                      justifyContent="flex-start"
-                    >
-                      <Column>
-                        <Text variant="body">
-                          At {getRelativeTime(actualExecTime.getTime())}{' '}
-                        </Text>
-                      </Column>
-                      {actualExecTime.getTime() -
-                        scheduledExecTime.getTime() >=
-                        120000 && (
-                          <Column>
-                            <Text variant="caption" style={{ fontStyle: 'italic' }}>
-                              Planned for {scheduledExecTime.toLocaleString()}. Execution was delayed (possibly due to a halt in block production or IBC relayer downtime).
-                            </Text>
-                          </Column>
-                        )}
-                      {execFee && execFee.length > 0 && execFee.map((fee) => (
+            <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+              Execution History
+            </Text>
+          </Inline>
+          {flowHistory
+            ?.slice(0).filter((entry, index, self) => self.findIndex(e => e.scheduledExecTime === entry.scheduledExecTime) === index)
+            .map(
+              (
+                {
+                  execFee,
+                  actualExecTime,
+                  scheduledExecTime,
+                  msgResponses,
+                  executed,
+                  errors,
+                  timedOut,
+                  queryResponses,
+                  packetSequences
+                },
+                index
+              ) => (
+
+                <div key={index}>
+                  <Column
+                    gap={2}
+                    align="flex-start"
+                    justifyContent="flex-start"
+                  >
+                    <Column>
+                      <Text variant="body">
+                        At {getRelativeTime(actualExecTime.getTime())}{' '}
+                      </Text>
+                    </Column>
+                    {actualExecTime.getTime() -
+                      scheduledExecTime.getTime() >=
+                      120000 && (
                         <Column>
-                          <Text variant="caption">
-                            Exec Fee:{' '}
-                            {convertMicroDenomToDenom(fee.amount, 6)} {resolveDenomSync(fee.denom, ibcAssetList)}
+                          <Text variant="caption" style={{ fontStyle: 'italic' }}>
+                            Planned for {scheduledExecTime.toLocaleString()}. Execution was delayed (possibly due to a halt in block production or IBC relayer downtime).
                           </Text>
                         </Column>
-                      ))}
-
-
-
+                      )}
+                    {execFee && execFee.length > 0 && execFee.map((fee) => (
                       <Column>
                         <Text variant="caption">
-                          Executed: {executed ? <>🟢</> :
-                            (Date.now() - actualExecTime.valueOf() >
-                              60000 && !timedOut ? (
-                                <>🔴</>
-                              ) || errors[0] : (timedOut ?
-                                <>⏱️</> : <>⌛</>
-                            ))}
+                          Exec Fee:{' '}
+                          {convertMicroDenomToDenom(fee.amount, 6)} {resolveDenomSync(fee.denom, ibcAssetList)}
                         </Text>
-                        {errors.map((err, i) => {
-                          // Check for AuthZ permission errors
-                          const isAuthZError = err.includes('error handling packet on host chain') &&
-                            (err.includes('ABCI code: 2:'));
-                          const isWasmError = err.includes('error handling packet on host chain') && transformedMsgs?.find((msg) => msg.includes('.wasm.')) &&
-                            (err.includes('ABCI code: 5:'));
-
-                          return (
-                            <Column key={i}>
-                              <Text variant="legend" style={{ paddingTop: '4px' }}>
-                                {isAuthZError ? 'AuthZ authorization lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
-                              </Text>
-                              {isAuthZError && index === 0 && (
-                                <Inline css={{ marginTop: '$2' }}>
-                                  <Button size="small" variant="secondary" onClick={() => showCreateGrants?.(true)}>
-                                    Authorization
-                                  </Button>
-                                </Inline>
-                              )}
-                            </Column>
-                          );
-                        })}
-                        {timedOut && (
-                          <Text variant="legend">
-                            Timed out relaying IBC packets for this execution
-                          </Text>
-                        )}
                       </Column>
-                      <Column>
-                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Received: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
-                          <Link key={i} href={`${rpc}/tx_search?query="recv_packet.packet_sequence=${packetSequence} AND recv_packet.packet_src_port='icacontroller-${trustlessAgentAddress}'"`} target="_blank">
-                            {Number(packetSequence)}
-                            {i < packetSequences.length - 1 ? ', ' : ''}
-                          </Link>
+                    ))}
 
-                        ))}</Text>}
-                        {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Acknowledgement{packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
-                          <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
-                            {Number(packetSequence)}
-                            {i < packetSequences.length - 1 ? ', ' : ''}
-                          </Link>
 
-                        ))}</Text>}
 
-                        {queryResponses.map((queryResponse, i) => (
+                    <Column>
+                      <Text variant="caption">
+                        Executed: {executed ? <>🟢</> :
+                          (Date.now() - actualExecTime.valueOf() >
+                            60000 && !timedOut ? (
+                              <>🔴</>
+                            ) || errors[0] : (timedOut ?
+                              <>⏱️</> : <>⌛</>
+                          ))}
+                      </Text>
+                      {errors.map((err, i) => {
+                        // Check for AuthZ permission errors
+                        const isAuthZError = err.includes('error handling packet on host chain') &&
+                          (err.includes('ABCI code: 2:'));
+                        const isWasmError = err.includes('error handling packet on host chain') && transformedMsgs?.find((msg) => msg.includes('.wasm.')) &&
+                          (err.includes('ABCI code: 5:'));
+
+                        return (
                           <Column key={i}>
-                            <Inline css={{ alignItems: 'center', gap: '$2' }}>
-                              <Text
-                                variant="caption"
-                                css={{ overflowWrap: 'anywhere', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}
-                              >
-                                Query Response: {(() => {
-                                  const str = JSON.stringify(queryResponse);
-                                  return str && str.length > 60 ? str.substring(0, 60) + '...' : str;
-                                })()}
-                              </Text>
-                              <Button
-                                variant="ghost"
-                                size="small"
-                                onClick={() => setOpenQueryIdx(openQueryIdx === i ? null : i)}
-                              >
-                                {openQueryIdx === i ? 'Hide' : 'Show full'}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="small"
-                                onClick={() => navigator.clipboard.writeText(JSON.stringify(queryResponse, null, 2))}
-                              >
-                                Copy
-                              </Button>
-                            </Inline>
-                            {openQueryIdx === i && (
-                              <Card css={{ padding: '$4', marginTop: '$2', maxHeight: '320px', overflow: 'auto' }}>
-                                <pre style={{ margin: 0, fontSize: '12px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                                  {JSON.stringify(queryResponse, null, 2)}
-                                </pre>
-                              </Card>
+                            <Text variant="legend" style={{ paddingTop: '4px' }}>
+                              {isAuthZError ? 'AuthZ authorization lacking' : isWasmError ? 'CosmWasm contract did not execute with a succesful result' : err}
+                            </Text>
+                            {isAuthZError && index === 0 && (
+                              <Inline css={{ marginTop: '$2' }}>
+                                <Button size="small" variant="secondary" onClick={() => showCreateGrants?.(true)}>
+                                  Authorization
+                                </Button>
+                              </Inline>
                             )}
                           </Column>
-                        ))}
-                      </Column>
+                        );
+                      })}
+                      {timedOut && (
+                        <Text variant="legend">
+                          Timed out relaying IBC packets for this execution
+                        </Text>
+                      )}
+                    </Column>
+                    <Column>
+                      {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Received: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                        <Link key={i} href={`${rpc}/tx_search?query="recv_packet.packet_sequence=${packetSequence} AND recv_packet.packet_src_port='icacontroller-${trustlessAgentAddress}'"`} target="_blank">
+                          {Number(packetSequence)}
+                          {i < packetSequences.length - 1 ? ', ' : ''}
+                        </Link>
 
-                      {msgResponses.map((msg: any, i) => (
-                        <div key={i}>
-                          <Card css={{ padding: '$6', marginTop: '$4' }} variant="secondary" disabled>
-                            <Column gap={8} align="flex-start" justifyContent="flex-start">
-                              <Text variant="legend" color="secondary" align="left">
-                                Message Response
-                              </Text>
-                              <Text variant="caption" >{msg.typeUrl} ✓ </Text>
+                      ))}</Text>}
+                      {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Acknowledgement{packetSequences.length > 1 ? 's' : ''}: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
+                        <Link key={i} href={process.env.NEXT_PUBLIC_INTO_RPC + `/tx_search?query="acknowledge_packet.packet_sequence=${packetSequence}"`} target="_blank">
+                          {Number(packetSequence)}
+                          {i < packetSequences.length - 1 ? ', ' : ''}
+                        </Link>
 
-                              {msg.value.length != 0 && (
-                                <>
-                                  <Text variant="legend" color="secondary" align="left">
-                                    Message Response Value
-                                  </Text>
-                                  <Text variant="caption">
-                                    {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), (_key, value) =>
-                                      typeof value === 'bigint'
-                                        ? value.toString()
-                                        : value // return everything else unchanged
-                                      , 2)}
-                                  </Text>
-                                </>
-                              )}
-                            </Column>
-                          </Card>
+                      ))}</Text>}
 
-                        </div>))}
+                      {queryResponses.map((queryResponse, i) => (
+                        <Column key={i}>
+                          <Inline css={{ alignItems: 'center', gap: '$2' }}>
+                            <Text
+                              variant="caption"
+                              css={{ overflowWrap: 'anywhere', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}
+                            >
+                              Query Response: {(() => {
+                                const str = JSON.stringify(queryResponse);
+                                return str && str.length > 60 ? str.substring(0, 60) + '...' : str;
+                              })()}
+                            </Text>
+                            <Button
+                              variant="ghost"
+                              size="small"
+                              onClick={() => setOpenQueryIdx(openQueryIdx === i ? null : i)}
+                            >
+                              {openQueryIdx === i ? 'Hide' : 'Show full'}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="small"
+                              onClick={() => navigator.clipboard.writeText(JSON.stringify(queryResponse, null, 2))}
+                            >
+                              Copy
+                            </Button>
+                          </Inline>
+                          {openQueryIdx === i && (
+                            <Card css={{ padding: '$4', marginTop: '$2', maxHeight: '320px', overflow: 'auto' }}>
+                              <pre style={{ margin: 0, fontSize: '12px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                                {JSON.stringify(queryResponse, null, 2)}
+                              </pre>
+                            </Card>
+                          )}
+                        </Column>
+                      ))}
                     </Column>
 
+                    {msgResponses.map((msg: any, i) => (
+                      <div key={i}>
+                        <Card css={{ padding: '$6', marginTop: '$4' }} variant="secondary" disabled>
+                          <Column gap={8} align="flex-start" justifyContent="flex-start">
+                            <Text variant="legend" color="secondary" align="left">
+                              Message Response
+                            </Text>
+                            <Text variant="caption" >{msg.typeUrl} ✓ </Text>
 
-                  </div>
-                )
-              )}
-            {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
-          </Column>
-        </Row>
+                            {msg.value.length != 0 && (
+                              <>
+                                <Text variant="legend" color="secondary" align="left">
+                                  Message Response Value
+                                </Text>
+                                <Text variant="caption">
+                                  {JSON.stringify(GlobalDecoderRegistry.unwrapAny(msg), (_key, value) =>
+                                    typeof value === 'bigint'
+                                      ? value.toString()
+                                      : value // return everything else unchanged
+                                    , 2)}
+                                </Text>
+                              </>
+                            )}
+                          </Column>
+                        </Card>
 
-      )}
+                      </div>))}
+                  </Column>
+
+
+                </div>
+              )
+            )}
+          {
+            !flowHistory.length && (
+              <Text variant="caption" align="center">No history found (yet). Executions will show up here.</Text>
+            )
+          }
+          {fetchedHistory && fetchedHistory.pagination && fetchedHistory.pagination.nextKey.length > 1 && (<Button onClick={fetchNextPage} variant="ghost" size="large"> {fetchNext || isHistoryLoading ? <Spinner instant /> : <>View more</>}</Button>)}
+        </Column>
+      </Row>
 
     </>
 
