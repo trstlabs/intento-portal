@@ -32,8 +32,7 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
-import { Globe } from 'lucide-react'
-import { File } from 'lucide-react'
+import { Globe, File,  } from 'lucide-react'
 
 
 type NavigationSidebarProps = {
