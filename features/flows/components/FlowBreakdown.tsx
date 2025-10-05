@@ -993,8 +993,8 @@ export const FlowBreakdown = ({
                 </div>
               ) : (
                 <>
-                  <div style={{ display: 'flex', marginBottom: '10px' }}>
-                    <Tooltip label="Compare responses to determine if execution should take place">
+                  <Inline>
+                    <Tooltip label="Compare message responses or query responses to determine if execution should take place">
                       <Text variant="title" align="left" style={{ fontWeight: '600' }}>
                         Comparison
                       </Text>
@@ -1002,39 +1002,57 @@ export const FlowBreakdown = ({
                     <Button
                       variant="ghost"
                       size="small"
-                      onClick={() => setEditingComparisonIndex(index)}
-                    >
-                      Edit
-                    </Button>
-                  </div>
+                      onClick={() => toggleAdminSectionExpansion(`comparison-${index}`)}
+                      icon={
+                        <IconWrapper
+                          size="medium"
+                          rotation={expandedAdminSections.has(`comparison-${index}`) ? "90deg" : "-90deg"}
+                          color="tertiary"
+                          icon={<Chevron />}
+                        />
+                      }
+                    />
+                  </Inline>
 
-                  <>
-                    {comparison.flowId.toString() !== "0" && (
-                      <Text variant="body">
-                        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">ID</Text> {comparison.flowId.toString()}
-                      </Text>
-                    )}
-                    {comparison.responseIndex !== undefined && comparison.responseIndex !== 0 && (
-                      <Text variant="body">
-                        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response Index</Text> {comparison.responseIndex}
-                      </Text>
-                    )}
-                    {comparison.responseKey && (
-                      <Text variant="body">
-                        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response Key</Text> {comparison.responseKey}
-                      </Text>
-                    )}
-                    <Text variant="body">
-                      <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Comparison Operator</Text> {ComparisonOperatorLabels[comparison.operator]}
-                    </Text>
-                    <Text variant="body">
-                      <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Comparison Operand</Text> {comparison.operand}
-                    </Text>
-                    <Text variant="body">
-                      <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
-                    </Text>
-                  </>
-                  {comparison.icqConfig && icqConfig(comparison.icqConfig)}
+                  {expandedAdminSections.has(`comparison-${index}`) && (
+                    <>
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        onClick={() => setEditingComparisonIndex(index)}
+                      >
+                        Edit
+                      </Button>
+
+                      <>
+                        {comparison.flowId.toString() !== "0" && (
+                          <Text variant="body">
+                            <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">ID</Text> {comparison.flowId.toString()}
+                          </Text>
+                        )}
+                        {comparison.responseIndex !== undefined && comparison.responseIndex !== 0 && (
+                          <Text variant="body">
+                            <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response Index</Text> {comparison.responseIndex}
+                          </Text>
+                        )}
+                        {comparison.responseKey && (
+                          <Text variant="body">
+                            <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Response Key</Text> {comparison.responseKey}
+                          </Text>
+                        )}
+                        <Text variant="body">
+                          <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Comparison Operator</Text> {ComparisonOperatorLabels[comparison.operator]}
+                        </Text>
+                        <Text variant="body">
+                          <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Comparison Operand</Text> {comparison.operand}
+                        </Text>
+                        <Text variant="body">
+                          <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
+                        </Text>
+                      </>
+                      {comparison.icqConfig && icqConfig(comparison.icqConfig)}
+                    </>
+                  )}
                 </>
               )}
             </div>
@@ -1047,40 +1065,58 @@ export const FlowBreakdown = ({
             <Column gap={4} align="flex-start" justifyContent="flex-start">
               <Tooltip
                 label={
-                  "Use a response value as a value for a message"
+                  "Use a response value or query response as a value for a message"
                 }
               >
-                <Text variant="title" align="left" style={{ fontWeight: '600' }}>
-                  Feedback Loop  🔁
-                </Text>
+                <Inline>
+                  <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+                    Feedback Loop
+                  </Text>
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    onClick={() => toggleAdminSectionExpansion(`feedback-${feedbackLoop.flowId}`)}
+                    icon={
+                      <IconWrapper
+                        size="medium"
+                        rotation={expandedAdminSections.has(`feedback-${feedbackLoop.flowId}`) ? "90deg" : "-90deg"}
+                        color="tertiary"
+                        icon={<Chevron />}
+                      />
+                    }
+                  />
+                </Inline>
               </Tooltip>
 
+              {expandedAdminSections.has(`feedback-${feedbackLoop.flowId}`) && (
+                <>
+                  {feedbackLoop.flowId.toString() != "0" && (
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
+                    </Text>)}
+                  {feedbackLoop.responseIndex != 0 &&
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
+                    </Text>
+                  }
+                  {feedbackLoop.responseKey != "" &&
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
+                    </Text>}
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
+                  </Text>
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left"> Key in message to replace</Text>  {feedbackLoop.msgKey}
+                  </Text>
 
-              {feedbackLoop.flowId.toString() != "0" && (
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
-                </Text>)}
-              {feedbackLoop.responseIndex != 0 &&
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
-                </Text>
-              }
-              {feedbackLoop.responseKey != "" &&
-                <Text variant="body">
-                  <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
-                </Text>}
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
-              </Text>
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left"> Key in message to replace</Text>  {feedbackLoop.msgKey}
-              </Text>
-
-              <Text variant="body">
-                <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
-              </Text>
-              {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))
-              }
+                  <Text variant="body">
+                    <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
+                  </Text>
+                  {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))
+                  }
+                </>
+              )}
             </Column>
           </Row>
           </>
@@ -1233,6 +1269,7 @@ export const FlowBreakdown = ({
           transformedMsgs={transformedMsgs}
           trustlessAgentAddress={flow?.trustlessAgent?.agentAddress || ""}
           showCreateGrants={(show: boolean) => setCreateGrants(show)}
+          ibcAssetList={ibcAssetList}
         />
 
 

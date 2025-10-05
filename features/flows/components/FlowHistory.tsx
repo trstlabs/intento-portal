@@ -6,6 +6,7 @@ import {
   Text,
   Spinner,
   Card,
+  Divider,
 } from 'junoblocks'
 
 import React from 'react'
@@ -28,7 +29,7 @@ type FlowHistoryProps = {
   rpc?: string
   trustlessAgentAddress?: string
   showCreateGrants?: (show: boolean) => void
-  ibcAssetList?: IBCAssetInfo[]
+  ibcAssetList: IBCAssetInfo[]
 }
 
 export const FlowHistory = ({
@@ -137,7 +138,7 @@ export const FlowHistory = ({
 
                 <div key={index}>
                   <Column
-                    gap={2}
+                    gap={4}
                     align="flex-start"
                     justifyContent="flex-start"
                   >
@@ -158,15 +159,15 @@ export const FlowHistory = ({
                     {execFee && execFee.length > 0 && execFee.map((fee) => (
                       <Column>
                         <Text variant="caption">
-                          Exec Fee:{' '}
-                          {convertMicroDenomToDenom(fee.amount, 6)} {resolveDenomSync(fee.denom, ibcAssetList)}
+                        Fee:
+                          { ' '} {convertMicroDenomToDenom(fee.amount, 6)} {resolveDenomSync(fee.denom, ibcAssetList)}
                         </Text>
                       </Column>
                     ))}
 
 
 
-                    <Column>
+               
                       <Text variant="caption">
                         Executed: {executed ? <>🟢</> :
                           (Date.now() - actualExecTime.valueOf() >
@@ -203,8 +204,7 @@ export const FlowHistory = ({
                           Timed out relaying IBC packets for this execution
                         </Text>
                       )}
-                    </Column>
-                    <Column>
+                
                       {packetSequences != undefined && packetSequences.length > 0 && <Text variant="caption"> Packet{packetSequences.length > 1 ? 's' : ''} Received: {packetSequences != undefined && packetSequences.length > 0 && packetSequences.map((packetSequence, i) => (
                         <Link key={i} href={`${rpc}/tx_search?query="recv_packet.packet_sequence=${packetSequence} AND recv_packet.packet_src_port='icacontroller-${trustlessAgentAddress}'"`} target="_blank">
                           {Number(packetSequence)}
@@ -249,14 +249,14 @@ export const FlowHistory = ({
                           </Inline>
                           {openQueryIdx === i && (
                             <Card css={{ padding: '$4', marginTop: '$2', maxHeight: '320px', overflow: 'auto' }}>
-                              <pre style={{ margin: 0, fontSize: '12px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                              <Text variant="caption"> <pre style={{ margin: 0, fontSize: '8px', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                                 {JSON.stringify(queryResponse, null, 2)}
-                              </pre>
+                              </pre></Text>
                             </Card>
                           )}
                         </Column>
                       ))}
-                    </Column>
+                   
 
                     {msgResponses.map((msg: any, i) => (
                       <div key={i}>
@@ -287,7 +287,9 @@ export const FlowHistory = ({
                       </div>))}
                   </Column>
 
-
+                          { index !== flowHistory.length - 1 && (
+                          <Divider css={{ marginTop: '20px', marginBottom: '10px' }} />
+                          )}
                 </div>
               )
             )}

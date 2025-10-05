@@ -60,7 +60,6 @@ interface IBCAssetInfo {
 
 export function resolveDenomSync(denom: string, ibcAssets?: IBCAssetInfo[]): string {
   if (!denom.toLowerCase().startsWith('ibc/')) return formatDenom(denom);
-  
   // If IBC assets list is provided, try to find a match
   if (ibcAssets?.length) {
     const matchingAsset = ibcAssets.find(
@@ -69,12 +68,10 @@ export function resolveDenomSync(denom: string, ibcAssets?: IBCAssetInfo[]): str
         asset.denom_local === denom ||
         (denom.startsWith('ibc/') && asset.denom.endsWith(denom.split('/').pop()!))
     );
-
     if (matchingAsset) {
       return matchingAsset.symbol;
     }
   }
-
   // Fallback to just formatting the denom if no match found
   return formatDenom(denom);
 }
