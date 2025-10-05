@@ -31,7 +31,7 @@ import { TokenSelector } from '../../send/components/TokenSelector'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from '../../../hooks/useChainList'
 import { TrustlessAgent } from 'intentojs/dist/codegen/intento/intent/v1/trustless_agent'
-import { EditExecutionSection } from '../../flows/components/EditExecutionSection'
+import { EditSchedulingSection } from '../../flows/components/EditSchedulingSection'
 import { FlowSummary } from './FlowSummary'
 
 interface SubmitFlowDialogProps {
@@ -212,7 +212,7 @@ export const SubmitFlowDialog = ({
               variant="secondary" disabled
             >
 
-              <EditExecutionSection
+              <EditSchedulingSection
                 updatedFlowParams={executionParams}
                 setUpdateFlow={setUpdateExecutionParams}
               />

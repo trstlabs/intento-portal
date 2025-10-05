@@ -45,7 +45,7 @@ import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { Share } from 'lucide-react'
-import { EditExecutionSection } from './EditExecutionSection'
+import { EditSchedulingSection } from './EditSchedulingSection'
 import { convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
 import { XTwitter } from '../../../icons/XTwitter'
 import { AuthzGrantCheck } from '../../build/components/AuthzGrantCheck'
@@ -123,7 +123,33 @@ export const FlowBreakdown = ({
 
   const [transformedMsgs, setTransformedMsgs] = useState<string[]>([])
 
-  // Safely parse JSON with error handling
+  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
+
+  const [expandedAdminSections, setExpandedAdminSections] = useState<Set<string>>(new Set())
+
+  // Function to toggle admin section expansion
+  const toggleAdminSectionExpansion = (sectionName: string) => {
+    setExpandedAdminSections(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(sectionName)) {
+        newSet.delete(sectionName)
+      } else {
+        newSet.add(sectionName)
+      }
+      return newSet
+    })
+  }
+  const toggleMessageExpansion = (msgIndex: number) => {
+    setExpandedMessages(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(msgIndex)) {
+        newSet.delete(msgIndex)
+      } else {
+        newSet.add(msgIndex)
+      }
+      return newSet
+    })
+  }
   const safeJsonParse = useCallback((jsonString: string | undefined) => {
     if (!jsonString) return null;
     try {
@@ -371,7 +397,7 @@ export const FlowBreakdown = ({
     };
   }, []);
 
-  const [ibcAssetList ] = useIBCAssetList()
+  const [ibcAssetList] = useIBCAssetList()
 
   function handleRemoveMsg(index: number) {
 
@@ -507,44 +533,117 @@ export const FlowBreakdown = ({
           </Button>}
           <FlowTransformButton flow={flow} initialChainID={chainId} />
         </Inline>
+
+
         <Row>
-          <Inline
-            style={{
-              wordBreak: 'break-word',
-            }}
+          <Column
+            css={{ padding: '$3' }}
+            gap={8}
+            align="flex-start"
+            justifyContent="flex-start"
           >
-            <Column
-              css={{ padding: '$3' }}
-              gap={8}
-              align="flex-start"
-              justifyContent="flex-start"
+            <Text variant="legend" color="secondary" align="left">
+              Owner
+            </Text>
+
+            <Text variant="body">{flow.owner} </Text>
+            <Tooltip
+              label={
+                "Address that can be funded to pay for execution fees. When self-hosting an Interchain Account, it is based on this unique address."
+              }
             >
-              <Text variant="legend" color="secondary" align="left">
-                Owner
-              </Text>
-
-              <Text variant="body">{flow.owner} </Text>
-            </Column>
-            {flow.selfHostedIca.portId && (
-              /* (icaActive && !isIcaActiveLoading ?  */
-              <Column
-                css={{ padding: '$3' }}
-                gap={8}
-                align="flex-start"
-                justifyContent="flex-start"
-              >
+              <Inline>
                 <Text variant="legend" color="secondary" align="left">
-                  IBC Port
+                  Flow Address
                 </Text>
+                <Button
+                  variant="ghost"
+                  size="small"
+                  onClick={() => toggleAdminSectionExpansion('flowAddress')}
+                  icon={
+                    <IconWrapper
+                      size="medium"
+                      rotation={expandedAdminSections.has('flowAddress') ? "90deg" : "-90deg"}
+                      color="tertiary"
+                      icon={<Chevron />}
+                    />
+                  }
+                />
+              </Inline>
+            </Tooltip>
 
-                <Text variant="body">{flow.selfHostedIca.portId} </Text>
-              </Column>
+            {expandedAdminSections.has('flowAddress') && (
+              <>
+                <Inline gap={2}>
+                  <Text css={{ wordBreak: 'break-all' }} variant="body">
+                    {flow.feeAddress}{' '}
+                  </Text>
+                </Inline>
+                {!isFeeBalanceLoading && feeBalance > 0 && (
+                  <Text variant="legend">
+                    {' '}
+                    Balance: <Text variant="caption"> {feeBalance} INTO</Text>{' '}
+                  </Text>
+                )}
+              </>
             )}
 
-          </Inline>
+            {flow.trustlessAgent.agentAddress && (
+              /* (icaActive && !isIcaActiveLoading ?  */
+              <>
+                <Tooltip
+                  label={
+                    "Address of the Trustless Agent that is used to execute flows on the target chain. A Trustless Agent is an Interchain Account with a fee configuration."
+                  }
+                >
+                  <Inline>
+                    <Text variant="legend" color="secondary" align="left">
+                      Trustless Agent
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      onClick={() => toggleAdminSectionExpansion('trustlessAgent')}
+                      icon={
+                        <IconWrapper
+                          size="medium"
+                          rotation={expandedAdminSections.has('trustlessAgent') ? "90deg" : "-90deg"}
+                          color="tertiary"
+                          icon={<Chevron />}
+                        />
+                      }
+                    />
+                  </Inline>
+                </Tooltip>
+
+                {expandedAdminSections.has('trustlessAgent') && (
+                  <>
+                    <Text css={{ wordBreak: 'break-all' }} variant="body">
+                      {flow.trustlessAgent.agentAddress}{' '}<a
+                        target={'_blank'}
+                        href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/trustless-agent/${flow.trustlessAgent.agentAddress}`}
+                        rel="noopener noreferrer"
+                      >
+                        <b>View Configuration</b>
+                      </a>
+                    </Text>
+                    {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Setting a Fee Limit limits the fee charged for your execution on the host chain by the Trustless Agent"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
+                    {flow.trustlessAgent.feeLimit?.length > 0 && flow.trustlessAgent.feeLimit.map((feeLimit: any) => (
+                      <Text variant="caption" > {convertMicroDenomToDenom(feeLimit.amount, 6)} {resolveDenomSync(feeLimit.denom, ibcAssetList)}</Text>
+                    ))}
+                    <Text variant="legend" color="secondary" align="left">
+                      Interchain Account
+                    </Text>
+
+                    <Text variant="body">{icaAddress} </Text>
+                  </>
+                )}
+              </>
+            )}
+          </Column>
         </Row>
 
-        {icaAddress && icaBalance && flow.selfHostedIca && (
+        {icaAddress && icaBalance != 0 && flow.selfHostedIca?.connectionId !== undefined && (
           <Row>
             <Column
               style={{
@@ -557,6 +656,37 @@ export const FlowBreakdown = ({
               align="flex-start"
               justifyContent="flex-start"
             >
+              {flow.selfHostedIca.portId && (
+                <Column
+                  css={{ padding: '$3' }}
+                  gap={8}
+                  align="flex-start"
+                  justifyContent="flex-start"
+                >
+                  <Inline>
+                    <Text variant="legend" color="secondary" align="left">
+                      IBC Port
+                    </Text>
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      onClick={() => toggleAdminSectionExpansion('ibcPort')}
+                      icon={
+                        <IconWrapper
+                          size="medium"
+                          rotation={expandedAdminSections.has('ibcPort') ? "90deg" : "-90deg"}
+                          color="tertiary"
+                          icon={<Chevron />}
+                        />
+                      }
+                    />
+                  </Inline>
+
+                  {expandedAdminSections.has('ibcPort') && (
+                    <Text variant="body">{flow.selfHostedIca.portId} </Text>
+                  )}
+                </Column>
+              )}
               <Text variant="legend" color="secondary" align="left">
                 Interchain Account
               </Text>
@@ -636,65 +766,7 @@ export const FlowBreakdown = ({
             </Column>
           </Row>
         )}
-        <Row>
-          <Column gap={8} align="flex-start" justifyContent="flex-start">
-            <Tooltip
-              label={
-                "Address that can be funded to pay for execution fees. When self-hosting an Interchain Account, it is based on this unique address."
-              }
-            >
 
-              <Text variant="legend" color="secondary" align="left">
-                Flow Address
-              </Text>
-            </Tooltip>
-            <Inline gap={2}>
-              <Text css={{ wordBreak: 'break-all' }} variant="body">
-                {flow.feeAddress}{' '}
-              </Text>
-            </Inline>
-            {!isFeeBalanceLoading && feeBalance > 0 && (
-              <Text variant="legend">
-                {' '}
-                Balance: <Text variant="caption"> {feeBalance} INTO</Text>{' '}
-              </Text>
-            )}
-
-            {flow.trustlessAgent.agentAddress && (
-              /* (icaActive && !isIcaActiveLoading ?  */
-              <>
-                <Tooltip
-                  label={
-                    "Address of the Trustless Agent that is used to execute flows on the target chain. A Trustless Agent is an Interchain Account with a fee configuration."
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Trustless Agent Address
-                  </Text></Tooltip>
-
-                <Text css={{ wordBreak: 'break-all' }} variant="body">
-                  {flow.trustlessAgent.agentAddress}{' '}<a
-                    target={'_blank'}
-                    href={`${process.env.NEXT_PUBLIC_INTO_API}/intento/intent/v1/trustless-agent/${flow.trustlessAgent.agentAddress}`}
-                    rel="noopener noreferrer"
-                  >
-                    <b>View Configuration</b>
-                  </a>
-                </Text>
-                {flow.trustlessAgent.feeLimit && flow.trustlessAgent.feeLimit.length > 0 && <Tooltip label="Setting a Fee Limit limits the fee charged for your execution on the host chain by the Trustless Agent"><Text variant="legend" color="secondary"> Fee Limit </Text></Tooltip>}
-                {flow.trustlessAgent.feeLimit?.length > 0 && flow.trustlessAgent.feeLimit.map((feeLimit: any) => (
-                  <Text variant="caption" > {convertMicroDenomToDenom(feeLimit.amount, 6)} {resolveDenomSync(feeLimit.denom, ibcAssetList)}</Text>
-                ))}
-                <Text variant="legend" color="secondary" align="left">
-                  Trustless Agent Interchain Account
-                </Text>
-
-                <Text variant="body">{icaAddress} </Text>
-
-              </>
-            )}
-          </Column>
-        </Row>
         {flow.msgs.map((msg: any, msgIndex) => (
           <div key={msgIndex}>
             <Row>
@@ -711,28 +783,43 @@ export const FlowBreakdown = ({
                     <Text variant="legend" color="secondary" align="left">
                       Message Value
                     </Text>
-
-                    {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
-                      <Button
-                        variant="ghost"
-                        size="small"
-                        onClick={() => showEditor(editorIndex != msgIndex, msgIndex)}
-                      >
-                        {editorIndex != msgIndex ? 'Edit' : 'Discard'}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="small"
-                        onClick={() => {
-                          showEditor(editorIndex != msgIndex, msgIndex)
-                        }}
-                      >
-                        {editorIndex != msgIndex ? 'Edit' : 'Discard'}
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      onClick={() => toggleMessageExpansion(msgIndex)}
+                      icon={
+                        <IconWrapper
+                          size="medium"
+                          rotation={expandedMessages.has(msgIndex) ? "90deg" : "-90deg"}
+                          color="tertiary"
+                          icon={<Chevron />}
+                        />
+                      }
+                    />
+                    {expandedMessages.has(msgIndex) &&
+                      <> {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
+                        <Button
+                          variant="ghost"
+                          size="small"
+                          onClick={() => showEditor(editorIndex != msgIndex, msgIndex)}
+                        >
+                          {editorIndex != msgIndex ? 'Edit' : 'Discard'}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="small"
+                          onClick={() => {
+                            showEditor(editorIndex != msgIndex, msgIndex)
+                          }}
+                        >
+                          {editorIndex != msgIndex ? 'Edit' : 'Discard'}
+                        </Button>
+                      )}
+                      </>
+                    }
                   </Inline>
-                  <Inline gap={2}>
+                  {expandedMessages.has(msgIndex) && <Inline gap={2}>
                     {editorIndex == msgIndex && editMsgs && editMsgs[msgIndex] ? (
                       <div style={{ width: '100%' }}>
                         <JsonFormWrapper
@@ -765,7 +852,7 @@ export const FlowBreakdown = ({
                         />
                       </div>
                     )}
-                  </Inline>
+                  </Inline>}
                 </>
 
 
@@ -780,98 +867,109 @@ export const FlowBreakdown = ({
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
               <Inline css={{ justifyContent: 'space-between' }} >
-                <Tooltip
-                  label={"Schedule execution of the flow"}
-                >
-                  <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
-                    Execution
+                  <Text variant="title" align="left" style={{  fontWeight: '600' }}>
+                    Scheduling
                   </Text>
-                </Tooltip>
+      
                 <Button
                   variant="ghost"
                   size="small"
-                  onClick={() => setEditExecution(!editExecution)}
-                >
-                  {!editExecution ? 'Edit' : 'Discard'}
-                </Button>
+                  onClick={() => toggleAdminSectionExpansion('execution')}
+                  icon={
+                    <IconWrapper
+                      size="medium"
+                      rotation={expandedAdminSections.has('execution') ? "90deg" : "-90deg"}
+                      color="tertiary"
+                      icon={<Chevron />}
+                    />
+                  }
+                />
               </Inline>
-              {!editExecution && <> {flow.startTime && (
+
+              {expandedAdminSections.has('execution') && (
                 <>
-                  <Tooltip
-                    label={
-                      'Start time is the time the flow starts. Execution starts at start time when a custom start time in the future is provided at submission'
-                    }
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    onClick={() => setEditExecution(!editExecution)}
                   >
-                    <Text variant="legend" color="secondary" align="left">
-                      Start Time
-                    </Text>
-                  </Tooltip>
-                  <Inline gap={2}>
-                    <Text variant="body">
-                      {getRelativeTime(flow.startTime.getTime())}
-                    </Text>
-                  </Inline>
+                    {!editExecution ? 'Edit' : 'Discard'}
+                  </Button>
+                  {!editExecution && <> {flow.startTime && (
+                    <>
+                      <Tooltip
+                        label={
+                          'Start time is the time the flow starts. Execution starts at start time when a custom start time in the future is provided at submission'
+                        }
+                      >
+                        <Text variant="legend" color="secondary" align="left">
+                          Start Time
+                        </Text>
+                      </Tooltip>
+                      <Inline gap={2}>
+                        <Text variant="body">
+                          {getRelativeTime(flow.startTime.getTime())}
+                        </Text>
+                      </Inline>
+                    </>
+                  )}
+                    <Tooltip
+                      label={
+                        'Execution time is the time the next execution takes place. In case a flow has ended, the execution time is the time of the last execution'
+                      }
+                    >
+                      <Text variant="legend" color="secondary" align="left">
+                        Execution Time
+                      </Text>
+                    </Tooltip>
+                    <Inline gap={2}>
+                      <Text variant="body">
+                        {getRelativeTime(flow.execTime.getTime())}
+                      </Text>
+                    </Inline>
+                    {flow.interval.seconds.toString() != '0' && (
+                      <>
+                        {' '}
+                        <Tooltip
+                          label={'Interval is the fixed time between 2 executions'}
+                        >
+                          <Text variant="legend" color="secondary" align="left">
+                            Interval
+                          </Text>
+                        </Tooltip>
+                        <Inline gap={2}>
+                          <Text variant="body">
+                            {getDuration(Number(flow.interval.seconds))}
+                          </Text>
+                        </Inline>
+                      </>
+                    )}
+                    {flow.endTime.getTime() && (
+                      <>
+                        <Tooltip
+                          label={'End time is the time execution ends'}
+                        >
+                          <Text variant="legend" color="secondary" align="left">
+                            End Time
+                          </Text>
+                        </Tooltip>
+                        <Inline gap={2}>
+                          <Text variant="body">
+                            {getRelativeTime(flow.endTime.getTime())}
+                          </Text>
+                        </Inline>
+                      </>
+                    )}
+                  </>}
+                  {editExecution && (
+                    <EditSchedulingSection
+                      updatedFlowParams={updatedFlowParams}
+                      setUpdateFlow={setUpdateFlow}
+                      updateOnButtonClick={true}
+                    />
+                  )}
                 </>
               )}
-                <Tooltip
-                  label={
-                    'Execution time is the time the next execution takes place. In case a flow has ended, the execution time is the time of the last execution'
-                  }
-                >
-                  <Text variant="legend" color="secondary" align="left">
-                    Execution Time
-                  </Text>
-                </Tooltip>
-                <Inline gap={2}>
-                  <Text variant="body">
-                    {getRelativeTime(flow.execTime.getTime())}
-                  </Text>
-                </Inline>
-                {flow.interval.seconds.toString() != '0' && (
-                  <>
-                    {' '}
-                    <Tooltip
-                      label={'Interval is the fixed time between 2 executions'}
-                    >
-                      <Text variant="legend" color="secondary" align="left">
-                        Interval
-                      </Text>
-                    </Tooltip>
-                    <Inline gap={2}>
-                      <Text variant="body">
-                        {getDuration(Number(flow.interval.seconds))}
-                      </Text>
-                    </Inline>
-                  </>
-                )}
-                {flow.endTime.getTime() && (
-                  <>
-                    <Tooltip
-                      label={'End time is the time execution ends'}
-                    >
-                      <Text variant="legend" color="secondary" align="left">
-                        End Time
-                      </Text>
-                    </Tooltip>
-                    <Inline gap={2}>
-                      <Text variant="body">
-                        {getRelativeTime(flow.endTime.getTime())}
-                      </Text>
-                    </Inline>
-                  </>
-                )}
-              </>}
-              {editExecution && (
-                <EditExecutionSection
-                  updatedFlowParams={updatedFlowParams}
-                  setUpdateFlow={setUpdateFlow}
-                  updateOnButtonClick={true}
-                />
-              )}
-
-
-
-
             </Column>
 
           </Row>
@@ -923,7 +1021,7 @@ export const FlowBreakdown = ({
                   </div>
 
                   <>
-                    {comparison.flowId.toString() != "0" && (
+                    {comparison.flowId.toString() !== "0" && (
                       <Text variant="body">
                         <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">ID</Text> {comparison.flowId.toString()}
                       </Text>
@@ -964,7 +1062,7 @@ export const FlowBreakdown = ({
                   "Use a response value as a value for a message"
                 }
               >
-                <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+                <Text variant="title" align="left" style={{  fontWeight: '600' }}>
                   Feedback Loop  🔁
                 </Text>
               </Tooltip>
@@ -1159,114 +1257,127 @@ export const FlowBreakdown = ({
       {' '}
       <Column gap={4} align="flex-start" justifyContent="flex-start">
         <Inline css={{ justifyContent: 'space-between' }} >
-          <Tooltip
-            label={"Configuration for the flow"}
-          >
-            <Text variant="title" align="left" style={{ marginBottom: '10px', fontWeight: '600' }}>
+            <Text variant="title" align="left" style={{  fontWeight: '600' }}>
               Configuration
             </Text>
-          </Tooltip>
           <Button
             variant="ghost"
             size="small"
-            onClick={() => setEditConfig(!editConfig)}
-          >
-            {!editConfig ? 'Edit' : 'Discard'}
-          </Button>
+            onClick={() => toggleAdminSectionExpansion('configuration')}
+            icon={
+              <IconWrapper
+                size="medium"
+                rotation={expandedAdminSections.has('configuration') ? "90deg" : "-90deg"}
+                color="tertiary"
+                icon={<Chevron />}
+              />
+            }
+          />
         </Inline>
-        {editConfig ?
-          <Configuration config={flow.configuration}
-            useAndForComparisons={flow.conditions?.useAndForComparisons}
-            disabled={false}
-            onChange={handleUpdateFlowConfigClick} />
-          :
-          <> <>
-            <Tooltip
-              label={'If set to true, message responses i.e. outputs may be used as inputs for new flows'}
+        {expandedAdminSections.has('configuration') && (
+          <>
+            <Button
+              variant="ghost"
+              size="small"
+              onClick={() => setEditConfig(!editConfig)}
             >
-              <Text variant="legend" color="secondary" align="left">
-                Save Responses
-              </Text>
-            </Tooltip>
+              {!editConfig ? 'Edit' : 'Discard'}
+            </Button>
+            {editConfig ?
+              <Configuration config={flow.configuration}
+                useAndForComparisons={flow.conditions?.useAndForComparisons}
+                disabled={false}
+                onChange={handleUpdateFlowConfigClick} />
+              :
+              <> <>
+                <Tooltip
+                  label={'If set to true, message responses i.e. outputs may be used as inputs for new flows'}
+                >
+                  <Text variant="legend" color="secondary" align="left">
+                    Save Responses
+                  </Text>
+                </Tooltip>
 
-            <Text variant="header">
-              {flow.configuration.saveResponses ? '✔' : '✖'}
-            </Text>
+                <Text variant="header">
+                  {flow.configuration.saveResponses ? '✔' : '✖'}
+                </Text>
+              </>
+                <>
+                  <Tooltip
+                    label={'If set to true, the flow settings can not be updated'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Updating Disabled
+                    </Text>
+                  </Tooltip>
+                  <Text variant="header">
+                    {flow.configuration.updatingDisabled ? '✔' : '✖'}
+                  </Text>
+                </>
+                <>
+                  <Tooltip
+                    label={'If set to true, stops on any errors that occur'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Stop on Failure
+                    </Text>
+                  </Tooltip>
+                  <Text variant="header">
+                    {flow.configuration.stopOnFailure ? '✔' : '✖'}
+                  </Text>
+                </>
+                <>
+                  <Tooltip
+                    label={'If set to true, stops when execution of the messages was succesful'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Stop On Success
+                    </Text>
+                  </Tooltip>
+                  <Text variant="header">
+                    {flow.configuration.stopOnSuccess ? '✔' : '✖'}
+                  </Text>
+                </>
+                <>
+                  <Tooltip
+                    label={'If set to true, stops on any timeout that occurs'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Stop on Timeout
+                    </Text>
+                  </Tooltip>
+                  <Text variant="header">
+                    {flow.configuration.stopOnTimeout ? '✔' : '✖'}
+                  </Text>
+                </>
+                <>
+                  <Tooltip
+                    label={'If set to true, as a fallback, the owner balance is used to pay for local fees'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Wallet Fallback
+                    </Text>
+                  </Tooltip>
+                  <Text variant="header">
+                    {flow.configuration.walletFallback ? '✔' : '✖'}
+                  </Text>
+                </>
+                <>
+                  <Tooltip
+                    label={'If set to true, will use AND for comparisons. On default execution happends when any condition returns true.'}
+                  >
+                    <Text variant="legend" color="secondary" align="left">
+                      Use AND for Comparisons
+                    </Text>
+                  </Tooltip>
+                  <Text variant="header">
+                    {flow.conditions.useAndForComparisons ? '✔' : '✖'}
+                  </Text>
+                </>
+              </>
+            }
           </>
-            <>
-              <Tooltip
-                label={'If set to true, the flow settings can not be updated'}
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Updating Disabled
-                </Text>
-              </Tooltip>
-              <Text variant="header">
-                {flow.configuration.updatingDisabled ? '✔' : '✖'}
-              </Text>
-            </>
-            <>
-              <Tooltip
-                label={'If set to true, stops on any errors that occur'}
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Stop on Failure
-                </Text>
-              </Tooltip>
-              <Text variant="header">
-                {flow.configuration.stopOnFailure ? '✔' : '✖'}
-              </Text>
-            </>
-            <>
-              <Tooltip
-                label={'If set to true, stops when execution of the messages was succesful'}
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Stop On Success
-                </Text>
-              </Tooltip>
-              <Text variant="header">
-                {flow.configuration.stopOnSuccess ? '✔' : '✖'}
-              </Text>
-            </>
-            <>
-              <Tooltip
-                label={'If set to true, stops on any timeout that occurs'}
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Stop on Timeout
-                </Text>
-              </Tooltip>
-              <Text variant="header">
-                {flow.configuration.stopOnTimeout ? '✔' : '✖'}
-              </Text>
-            </>
-            <>
-              <Tooltip
-                label={'If set to true, as a fallback, the owner balance is used to pay for local fees'}
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Wallet Fallback
-                </Text>
-              </Tooltip>
-              <Text variant="header">
-                {flow.configuration.walletFallback ? '✔' : '✖'}
-              </Text>
-            </>
-            <>
-              <Tooltip
-                label={'If set to true, will use AND for comparisons. On default execution happends when any condition returns true.'}
-              >
-                <Text variant="legend" color="secondary" align="left">
-                  Use AND for Comparisons
-                </Text>
-              </Tooltip>
-              <Text variant="header">
-                {flow.conditions.useAndForComparisons ? '✔' : '✖'}
-              </Text>
-            </>
-          </>
-        }
+        )}
       </Column>
     </Row>
   }
@@ -1276,7 +1387,7 @@ export const FlowBreakdown = ({
       <Tooltip
         label={"Perform an interchain query for conditions"}
       >
-        <Text variant="body" style={{ fontSize: '14px', marginTop: '16px', marginBottom: '10px', fontWeight: '600' }} align="left">
+        <Text variant="body" style={{ fontSize: '14px', marginTop: '16px',  fontWeight: '600' }} align="left">
           Interchain Query
         </Text>
       </Tooltip>

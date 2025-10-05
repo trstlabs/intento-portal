@@ -260,7 +260,7 @@ export const FlowHistory = ({
 
                       {msgResponses.map((msg: any, i) => (
                         <div key={i}>
-                          <Card css={{ padding: '$6', marginTop: '$4' }}>
+                          <Card css={{ padding: '$6', marginTop: '$4' }} variant="secondary" disabled>
                             <Column gap={8} align="flex-start" justifyContent="flex-start">
                               <Text variant="legend" color="secondary" align="left">
                                 Message Response

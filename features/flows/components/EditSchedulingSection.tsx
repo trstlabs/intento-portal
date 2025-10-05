@@ -76,7 +76,7 @@ const intervalOptions = [
   { label: '6 months', value: 180 * 24 * 60 * 60 * 1000 }
 ]
 
-type EditExecutionSectionProps = {
+type EditSchedulingSectionProps = {
   updatedFlowParams: {
     startAt?: number;
     interval?: number;
@@ -90,12 +90,12 @@ type EditExecutionSectionProps = {
   updateOnButtonClick?: boolean
 }
 
-export function EditExecutionSection({
+export function EditSchedulingSection({
   updatedFlowParams,
   setUpdateFlow,
   isExecutingUpdateFlow,
   updateOnButtonClick = false,
-}: EditExecutionSectionProps) {
+}: EditSchedulingSectionProps) {
 
   const StyledDiv = styled('div', {
 
