@@ -62,8 +62,6 @@ export const BuildComponent = ({
   const [hasConnectionID, setHasConnectionID] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
-  const [selectedTemplateLabel, setSelectedTemplateLabel] = useState<string | null>(null)
-
   const [_isJsonValid, setIsJsonValid] = useState(true)
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
   const [requestedSubmitTx, setRequestedSubmitTx] = useState(false)
@@ -202,7 +200,7 @@ export const BuildComponent = ({
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
-    setSelectedTemplateLabel(null)
+    flowInput.label = ""
     const newMsgs = [...flowInput.msgs];
     newMsgs[index] = msg;
     const updatedFlowInput = {
@@ -234,35 +232,35 @@ export const BuildComponent = ({
     updatedFlowInput.msgs = updatedFlowInput.msgs.map((msg) => {
       try {
         let processedMsg = msg;
-    
+
         // Handle prefix replacement
         if (processedMsg.includes(prefix + "1...")) {
           processedMsg = processedMsg.replaceAll(
             prefix + "1...",
             newPrefix + "1..."
           );
-    
+
           const processedInput = processFlowInput(
             { ...updatedFlowInput, msgs: [processedMsg] },
             isIntoChain
           );
-    
+
           processedMsg = processedInput.msgs[0].replaceAll(denom, newDenom);
         }
-    
+
         // Handle address placeholder replacement
         const oldAddress = isIntoChain ? "Your Intento address" : "Your address";
         const newAddress = isIntoChain ? "Your Intento address" : "Your address";
         // In case you need to normalize from one to the other
         processedMsg = processedMsg.replaceAll(oldAddress, newAddress);
-    
+
         return processedMsg;
       } catch (e) {
         console.error("Error processing message:", e);
         return msg; // Fallback to original
       }
     });
-    
+
     const hasConnectionId = Boolean(connectionId);
 
     // Batch state updates to minimize re-renders
@@ -291,7 +289,7 @@ export const BuildComponent = ({
         console.error('Error connecting external wallet:', e);
       }
     }
-    }, [prefix, denom, connectExternalWallet, flowInput, onFlowChange]);
+  }, [prefix, denom, connectExternalWallet, flowInput, onFlowChange]);
 
   const prevDenomRef = useRef(denom);
   const prevIcaAddressRef = useRef(icaAddress);
@@ -300,8 +298,8 @@ export const BuildComponent = ({
   const prevTrustlessAgentICARef = useRef(trustlessAgentICA);
 
   useEffect(() => {
-    if (icaAddress && icaAddress !== "" && denom && 
-        (icaAddress !== prevIcaAddressRef.current || denom !== prevDenomRef.current)) {
+    if (icaAddress && icaAddress !== "" && denom &&
+      (icaAddress !== prevIcaAddressRef.current || denom !== prevDenomRef.current)) {
       refetchICA();
       prevIcaAddressRef.current = icaAddress;
       prevDenomRef.current = denom;
@@ -309,8 +307,8 @@ export const BuildComponent = ({
   }, [denom, icaAddress, refetchICA]);
 
   useEffect(() => {
-    if (trustlessAgent && chainId && 
-        (trustlessAgent !== prevTrustlessAgentRef.current || chainId !== prevChainIdRef.current)) {
+    if (trustlessAgent && chainId &&
+      (trustlessAgent !== prevTrustlessAgentRef.current || chainId !== prevChainIdRef.current)) {
       refetchTrustlessAgentICA();
       prevTrustlessAgentRef.current = trustlessAgent;
       prevChainIdRef.current = chainId;
@@ -390,13 +388,13 @@ export const BuildComponent = ({
       if (label) {
         updatedFlowInput.label = label;
       }
-
-      onFlowChange(updatedFlowInput);
-
       // Set selected template label if provided
       if (templateLabel !== undefined) {
-        setSelectedTemplateLabel(templateLabel);
+        updatedFlowInput.label = templateLabel;
       }
+      onFlowChange(updatedFlowInput);
+
+
     } catch (e) {
       console.error('Error in setAllMessages:', e);
       alert(`Error setting messages: ${e.message}`);
@@ -560,7 +558,7 @@ export const BuildComponent = ({
             handleRemoveMsg={handleRemoveMsg}
             handleChangeMsg={handleChangeMsg}
             setIsJsonValid={setIsJsonValid}
-            selectedTemplateLabel={selectedTemplateLabel}
+            selectedTemplateLabel={flowInput?.label}
           />
         </div>
       ))}{' '}

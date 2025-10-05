@@ -72,7 +72,7 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
         margin: '0.3em 0.4em',
         cursor: soon ? 'not-allowed' : 'pointer',
         boxShadow: isDark ? '0 2px 16px 0 rgba(30,40,70,0.18)' : '0 2px 12px 0 rgba(80,80,200,0.10)',
-        border: selected ? (isDark ? '2px solid #5a6b9a' : '2px solid #b7c6e7') : 'none',
+        border: selected ? (isDark ? '1.5px solid #b7c6e7' : ' 1.5px solid #5a6b9a') : 'none',
         transition: 'all 0.12s cubic-bezier(.4,0,.2,1), transform 0.1s ease',
         background: isDark ? darkGradient : gradient,
         transform: 'scale(1)',
@@ -626,7 +626,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                     disabled={true}
                   />
                 );
-              })()}  
+              })()}
             </>
           )}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
@@ -800,7 +800,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                           },
                           funds: [
                             {
-                             denom: 'USDC (transfer/channel-750)', amount: '1'
+                              denom: 'USDC (transfer/channel-750)', amount: '1'
                             }
                           ]
                         }
