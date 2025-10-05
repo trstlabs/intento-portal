@@ -31,7 +31,6 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
     flowInput,
     displaySymbol = 'INTO',
     expectedFee = '0',
-    useMsgExec = false,
     chainId,
     grantee,
     authzGrants,
