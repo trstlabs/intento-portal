@@ -44,7 +44,7 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
       // if (client == null) {
       //   throw new Error('Please try reconnecting your wallet.')
       // }
-      console.log(flowInput)
+
       if (flowInput.configuration.walletFallback == false && flowInput.feeFunds?.amount == "0"){
         throw new Error('No funds attached and no fallback to owner balance, can not submit flow.')
       }

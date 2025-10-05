@@ -38,7 +38,6 @@ export const executeSubmitFlow = async ({
     }
   }
 
-  
   // Convert to integer before creating BigInt
   let startAt = startAtInt != 0 ? BigInt(Math.floor(startAtInt)) : BigInt('0')
   console.log('startAt (s)', startAtInt / 1000)
@@ -60,6 +59,7 @@ export const executeSubmitFlow = async ({
     ibcWalletAddress,
   })
 
+  console.log('Transformed messages:', msgs)
   if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ !== '') {
     msgs = msgs.map((msg) => {
       const execMsg = {
@@ -80,33 +80,36 @@ export const executeSubmitFlow = async ({
     feeFunds = [flowInput.feeFunds]
   }
 
-  let msgSubmitFlow =
-    intento.intent.v1.MessageComposer.withTypeUrl.submitFlow({
-      owner,
-      msgs,
-      label: flowInput.label ? flowInput.label : '',
-      duration,
-      interval,
-      startAt,
-      connectionId: /* flowInput.connectionId ? flowInput.connectionId :  */ '',
-      configuration: flowInput.configuration
-        ? flowInput.configuration
-        : {
-            saveResponses: false,
-            updatingDisabled: false,
-            stopOnSuccess: false,
-            stopOnFailure: false,
-            stopOnTimeout: false,
-            walletFallback: true,
-          },
-      feeFunds,
-      conditions: flowInput.conditions,
-      trustlessAgent: flowInput.trustlessAgent,
-    })
+  let msgSubmitFlow = intento.intent.v1.MessageComposer.withTypeUrl.submitFlow({
+    owner,
+    msgs,
+    label: flowInput.label ? flowInput.label : '',
+    duration,
+    interval,
+    startAt,
+    connectionId: /* flowInput.connectionId ? flowInput.connectionId :  */ '',
+    configuration: flowInput.configuration
+      ? flowInput.configuration
+      : {
+          saveResponses: false,
+          updatingDisabled: false,
+          stopOnSuccess: false,
+          stopOnFailure: false,
+          stopOnTimeout: false,
+          walletFallback: true,
+        },
+    feeFunds,
+    conditions: flowInput.conditions,
+    trustlessAgent: flowInput.trustlessAgent,
+  })
 
   if (process.env.NEXT_PUBLIC_PREFERRED_SIGN_AMINO == 'true') {
     msgSubmitFlow = removeEmptyProperties(msgSubmitFlow)
   }
+
+
+  console.log('Submitting MsgSubmitFlow ⬇')
+  console.log(msgSubmitFlow)
 
   const result = await validateTransactionSuccess(
     await client.signAndBroadcast(owner, [msgSubmitFlow], {
@@ -172,12 +175,14 @@ export function transformAndEncodeMsgs({
 
   for (let msgJSON of flowInputMsgs) {
     let parsedMsg = JSON.parse(msgJSON)
-    let value = replacePlaceholders({
-      value: parsedMsg['value'],
+    let value = processDenomFields(parsedMsg['value'])
+    value = replacePlaceholders({
+      value,
       ownerAddress,
       ibcWalletAddress,
     })
-    value = processDenomFields(value)
+    console.log('Transformed message value:', value)
+
     let typeUrl: string = parsedMsg['typeUrl'].toString()
     msgs.push(encodeMsg(typeUrl, value))
   }

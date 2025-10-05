@@ -86,7 +86,7 @@ export const getAuthZGrantsForGrantee = async ({
       pagination: undefined,
     })
     const resp = await cosmosClient.cosmos.authz.v1beta1.granterGrants(req)
-    console.log(resp)
+
     let granterGrants: GrantResponse[] = []
     for (const grant of resp.grants) {
       if (grant.grantee == grantee) {

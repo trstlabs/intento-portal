@@ -65,7 +65,7 @@ export const useConnectIBCWallet = (
 
 
   const mutation = useMutation(async () => {
-    console.log('useConnectIBCWallet: Starting wallet connection...');
+   // console.log('useConnectIBCWallet: Starting wallet connection...');
 
     if (!assetInfo && !registryInfo) {
       const error = new Error('Asset info for the provided `tokenSymbol` was not found.');
@@ -82,10 +82,10 @@ export const useConnectIBCWallet = (
     }));
 
     try {
-      console.log('Initiating wallet connection...');
+      // console.log('Initiating wallet connection...');
 
       // First, ensure the correct chain is selected in Keplr
-      console.log('Ensuring correct chain is selected in Keplr...');
+      // console.log('Ensuring correct chain is selected in Keplr...');
 
       // Always try to add/suggest the chain to Keplr for local/dev environments
       if (['cosmosdev'].some(
@@ -115,9 +115,9 @@ export const useConnectIBCWallet = (
       }
 
       // Then try to connect the wallet
-      console.log('Initiating wallet connection...');
+     // console.log('Initiating wallet connection...');
       await connect();
-      console.log('Wallet connect initiated, waiting for address...');
+     // console.log('Wallet connect initiated, waiting for address...');
 
       // Wait for the wallet connection to be established
       // We'll try a few times to get the address
@@ -126,7 +126,7 @@ export const useConnectIBCWallet = (
       let currentAddress = address;
 
       while (!currentAddress && attempts < maxAttempts) {
-        console.log(`Waiting for wallet address (attempt ${attempts + 1}/${maxAttempts})...`);
+     // console.log(`Waiting for wallet address (attempt ${attempts + 1}/${maxAttempts})...`);
         await new Promise(resolve => setTimeout(resolve, 500));
 
         // Force refresh the address from the wallet
@@ -152,7 +152,7 @@ export const useConnectIBCWallet = (
         attempts++;
       }
 
-      console.log(`Final address check: ${currentAddress || 'not available'}`);
+      //console.log(`Final address check: ${currentAddress || 'not available'}`);
 
       // If we still don't have an address, the user might have cancelled the connection
       if (!currentAddress) {
@@ -161,7 +161,7 @@ export const useConnectIBCWallet = (
         throw error;
       }
 
-      console.log('Getting signing client...');
+     // console.log('Getting signing client...');
       // Now get the signing client
       const ibcChainClient = await getSigningStargateClient();
 
@@ -171,7 +171,7 @@ export const useConnectIBCWallet = (
         throw error;
       }
 
-      console.log('Wallet connected successfully:', { address: currentAddress });
+      //console.log('Wallet connected successfully:', { address: currentAddress });
 
       // Update the wallet state with the connected wallet info
       setWalletState({

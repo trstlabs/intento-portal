@@ -20,7 +20,6 @@ export const useValidators = (chainSymbol: string) => {
     const { data, isLoading } = useQuery(
         ['validators', chainSymbol, address],
         async () => {
-            console.log(address, assetInfo, rpcEndpoint)
             if (!rpcEndpoint) {
                 console.error(`No RPC endpoint found for chain: ${chainSymbol}`)
                 return []
@@ -29,7 +28,6 @@ export const useValidators = (chainSymbol: string) => {
             const client = await cosmos.ClientFactory.createRPCQueryClient({
                 rpcEndpoint,
             })
-            console.log("validators")
             const response = await client.cosmos.staking.v1beta1.delegatorValidators({
                 delegatorAddr: address,
                 pagination: undefined,
@@ -37,7 +35,6 @@ export const useValidators = (chainSymbol: string) => {
             const validators = response.validators.sort((a, b) => {
                 return Number(a.tokens) - Number(b.tokens)
             })
-            console.log(validators)
 
             return validators
         },
