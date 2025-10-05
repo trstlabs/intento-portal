@@ -95,20 +95,21 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
                     {/* Scheduling Summary */}
                     <Column css={{ gap: '$2', padding: '$4', background: '$colors$dark5', borderRadius: '8px', fontSize: '12px' }}>
 
-                        <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
-                            <Text variant="body">Start Time</Text>
+                     <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
+                            <Text variant="body">Start</Text>
                             <Text variant="body" color="tertiary">{displayStartTime}</Text>
                         </Inline>
 
-                        <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
+                        {interval > 0 && <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
                             <Text variant="body">Duration</Text>
                             <Text variant="body" color="tertiary">{displayDuration}</Text>
-                        </Inline>
-
-                        <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
-                            <Text variant="body">Recurrences</Text>
-                            <Text variant="body" color="tertiary">{recurrences}</Text>
-                        </Inline>
+                        </Inline>}
+                        <Tooltip label="The number of times the flow will run. This is calculated based on the start time, interval, and duration. If no interval and start time is set, the flow will run only once.">
+                            <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
+                                <Text variant="body">Runs</Text>
+                                <Text variant="body" color="tertiary">{recurrences} time{recurrences > 1 && "s"}</Text>
+                            </Inline>
+                        </Tooltip>
                         {interval > 0 && (
                             <>
                                 <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
@@ -118,20 +119,21 @@ export const FlowSummary: React.FC<FlowSummaryProps> = ({
 
                             </>
                         )}
-
+                        <Tooltip label="The estimated fee for the flow. This is an estimate including the Trustless Agent fees that cover execution fees on the host chain, assuming every message will get executed.">
                         <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
-                            <Text variant="body">Estimated Fee</Text>
+                            <Text variant="body">Fee</Text>
                             <Text variant="body" color="tertiary">~ {expectedFee} {displaySymbol}</Text>
                         </Inline>
+                        </Tooltip>
 
-                        {useMsgExec != false && (
-                            <Tooltip label="Wrap the flow for the execution so the Intento Interchain Account can securely execute your message">
+                        {/* {useMsgExec != false && (
+                            <Tooltip label="Wrap the flow for the execution so the Trustless Agent can securely execute your message">
                                 <Inline justifyContent="space-between" css={{ marginBottom: 8, paddingLeft: '$4' }}>
-                                    <Text variant="body">Wrap for ICA</Text>
+                                    <Text variant="body">Wrap for Trustless Agent</Text>
                                     <Text variant="body" color="tertiary">{useMsgExec ? 'Yes' : 'No'}</Text>
                                 </Inline>
                             </Tooltip>
-                        )}
+                        )} */}
 
                         {flowInput.label && (
                             <Inline justifyContent="space-between" css={{ paddingLeft: '$4' }}>
