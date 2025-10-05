@@ -31,7 +31,7 @@ import {
   useGetICA,
   useICATokenBalance,
 } from '../../../hooks/useICA'
-import { useGetBalanceForAcc } from 'hooks/useTokenBalance'
+import { useGetBalancesForAcc } from 'hooks/useTokenBalance'
 import { IBCAssetInfo, useIBCAssetList } from '../../../hooks/useChainList'
 import { useSendFundsOnHost, useUpdateFlow } from '../../build/hooks'
 import { getDuration, getRelativeTime } from '../../../util/time'
@@ -74,7 +74,7 @@ export const FlowBreakdown = ({
     true
   )
 
-  const [feeBalance, isFeeBalanceLoading] = useGetBalanceForAcc(
+  const [feeBalances, isFeeBalancesLoading] = useGetBalancesForAcc(
     flow.feeAddress
   )
   const [createGrants, setCreateGrants] = useState(false)
@@ -547,44 +547,32 @@ export const FlowBreakdown = ({
             </Text>
 
             <Text variant="body">{flow.owner} </Text>
-            <Tooltip
-              label={
-                "Address that can be funded to pay for execution fees. When self-hosting an Interchain Account, it is based on this unique address."
-              }
-            >
-              <Inline>
-                <Text variant="legend" color="secondary" align="left">
-                  Flow Address
-                </Text>
-                <Button
-                  variant="ghost"
-                  size="small"
-                  onClick={() => toggleAdminSectionExpansion('flowAddress')}
-                  icon={
-                    <IconWrapper
-                      size="medium"
-                      rotation={expandedAdminSections.has('flowAddress') ? "90deg" : "-90deg"}
-                      color="tertiary"
-                      icon={<Chevron />}
-                    />
-                  }
-                />
-              </Inline>
-            </Tooltip>
+           
+            {!isFeeBalancesLoading && feeBalances && feeBalances.length > 0 && (
+              <>  <Tooltip
+                label={
+                  "Address that can be funded to pay for execution fees."
+                }
+              >
+                <Inline>
+                  <Text variant="legend" color="secondary" align="left">
+                    Flow Address
+                  </Text>
 
-            {expandedAdminSections.has('flowAddress') && (
-              <>
+                </Inline>
+              </Tooltip>
+
                 <Inline gap={2}>
                   <Text css={{ wordBreak: 'break-all' }} variant="body">
                     {flow.feeAddress}{' '}
                   </Text>
                 </Inline>
-                {!isFeeBalanceLoading && feeBalance > 0 && (
+                { feeBalances.map((balance) => (
                   <Text variant="legend">
                     {' '}
-                    Balance: <Text variant="caption"> {feeBalance} INTO</Text>{' '}
+                    Balance: <Text variant="caption"> {convertMicroDenomToDenom(Number(balance.amount), 6)} {resolveDenomSync(balance.denom)}</Text>{' '}
                   </Text>
-                )}
+                ))}
               </>
             )}
 
@@ -867,10 +855,10 @@ export const FlowBreakdown = ({
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
               <Inline css={{ justifyContent: 'space-between' }} >
-                  <Text variant="title" align="left" style={{  fontWeight: '600' }}>
-                    Scheduling
-                  </Text>
-      
+                <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+                  Scheduling
+                </Text>
+
                 <Button
                   variant="ghost"
                   size="small"
@@ -1062,7 +1050,7 @@ export const FlowBreakdown = ({
                   "Use a response value as a value for a message"
                 }
               >
-                <Text variant="title" align="left" style={{  fontWeight: '600' }}>
+                <Text variant="title" align="left" style={{ fontWeight: '600' }}>
                   Feedback Loop  🔁
                 </Text>
               </Tooltip>
@@ -1257,9 +1245,9 @@ export const FlowBreakdown = ({
       {' '}
       <Column gap={4} align="flex-start" justifyContent="flex-start">
         <Inline css={{ justifyContent: 'space-between' }} >
-            <Text variant="title" align="left" style={{  fontWeight: '600' }}>
-              Configuration
-            </Text>
+          <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+            Configuration
+          </Text>
           <Button
             variant="ghost"
             size="small"
@@ -1387,7 +1375,7 @@ export const FlowBreakdown = ({
       <Tooltip
         label={"Perform an interchain query for conditions"}
       >
-        <Text variant="body" style={{ fontSize: '14px', marginTop: '16px',  fontWeight: '600' }} align="left">
+        <Text variant="body" style={{ fontSize: '14px', marginTop: '16px', fontWeight: '600' }} align="left">
           Interchain Query
         </Text>
       </Tooltip>

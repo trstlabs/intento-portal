@@ -10,6 +10,7 @@ import { IBCAssetInfo, useIBCAssetList } from './useChainList'
 
 import { getBalanceForAcc } from '../services/chain-info'
 import { useCosmosRpcClient } from './useRPCClient'
+import { QueryAllBalancesResponse } from 'intentojs/dist/codegen/cosmos/bank/v1beta1/query'
 
 async function fetchTokenBalance({
   client,
@@ -141,18 +142,15 @@ export const useMultipleTokenBalance = (tokenSymbols?: Array<string>) => {
   return [data, isLoading] as const
 }
 
-export const useGetBalanceForAcc = (address: string) => {
+export const useGetBalancesForAcc = (address: string) => {
   const client = useCosmosRpcClient()
   const enabled = !!address && !!client
 
   const { data, isLoading } = useQuery(
     ['address', address],
     async () => {
-      const resp = await getBalanceForAcc({ address, client })
-      if (resp?.[0]) {
-        return convertMicroDenomToDenom(resp[0].amount, 6)
-      }
-      return null
+      const resp: QueryAllBalancesResponse = await getBalanceForAcc({ address, client })
+      return resp.balances
     },
     { enabled }
   )

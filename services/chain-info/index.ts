@@ -11,6 +11,7 @@ import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 import { QueryParamsResponse as QueryAllocParamsResponse } from 'intentojs/dist/codegen/intento/alloc/v1/query'
 import { QueryParamsResponse as QueryFlowParamsResponse } from 'intentojs/dist/codegen/intento/intent/v1/query'
 import { QueryAnnualProvisionsResponse } from 'intentojs/dist/codegen/intento/mint/v1/query'
+import { QueryAllBalancesResponse } from 'intentojs/dist/codegen/cosmos/bank/v1beta1/query'
 
 export interface BaseQueryInput {
   client: any
@@ -33,7 +34,7 @@ export interface BaseQueryInput {
 
 export const getBalanceForAcc = async ({ address, client }: BaseQueryInput) => {
   try {
-    const response = await client.cosmos.bank.v1beta1.allBalances({
+    const response: QueryAllBalancesResponse = await client.cosmos.bank.v1beta1.allBalances({
       address,
       pagination: undefined,
     })
