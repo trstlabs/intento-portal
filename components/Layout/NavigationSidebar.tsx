@@ -6,7 +6,6 @@ import {
   Column,
   Discord,
   Divider,
-  DoubleArrowIcon,
   FeedbackIcon,
   Github,
   IconWrapper,
@@ -33,6 +32,8 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
+import { Globe } from 'lucide-react'
+import { File } from 'lucide-react'
 
 
 type NavigationSidebarProps = {
@@ -177,7 +178,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         </Link>
       )}
 
-      <Link href="/send" passHref>
+      {/* <Link href="/send" passHref>
         <Button
           as="a"
           variant="menu"
@@ -187,7 +188,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         >
           <Inline css={{ paddingLeft: '$4' }}>Coin Streamer</Inline>
         </Button>
-      </Link>
+      </Link> */}
       <Inline css={{ paddingBottom: '$6' }} />
 
       {process.env.NEXT_PUBLIC_AIRDROP_ENABLED == 'true' && (
@@ -353,13 +354,37 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Column gap={4}>
           <Button
             as="a"
+            href={'https://explorer.intento.zone/intento-' + (__TEST_MODE__ ? 'devnet' : 'mainnet')}
+            target="__blank"
+            variant="ghost"
+            size="large"
+            iconLeft={<IconWrapper icon={<Globe size={18} />} />}
+            iconRight={<IconWrapper icon={<UpRightArrow />} />}
+          >
+            Explorer
+          </Button>
+        </Column>
+        <Column gap={4}>
+          <Button
+            as="a"
+            href={'https://docs.intento.zone'}
+            target="__blank"
+            variant="ghost"
+            size="large"
+            iconLeft={<IconWrapper icon={<File size={18} />} />}
+            iconRight={<IconWrapper icon={<UpRightArrow />} />}
+          >
+            Docs
+          </Button>
+        </Column>
+        <Column gap={4}>
+          <Button
+            as="a"
             href={process.env.NEXT_PUBLIC_FEEDBACK_LINK}
             target="__blank"
             variant="ghost"
             size="large"
-            iconLeft={<FeedbackIcon />}
-            iconRight={<IconWrapper icon={<UpRightArrow />} />}
-          >
+            iconLeft={<FeedbackIcon />} >
             Provide feedback
           </Button>
         </Column>
@@ -402,7 +427,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           />
         </Inline>
       </Column>
-    </StyledWrapper>
+    </StyledWrapper >
   )
 }
 
