@@ -80,16 +80,16 @@ export const JsonFormWrapper = ({
       disabled
     >
       <CardContent size="large" css={{ padding: '$4', marginTop: '$4' }}>
-        <ExampleFlowChips
+        {setExample && <ExampleFlowChips
           chainSymbol={chainSymbol}
           setAllMessages={setAllMessages}
           index={index}
           onCustom={() => setShowCustom(!showCustom)}
           selectedTemplateLabel={selectedTemplateLabel}
-        />
-        {showCustom && (
+        />}
+        {showCustom && setExample && (
           <Inline css={{ justifyContent: 'space-between' }}>
-            {setExample && (
+            {(
               <MessageSelector
                 msgTypeName={msgTypeName}
                 setSchema={setSchema}
@@ -109,12 +109,12 @@ export const JsonFormWrapper = ({
           </Inline>
         )}
         <Column>
-          {showCustom && <ExampleChips
+          {showCustom && setExample && <ExampleChips
             chainSymbol={chainSymbol}
             setExample={setExample}
             messageIndex={index}
           />}
-          <Divider offsetY="$6" />
+          { setExample && <Divider offsetY="$6" />}
           <div style={{ margin: '$4', padding: '$4' }}>
             <Inline css={{ justifyContent: 'space-between' }}>
               <Button

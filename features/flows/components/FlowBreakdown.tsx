@@ -123,29 +123,16 @@ export const FlowBreakdown = ({
 
   const [transformedMsgs, setTransformedMsgs] = useState<string[]>([])
 
-  const [expandedMessages, setExpandedMessages] = useState<Set<number>>(new Set())
-
-  const [expandedAdminSections, setExpandedAdminSections] = useState<Set<string>>(new Set())
+  const [expandedFlowSections, setExpandedFlowSections] = useState<Set<string>>(new Set())
 
   // Function to toggle admin section expansion
-  const toggleAdminSectionExpansion = (sectionName: string) => {
-    setExpandedAdminSections(prev => {
+  const toggleFlowSectionExpansion = (sectionName: string) => {
+    setExpandedFlowSections(prev => {
       const newSet = new Set(prev)
       if (newSet.has(sectionName)) {
         newSet.delete(sectionName)
       } else {
         newSet.add(sectionName)
-      }
-      return newSet
-    })
-  }
-  const toggleMessageExpansion = (msgIndex: number) => {
-    setExpandedMessages(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(msgIndex)) {
-        newSet.delete(msgIndex)
-      } else {
-        newSet.add(msgIndex)
       }
       return newSet
     })
@@ -475,7 +462,7 @@ export const FlowBreakdown = ({
           </Column>
         </CardContent>
       </Card>
-      {/* </Row> */}
+      {/* </FlowBreakdownSection> */}
       <>
         <Inline
           css={{
@@ -535,7 +522,7 @@ export const FlowBreakdown = ({
         </Inline>
 
 
-        <Row>
+        <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion('trustlessAgent')} isExpanded={expandedFlowSections.has('trustlessAgent')}>
           <Column
             css={{ padding: '$3' }}
             gap={8}
@@ -547,7 +534,7 @@ export const FlowBreakdown = ({
             </Text>
 
             <Text variant="body">{flow.owner} </Text>
-           
+
             {!isFeeBalancesLoading && feeBalances && feeBalances.length > 0 && (
               <>  <Tooltip
                 label={
@@ -567,7 +554,7 @@ export const FlowBreakdown = ({
                     {flow.feeAddress}{' '}
                   </Text>
                 </Inline>
-                { feeBalances.map((balance) => (
+                {feeBalances.map((balance) => (
                   <Text variant="legend">
                     {' '}
                     Balance: <Text variant="caption"> {convertMicroDenomToDenom(Number(balance.amount), 6)} {resolveDenomSync(balance.denom)}</Text>{' '}
@@ -591,11 +578,12 @@ export const FlowBreakdown = ({
                     <Button
                       variant="ghost"
                       size="small"
-                      onClick={() => toggleAdminSectionExpansion('trustlessAgent')}
+                      onClick={() => toggleFlowSectionExpansion('trustlessAgent')}
+                      disabled={!expandedFlowSections.has('trustlessAgent')}
                       icon={
                         <IconWrapper
                           size="medium"
-                          rotation={expandedAdminSections.has('trustlessAgent') ? "90deg" : "-90deg"}
+                          rotation={expandedFlowSections.has('trustlessAgent') ? "90deg" : "-90deg"}
                           color="tertiary"
                           icon={<Chevron />}
                         />
@@ -604,7 +592,7 @@ export const FlowBreakdown = ({
                   </Inline>
                 </Tooltip>
 
-                {expandedAdminSections.has('trustlessAgent') && (
+                {expandedFlowSections.has('trustlessAgent') && (
                   <>
                     <Text css={{ wordBreak: 'break-all' }} variant="body">
                       {flow.trustlessAgent.agentAddress}{' '}<a
@@ -629,10 +617,10 @@ export const FlowBreakdown = ({
               </>
             )}
           </Column>
-        </Row>
+        </FlowBreakdownSection>
 
         {icaAddress && icaBalance != 0 && flow.selfHostedIca?.connectionId !== undefined && (
-          <Row>
+          <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion('ibcPort')} isExpanded={expandedFlowSections.has('ibcPort')}>
             <Column
               style={{
                 display: 'inline-block',
@@ -658,11 +646,12 @@ export const FlowBreakdown = ({
                     <Button
                       variant="ghost"
                       size="small"
-                      onClick={() => toggleAdminSectionExpansion('ibcPort')}
+                      onClick={() => toggleFlowSectionExpansion('ibcPort')}
+                      disabled={!expandedFlowSections.has('ibcPort')}
                       icon={
                         <IconWrapper
                           size="medium"
-                          rotation={expandedAdminSections.has('ibcPort') ? "90deg" : "-90deg"}
+                          rotation={expandedFlowSections.has('ibcPort') ? "90deg" : "-90deg"}
                           color="tertiary"
                           icon={<Chevron />}
                         />
@@ -670,7 +659,7 @@ export const FlowBreakdown = ({
                     />
                   </Inline>
 
-                  {expandedAdminSections.has('ibcPort') && (
+                  {expandedFlowSections.has('ibcPort') && (
                     <Text variant="body">{flow.selfHostedIca.portId} </Text>
                   )}
                 </Column>
@@ -705,7 +694,7 @@ export const FlowBreakdown = ({
                 }
               />
               {showICAHostButtons && (
-                <Row>
+                <FlowBreakdownSection>
                   <Column
                     gap={8}
                     align="flex-start"
@@ -749,15 +738,15 @@ export const FlowBreakdown = ({
                         </Button>
                       )}
                   </Column>
-                </Row>
+                </FlowBreakdownSection>
               )}
             </Column>
-          </Row>
+          </FlowBreakdownSection>
         )}
 
         {flow.msgs.map((msg: any, msgIndex) => (
           <div key={msgIndex}>
-            <Row>
+            <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion(`message-${msgIndex}`)} isExpanded={expandedFlowSections.has(`message-${msgIndex}`)}>
               <Column gap={8} align="flex-start" justifyContent="flex-start">
                 <Text variant="legend" color="secondary" align="left">
                   Message {msgIndex + 1} Type
@@ -774,24 +763,25 @@ export const FlowBreakdown = ({
                     <Button
                       variant="ghost"
                       size="small"
-                      onClick={() => toggleMessageExpansion(msgIndex)}
+                      onClick={() => toggleFlowSectionExpansion(`message-${msgIndex}`)}
+                      disabled={!expandedFlowSections.has(`message-${msgIndex}`)}
                       icon={
                         <IconWrapper
                           size="medium"
-                          rotation={expandedMessages.has(msgIndex) ? "90deg" : "-90deg"}
+                          rotation={expandedFlowSections.has(`message-${msgIndex}`) ? "90deg" : "-90deg"}
                           color="tertiary"
                           icon={<Chevron />}
                         />
                       }
                     />
-                    {expandedMessages.has(msgIndex) &&
+                    {expandedFlowSections.has(`message-${msgIndex}`) &&
                       <> {msg.typeUrl != '/cosmos.authz.v1beta1.MsgExec' ? (
                         <Button
                           variant="ghost"
                           size="small"
                           onClick={() => showEditor(editorIndex != msgIndex, msgIndex)}
                         >
-                          {editorIndex != msgIndex ? 'Edit' : 'Discard'}
+                          {editorIndex != msgIndex ? 'Edit' : 'Discard Edit'}
                         </Button>
                       ) : (
                         <Button
@@ -801,13 +791,13 @@ export const FlowBreakdown = ({
                             showEditor(editorIndex != msgIndex, msgIndex)
                           }}
                         >
-                          {editorIndex != msgIndex ? 'Edit' : 'Discard'}
+                          {editorIndex != msgIndex ? 'Edit' : 'Discard Edit'}
                         </Button>
                       )}
                       </>
                     }
                   </Inline>
-                  {expandedMessages.has(msgIndex) && <Inline gap={2}>
+                  {expandedFlowSections.has(`message-${msgIndex}`) && <Inline gap={2}>
                     {editorIndex == msgIndex && editMsgs && editMsgs[msgIndex] ? (
                       <div style={{ width: '100%' }}>
                         <JsonFormWrapper
@@ -845,13 +835,13 @@ export const FlowBreakdown = ({
 
 
               </Column>
-            </Row>
+            </FlowBreakdownSection>
 
           </div>
         ))}
 
         {flow.startTime.getTime() > 0 && (
-          <Row>
+          <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion('scheduling')} isExpanded={expandedFlowSections.has('scheduling')}>
             {' '}
             <Column gap={8} align="flex-start" justifyContent="flex-start">
               <Inline css={{ justifyContent: 'space-between' }} >
@@ -862,11 +852,12 @@ export const FlowBreakdown = ({
                 <Button
                   variant="ghost"
                   size="small"
-                  onClick={() => toggleAdminSectionExpansion('execution')}
+                  onClick={() => toggleFlowSectionExpansion('scheduling')}
+                  disabled={!expandedFlowSections.has('scheduling')}
                   icon={
                     <IconWrapper
                       size="medium"
-                      rotation={expandedAdminSections.has('execution') ? "90deg" : "-90deg"}
+                      rotation={expandedFlowSections.has('scheduling') ? "90deg" : "-90deg"}
                       color="tertiary"
                       icon={<Chevron />}
                     />
@@ -874,7 +865,7 @@ export const FlowBreakdown = ({
                 />
               </Inline>
 
-              {expandedAdminSections.has('execution') && (
+              {expandedFlowSections.has('scheduling') && (
                 <>
                   <Button
                     variant="ghost"
@@ -960,12 +951,12 @@ export const FlowBreakdown = ({
               )}
             </Column>
 
-          </Row>
+          </FlowBreakdownSection>
         )}
 
 
         {flow.conditions.comparisons && flow.conditions.comparisons.map((comparison: Comparison, index: number) => (
-          <Row>
+          <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion(`comparison-${index}`)} isExpanded={expandedFlowSections.has(`comparison-${index}`)}>
 
 
             <div style={{ width: '100%' }}>
@@ -1002,11 +993,12 @@ export const FlowBreakdown = ({
                     <Button
                       variant="ghost"
                       size="small"
-                      onClick={() => toggleAdminSectionExpansion(`comparison-${index}`)}
+                      onClick={() => toggleFlowSectionExpansion(`comparison-${index}`)}
+                      disabled={!expandedFlowSections.has(`comparison-${index}`)}
                       icon={
                         <IconWrapper
                           size="medium"
-                          rotation={expandedAdminSections.has(`comparison-${index}`) ? "90deg" : "-90deg"}
+                          rotation={expandedFlowSections.has(`comparison-${index}`) ? "90deg" : "-90deg"}
                           color="tertiary"
                           icon={<Chevron />}
                         />
@@ -1014,7 +1006,7 @@ export const FlowBreakdown = ({
                     />
                   </Inline>
 
-                  {expandedAdminSections.has(`comparison-${index}`) && (
+                  {expandedFlowSections.has(`comparison-${index}`) && (
                     <>
                       <Button
                         variant="ghost"
@@ -1058,67 +1050,69 @@ export const FlowBreakdown = ({
             </div>
 
 
-          </Row>
+          </FlowBreakdownSection>
         ))}
         {flow.conditions.feedbackLoops && flow.conditions.feedbackLoops.map((feedbackLoop) => (
-          <><Row>
-            <Column gap={4} align="flex-start" justifyContent="flex-start">
-              <Tooltip
-                label={
-                  "Use a response value or query response as a value for a message"
-                }
-              >
-                <Inline>
-                  <Text variant="title" align="left" style={{ fontWeight: '600' }}>
-                    Feedback Loop
-                  </Text>
-                  <Button
-                    variant="ghost"
-                    size="small"
-                    onClick={() => toggleAdminSectionExpansion(`feedback-${feedbackLoop.flowId}`)}
-                    icon={
-                      <IconWrapper
-                        size="medium"
-                        rotation={expandedAdminSections.has(`feedback-${feedbackLoop.flowId}`) ? "90deg" : "-90deg"}
-                        color="tertiary"
-                        icon={<Chevron />}
-                      />
-                    }
-                  />
-                </Inline>
-              </Tooltip>
-
-              {expandedAdminSections.has(`feedback-${feedbackLoop.flowId}`) && (
-                <>
-                  {feedbackLoop.flowId.toString() != "0" && (
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
-                    </Text>)}
-                  {feedbackLoop.responseIndex != 0 &&
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
+          <>
+            <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion(`feedback-${feedbackLoop.flowId}`)} isExpanded={expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`)}>
+              <Column gap={4} align="flex-start" justifyContent="flex-start">
+                <Tooltip
+                  label={
+                    "Use a response value or query response as a value for a message"
+                  }
+                >
+                  <Inline>
+                    <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+                      Feedback Loop
                     </Text>
-                  }
-                  {feedbackLoop.responseKey != "" &&
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
-                    </Text>}
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
-                  </Text>
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left"> Key in message to replace</Text>  {feedbackLoop.msgKey}
-                  </Text>
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      onClick={() => toggleFlowSectionExpansion(`feedback-${feedbackLoop.flowId}`)}
+                      disabled={!expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`)}
+                      icon={
+                        <IconWrapper
+                          size="medium"
+                          rotation={expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`) ? "90deg" : "-90deg"}
+                          color="tertiary"
+                          icon={<Chevron />}
+                        />
+                      }
+                    />
+                  </Inline>
+                </Tooltip>
 
-                  <Text variant="body">
-                    <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
-                  </Text>
-                  {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))
-                  }
-                </>
-              )}
-            </Column>
-          </Row>
+                {expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`) && (
+                  <>
+                    {feedbackLoop.flowId.toString() != "0" && (
+                      <Text variant="body">
+                        <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
+                      </Text>)}
+                    {feedbackLoop.responseIndex != 0 &&
+                      <Text variant="body">
+                        <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
+                      </Text>
+                    }
+                    {feedbackLoop.responseKey != "" &&
+                      <Text variant="body">
+                        <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
+                      </Text>}
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
+                    </Text>
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left"> Key in message to replace</Text>  {feedbackLoop.msgKey}
+                    </Text>
+
+                    <Text variant="body">
+                      <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
+                    </Text>
+                    {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))
+                    }
+                  </>
+                )}
+              </Column>
+            </FlowBreakdownSection>
           </>
 
         ))}
@@ -1128,7 +1122,7 @@ export const FlowBreakdown = ({
         )}
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {flow.conditions.skipOnFailureOf.length != 0 && (
-            <Row>
+            <FlowBreakdownSection>
               <Tooltip
                 label={
                   "Skip execution when dependent flows fail"
@@ -1142,12 +1136,12 @@ export const FlowBreakdown = ({
               <Text variant="body">
                 {flow.conditions.skipOnFailureOf}
               </Text>
-            </Row>
+            </FlowBreakdownSection>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {flow.conditions.skipOnSuccessOf.length != 0 && (
-            <Row>
+            <FlowBreakdownSection>
               <Tooltip
                 label={
                   "Skip execution when dependent flows succeed"
@@ -1161,12 +1155,12 @@ export const FlowBreakdown = ({
               <Text variant="body">
                 {flow.conditions.skipOnSuccessOf}
               </Text>
-            </Row>
+            </FlowBreakdownSection>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {flow.conditions.stopOnFailureOf.length != 0 && (
-            <Row>
+            <FlowBreakdownSection>
               <Tooltip
                 label={
                   "Stop execution when dependent flows fail"
@@ -1180,12 +1174,12 @@ export const FlowBreakdown = ({
               <Text variant="body">
                 {flow.conditions.stopOnFailureOf}
               </Text>
-            </Row>
+            </FlowBreakdownSection>
           )}
         </Column>
         <Column gap={8} align="flex-start" justifyContent="flex-start">
           {flow.conditions.stopOnSuccessOf.length != 0 && (
-            <Row>
+            <FlowBreakdownSection>
               <Tooltip
                 label={
                   "Stop execution when dependent flows succeed"
@@ -1199,7 +1193,7 @@ export const FlowBreakdown = ({
               <Text variant="body">
                 {flow.conditions.stopOnSuccessOf}
               </Text>
-            </Row>
+            </FlowBreakdownSection>
           )}
         </Column>
 
@@ -1211,7 +1205,7 @@ export const FlowBreakdown = ({
           flow.updateHistory.length != 0 && (
             <>
               {' '}
-              <Row>
+              <FlowBreakdownSection>
                 {' '}
                 <Column gap={8} align="flex-start" justifyContent="flex-start">
                   {' '}
@@ -1239,7 +1233,7 @@ export const FlowBreakdown = ({
 
 
                 </Column>
-              </Row>
+              </FlowBreakdownSection>
             </>
           )
         }
@@ -1278,7 +1272,7 @@ export const FlowBreakdown = ({
   )
 
   function showConfiguration() {
-    return <Row>
+    return <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion('configuration')} isExpanded={expandedFlowSections.has('configuration')}>
       {' '}
       <Column gap={4} align="flex-start" justifyContent="flex-start">
         <Inline css={{ justifyContent: 'space-between' }} >
@@ -1288,18 +1282,19 @@ export const FlowBreakdown = ({
           <Button
             variant="ghost"
             size="small"
-            onClick={() => toggleAdminSectionExpansion('configuration')}
+            onClick={() => toggleFlowSectionExpansion('configuration')}
+            disabled={!expandedFlowSections.has('configuration')}
             icon={
               <IconWrapper
                 size="medium"
-                rotation={expandedAdminSections.has('configuration') ? "90deg" : "-90deg"}
+                rotation={expandedFlowSections.has('configuration') ? "90deg" : "-90deg"}
                 color="tertiary"
                 icon={<Chevron />}
               />
             }
           />
         </Inline>
-        {expandedAdminSections.has('configuration') && (
+        {expandedFlowSections.has('configuration') && (
           <>
             <Button
               variant="ghost"
@@ -1404,7 +1399,7 @@ export const FlowBreakdown = ({
           </>
         )}
       </Column>
-    </Row>
+    </FlowBreakdownSection>
   }
 
   function icqConfig(icqConfig: ICQConfig): React.ReactNode {
@@ -1438,7 +1433,7 @@ export const FlowBreakdown = ({
   }
 }
 
-function Row({ children }) {
+function FlowBreakdownSection({ children, onClick, expandable = false, isExpanded = false }: { children: React.ReactNode; onClick?: () => void; expandable?: boolean; isExpanded?: boolean }) {
   const baseCss = { padding: '$10 $10' }
   return (
     <Inline
@@ -1452,7 +1447,9 @@ function Row({ children }) {
         borderRadius: '18px',
         border: '1px solid $borderColors$default',
         backgroundColor: '$base',
+        cursor: expandable ? 'pointer' : 'default',
       }}
+      onClick={expandable && onClick && !isExpanded ? onClick : undefined}
     >
       {children}
     </Inline>
