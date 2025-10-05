@@ -48,10 +48,12 @@ export const processDenomFields = (obj: any): any => {
     // Process denom and amount if denom exists and needs conversion
     if ('denom' in result && typeof result.denom === 'string') {
         const denom = result.denom;
-        if (denom === denom.toUpperCase() && !denom.startsWith('u') && !denom.startsWith('i')) {
+        if (denom === denom.toUpperCase() && !denom.startsWith('u') ) {
+            if (!denom.startsWith('ibc/')) {
             // Convert symbol to micro-denom (e.g., 'INTO' -> 'uinto')
             result.denom = 'u' + denom.toLowerCase();
             
+            }
             // Convert amount to micro units (10^6) if it exists
             if ('amount' in result && typeof result.amount === 'string') {
                 const amount = parseFloat(result.amount);

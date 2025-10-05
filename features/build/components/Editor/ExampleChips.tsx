@@ -12,7 +12,7 @@ import { useIBCAssetInfo } from '../../../../hooks/useIBCAssetInfo'
 const chainIcons = {
   'ATOM': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg',
   'OSMO': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.svg',
-  'INTO': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/testnets/intentotestnet/images/into.png',
+  'INTO': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/intento/images/into.png',
   'ELYS': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/elys/images/elys.png',
   'USDC': 'https://raw.githubusercontent.com/cosmos/chain-registry/master/axelar/images/usdc.png',
 } as const
@@ -23,7 +23,7 @@ const getChainIcon = (chainSymbol: string): string => {
 }
 
 // IntentTemplateChip: visually distinct chip for preset flows
-function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, disabled = false, description, autoParse = false }: { label: string; iconUrl?: string; gradient: string; onClick?: () => void; soon?: boolean; disabled?: boolean; description?: string; autoParse?: boolean }) {
+function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, disabled = false, description, autoParse = false, selected = false }: { label: string; iconUrl?: string; gradient: string; onClick?: () => void; soon?: boolean; disabled?: boolean; description?: string; autoParse?: boolean; selected?: boolean }) {
   const themeController = useControlTheme();
   const isDark = themeController.theme.name === 'dark';
   // State to manage which tooltip to show
@@ -72,7 +72,7 @@ function IntentTemplateChip({ label, iconUrl, gradient, onClick, soon = false, d
         margin: '0.3em 0.4em',
         cursor: soon ? 'not-allowed' : 'pointer',
         boxShadow: isDark ? '0 2px 16px 0 rgba(30,40,70,0.18)' : '0 2px 12px 0 rgba(80,80,200,0.10)',
-        border: 'none',
+        border: selected ? (isDark ? '2px solid #5a6b9a' : '2px solid #b7c6e7') : 'none',
         transition: 'all 0.12s cubic-bezier(.4,0,.2,1), transform 0.1s ease',
         background: isDark ? darkGradient : gradient,
         transform: 'scale(1)',
@@ -269,7 +269,7 @@ function Chip({ label, onClick, icon }) {
 
 
 
-const AutoCompoundChip = ({ chainSymbol, setAllMessages, IBCAssetInfo }) => {
+const AutoCompoundChip = ({ chainSymbol, setAllMessages, IBCAssetInfo, selectedTemplateLabel }) => {
   const { validators } = useValidators(chainSymbol)
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
 
@@ -316,7 +316,7 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages, IBCAssetInfo }) => {
           }
           ],
         }
-      }
+      }, `Autocompound if rewards > 1 ${chainSymbol}`
     )
   }
 
@@ -324,9 +324,10 @@ const AutoCompoundChip = ({ chainSymbol, setAllMessages, IBCAssetInfo }) => {
     <IntentTemplateChip
       label={`Autocompound if rewards > 1 ${chainSymbol}`}
       autoParse
-      description={`Autocompound if rewards > 1. Uses a feedback loop to check if rewards are more than 1 and compound them. Will stop when rewards are less than 1. You can change these inputs. Continous smart autocompounding coming soon. Validator address should start with ${IBCAssetInfo.prefix}1.`}
+      description={`Autocompound if rewards > 1. Uses a feedback loop to check if rewards are more than 1 and compound them. Will stop when rewards are less than 1. You can change these inputs. Validator address should start with ${IBCAssetInfo?.prefix}1.`}
       iconUrl={getChainIcon(chainSymbol)}
       gradient="linear-gradient(90deg, #9C27B0 0%, #673AB7 100%)"
+      selected={selectedTemplateLabel === `Autocompound if rewards > 1 ${chainSymbol}`}
       onClick={handleClick}
     />
   )
@@ -410,13 +411,14 @@ interface FlowInput {
 
 interface ExampleFlowChipsProps {
   chainSymbol: string;
-  setAllMessages?: (messages: any[], label?: string, conditions?: any) => void;
+  setAllMessages?: (messages: any[], label?: string, conditions?: any, templateLabel?: string) => void;
   index: number;
   flowInput?: FlowInput;
   onCustom?: () => void;
+  selectedTemplateLabel?: string | null;
 }
 
-export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput = {}, onCustom }: ExampleFlowChipsProps) {
+export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput = {}, onCustom, selectedTemplateLabel }: ExampleFlowChipsProps) {
   const { validators } = useValidators(chainSymbol)
   const validatorAddress = React.useMemo(() => validators?.[0]?.operatorAddress, [validators])
   const IBCAssetInfo = useIBCAssetInfo(chainSymbol)
@@ -433,322 +435,380 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
     <>
       {setAllMessages && index === 0 && (
         <Inline css={{ marginBottom: '$4', flexWrap: 'wrap', gap: '$2' }}>
-          <IntentTemplateChip
-            label={`Stream 1 ${chainSymbol}`}
-            iconUrl={getChainIcon(chainSymbol)}
-            gradient="linear-gradient(90deg,rgb(94, 94, 178) 0%,rgb(123, 134, 218) 100%)"
-            autoParse
-            description={`Streams one ${chainSymbol} from your address to another address. You can adjust the amount after selecting.`}
-            onClick={() => setAllMessages([
-              {
-                typeUrl: '/cosmos.bank.v1beta1.MsgSend',
-                value: {
-                  fromAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
-                  toAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
-                  amount: [{
-                    denom: `${chainSymbol}`,
-                    amount: '1'
-                  }]
-                }
-              }
-            ], `Stream ${chainSymbol}`)}
-          />
+          {(() => {
+            const templateLabel = `Stream 1 ${chainSymbol}`;
+            return (
+              <IntentTemplateChip
+                label={templateLabel}
+                iconUrl={getChainIcon(chainSymbol)}
+                gradient="linear-gradient(90deg,rgb(94, 94, 178) 0%,rgb(123, 134, 218) 100%)"
+                autoParse
+                description={`Streams one ${chainSymbol} from your address to another address. You can adjust the amount after selecting.`}
+                selected={selectedTemplateLabel === templateLabel}
+                onClick={() => setAllMessages([
+                  {
+                    typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+                    value: {
+                      fromAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
+                      toAddress: chainSymbol === 'INTO' ? 'Your Intento address' : `Your ${IBCAssetInfo.prefix} address`,
+                      amount: [{
+                        denom: `${chainSymbol}`,
+                        amount: '1'
+                      }]
+                    }
+                  }
+                ], `Stream ${chainSymbol}`, undefined, templateLabel)}
+              />
+            );
+          })()}
           {(chainSymbol === 'ATOM' || chainSymbol === 'OSMO' || chainSymbol === 'INTO') && (
-            <AutoCompoundChip chainSymbol={chainSymbol} IBCAssetInfo={IBCAssetInfo} setAllMessages={setAllMessages} />
+            <AutoCompoundChip chainSymbol={chainSymbol} IBCAssetInfo={IBCAssetInfo} setAllMessages={setAllMessages} selectedTemplateLabel={selectedTemplateLabel} />
           )}
 
           {chainSymbol === 'ATOM' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
-              <IntentTemplateChip
-                label="Swap ATOM for BTC if ATOM < $5"
-                autoParse
-                description="Swaps 1 ATOM for BTC if ATOM < $5 via Osmosis. Uses a query to check the price of ATOM, this saves gas. "
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
-                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
-                onClick={() => setAllMessages([
-                  {
-                    typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
-                    value: {
-                      sourcePort: "transfer",
-                      sourceChannel: "channel-141",
-                      token: {
-                        denom: "ATOM",
-                        amount: "1"
-                      },
-                      sender: `Your ${IBCAssetInfo.prefix} address`,
-                      receiver: "osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u",
-                      timeoutHeight: {
-                        revisionNumber: "0",
-                        revisionHeight: "0"
-                      },
-                      timeoutTimestamp: timeoutTimestamp,
-                      memo: `{"wasm":{"contract":"osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u","msg":{"swap_and_action":{"user_swap":{"swap_exact_asset_in":{"swap_venue_name":"osmosis-poolmanager","operations":[{"pool":"611","denom_in":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","denom_out":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4"},{"pool":"1096","denom_in":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4","denom_out":"uosmo"},{"pool":"712","denom_in":"uosmo","denom_out":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F"},{"pool":"1868","denom_in":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F","denom_out":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF"}]}},"min_asset":{"native":{"denom":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF","amount":"1"}},"timeout_timestamp":${timeoutTimestamp},"post_swap_action":{"transfer":{"to_address":"Your osmo address"}},"affiliates":[]}}}}`
-                    }
-                  }
-                ],
-                  'Swap ATOM for BTC if ATOM < $5',
-                  {
-                    conditions: {
-                      comparisons: [
-                        {
-                          responseIndex: 0,
-                          responseKey: "",
-                          operand: "5.0",
-                          operator: 3,
-                          valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
-                          icqConfig: {
-                            connectionId: "connection-1",
-                            chainId: "osmosis-1",
-                            timeoutPolicy: 2,
-                            timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
-                            queryType: "store/twap/key",
-                            queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
-                          }
+              {(() => {
+                const templateLabel = "Swap ATOM for BTC if ATOM < $5";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    autoParse
+                    description="Swaps 1 ATOM for BTC if ATOM < $5 via Osmosis. Uses a query to check the price of ATOM, this saves gas. "
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                    gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                      {
+                        typeUrl: "/ibc.applications.transfer.v1.MsgTransfer",
+                        value: {
+                          sourcePort: "transfer",
+                          sourceChannel: "channel-141",
+                          token: {
+                            denom: "ATOM",
+                            amount: "1"
+                          },
+                          sender: `Your ${IBCAssetInfo.prefix} address`,
+                          receiver: "osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u",
+                          timeoutHeight: {
+                            revisionNumber: "0",
+                            revisionHeight: "0"
+                          },
+                          timeoutTimestamp: timeoutTimestamp,
+                          memo: `{"wasm":{"contract":"osmo10a3k4hvk37cc4hnxctw4p95fhscd2z6h2rmx0aukc6rm8u9qqx9smfsh7u","msg":{"swap_and_action":{"user_swap":{"swap_exact_asset_in":{"swap_venue_name":"osmosis-poolmanager","operations":[{"pool":"611","denom_in":"ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2","denom_out":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4"},{"pool":"1096","denom_in":"ibc/987C17B11ABC2B20019178ACE62929FE9840202CE79498E29FE8E5CB02B7C0A4","denom_out":"uosmo"},{"pool":"712","denom_in":"uosmo","denom_out":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F"},{"pool":"1868","denom_in":"ibc/D1542AA8762DB13087D8364F3EA6509FD6F009A34F00426AF9E4F9FA85CBBF1F","denom_out":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF"}]}},"min_asset":{"native":{"denom":"ibc/2F4258D6E1E01B203D6CA83F2C7E4959615053A21EC2C2FC196F7911CAC832EF","amount":"1"}},"timeout_timestamp":${timeoutTimestamp},"post_swap_action":{"transfer":{"to_address":"Your osmo address"}},"affiliates":[]}}}}`
                         }
-                      ],
-                      feedbackLoops: []
-                    }
-                  }
-                )}
-                soon={false}
-              />
-              <IntentTemplateChip
-                label="Compound if ATOM < $5"
-                autoParse
-                description={`Compounds all withdrawn rewards ATOM if ATOM < $5. Uses a query to check the price of ATOM, this saves gas. Validator address should start with ${IBCAssetInfo.prefix}1.`}
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
-                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
-                onClick={() => setAllMessages(
-                  [
-                    {
-                      typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
-                      value: {
-                        delegatorAddress: `Your ${IBCAssetInfo.prefix} address`,
-                        validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
-                      },
-                    },
-                    {
-                      typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
-                      value: {
-                        delegatorAddress: `Your ${IBCAssetInfo.prefix} address`,
-                        validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
-                        amount: {
-                          denom: `${chainSymbol}`,
-                          amount: '1', // This will be replaced by the feedback loop
+                      }
+                    ],
+                      'Swap ATOM for BTC if ATOM < $5',
+                      {
+                        conditions: {
+                          comparisons: [
+                            {
+                              responseIndex: 0,
+                              responseKey: "",
+                              operand: "5.0",
+                              operator: 3,
+                              valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
+                              icqConfig: {
+                                connectionId: "connection-1",
+                                chainId: "osmosis-1",
+                                timeoutPolicy: 2,
+                                timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
+                                queryType: "store/twap/key",
+                                queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
+                              }
+                            }
+                          ],
+                          feedbackLoops: []
+                        }
+                      }, templateLabel
+                    )}
+                    soon={false}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "Compound if ATOM < $5";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    autoParse
+                    description={`Compounds all withdrawn rewards ATOM if ATOM < $5. Uses a query to check the price of ATOM, this saves gas. Validator address should start with ${IBCAssetInfo.prefix}1.`}
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.svg"
+                    gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages(
+                      [
+                        {
+                          typeUrl: `/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward`,
+                          value: {
+                            delegatorAddress: `Your ${IBCAssetInfo.prefix} address`,
+                            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
+                          },
                         },
-                      },
-                    },
-                  ],
-                  'Compound if ATOM < $5',
-                  {
-                    conditions: {
-                      feedbackLoops: [
                         {
-                          responseIndex: 0,
-                          responseKey: 'Amount.[-1]',
-                          msgsIndex: 1,
-                          msgKey: 'Amount',
-                          valueType: 'sdk.Coin',
-                        }
+                          typeUrl: `/cosmos.staking.v1beta1.MsgDelegate`,
+                          value: {
+                            delegatorAddress: `Your ${IBCAssetInfo.prefix} address`,
+                            validatorAddress: validatorAddress ? validatorAddress : 'Not found. Stake tokens or insert a validator operator address here ⚠️',
+                            amount: {
+                              denom: `${chainSymbol}`,
+                              amount: '1', // This will be replaced by the feedback loop
+                            },
+                          },
+                        },
                       ],
-                      comparisons: [
-                        {
-                          responseIndex: 0,
-                          responseKey: "",
-                          operand: "5.0",
-                          operator: 3,
-                          valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
-                          icqConfig: {
-                            connectionId: "connection-1",
-                            chainId: "osmosis-1",
-                            timeoutPolicy: 2,
-                            timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
-                            queryType: "store/twap/key",
-                            queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
-                          }
+                      'Compound if ATOM < $5',
+                      {
+                        conditions: {
+                          feedbackLoops: [
+                            {
+                              responseIndex: 0,
+                              responseKey: 'Amount.[-1]',
+                              msgsIndex: 1,
+                              msgKey: 'Amount',
+                              valueType: 'sdk.Coin',
+                            }
+                          ],
+                          comparisons: [
+                            {
+                              responseIndex: 0,
+                              responseKey: "",
+                              operand: "5.0",
+                              operator: 3,
+                              valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
+                              icqConfig: {
+                                connectionId: "connection-1",
+                                chainId: "osmosis-1",
+                                timeoutPolicy: 2,
+                                timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
+                                queryType: "store/twap/key",
+                                queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDEyNTF8aWJjLzI3Mzk0RkIwOTJEMkVDQ0Q1NjEyM0M3NEYzNkU0QzFGOTI2MDAxQ0VBREE5Q0E5N0VBNjIyQjI1RjQxRTVFQjJ8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTQ=",
+                              }
+                            }
+                          ]
                         }
-                      ]
-                    }
-                  }
-                )}
-              />
+                      }, templateLabel
+                    )}
+                  />
+                );
+              })()}
 
-              <IntentTemplateChip
-                label="DCA into StreamSwap"
-                autoParse
-                description="DCA into StreamSwap to average your entry into the streaming event."
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png"
-                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
-                onClick={() => setAllMessages([
-                  {
-                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                    value: {
-                      sender: `Your ${IBCAssetInfo.prefix} address`,
-                      contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
-                      msg: {
-                        subscribe: {
-                          stream_id: 3
+              {(() => {
+                const templateLabel = "DCA into StreamSwap";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    autoParse
+                    description="DCA into StreamSwap to average your entry into the streaming event."
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/cosmoshub/images/atom.png"
+                    gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                      {
+                        typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                        value: {
+                          sender: `Your ${IBCAssetInfo.prefix} address`,
+                          contract: 'cosmos1gzz44pdc87r8vfdktum8285j2aghtcg56qultynjzqy75ft3czxsux5xec',
+                          msg: {
+                            subscribe: {
+                              stream_id: 3
+                            }
+                          },
+                          funds: [
+                            {
+                              denom: 'ATOM',
+                              amount: '1'
+                            }
+                          ]
                         }
-                      },
-                      funds: [
-                        {
-                          denom: 'ATOM',
-                          amount: '1'
-                        }
-                      ]
-                    }
-
-                  }
-                ], 'DCA into StreamSwap',
-                )}
-                disabled={true}
-              />
+                      }
+                    ], 'DCA into StreamSwap', undefined, templateLabel)}
+                    disabled={true}
+                  />
+                );
+              })()}  
             </>
           )}
           {chainSymbol === 'OSMO' && process.env.NEXT_PUBLIC_TEST_MODE_DISABLED === 'true' && (
             <>
-
-              <IntentTemplateChip
-                label="DCA into ATOM"
-                autoParse
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                description="Swaps 1 USDC into ATOM with no additional conditions. You can adjust the tokenIn and routes after selecting."
-                gradient="linear-gradient(90deg, #5a4fcf 0%, #8a7aff 100%)"
-                onClick={() => setAllMessages([
-                  // Example: DCA flow: swap, send
-                  {
-                    typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
-                    value: {
-                      sender: `Your ${IBCAssetInfo.prefix} address`,
-                      routes: [{ poolId: '1464', tokenOutDenom: 'uosmo' }, { poolId: '1265', tokenOutDenom: 'ibc/27394FB092D2ECCD56123C74F36E4C1F926001CEADA9CA97EA622B25F41E5EB2' }],
-                      tokenIn: { denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', amount: '1000000' },
-                      tokenOutMinAmount: '1',
-                    },
-                  }
-                ], 'DCA into ATOM')}
-              />
-              <IntentTemplateChip
-                label="DCA into INTO"
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #0c76af 0%, #38aff9 100%)"
-                autoParse
-                description="Swaps 1 USDC into INTO with no additional conditions. You can adjust the tokenIn and routes after selecting."
-                onClick={() => setAllMessages([
-                  {
-                    typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
-                    value: {
-                      sender: `Your ${IBCAssetInfo.prefix} address`,
-                      poolId: '3138',
-                      tokenIn: {
-                        denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', // USDC IBC denom
-                        amount: '1000000', // 1 USDC in micro units
-                      },
-                      tokenOutMinAmount: '1', // price < 0.01 USDC
-                      routes: [
-                        { poolId: '3138', tokenOutDenom: 'ibc/BE072C03DA544CF282499418E7BC64D38614879B3EE95F9AD91E6C37267D4836' } // token1 denom
-                      ]
-                    }
-                  }
-                ], 'DCA into INTO')}
-              />
-              <IntentTemplateChip
-                label="DCA into INTO if price < 0.01"
-                autoParse
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg,rgb(67, 142, 233) 0%,rgb(56, 95, 249) 100%)"
-                description="Swaps 1 USDC into INTO with a query for the last price. You can adjust the tokenIn and routes after selecting."
-                onClick={() => setAllMessages([
-                  {
-                    typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
-                    value: {
-                      sender: `Your ${IBCAssetInfo.prefix} address`,
-                      poolId: '3138',
-                      tokenIn: {
-                        denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4', // USDC IBC denom
-                        amount: '1000000', // 1 USDC in micro units
-                      },
-                      tokenOutMinAmount: '1',
-                      routes: [
-                        { poolId: '3138', tokenOutDenom: 'ibc/BE072C03DA544CF282499418E7BC64D38614879B3EE95F9AD91E6C37267D4836' } // token1 denom
-                      ]
-                    }
-                  }
-                ], 'DCA into INTO if price < 0.01', {
-                  conditions: {
-                    comparisons: [
+              {(() => {
+                const templateLabel = "DCA into ATOM";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    autoParse
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    description="Swaps 1 USDC into ATOM with no additional conditions. You can adjust the tokenIn and routes after selecting."
+                    gradient="linear-gradient(90deg, #5a4fcf 0%, #8a7aff 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                      // Example: DCA flow: swap, send
                       {
-                        responseIndex: 0,
-                        responseKey: "",
-                        operand: "0.01",
-                        operator: 3,
-                        valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
-                        icqConfig: {
-                          connectionId: "connection-1",
-                          chainId: "osmosis-1",
-                          timeoutPolicy: 2,
-                          timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
-                          queryType: "store/twap/key",
-                          queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDMxMzh8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
+                        typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
+                        value: {
+                          sender: `Your ${IBCAssetInfo.prefix} address`,
+                          routes: [{ poolId: '1464', tokenOutDenom: 'uosmo' }, { poolId: '1265', tokenOutDenom: 'ATOM (transfer/channel-0)' }],
+                          tokenIn: { denom: 'USDC (transfer/channel-750)', amount: '1000000' },
+                          tokenOutMinAmount: '1',
+                        },
+                      }
+                    ], 'DCA into ATOM', undefined, templateLabel)}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "DCA into INTO";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    gradient="linear-gradient(90deg, #0c76af 0%, #38aff9 100%)"
+                    autoParse
+                    description="Swaps 1 USDC into INTO with no additional conditions. You can adjust the tokenIn and routes after selecting."
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                      {
+                        typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
+                        value: {
+                          sender: `Your ${IBCAssetInfo.prefix} address`,
+                          tokenIn: {
+                            denom: 'USDC (transfer/channel-750)', // USDC IBC denom
+                            amount: '1', // 1 USDC in micro units
+                          },
+                          tokenOutMinAmount: '1', // price < 0.01 USDC
+                          routes: [
+                            { poolId: '3138', tokenOutDenom: 'INTO (transfer/channel-106076)' } // token1 denom
+                          ]
                         }
                       }
-                    ],
-                    feedbackLoops: []
-                  }
-                }
-                )}
-              />
-              <IntentTemplateChip
-                label="BTC Trend detection"
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
-                onClick={() => setAllMessages([
-                ], 'BTC Trend detection')}
-                soon={true}
-              />
-              <IntentTemplateChip
-                label="Spot vs TWAP arbitrage"
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
-                onClick={() => setAllMessages([
-                ], 'Spot vs TWAP arbitrage')}
-                soon={true}
-              />
-              <IntentTemplateChip
-                label="TWAP-based DCA"
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
-                onClick={() => setAllMessages([
-                ], 'TWAP-based DCA')}
-                soon={true}
-              />
-              <IntentTemplateChip
-                label="DCA into StreamSwap"
-                autoParse
-                description="DCA into StreamSwap to average your entry into the streaming event."
-                iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
-                gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
-                onClick={() => setAllMessages([
-                  {
-                    typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-                    value: {
-                      sender: `Your ${IBCAssetInfo.prefix} address`,
-                      contract: 'osmo1994s0ea4z2lqrh5gl8l5s0cw6hwz92s3pn2yhkamfh57j9yh7lxssnr80s',
-                      msg: {
-                        subscribe: {
-                          stream_id: 8
+                    ], 'DCA into INTO', undefined, templateLabel)}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "DCA into INTO if price < 0.01";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    autoParse
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    gradient="linear-gradient(90deg,rgb(67, 142, 233) 0%,rgb(56, 95, 249) 100%)"
+                    description="Swaps 1 USDC into INTO with a query for the last price. You can adjust the tokenIn and routes after selecting."
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                      {
+                        typeUrl: '/osmosis.gamm.v1beta1.MsgSwapExactAmountIn',
+                        value: {
+                          sender: `Your ${IBCAssetInfo.prefix} address`,
+                          tokenIn: {
+                            denom: 'USDC (transfer/channel-750)', // USDC IBC denom
+                            amount: '1', // 1 USDC in micro units
+                          },
+                          tokenOutMinAmount: '1',
+                          routes: [
+                            { poolId: '3138', tokenOutDenom: 'INTO (transfer/channel-106076)' } // token1 denom
+                          ]
                         }
-                      },
-                      funds: [
-                        {
-                          denom: 'ibc/498A0751C798A0D9A389AA3691123DADA57DAA4FE165D5C75894505B876BA6E4',
-                          amount: '1000000'
+                      }
+                    ], 'DCA into INTO if price < 0.01', {
+                      conditions: {
+                        comparisons: [
+                          {
+                            responseIndex: 0,
+                            responseKey: "",
+                            operand: "0.01",
+                            operator: 3,
+                            valueType: "osmosistwapv1beta1.TwapRecord.P0LastSpotPrice",
+                            icqConfig: {
+                              connectionId: "connection-1",
+                              chainId: "osmosis-1",
+                              timeoutPolicy: 2,
+                              timeoutDuration: Duration.fromPartial({ "seconds": BigInt(120) }),
+                              queryType: "store/twap/key",
+                              queryKey: "cmVjZW50X3R3YXB8MDAwMDAwMDAwMDAwMDAwMDMxMzh8aWJjLzQ5OEEwNzUxQzc5OEEwRDlBMzg5QUEzNjkxMTIzREFEQTU3REFBNEZFMTY1RDVDNzU4OTQ1MDVCODc2QkE2RTR8aWJjL0JFMDcyQzAzREE1NDRDRjI4MjQ5OTQxOEU3QkM2NEQzODYxNDg3OUIzRUU5NUY5QUQ5MUU2QzM3MjY3RDQ4MzY=",
+                            }
+                          }
+                        ],
+                        feedbackLoops: []
+                      }
+                    }, templateLabel)}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "BTC Trend detection";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                    ], 'BTC Trend detection', undefined, templateLabel)}
+                    soon={true}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "Spot vs TWAP arbitrage";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                    ], 'Spot vs TWAP arbitrage', undefined, templateLabel)}
+                    soon={true}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "TWAP-based DCA";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    gradient="linear-gradient(90deg,rgb(67, 142, 233) 50%,rgba(240, 190, 97, 0.6) 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                    ], 'TWAP-based DCA', undefined, templateLabel)}
+                    soon={true}
+                  />
+                );
+              })()}
+              {(() => {
+                const templateLabel = "DCA into StreamSwap";
+                return (
+                  <IntentTemplateChip
+                    label={templateLabel}
+                    autoParse
+                    description="DCA into StreamSwap to average your entry into the streaming event."
+                    iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
+                    gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
+                    selected={selectedTemplateLabel === templateLabel}
+                    onClick={() => setAllMessages([
+                      {
+                        typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+                        value: {
+                          sender: `Your ${IBCAssetInfo.prefix} address`,
+                          contract: 'osmo1994s0ea4z2lqrh5gl8l5s0cw6hwz92s3pn2yhkamfh57j9yh7lxssnr80s',
+                          msg: {
+                            subscribe: {
+                              stream_id: 8
+                            }
+                          },
+                          funds: [
+                            {
+                             denom: 'USDC (transfer/channel-750)', amount: '1'
+                            }
+                          ]
                         }
-                      ]
-                    }
-                  }
-                ], 'DCA into StreamSwap 8',
-                )} disabled={true}
-              />
+                      }
+                    ], 'DCA into StreamSwap', undefined, templateLabel)}
+                  />
+                );
+              })()}
             </>
           )}
           {/* Custom builder entry */}

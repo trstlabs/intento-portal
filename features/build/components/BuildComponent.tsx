@@ -57,11 +57,12 @@ export const BuildComponent = ({
   const [prefix, setPrefix] = useState('into')
   const [denom, setDenom] = useState('uinto')
   const [chainName, setChainName] = useState('')
-
   const [chainSymbol, setChainSymbol] = useState('INTO')
   const [chainId, setChainId] = useState(flowInput.chainId || process.env.NEXT_PUBLIC_INTO_CHAIN_ID)
   const [hasConnectionID, setHasConnectionID] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
+
+  const [selectedTemplateLabel, setSelectedTemplateLabel] = useState<string | null>(null)
 
   const [_isJsonValid, setIsJsonValid] = useState(true)
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
@@ -201,6 +202,7 @@ export const BuildComponent = ({
 
   //////////////////////////////////////// Flow message data \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
   const handleChangeMsg = (index: number) => (msg: string) => {
+    setSelectedTemplateLabel(null)
     const newMsgs = [...flowInput.msgs];
     newMsgs[index] = msg;
     const updatedFlowInput = {
@@ -357,7 +359,8 @@ export const BuildComponent = ({
   function setAllMessages(
     msgObjects: any[],
     label?: string,
-    extra?: { conditions?: ExecutionConditions }
+    extra?: { conditions?: ExecutionConditions },
+    templateLabel?: string
   ) {
     try {
       const processedMsgs = msgObjects.map((msgObject) => {
@@ -389,6 +392,11 @@ export const BuildComponent = ({
       }
 
       onFlowChange(updatedFlowInput);
+
+      // Set selected template label if provided
+      if (templateLabel !== undefined) {
+        setSelectedTemplateLabel(templateLabel);
+      }
     } catch (e) {
       console.error('Error in setAllMessages:', e);
       alert(`Error setting messages: ${e.message}`);
@@ -552,6 +560,7 @@ export const BuildComponent = ({
             handleRemoveMsg={handleRemoveMsg}
             handleChangeMsg={handleChangeMsg}
             setIsJsonValid={setIsJsonValid}
+            selectedTemplateLabel={selectedTemplateLabel}
           />
         </div>
       ))}{' '}
