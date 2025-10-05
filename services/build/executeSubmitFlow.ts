@@ -183,6 +183,24 @@ export function transformAndEncodeMsgs({
     })
     console.log('Transformed message value:', value)
 
+    // Validate address fields
+    const validateAddresses = (obj: any, path = '') => {
+      for (const [key, val] of Object.entries(obj)) {
+        const currentPath = path ? `${path}.${key}` : key
+        if (typeof val === 'string' && key.toLowerCase().includes('address')) {
+          if (val.length <= 30) {
+            throw new Error(`Address validation failed for ${currentPath}: must have more than 30 characters, got ${val.length}`)
+          }
+          if (!val.substring(0, 15).includes('1')) {
+            throw new Error(`Address validation failed for ${currentPath}: must include '1' in first 15 characters`)
+          }
+        } else if (typeof val === 'object' && val !== null) {
+          validateAddresses(val, currentPath)
+        }
+      }
+    }
+    validateAddresses(value)
+
     let typeUrl: string = parsedMsg['typeUrl'].toString()
     msgs.push(encodeMsg(typeUrl, value))
   }
