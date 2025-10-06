@@ -5,6 +5,7 @@ import { Params } from 'intentojs/dist/codegen/intento/intent/v1/params'
 import { Params as MintModuleParams } from 'intentojs/dist/codegen/intento/mint/v1/mint'
 import { Params as AllocModuleParams } from 'intentojs/dist/codegen/intento/alloc/v1/params'
 import { Params as StakingModuleParams } from 'intentojs/dist/codegen/cosmos/staking/v1beta1/staking'
+import { Params as DistrModuleParams } from 'intentojs/dist/codegen/cosmos/distribution/v1beta1/distribution'
 
 import { ParamsState } from '../../state/atoms/moduleParamsAtoms'
 
@@ -17,22 +18,12 @@ export interface BaseQueryInput {
   client: any
 }
 
-export const getValidators = async ({ client }: BaseQueryInput) => {
-  try {
-    const resp = await client.cosmos.staking.v1beta1.validators({})
-
-    return resp.validators
-  } catch (e) {
-    console.error('err(getBalanceForAcc):', e)
-  }
-}
-
-export interface BaseQueryInput {
+export interface BaseQueryInputWithAddress {
   address: string
   client: any
 }
 
-export const getBalanceForAcc = async ({ address, client }: BaseQueryInput) => {
+export const getBalanceForAcc = async ({ address, client }: BaseQueryInputWithAddress) => {
   try {
     const response: QueryAllBalancesResponse = await client.cosmos.bank.v1beta1.allBalances({
       address,
@@ -48,7 +39,7 @@ export const getBalanceForAcc = async ({ address, client }: BaseQueryInput) => {
 export const getStakeBalanceForAcc = async ({
   address,
   client,
-}: BaseQueryInput) => {
+}: BaseQueryInputWithAddress) => {
   try {
     let stakingBalanceAmount = 0
     const resp = await client.cosmos.staking.v1beta1.delegatorDelegations({
@@ -82,6 +73,7 @@ export const getAPR = async (
     )
 
     const bondedTokens = await getBondedTokens(cosmosClient)
+    console.log('moduleState', moduleState)
     const communityTax = moduleState.distrModuleParams.communityTax
     const communityTaxNumber = Number(communityTax)
     const blockParams = await getBlockParams(client)
@@ -119,13 +111,14 @@ export const getModuleParams = async (cosmosClient: any, trstClient: any) => {
       trstClient
     )
 
-    // const distrModuleParams: DistrModuleParams = (
-    //   await getDistributionParams(cosmosClient)
-    // ).params.params
+    const distrModuleParams: DistrModuleParams = await getDistributionParams(
+      trstClient
+    )
 
     const stakingProvision = await getStakeProvisionPercent(trstClient)
 
     return {
+      distrModuleParams,
       mintModuleParams,
       stakingModuleParams,
       allocModuleParams,
@@ -276,6 +269,15 @@ async function getAllocParams(client: any) {
   }
 }
 
+async function getDistributionParams(client: any) {
+  try {
+    const distribution = await client.cosmos.distribution.v1beta1.params({})
+    return distribution.params
+  } catch (e) {
+    console.error('err(getDistributionParams):', e)
+  }
+}
+
 async function getBondedTokens(client: any) {
   try {
     const pool = await client.cosmos.staking.v1beta1.pool({})
@@ -333,5 +335,56 @@ async function getStakeProvisionPercent(client: any) {
     return Number(stakeProvision)
   } catch (e) {
     console.error('err(getStakeProvisionPercent):', e)
+  }
+}
+
+export const getTotalSupply = async ({ client }: BaseQueryInput) => {
+  try {
+    const response = await client.cosmos.bank.v1beta1.supplyOf({
+      denom: 'uinto'
+    })
+    return Number(response.amount.amount)
+  } catch (e) {
+    console.error('err(getTotalSupply):', e)
+    return 0
+  }
+}
+
+export const getCommunityPool = async ({ client }: BaseQueryInput) => {
+  try {
+    const response = await client.cosmos.distribution.v1beta1.communityPool({})
+    const intoCoin = response.pool.find((coin: any) => coin.denom === 'uinto')
+    return intoCoin ? Number(intoCoin.amount/1e18) : 0 //convert to nondec
+  } catch (e) {
+    console.error('err(getCommunityPool):', e)
+    return 0
+  }
+}
+
+export const getChainAndTeamWalletsBalance = async ({ client }: BaseQueryInput) => {
+  try {
+    // Team wallet addresses - these should be updated with actual addresses
+    const chainAndTeamWallets = [
+      'into1m5dncvfv7lvpvycr23zja93fecun2kcvdnvuvq',
+      'into19q4uhsls5d9g5jkx7qxzwm70vm8nw4arlx7vs3',
+      'into1j7wtjwwtmyr79udlahcuxqgmw04tp58seu3uhv',
+      'into1mw07rsryylskarzqlet98py8ckk3a9gw7q6qch',
+    ]
+
+    let totalTeamBalance = 0
+    for (const address of chainAndTeamWallets) {
+      const response = await client.cosmos.bank.v1beta1.allBalances({
+        address,
+        pagination: undefined,
+      })
+      const intoBalance = response.balances.find((coin: any) => coin.denom === 'uinto')
+      if (intoBalance) {
+        totalTeamBalance += Number(intoBalance.amount)
+      }
+    }
+    return totalTeamBalance
+  } catch (e) {
+    console.error('err(getChainAndTeamWalletsBalance):', e)
+    return 0
   }
 }
