@@ -13,6 +13,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { intentModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
+import { walletState } from '../../../state/atoms/walletAtoms'
 import { getDuration } from '../../../util/time'
 import { convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
 
@@ -37,6 +38,7 @@ import { __TEST_MODE__ } from '../../../util/constants'
 import { Database, TrendingUp, Clock, DollarSign, Info } from 'lucide-react'
 import { FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { useIBCAssetList } from '../../../hooks/useChainList'
+import { Alert } from '../../../icons/Alert'
 import { FlowWaveIcon } from '../../../icons/FlowWaveIcon'
 
 type TokenomicsCardProps = {
@@ -99,6 +101,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
   const { balance, isLoading } = useTokenBalance('INTO')
   const [ibcAssetList] = useIBCAssetList()
   const { totalFlows, flowIncrease, isLoading: isFlowStatsLoading } = useFlowStats()
+  const wallet = useRecoilValue(walletState)
   const { mutate: handleSubmitFlow, isLoading: isExecutingSchedule } =
     useSubmitFlow({ flowInput })
 
@@ -266,8 +269,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                         <Text css={{
                           paddingTop: '$1',
                           fontSize: '1rem',
-                          opacity: 0.8,
-                          display: 'block'
+                       
                         }} variant="caption">
                           {' '}
                           {APYWFees.toPrecision(3).toString()}%
@@ -449,6 +451,30 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                   >
                     {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
                   </Button>
+                  {wallet?.address && (
+                    <Button
+                      css={{
+                        marginLeft: '$8',
+                        background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                        border: 'none',
+                        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                        transition: 'all 0.2s ease',
+                        '&:hover': {
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 6px 16px rgba(245, 158, 11, 0.4)',
+                        }
+                      }}
+                      variant="secondary"
+                      size="large"
+                      as="a"
+                      href={`/alert?owner=${wallet.address}`}
+                      target="__blank"
+                      
+                      iconRight={<Alert />}
+                    >
+                    Flow Alerts
+                    </Button>
+                  )}
                 </StyledDivForButtons>
             </Card>
           ) : (

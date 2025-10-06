@@ -26,6 +26,7 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { Globe, File } from 'lucide-react'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__ } from 'util/constants'
@@ -33,7 +34,8 @@ import { WalletButton } from '../Wallet/WalletButton'
 import { useRecoilState } from 'recoil'
 import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
-import { Globe, File,  } from 'lucide-react'
+import { Alert } from '../../icons/Alert'
+import { Analytics } from '../../icons/Analytics'
 
 
 type NavigationSidebarProps = {
@@ -230,18 +232,6 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           {process.env.NEXT_PUBLIC_GOVERNANCE_LINK_LABEL}
         </Button>
       </Link>
-      <Link href={process.env.NEXT_PUBLIC_PRICE_LINK_URL} passHref>
-        <Button
-          as="a"
-          target="__blank"
-          variant="ghost"
-          size="large"
-          iconLeft={<IconWrapper icon={<Analytics />} />}
-          iconRight={<IconWrapper icon={<UpRightArrow />} />}
-        >
-          {process.env.NEXT_PUBLIC_PRICE_LINK_LABEL}
-        </Button>
-      </Link> 
       <Link
         href={`${process.env.NEXT_PUBLIC_KADO_LINK_URL}${status === WalletStatusType.connected ? `&onToAddress=${address}` : ''
           }`}
@@ -393,6 +383,20 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
         <Column gap={4}>
           <Button
             as="a"
+            href={process.env.NEXT_PUBLIC_PRICE_LINK_URL}
+            target="__blank"
+            variant="ghost"
+            size="large"
+            iconLeft={<IconWrapper icon={<Analytics />} />}
+            iconRight={<IconWrapper icon={<UpRightArrow />} />}
+            rel="noopener noreferrer"
+          >
+            INTO Price
+          </Button>
+        </Column>
+        <Column gap={4}>
+          <Button
+            as="a"
             href={process.env.NEXT_PUBLIC_FEEDBACK_LINK}
             target="__blank"
             variant="ghost"
@@ -401,6 +405,20 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             Provide feedback
           </Button>
         </Column>
+        {address && (
+            <Column gap={4}>
+              <Button
+                as="a"
+                href={`/alert?owner=${address}`}
+                target="__blank"
+                variant="ghost"
+                size="large"
+                iconLeft={<IconWrapper icon={<Alert />} />}
+              >
+                Subscribe to Flow Alerts
+              </Button>
+            </Column>
+          )}
         <Inline gap={2} css={{ padding: '$20 0 $13' }}>
           <Button
             as="a"
@@ -435,6 +453,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             target="__blank"
             icon={<IconWrapper icon={<Github />} />}
             variant="ghost"
+            rel="noopener noreferrer"
             size="medium"
             css={buttonIconCss}
           />
