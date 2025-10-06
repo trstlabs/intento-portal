@@ -261,7 +261,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                       <div>
                         <Inline>
                           <Text variant="legend" css={{ fontWeight: '600', color: '#3b82f6' }}>APY (Weekly Compound)</Text>
-                          <Tooltip label="Annual Percentage Yield (APY) represents the effective annual rate of return of staked INTO that is compounded for a year. For Weekly Compound APY, rewards are calculated and added to your staking balance every week.">
+                          <Tooltip label="Annual Percentage Yield (APY) represents the effective annual rate of return of staked INTO that is compounded for a year, where rewards are calculated and added to your staking balance every week.">
                             <Button
                               variant="ghost"
                               size="small"
@@ -611,7 +611,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                   fontSize: '0.875rem',
                   marginTop: '$2'
                 }}>
-                  Total Intento flows on Intento
+                  Total flows on Intento
                 </Text>
               </Card>
               <Card css={{
