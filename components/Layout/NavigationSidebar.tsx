@@ -9,7 +9,6 @@ import {
   FeedbackIcon,
   Github,
   IconWrapper,
-  InfoIcon,
   Inline,
   media,
   MoonIcon,
@@ -36,6 +35,7 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
 import { Alert } from '../../icons/Alert'
 import { Analytics } from '../../icons/Analytics'
+import { LineChart } from 'lucide-react'
 
 
 type NavigationSidebarProps = {
@@ -185,7 +185,7 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
             as="a"
             variant="menu"
             size="large"
-            iconLeft={<InfoIcon />}
+            iconLeft={<IconWrapper icon={<LineChart />} />}
             selected={getIsLinkActive('/stats')}
           >
             <Inline css={{ paddingLeft: '$4' }}>Statistics </Inline>
