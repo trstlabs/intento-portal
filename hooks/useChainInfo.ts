@@ -2,7 +2,8 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { useQuery } from 'react-query'
 import { queryClient } from '../services/queryClient'
 
-import { convertMicroDenomToDenom } from 'util/conversion'
+import { getExpectedFlowFee, getFlowParams, getStakeBalanceForAcc, getAPR, getModuleParams } from '../services/chain-info'
+import { convertMicroDenomToDenom } from '../util/conversion'
 import { cosmos } from 'intentojs'
 import {
   DEFAULT_REFETCH_INTERVAL,
@@ -14,13 +15,6 @@ import {
   useCosmosRpcClient,
   useTendermintRpcClient,
 } from './useRPCClient'
-import {
-  getStakeBalanceForAcc,
-  getAPR,
-  getExpectedFlowFee,
-  getFlowParams,
-  getModuleParams,
-} from '../services/chain-info'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 
@@ -308,7 +302,12 @@ export const useGetAPYWithFees = (
       setTriggerModuleData(intentModuleParams)
       const recurrences =
         interval && interval < duration ? Math.floor(duration / interval) : 1
-      // Use apr value from useAPR instead of calling getAPYForAutoCompound directly
+
+      // Calculate the APY percentage first (same as useGetAPY)
+      const periodsPerYear = (60 * 60 * 24 * 365) / interval
+      const baseAPY = ((1 + APR.estimatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) * 100
+
+      // Calculate fees for the entire period
       const expectedFees = getExpectedFlowFee(
         intentModuleParams,
         200000,
@@ -316,12 +315,19 @@ export const useGetAPYWithFees = (
         recurrences,
         'uinto'
       )
-      return (
-        (APR.calculatedApr * stakingBalance) / stakingBalance - expectedFees
-      )
+
+      // Convert fees from micro units to INTO tokens
+      const feesInINTO = convertMicroDenomToDenom(expectedFees, 6)
+
+      // Calculate the effective APY by reducing the staking rewards by the fees
+      // This is a simplified calculation - in reality, fees would be deducted periodically
+      const feesAsPercentageOfStakingBalance = (feesInINTO / stakingBalance) * 100
+
+      // Reduce the APY by the fee percentage
+      return Math.max(0, baseAPY - feesAsPercentageOfStakingBalance)
     },
     {
-      enabled: Boolean(client && APR && paramsState), // Ensure apr is available before executing
+      enabled: Boolean(client && APR && paramsState && stakingBalance > 0), // Ensure apr is available before executing
       refetchOnMount: false,
       staleTime: 60000, // Cache data for 60 seconds
       cacheTime: 300000, // Cache data for 5 minutes
@@ -430,7 +436,6 @@ export const useGetCirculatingSupply = () => {
 
   const circulatingSupply = useMemo(() => {
     if (totalSupply && communityPool && chainAndTeamWallets) {
-      console.log(totalSupply, communityPool, chainAndTeamWallets)
       return totalSupply - communityPool - chainAndTeamWallets
     }
     return null

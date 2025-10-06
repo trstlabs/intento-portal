@@ -31,15 +31,16 @@ import {
 } from '../../../hooks/useChainInfo'
 import { useFlowStats } from '../../../hooks/useFlowStats'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
+import { useIBCAssetList } from '../../../hooks/useChainList'
+import { Alert } from '../../../icons/Alert'
+import { FlowWaveIcon } from '../../../icons/FlowWaveIcon'
 import { FlowInput } from '../../../types/trstTypes'
 import { __TEST_MODE__ } from '../../../util/constants'
 
 // Import icons for visual enhancement
-import { Database, TrendingUp, Clock, DollarSign, Info } from 'lucide-react'
+import { Database, TrendingUp, Clock, DollarSign, Info, Compass } from 'lucide-react'
 import { FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1/flow'
-import { useIBCAssetList } from '../../../hooks/useChainList'
-import { Alert } from '../../../icons/Alert'
-import { FlowWaveIcon } from '../../../icons/FlowWaveIcon'
+import { useINTOPrice } from '../../../hooks/useINTOPrice'
 
 type TokenomicsCardProps = {
   shouldShowAutoCompound: Boolean
@@ -50,13 +51,11 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
   const [requestedSubmitFlow, setRequestedSubmitFlow] = useState(false)
   const intentParams = useRecoilValue(intentModuleParamsAtom)
   let data = new FlowInput()
-  data.duration = 365 * 86400000
-  data.interval = 86400000
   data.msgs = ['']
   const initConfig = {
-    saveResponses: false,
+    saveResponses: true,
     updatingDisabled: false,
-    stopOnFailure: true,
+    stopOnFailure: false,
     stopOnSuccess: false,
     stopOnTimeout: false,
     walletFallback: true,
@@ -73,15 +72,6 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
   }
   data.label = "Autocompound"
   data.conditions = initConditions
-  const feedbackLoop: FeedbackLoop = {
-    responseIndex: 0,
-    responseKey: 'Amount.[-1]',
-    msgsIndex: 1,
-    msgKey: 'Amount',
-    valueType: 'sdk.Coin',
-    flowId: BigInt(0)
-  }
-  data.conditions.feedbackLoops.push(feedbackLoop)
   const [flowInput, setFlowInput] = useState(data)
   const [APR, isAPRLoading] = useGetAPR()
   const week = 60 * 60 * 24 * 7
@@ -101,6 +91,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
   const { balance, isLoading } = useTokenBalance('INTO')
   const [ibcAssetList] = useIBCAssetList()
   const { totalFlows, flowIncrease, isLoading: isFlowStatsLoading } = useFlowStats()
+  const { price, isLoading: isPriceLoading } = useINTOPrice()
   const wallet = useRecoilValue(walletState)
   const { mutate: handleSubmitFlow, isLoading: isExecutingSchedule } =
     useSubmitFlow({ flowInput })
@@ -117,21 +108,46 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
 
   const handleSubmitFlowClick = (newFlowInput: FlowInput) => {
     const msgs = []
-    for (const validator of stakeBalance.validators) {
+    const feedbackLoops = []
+
+    for (let i = 0; i < stakeBalance.validators.length; i++) {
+      const validator = stakeBalance.validators[i]
+
+      // Create claim message for this validator
       let claimMsg = claimRewardSDKMessage
       claimMsg.value.delegatorAddress = stakeBalance.address
       claimMsg.value.validatorAddress = validator
       msgs.push(JSON.stringify(claimMsg))
+
+      // Create delegate message for this validator
       let delegateMsg = delegateSDKMessage
       delegateMsg.value.delegatorAddress = stakeBalance.address
       delegateMsg.value.validatorAddress = validator
       msgs.push(JSON.stringify(delegateMsg))
+
+      // Create feedback loop for this validator's messages
+      // Connect the claim message (2*i) to delegate message (2*i + 1)
+      const feedbackLoop: FeedbackLoop = {
+        msgsIndex: 2 * i, // Index of claim message for this validator
+        msgKey: 'Amount',
+        responseIndex: 0,
+        responseKey: "Amount.[-1]",
+        valueType: 'sdk.Coin',
+        flowId: BigInt(0)
+      }
+      feedbackLoops.push(feedbackLoop)
     }
+
     const flow = {
+      ...data,
       ...newFlowInput,
       msgs,
+      conditions: {
+        ...data.conditions,
+        feedbackLoops: feedbackLoops
+      }
     }
-    // console.log(flow)
+
     setFlowInput(flow)
     return setRequestedSubmitFlow(true)
   }
@@ -559,9 +575,9 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                       justifyContent: 'center',
                       boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
                     }}>
-                      <DollarSign size={20} color="white" />
+                      <Compass size={20} color="white" />
                     </div>
-                    <Text variant="legend" css={{ fontWeight: '600', color: '#8b5cf6' }}>Network Fees</Text>
+                    <Text variant="legend" css={{ fontWeight: '600', color: '#8b5cf6' }}>Flow Fees</Text>
                   </div>
                   <>
 
@@ -738,6 +754,59 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
               margin: '$4',
               position: 'relative',
               overflow: 'hidden',
+              background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%)',
+              border: '1px solid rgba(245, 158, 11, 0.2)',
+              transition: 'all 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-2px)',
+                boxShadow: '0 8px 25px rgba(245, 158, 11, 0.15)',
+                borderColor: 'rgba(245, 158, 11, 0.4)',
+              }
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                }}>
+                  <DollarSign size={20} color="white" />
+                </div>
+                <Text variant="legend" css={{ fontWeight: '600', color: '#f59e0b' }}>INTO Price</Text>
+              </div>
+              <Text css={{
+                padding: '$8',
+                fontSize: '1.75rem',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #fbbf24, #facc15)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
+              }} variant="title">
+                {!isPriceLoading && price > 0
+                  ? `$${price.toFixed(6)}`
+                  : 'Loading...'
+                }{' '}
+                <span style={{ fontSize: '1rem', opacity: 0.8 }}>USDC</span>
+              </Text>
+              <Text variant="caption" css={{
+                display: 'block',
+                color: 'rgba(245, 158, 11, 0.8)',
+                fontSize: '0.875rem',
+                marginTop: '$2'
+              }}>
+                Live price from Osmosis pool (INTO/USDC)
+              </Text>
+            </Card>
+
+            <Card css={{
+              padding: '$12',
+              margin: '$4',
+              position: 'relative',
+              overflow: 'hidden',
               background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%)',
               border: '1px solid rgba(168, 85, 247, 0.2)',
               transition: 'all 0.3s ease',
@@ -878,7 +947,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                     fontSize: '0.8rem',
                     lineHeight: '1.4'
                   }}>
-                    As it stands, {Number((100 - (airdropClawback?.percentage || 0)).toFixed(3))}% of the total airdrop will be clawed back to the community pool. These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
+                   These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
                   </Text>
                 </>
               ) : (
@@ -971,6 +1040,11 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
           handleSubmitFlow={(flowInput) =>
             handleSubmitFlowClick(flowInput)
           }
+          executionParams={{
+            startAt: 0,
+            interval: 86400000 * 7, // Weekly compounding
+            endTime: Date.now() + 365 * 86400000 + 900000, // 1 year from now + 15 minutes
+          }}
         />
       </StyledDivForInfoGrid>
     </StyledDivForContainer>
