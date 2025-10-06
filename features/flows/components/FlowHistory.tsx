@@ -21,8 +21,6 @@ import { __TEST_MODE__ } from '../../../util/constants'
 import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { Link } from '@interchain-ui/react'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
-import { TwapRecord } from '../../../util/conversion/twapRecord'
-import { fromBase64 } from "@cosmjs/encoding";
 
 type FlowHistoryProps = {
   id: string
