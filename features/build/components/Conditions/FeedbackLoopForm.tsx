@@ -9,6 +9,8 @@ import { ICQConfigForm } from "./ICQConfigForm"
 type FeedbackLoopFormProps = {
   feedbackLoop?: FeedbackLoop
   onChange: (value: FeedbackLoop) => void
+  onSave?: () => void
+  onCancel?: () => void
   setDisabled: () => void
 }
 

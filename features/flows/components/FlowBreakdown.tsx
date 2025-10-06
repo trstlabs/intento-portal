@@ -46,9 +46,11 @@ import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { Share } from 'lucide-react'
 import { EditSchedulingSection } from './EditSchedulingSection'
-import { convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
+import { convertBigIntToString, convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
 import { XTwitter } from '../../../icons/XTwitter'
 import { AuthzGrantCheck } from '../../build/components/AuthzGrantCheck'
+import { FeedbackLoopForm } from '../../build/components/Conditions/FeedbackLoopForm'
+import { TwapRecord } from '../../../util/conversion/twapRecord'
 
 
 type FlowBreakdownProps = {
@@ -1008,13 +1010,13 @@ export const FlowBreakdown = ({
 
                   {expandedFlowSections.has(`comparison-${index}`) && (
                     <>
-                      <Button
+                      {/* <Button
                         variant="ghost"
                         size="small"
                         onClick={() => setEditingComparisonIndex(index)}
                       >
                         Edit
-                      </Button>
+                      </Button> */}
 
                       <>
                         {comparison.flowId.toString() !== "0" && (
@@ -1052,70 +1054,144 @@ export const FlowBreakdown = ({
 
           </FlowBreakdownSection>
         ))}
-        {flow.conditions.feedbackLoops && flow.conditions.feedbackLoops.map((feedbackLoop) => (
-          <>
-            <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion(`feedback-${feedbackLoop.flowId}`)} isExpanded={expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`)}>
-              <Column gap={4} align="flex-start" justifyContent="flex-start">
-                <Tooltip
-                  label={
-                    "Use a response value or query response as a value for a message"
-                  }
-                >
-                  <Inline>
-                    <Text variant="title" align="left" style={{ fontWeight: '600' }}>
-                      Feedback Loop
-                    </Text>
+        {flow.conditions.feedbackLoops && flow.conditions.feedbackLoops.map((feedbackLoop, index) => {
+          const [isEditing, setIsEditing] = useState(false)
+          const [editedFeedbackLoop, setEditedFeedbackLoop] = useState(feedbackLoop)
+
+          const handleSave = () => {
+            const updatedConditions = { ...flow.conditions }
+            
+            // Update the specific feedback loop
+            const updatedFeedbackLoops = [...(updatedConditions.feedbackLoops || [])]
+            updatedFeedbackLoops[index] = editedFeedbackLoop
+            console.log(updatedFeedbackLoops)
+            // Prepare the update parameters
+            const updateParams: MsgUpdateFlowParams = {
+              id: Number(flow.id),
+              owner: flow.owner,
+              msgs: transformedMsgs,
+              conditions: {
+                ...updatedConditions,
+                feedbackLoops: updatedFeedbackLoops
+              }
+            }
+            
+            // Update the local state
+            setUpdatedFlowParams(updateParams)
+            
+            // Trigger the update
+            setRequestedUpdateFlow(true)
+            setIsEditing(false)
+          }
+
+          const handleCancel = () => {
+            setEditedFeedbackLoop(feedbackLoop)
+            setIsEditing(false)
+          }
+
+          return (
+            <div key={`feedback-${index}`}>
+              {!isEditing ? (
+                <FlowBreakdownSection expandable onClick={() => toggleFlowSectionExpansion(`feedback-${index}`)} isExpanded={expandedFlowSections.has(`feedback-${index}`)}>
+                  <Column gap={4} align="flex-start" justifyContent="flex-start">
+                    <Tooltip
+                      label={
+                        "Use a response value or query response as a value for a message"
+                      }
+                    >
+                      <Inline css={{ width: '100%', justifyContent: 'space-between' }}>
+                        <Inline>
+                          <Text variant="title" align="left" style={{ fontWeight: '600' }}>
+                            Feedback Loop
+                          </Text>
+                          <Button
+                            variant="ghost"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              toggleFlowSectionExpansion(`feedback-${index}`)
+                            }}
+                            disabled={!expandedFlowSections.has(`feedback-${index}`)}
+                            icon={
+                              <IconWrapper
+                                size="medium"
+                                rotation={expandedFlowSections.has(`feedback-${index}`) ? "90deg" : "-90deg"}
+                                color="tertiary"
+                                icon={<Chevron />}
+                              />
+                            }
+                          />
+                        </Inline>
+                        {/* {expandedFlowSections.has(`feedback-${index}`) && (
+                          <Button
+                            variant="ghost"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setIsEditing(true)
+                            }}
+                          >
+                            Edit
+                          </Button>
+                        )} */}
+                      </Inline>
+                    </Tooltip>
+
+                    {expandedFlowSections.has(`feedback-${index}`) && (
+                      <>
+                        {feedbackLoop.flowId.toString() != "0" && (
+                          <Text variant="body">
+                            <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
+                          </Text>)}
+                        {feedbackLoop.responseIndex != 0 &&
+                          <Text variant="body">
+                            <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
+                          </Text>
+                        }
+                        {feedbackLoop.responseKey != "" &&
+                          <Text variant="body">
+                            <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
+                          </Text>}
+                        <Text variant="body">
+                          <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
+                        </Text>
+                        <Text variant="body">
+                          <Text variant="legend" color="secondary" align="left">Key in message to replace</Text>  {feedbackLoop.msgKey}
+                        </Text>
+                        <Text variant="body">
+                          <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
+                        </Text>
+                        {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))}
+                      </>
+                    )}
+                  </Column>
+                </FlowBreakdownSection>
+              ) : (
+                <div style={{ padding: '16px', border: '1px solid #e2e8f0', borderRadius: '8px', margin: '8px 0' }}>
+                  <FeedbackLoopForm
+                    feedbackLoop={editedFeedbackLoop}
+                    onChange={(updated) => setEditedFeedbackLoop(updated)}
+                    setDisabled={() => { }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '16px' }}>
                     <Button
                       variant="ghost"
-                      size="small"
-                      onClick={() => toggleFlowSectionExpansion(`feedback-${feedbackLoop.flowId}`)}
-                      disabled={!expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`)}
-                      icon={
-                        <IconWrapper
-                          size="medium"
-                          rotation={expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`) ? "90deg" : "-90deg"}
-                          color="tertiary"
-                          icon={<Chevron />}
-                        />
-                      }
-                    />
-                  </Inline>
-                </Tooltip>
-
-                {expandedFlowSections.has(`feedback-${feedbackLoop.flowId}`) && (
-                  <>
-                    {feedbackLoop.flowId.toString() != "0" && (
-                      <Text variant="body">
-                        <Text variant="legend" color="secondary" align="left">ID</Text>  {feedbackLoop.flowId.toString()}
-                      </Text>)}
-                    {feedbackLoop.responseIndex != 0 &&
-                      <Text variant="body">
-                        <Text variant="legend" color="secondary" align="left">Response Index (optional)</Text>    {feedbackLoop.responseIndex}
-                      </Text>
-                    }
-                    {feedbackLoop.responseKey != "" &&
-                      <Text variant="body">
-                        <Text variant="legend" color="secondary" align="left">Response Key (optional)</Text>      {feedbackLoop.responseKey}
-                      </Text>}
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Index in messages</Text>  {feedbackLoop.msgsIndex}
-                    </Text>
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left"> Key in message to replace</Text>  {feedbackLoop.msgKey}
-                    </Text>
-
-                    <Text variant="body">
-                      <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
-                    </Text>
-                    {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))
-                    }
-                  </>
-                )}
-              </Column>
-            </FlowBreakdownSection>
-          </>
-
-        ))}
+                      onClick={handleCancel}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={handleSave}
+                    >
+                      Update
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
         {flow.configuration && (
           showConfiguration()
 
@@ -1403,6 +1479,14 @@ export const FlowBreakdown = ({
   }
 
   function icqConfig(icqConfig: ICQConfig): React.ReactNode {
+    let response = null
+    if (icqConfig.queryType.includes("twap")) {
+      const twapRecord = TwapRecord.decode(icqConfig.response)
+      response = convertBigIntToString(twapRecord)
+      response = JSON.stringify(response, null, 2)
+    } else {
+      response = JSON.stringify(response, null, 2)
+    }
     return <>
       <Tooltip
         label={"Perform an interchain query for conditions"}
@@ -1428,6 +1512,9 @@ export const FlowBreakdown = ({
       </Text>
       <Text variant="body">
         <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[icqConfig.timeoutPolicy]}
+      </Text>
+      <Text variant="body">
+        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Latest Response</Text>  {response}
       </Text>
     </>
   }
