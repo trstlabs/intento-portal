@@ -36,8 +36,8 @@ export default function Claim() {
                 <PageHeader
                     title="Statistics"
                     subtitle={<>
-                        Statistics on Intento's tokenomics, usage and more. {" "} Read more about the INTO token {" "}
-                        <Link href="https://docs.intento.zone/getting-started/into-token" target="_blank" color="primary">
+                        Statistics on Intento tokenomics, usage and more. {" "} Read more about the INTO token {" "}
+                        <Link href="https://docs.intento.zone/getting-started/into-token" as="a" passHref target="_blank" color="primary">
                             <span style={{ fontWeight: 'bold' }}> here.</span>
                         </Link>
                     </>
