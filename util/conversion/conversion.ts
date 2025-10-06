@@ -149,3 +149,28 @@ export function removeEmptyProperties(obj: any): any {
   }
   return newObj
 }
+
+
+export const convertBigIntToString = (obj) => {
+  if (typeof obj !== 'object' || obj === null) {
+      return obj;
+  }
+  if (Array.isArray(obj)) {
+      return obj.map(convertBigIntToString);
+  }
+
+  return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => {
+          if (typeof value === 'bigint') {
+              return [key, value.toString()];
+          }
+
+          // // Special handling to avoid wrapping amount/denom objects
+          // if (typeof value === 'object' && value !== null && 'denom' in value && 'amount' in value) {
+          //     return [key, { denom: String(value.denom), amount: String(value.amount) }];
+          // }
+
+          return [key, convertBigIntToString(value)];
+      })
+  );
+};

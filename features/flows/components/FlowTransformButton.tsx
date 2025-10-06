@@ -2,6 +2,7 @@ import { Flow } from 'intentojs/dist/codegen/intento/intent/v1/flow';
 import { FlowInput } from '../../../types/trstTypes';
 import { Button, CopyIcon } from 'junoblocks';
 import { fetchFlowMsgs } from '../../../hooks/useGetMsgsFromAPI';
+import { convertBigIntToString } from '../../../util/conversion';
 
 
 type FlowTransformButtonProps = {
@@ -10,29 +11,7 @@ type FlowTransformButtonProps = {
 }
 
 export const FlowTransformButton = ({ flow, initialChainID }: FlowTransformButtonProps) => {
-    const convertBigIntToString = (obj) => {
-        if (typeof obj !== 'object' || obj === null) {
-            return obj;
-        }
-        if (Array.isArray(obj)) {
-            return obj.map(convertBigIntToString);
-        }
-
-        return Object.fromEntries(
-            Object.entries(obj).map(([key, value]) => {
-                if (typeof value === 'bigint') {
-                    return [key, value.toString()];
-                }
-
-                // // Special handling to avoid wrapping amount/denom objects
-                // if (typeof value === 'object' && value !== null && 'denom' in value && 'amount' in value) {
-                //     return [key, { denom: String(value.denom), amount: String(value.amount) }];
-                // }
-
-                return [key, convertBigIntToString(value)];
-            })
-        );
-    };
+    
 
     const transformFlow = async (flow: Flow) => {
         const msgs = await transformFlowMsgs(flow)
@@ -237,4 +216,3 @@ const normalizeAmountField = (obj: any): any => {
 const toSnakeCase = (str: string): string => {
     return str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
 };
-
