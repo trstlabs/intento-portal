@@ -45,21 +45,20 @@ export const processDenomFields = (obj: any): any => {
 
     const result = { ...obj };
 
-    // Process denom and amount if denom exists and needs conversion
+    // Process denom and amount if denom exists
     if ('denom' in result && typeof result.denom === 'string') {
         const denom = result.denom;
-        if (denom === denom.toUpperCase() && !denom.startsWith('u') ) {
-            if (!denom.startsWith('ibc/')) {
-            // Convert symbol to micro-denom (e.g., 'INTO' -> 'uinto')
+        
+        // Handle non-IBC denoms (convert to micro-denom)
+        if (!denom.startsWith('ibc/') && denom === denom.toUpperCase() && !denom.startsWith('u')) {
             result.denom = 'u' + denom.toLowerCase();
-            
-            }
-            // Convert amount to micro units (10^6) if it exists
-            if ('amount' in result && typeof result.amount === 'string') {
-                const amount = parseFloat(result.amount);
-                if (!isNaN(amount)) {
-                    result.amount = Math.floor(amount * 1_000_000).toString();
-                }
+        }
+        
+        // Convert amount to micro units (10^6) only for non-micro and non-IBC denoms
+        if (!denom.startsWith('u') && !denom.startsWith('ibc/') && 'amount' in result && typeof result.amount === 'string' && result.amount) {
+            const amount = parseFloat(result.amount);
+            if (!isNaN(amount)) {
+                result.amount = Math.floor(amount * 1_000_000).toString();
             }
         }
     }
