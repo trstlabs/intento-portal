@@ -999,7 +999,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }} variant="title">
-                560M INTO
+                560M  <span style={{ fontSize: '1rem' }}> {" "}INTO</span>
               </Text>
               <Text variant="caption" css={{
                 padding: '0 $8 $8',
