@@ -9,6 +9,7 @@ import {
   FeedbackIcon,
   Github,
   IconWrapper,
+  InfoIcon,
   Inline,
   media,
   MoonIcon,
@@ -176,6 +177,19 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Button>
         </Link>
       )}
+      {process.env.NEXT_PUBLIC_STATS_ENABLED == "true" && <Column css={{ paddingTop: '12' }}>
+        <Link href="/stats" passHref>
+          <Button
+            as="a"
+            variant="menu"
+            size="large"
+            iconLeft={<InfoIcon />}
+            selected={getIsLinkActive('/stats')}
+          >
+            <Inline css={{ paddingLeft: '$4' }}>Statistics </Inline>
+          </Button>
+        </Link>
+      </Column>}
 
       {/* <Link href="/send" passHref>
         <Button

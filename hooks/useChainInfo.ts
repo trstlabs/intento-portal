@@ -362,3 +362,123 @@ export const useGetAPY = (intervalSeconds: number) => {
 
   return [data, isLoading || isLoadingAPR] as const
 }
+
+export const useGetTotalSupply = () => {
+  const client = useIntentoRpcClient()
+
+  const { data, isLoading } = useQuery(
+    'getTotalSupply',
+    async () => {
+      const { getTotalSupply } = await import('../services/chain-info')
+      return getTotalSupply({ client })
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [data, isLoading] as const
+}
+
+export const useGetCommunityPool = () => {
+  const client = useIntentoRpcClient()
+
+  const { data, isLoading } = useQuery(
+    'getCommunityPool',
+    async () => {
+      const { getCommunityPool } = await import('../services/chain-info')
+      return getCommunityPool({ client })
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [data, isLoading] as const
+}
+
+export const useGetChainAndTeamWalletsBalance = () => {
+  const client = useIntentoRpcClient()
+
+  const { data, isLoading } = useQuery(
+    'getChainAndTeamWalletsBalance',
+    async () => {
+      const { getChainAndTeamWalletsBalance } = await import('../services/chain-info')
+      return getChainAndTeamWalletsBalance({ client })
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [data, isLoading] as const
+}
+
+export const useGetCirculatingSupply = () => {
+  const [totalSupply, isTotalSupplyLoading] = useGetTotalSupply()
+  const [communityPool, isCommunityPoolLoading] = useGetCommunityPool()
+  const [chainAndTeamWallets, isChainAndTeamWalletsLoading] = useGetChainAndTeamWalletsBalance()
+
+  const circulatingSupply = useMemo(() => {
+    if (totalSupply && communityPool && chainAndTeamWallets) {
+      console.log(totalSupply, communityPool, chainAndTeamWallets)
+      return totalSupply - communityPool - chainAndTeamWallets
+    }
+    return null
+  }, [totalSupply, communityPool, chainAndTeamWallets])
+
+  const isLoading = isTotalSupplyLoading || isCommunityPoolLoading || isChainAndTeamWalletsLoading
+
+  return [circulatingSupply, isLoading] as const
+}
+
+export const useGetAirdropClawback = () => {
+  const client = useIntentoRpcClient()
+
+  const { data, isLoading } = useQuery(
+    'getAirdropClawback',
+    async () => {
+      if (!client) return { percentage: 0, amount: 0 }
+
+      try {
+        const initialModuleBalance = 89973272000000 // 89,973,272,000,000 in micro units
+        const moduleAccAddress = 'into1m5dncvfv7lvpvycr23zja93fecun2kcvdnvuvq'
+
+        const coin = await client.cosmos.bank.v1beta1.balance({
+          address: moduleAccAddress,
+          denom: 'uinto'
+        })
+
+        if (coin?.balance) {
+          const diff = initialModuleBalance - Number(coin.balance.amount)
+          const percentage = (diff / initialModuleBalance) * 100
+          return {
+            percentage: Number(percentage.toFixed(3)),
+            amount: diff
+          }
+        }
+        return { percentage: 0, amount: 0 }
+      } catch (error) {
+        console.error('Error fetching airdrop clawback:', error)
+        return { percentage: 0, amount: 0 }
+      }
+    },
+    {
+      enabled: Boolean(client),
+      refetchOnMount: 'always',
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchIntervalInBackground: true,
+    }
+  )
+
+  return [data, isLoading] as const
+}

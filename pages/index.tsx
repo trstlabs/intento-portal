@@ -23,7 +23,6 @@ import { useCallback, useMemo, useState } from 'react'
 import { useUpdateEffect } from 'react-use'
 import { useFlows, useFlowsByOwner } from 'hooks/useFlow'
 import { FlowCard } from '../features/flows/components/FlowCard'
-import { InfoCard } from '../features/dashboard/components/InfoCard'
 import { useChain } from '@cosmos-kit/react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { APP_NAME } from '../util/constants'
@@ -77,7 +76,6 @@ export default function Home() {
     ),
   })
 
-  const shouldShowAutoCompound = !myFlows?.length || myFlows.find((tx) => tx.label === 'Autocompound') == undefined
   const shouldShowFetchingState = (isLoading || isRefreshing) && !allFlows?.flows.length && isMyFlowsLoading && !myFlows?.length
   const shouldRenderMyFlows = Boolean(myFlows?.length)
   const hasNextPage = Boolean(allFlows?.pagination?.nextKey)
@@ -249,9 +247,6 @@ export default function Home() {
           </Column>
         </>
       )}
-      {process.env.NEXT_PUBLIC_DASHBOARD_INFO_ENABLED == "true" && <Column css={{ paddingTop: '12' }}>
-        <InfoCard shouldShowAutoCompound={shouldShowAutoCompound} />
-      </Column>}
 
       {shouldRenderMyFlows && (
         <>
