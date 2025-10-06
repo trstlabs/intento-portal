@@ -71,7 +71,7 @@ export const FlowCard = ({ flow }: flowWithDetails) => {
   const execTime = flow.execTime?.getTime()
 
   const isActive = endTime && execTime &&
-    endTime > execTime &&
+    endTime >= execTime &&
     endTime > now &&
     execTime > now;
 
