@@ -44,6 +44,11 @@ interface SubmitFlowDialogProps {
   trustlessAgent?: TrustlessAgent
   chainId: string
   chainName?: string // Optional chain name
+  executionParams?: {
+    startAt?: number
+    interval?: number
+    endTime?: number
+  }
 }
 
 // Only executionParams and setUpdateExecutionParams are used for interval/startAt/duration
@@ -57,6 +62,7 @@ export const SubmitFlowDialog = ({
   handleSubmitFlow,
   trustlessAgent,
   chainName: propChainName,
+  executionParams: propExecutionParams,
 }: SubmitFlowDialogProps) => {
   // Lookup chain name if not provided
   const chainInfo = useChainInfoByChainID(chainId)
@@ -70,9 +76,9 @@ export const SubmitFlowDialog = ({
 
   // Single source of truth for execution params
   const [executionParams, setExecutionParams] = useState({
-    startAt: 0,
-    interval: 86400000, // 1 day in ms
-    endTime: Date.now() + 7 * 86400000 + 900000, // 7 days from now + 15 minutes
+    startAt: propExecutionParams?.startAt ?? 0,
+    interval: propExecutionParams?.interval ?? 86400000, // 1 day in ms
+    endTime: propExecutionParams?.endTime ?? (Date.now() + 7 * 86400000 + 900000), // 7 days from now + 15 minutes
   })
 
   function setUpdateExecutionParams(params: { startAt?: number; interval?: number; endTime?: number }) {
