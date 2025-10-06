@@ -14,7 +14,6 @@ import React, { useEffect, useState } from 'react'
 import { useRecoilValue } from 'recoil'
 import { intentModuleParamsAtom } from '../../../state/atoms/moduleParamsAtoms'
 import { walletState } from '../../../state/atoms/walletAtoms'
-import { getDuration } from '../../../util/time'
 import { convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
 
 import { SubmitFlowDialog } from '../../build/components/SubmitFlowDialog'
@@ -285,7 +284,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                         <Text css={{
                           paddingTop: '$1',
                           fontSize: '1rem',
-                       
+
                         }} variant="caption">
                           {' '}
                           {APYWFees.toPrecision(3).toString()}%
@@ -394,13 +393,13 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
               margin: '$4',
               position: 'relative',
               overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%)',
-              border: '1px solid rgba(168, 85, 247, 0.2)',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
               transition: 'all 0.3s ease',
               '&:hover': {
                 transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(168, 85, 247, 0.15)',
-                borderColor: 'rgba(168, 85, 247, 0.4)',
+                boxShadow: '0 8px 25px rgba(59, 130, 246, 0.15)',
+                borderColor: 'rgba(59, 130, 246, 0.4)',
               }
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
@@ -408,90 +407,90 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                   width: '40px',
                   height: '40px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #a855f7, #d946ef)',
+                  background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
                 }}>
                   <TrendingUp size={20} color="white" />
                 </div>
-                <Text variant="legend" css={{ fontWeight: '600', color: '#a855f7' }}>Staking Actions</Text>
+                <Text variant="legend" css={{ fontWeight: '600', color: '#3b82f6' }}>Staking Actions</Text>
               </div>
-            
-                <StyledDivForButtons>
+
+              <StyledDivForButtons>
+                <Button
+                  css={{
+                    marginLeft: '$8',
+                    background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 6px 16px rgba(59, 130, 246, 0.4)',
+                    }
+                  }}
+                  variant="secondary"
+                  size="large"
+                  disabled={isStakeBalanceLoading}
+                  as="a"
+                  href={'https://explorer.intento.zone/intento-' + (__TEST_MODE__ ? 'devnet' : 'mainnet') + '/staking'}
+                  target="__blank"
+                >
+                  {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
+                </Button>
+                <Button
+                  css={{
+                    marginLeft: '$8',
+                    background: 'linear-gradient(135deg, #10b981, #22c55e)',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
+                      boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
+                    }
+                  }}
+                  variant="secondary"
+                  size="large"
+                  disabled={
+                    isStakeBalanceLoading ||
+                    (stakeBalance && stakeBalance.stakingBalanceAmount == 0)
+                  }
+                  onClick={() =>
+                    setSubmitFlowDialogState({
+                      isShowing: true,
+                    })
+                  }
+                >
+                  {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
+                </Button>
+                {wallet?.address && (
                   <Button
                     css={{
                       marginLeft: '$8',
-                      background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                      background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
                       border: 'none',
-                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
                       transition: 'all 0.2s ease',
                       '&:hover': {
                         transform: 'translateY(-1px)',
-                        boxShadow: '0 6px 16px rgba(59, 130, 246, 0.4)',
+                        boxShadow: '0 6px 16px rgba(245, 158, 11, 0.4)',
                       }
                     }}
                     variant="secondary"
                     size="large"
-                    disabled={isStakeBalanceLoading}
                     as="a"
-                    href={'https://explorer.intento.zone/intento-' + (__TEST_MODE__ ? 'devnet' : 'mainnet') + '/staking'}
+                    href={`/alert?owner=${wallet.address}`}
                     target="__blank"
+
+                    iconRight={<Alert />}
                   >
-                    {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
-                  </Button>
-                  <Button
-                    css={{
-                      marginLeft: '$8',
-                      background: 'linear-gradient(135deg, #10b981, #22c55e)',
-                      border: 'none',
-                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-                      transition: 'all 0.2s ease',
-                      '&:hover': {
-                        transform: 'translateY(-1px)',
-                        boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
-                      }
-                    }}
-                    variant="secondary"
-                    size="large"
-                    disabled={
-                      isStakeBalanceLoading ||
-                      (stakeBalance && stakeBalance.stakingBalanceAmount == 0)
-                    }
-                    onClick={() =>
-                      setSubmitFlowDialogState({
-                        isShowing: true,
-                      })
-                    }
-                  >
-                    {isExecutingSchedule ? <Spinner instant /> : 'Autocompound'}
-                  </Button>
-                  {wallet?.address && (
-                    <Button
-                      css={{
-                        marginLeft: '$8',
-                        background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-                        border: 'none',
-                        boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
-                        transition: 'all 0.2s ease',
-                        '&:hover': {
-                          transform: 'translateY(-1px)',
-                          boxShadow: '0 6px 16px rgba(245, 158, 11, 0.4)',
-                        }
-                      }}
-                      variant="secondary"
-                      size="large"
-                      as="a"
-                      href={`/alert?owner=${wallet.address}`}
-                      target="__blank"
-                      
-                      iconRight={<Alert />}
-                    >
                     Flow Alerts
-                    </Button>
-                  )}
-                </StyledDivForButtons>
+                  </Button>
+                )}
+              </StyledDivForButtons>
             </Card>
           ) : (
             <Card css={{
@@ -529,10 +528,10 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                   marginTop: '$4',
                   fontSize: '1.25rem',
                   fontWeight: '600',
-                  color: '#22c55e'
+                  color: '#3b82f6'
                 }}>You are autocompounding</Text>
                 <Text variant="caption" css={{
-                  color: 'rgba(34, 197, 94, 0.8)',
+                  color: 'rgba(59, 130, 246, 0.8)',
                   marginTop: '$2'
                 }}>
                   Your staking rewards are automatically being restaked to maximize your yield.
@@ -540,109 +539,174 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
               </div>
             </Card>
           )}
-                    {intentParams && (
-              <Column css={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '$4',
-                height: '100%',
-              }}>
-                <Text variant="title" css={{ padding: '$8' }}>
-                  <span> Fee Info</span>
-                </Text>
-                <Card css={{
-                  padding: '$12',
-                  margin: '$4',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%)',
-                  border: '1px solid rgba(139, 92, 246, 0.2)',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)',
-                    borderColor: 'rgba(139, 92, 246, 0.4)',
-                  }
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '12px',
-                      background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
-                    }}>
-                      <Compass size={20} color="white" />
-                    </div>
-                    <Text variant="legend" css={{ fontWeight: '600', color: '#8b5cf6' }}>Flow Fees</Text>
-                  </div>
-                  <>
+          {intentParams && (
+            <Column css={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '$4',
+              height: '100%',
+            }}>
+              <Text variant="title" css={{ padding: '$8' }}>
+                <span> Intent Engine</span>
+              </Text>
 
-                    <div>
-                      <Tooltip label="The gas fee multiplier is the multiplier that is applied to the gas fee of a flow.">
-                        <Text variant="legend" css={{ marginBottom: '0.5rem', display: 'block' }}>Gas Fee Multiplier</Text></Tooltip>
-                      <Text css={{
-                        padding: '$6',
-                        fontSize: '1.25rem',
-                        fontWeight: '700',
-                        background: 'linear-gradient(135deg, #a78bfa, #c084fc)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        display: 'block'
-                      }} variant="title">
-                        {
-                          Number(intentParams.flowFlexFeeMul)} {" "}
-                      </Text>
-                    </div>
-                    {intentParams.gasFeeCoins && intentParams.gasFeeCoins.length > 0 && (
-                      <div style={{ marginBottom: '1rem' }}>
-                        <Text variant="legend" css={{ marginBottom: '0.5rem', display: 'block' }}>Supported Gas Coins</Text>
-                        <div style={{
-                          display: 'flex',
-                          flexWrap: 'wrap',
-                          gap: '0.5rem'
-                        }}>
-                          {intentParams.gasFeeCoins.map((coin, index) => (
-                            <div key={index} style={{
-                              padding: '0.25rem 0.75rem',
-                              background: 'rgba(139, 92, 246, 0.1)',
-                              border: '1px solid rgba(139, 92, 246, 0.3)',
-                              borderRadius: '12px',
-                              fontSize: '0.875rem',
-                              color: '#a78bfa',
-                              fontWeight: '500'
-                            }}>
-                              {resolveDenomSync(coin.denom, ibcAssetList)}
-                            </div>
-                          ))}
-                        </div>
+              <Card css={{
+                padding: '$12',
+                margin: '$4',
+                position: 'relative',
+                overflow: 'hidden',
+                background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%)',
+                border: '1px solid rgba(168, 85, 247, 0.2)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 25px rgba(168, 85, 247, 0.15)',
+                  borderColor: 'rgba(168, 85, 247, 0.4)',
+                }
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #a855f7, #d946ef)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
+                  }}>
+                    <FlowWaveIcon size={20} color="white" />
+                  </div>
+                  <div>
+                    <Text variant="legend" css={{ fontWeight: '600', color: '#a855f7' }}>Total Flows</Text>
+                    {flowIncrease && (
+                      <div style={{
+                        fontSize: '0.75rem',
+                        color: '#22c55e',
+                        fontWeight: '600',
+                        marginTop: '0.125rem'
+                      }}>
+                        +{flowIncrease} new flows!
                       </div>
                     )}
+                  </div>
+                </div>
+                <Text css={{
+                  padding: '$8',
+                  fontSize: '1.75rem',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #c084fc, #a855f7)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }} variant="title">
+                  {!isFlowStatsLoading && totalFlows !== undefined
+                    ? totalFlows.toLocaleString()
+                    : 'Loading...'
+                  }{' '}
+                  <span style={{ fontSize: '1rem', opacity: 0.8 }}>flows</span>
+                </Text>
+                <Text variant="caption" css={{
+                  display: 'block',
+                  color: 'rgba(168, 85, 247, 0.8)',
+                  fontSize: '0.875rem',
+                  marginTop: '$2'
+                }}>
+                  Total Intento flows on Intento
+                </Text>
+              </Card>
+              <Card css={{
+                padding: '$12',
+                margin: '$4',
+                position: 'relative',
+                overflow: 'hidden',
+                background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%)',
+                border: '1px solid rgba(139, 92, 246, 0.2)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)',
+                  borderColor: 'rgba(139, 92, 246, 0.4)',
+                }
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                  }}>
+                    <Compass size={20} color="white" />
+                  </div>
+                  <Text variant="legend" css={{ fontWeight: '600', color: '#8b5cf6' }}>Flow Fees</Text>
+                </div>
+                <>
+
+                  <div>
+                    <Tooltip label="The gas fee multiplier is the multiplier that is applied to the gas fee of a flow.">
+                      <Text variant="legend" css={{ marginBottom: '0.5rem', display: 'block' }}>Gas Fee Multiplier</Text></Tooltip>
+                    <Text css={{
+                      padding: '$6',
+                      fontSize: '1.25rem',
+                      fontWeight: '700',
+                      background: 'linear-gradient(135deg, #a78bfa, #c084fc)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      display: 'block'
+                    }} variant="title">
+                      {
+                        Number(intentParams.flowFlexFeeMul)} {" "}
+                    </Text>
+                  </div>
+                  {intentParams.gasFeeCoins && intentParams.gasFeeCoins.length > 0 && (
                     <div style={{ marginBottom: '1rem' }}>
-                      <Text variant="legend" css={{ marginBottom: '0.5rem', display: 'block' }}>INTO Burn Per Execution</Text>
-                      <Text css={{
-                        padding: '$6',
-                        fontSize: '1.25rem',
-                        fontWeight: '700',
-                        background: 'linear-gradient(135deg, #a78bfa, #c084fc)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        display: 'block'
-                      }} variant="title">
-                        {convertMicroDenomToDenom(
-                          Number(intentParams.burnFeePerMsg),
-                          6
-                        )}{' '}
-                        INTO{' '}
-                      </Text>
+                      <Text variant="legend" css={{ marginBottom: '0.5rem', display: 'block' }}>Supported Gas Coins</Text>
+                      <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '0.5rem'
+                      }}>
+                        {intentParams.gasFeeCoins.map((coin, index) => (
+                          <div key={index} style={{
+                            padding: '0.25rem 0.75rem',
+                            background: 'rgba(139, 92, 246, 0.1)',
+                            border: '1px solid rgba(139, 92, 246, 0.3)',
+                            borderRadius: '12px',
+                            fontSize: '0.875rem',
+                            color: '#a78bfa',
+                            fontWeight: '500'
+                          }}>
+                            {resolveDenomSync(coin.denom, ibcAssetList)}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </>
-                </Card>
-              </Column>
-            )}</Column>
+                  )}
+                  <div style={{ marginBottom: '1rem' }}>
+                    <Text variant="legend" css={{ marginBottom: '0.5rem', display: 'block' }}>INTO Burn Per Execution</Text>
+                    <Text css={{
+                      padding: '$6',
+                      fontSize: '1.25rem',
+                      fontWeight: '700',
+                      background: 'linear-gradient(135deg, #a78bfa, #c084fc)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      display: 'block'
+                    }} variant="title">
+                      {convertMicroDenomToDenom(
+                        Number(intentParams.burnFeePerMsg),
+                        6
+                      )}{' '}
+                      INTO{' '}
+                    </Text>
+                  </div>
+                </>
+              </Card>
+            </Column>
+          )}</Column>
         {process.env.NEXT_PUBLIC_SHOW_DISTRIBUTION && params && (
           <Column css={{
             display: 'flex',
@@ -695,10 +759,10 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 WebkitTextFillColor: 'transparent'
               }} variant="title">
                 {!isTotalSupplyLoading && totalSupply
-                  ? formatTokenBalance(convertMicroDenomToDenom(totalSupply, 6).toFixed(0), { includeCommaSeparation: true })
+                  ? `${(convertMicroDenomToDenom(totalSupply, 6) / 1000000).toFixed(1)}M`
                   : 'Loading...'
-                }{' '}
-                <span style={{ fontSize: '1rem', opacity: 0.8 }}>INTO</span>
+                }
+                <span style={{ fontSize: '1rem' }}> {" "}INTO</span>
               </Text>
             </Card>
 
@@ -742,10 +806,10 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 WebkitTextFillColor: 'transparent'
               }} variant="title">
                 {!isCirculatingSupplyLoading && circulatingSupply
-                  ? formatTokenBalance(convertMicroDenomToDenom(circulatingSupply, 6).toFixed(0), { includeCommaSeparation: true })
+                  ? `${(convertMicroDenomToDenom(circulatingSupply, 6) / 1000000).toFixed(1)}M`
                   : 'Loading...'
-                }{' '}
-                <span style={{ fontSize: '1rem', opacity: 0.8 }}>INTO</span>
+                }
+                <span style={{ fontSize: '1rem' }}> {" "}INTO</span>
               </Text>
             </Card>
 
@@ -799,71 +863,6 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 marginTop: '$2'
               }}>
                 Live price from Osmosis pool (INTO/USDC)
-              </Text>
-            </Card>
-
-            <Card css={{
-              padding: '$12',
-              margin: '$4',
-              position: 'relative',
-              overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(217, 70, 239, 0.05) 100%)',
-              border: '1px solid rgba(168, 85, 247, 0.2)',
-              transition: 'all 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(168, 85, 247, 0.15)',
-                borderColor: 'rgba(168, 85, 247, 0.4)',
-              }
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #a855f7, #d946ef)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(168, 85, 247, 0.3)'
-                }}>
-                  <FlowWaveIcon size={20} color="white" />
-                </div>
-                <div>
-                  <Text variant="legend" css={{ fontWeight: '600', color: '#a855f7' }}>Total Flows</Text>
-                  {flowIncrease && (
-                    <div style={{
-                      fontSize: '0.75rem',
-                      color: '#22c55e',
-                      fontWeight: '600',
-                      marginTop: '0.125rem'
-                    }}>
-                      +{flowIncrease} new flows!
-                    </div>
-                  )}
-                </div>
-              </div>
-              <Text css={{
-                padding: '$8',
-                fontSize: '1.75rem',
-                fontWeight: '700',
-                background: 'linear-gradient(135deg, #c084fc, #a855f7)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent'
-              }} variant="title">
-                {!isFlowStatsLoading && totalFlows !== undefined
-                  ? totalFlows.toLocaleString()
-                  : 'Loading...'
-                }{' '}
-                <span style={{ fontSize: '1rem', opacity: 0.8 }}>flows</span>
-              </Text>
-              <Text variant="caption" css={{
-                display: 'block',
-                color: 'rgba(168, 85, 247, 0.8)',
-                fontSize: '0.875rem',
-                marginTop: '$2'
-              }}>
-                Total Intento flows on Intento 
               </Text>
             </Card>
 
@@ -947,7 +946,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                     fontSize: '0.8rem',
                     lineHeight: '1.4'
                   }}>
-                   These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
+                    These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
                   </Text>
                 </>
               ) : (
@@ -963,19 +962,18 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 </Text>
               )}
             </Card>
-
             <Card css={{
               padding: '$12',
               margin: '$4',
               position: 'relative',
               overflow: 'hidden',
-              background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(168, 85, 247, 0.05) 100%)',
-              border: '1px solid rgba(139, 92, 246, 0.2)',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%)',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
               transition: 'all 0.3s ease',
               '&:hover': {
                 transform: 'translateY(-2px)',
-                boxShadow: '0 8px 25px rgba(139, 92, 246, 0.15)',
-                borderColor: 'rgba(139, 92, 246, 0.4)',
+                boxShadow: '0 8px 25px rgba(59, 130, 246, 0.15)',
+                borderColor: 'rgba(59, 130, 246, 0.4)',
               }
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
@@ -983,46 +981,34 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                   width: '40px',
                   height: '40px',
                   borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #8b5cf6, #a855f7)',
+                  background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                  boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
                 }}>
-                  <DollarSign size={20} color="white" />
+                  <Info size={20} color="white" />
                 </div>
-                <Text variant="legend" css={{ fontWeight: '600', color: '#8b5cf6' }}>Token Issuance</Text>
+                <Text variant="legend" css={{ fontWeight: '600', color: '#3b82f6' }}>Maximum Supply</Text>
               </div>
               <Text css={{
                 padding: '$8',
                 fontSize: '1.75rem',
                 fontWeight: '700',
-                background: 'linear-gradient(135deg, #a78bfa, #c084fc)',
+                background: 'linear-gradient(135deg, #3b82f6, #60a5fa)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent'
               }} variant="title">
-                {(
-                  Number(params.annualProvision) / 1000000000000000000000000
-                ).toLocaleString()}{' '}
-                <span style={{ fontSize: '1rem', opacity: 0.8 }}>INTO annually</span>
+                560M INTO
               </Text>
-              {/* todo: needs to be updated for after first fourthning.. */}
-              {APR && (
-                <Text variant="caption" css={{
-                  paddingTop: '$8',
-                  color: 'rgba(139, 92, 246, 0.8)',
-                  fontSize: '0.875rem'
-                }}>
-                  {' '}
-                  25% issuance decrease in ~
-                  {getDuration(
-                    (APR.blockParams.actualBlockTime *
-                      (Number(APR.blockParams.actualBlocksPerYear) -
-                        APR.blockParams.currentBlockHeight)) /
-                    1000
-                  )}
-                </Text>
-              )}
+              <Text variant="caption" css={{
+                padding: '0 $8 $8',
+                color: 'rgba(59, 130, 246, 0.8)',
+                fontSize: '0.875rem',
+                lineHeight: '1.4'
+              }}>
+                Projected over 20 years with 400M initial supply, 10% initial inflation, and 25% yearly inflation reduction.
+              </Text>
             </Card>
 
           </Column>
