@@ -783,6 +783,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                   <IntentTemplateChip
                     label={templateLabel}
                     autoParse
+                    disabled
                     description="DCA into StreamSwap to average your entry into the streaming event."
                     iconUrl="https://raw.githubusercontent.com/cosmos/chain-registry/master/osmosis/images/osmo.png"
                     gradient="linear-gradient(90deg, #5a4fcf 0%, #b44bff 100%)"
