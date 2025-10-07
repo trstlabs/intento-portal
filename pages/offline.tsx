@@ -6,7 +6,7 @@ export default function OfflinePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
       <Head>
-        <title>Offline | CosmoPortal</title>
+        <title>Offline | {process.env.NEXT_PUBLIC_SITE_TITLE} </title>
         <meta name="description" content="You are currently offline" />
         <meta name="robots" content="noindex, nofollow" />
       </Head>

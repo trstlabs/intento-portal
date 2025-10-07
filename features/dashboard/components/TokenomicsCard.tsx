@@ -431,14 +431,14 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                       boxShadow: '0 6px 16px rgba(59, 130, 246, 0.4)',
                     }
                   }}
-                  variant="secondary"
+                  variant="primary"
                   size="large"
                   disabled={isStakeBalanceLoading}
                   as="a"
                   href={'https://explorer.intento.zone/intento-' + (__TEST_MODE__ ? 'devnet' : 'mainnet') + '/staking'}
                   target="__blank"
                 >
-                  {isExecutingSchedule ? <Spinner instant /> : ' Stake'}
+                  {' Stake'}
                 </Button>
                 <Button
                   css={{
@@ -452,7 +452,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                       boxShadow: '0 6px 16px rgba(16, 185, 129, 0.4)',
                     }
                   }}
-                  variant="secondary"
+                  variant="primary"
                   size="large"
                   disabled={
                     isStakeBalanceLoading ||
@@ -479,7 +479,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                         boxShadow: '0 6px 16px rgba(245, 158, 11, 0.4)',
                       }
                     }}
-                    variant="secondary"
+                    variant="primary"
                     size="large"
                     as="a"
                     href={`/alert?owner=${wallet.address}`}

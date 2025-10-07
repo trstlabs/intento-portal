@@ -54,7 +54,7 @@ export default function ErrorPage({
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-50">
       <Head>
-        <title>{`${errorInfo.title} | CosmoPortal`}</title>
+        <title>{`${errorInfo.title} | {process.env.NEXT_PUBLIC_SITE_TITLE}`}</title>
         <meta name="robots" content="noindex, nofollow" />
       </Head>
 
