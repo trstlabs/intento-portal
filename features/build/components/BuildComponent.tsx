@@ -601,7 +601,7 @@ export const BuildComponent = ({
             color="tertiary"
             css={{ padding: '0 $15 0 $6' }}
           >
-            Specify conditions
+            Specify conditions {(flowInput.conditions?.comparisons?.length > 0 || flowInput.conditions?.feedbackLoops?.length > 0) ? '- injected from template' : '(optional)'}
           </Text>
         </Inline>
         <Conditions conditions={flowInput.conditions}
