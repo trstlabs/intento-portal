@@ -25,7 +25,7 @@ import {
 } from 'junoblocks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Globe, File } from 'lucide-react'
+import { Globe, File, LineChart } from 'lucide-react'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { useChain } from '@cosmos-kit/react'
 import { __TEST_MODE__ } from 'util/constants'
@@ -35,7 +35,6 @@ import { walletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useAfterConnectWallet } from '../../hooks/useAfterConnectWallet'
 import { Alert } from '../../icons/Alert'
 import { Analytics } from '../../icons/Analytics'
-import { LineChart } from 'lucide-react'
 
 
 type NavigationSidebarProps = {
@@ -406,19 +405,19 @@ export function NavigationSidebar(_: NavigationSidebarProps) {
           </Button>
         </Column>
         {address && (
-            <Column gap={4}>
-              <Button
-                as="a"
-                href={`/alert?owner=${address}`}
-                target="__blank"
-                variant="ghost"
-                size="large"
-                iconLeft={<IconWrapper icon={<Alert />} />}
-              >
-                Subscribe to Flow Alerts
-              </Button>
-            </Column>
-          )}
+          <Column gap={4}>
+            <Button
+              as="a"
+              href={`/alert?owner=${address}`}
+              target="__blank"
+              variant="ghost"
+              size="large"
+              iconLeft={<IconWrapper icon={<Alert />} />}
+            >
+              Subscribe to Flow Alerts
+            </Button>
+          </Column>
+        )}
         <Inline gap={2} css={{ padding: '$20 0 $13' }}>
           <Button
             as="a"
