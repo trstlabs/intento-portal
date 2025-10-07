@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import * as yup from 'yup';
-import { styled, Text } from 'junoblocks';
+import { styled, Text, IconWrapper } from 'junoblocks';
 import { ErrorStack } from './Validation';
 import get from "lodash/get";
 import set from "lodash/set";
+import { Clipboard } from 'lucide-react';
 
 // Utility to create the validation schema from properties
 const createValidationSchema = (properties) => {
@@ -38,7 +39,28 @@ const StyledInput = styled('input', {
     color: 'inherit',
     padding: '$2',
     margin: '$2',
-    fontSize: '16px',
+    fontSize: '16px'
+});
+
+const PasteButton = styled('button', {
+    position: 'absolute',
+    right: '12px',
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+    color: '$textColors$secondary',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '4px',
+    borderRadius: '4px',
+    '&:hover': {
+        color: '$colors$primary',
+        backgroundColor: '$colors$dark10'
+    },
+    '&:active': {
+        transform: 'scale(0.95)'
+    }
 });
 
 const StyledLabel = styled(Text, {
@@ -206,9 +228,32 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
         };
     }, [commitChanges]);
 
+    // Handle paste from clipboard
+    const handlePaste = async (fieldPath: string) => {
+        try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+                handleChange(fieldPath, text);
+                commitChanges();
+                // Show success feedback
+                const button = document.getElementById(`paste-button-${fieldPath}`);
+                if (button) {
+                    const originalHTML = button.innerHTML;
+                    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>`;
+                    setTimeout(() => {
+                        if (button) button.innerHTML = originalHTML;
+                    }, 2000);
+                }
+            }
+        } catch (err) {
+            console.error('Failed to read from clipboard:', err);
+        }
+    };
+
     // Render a single field
     const renderField = (key: string, fieldPath: string = key) => {
         const value = get(localValues, fieldPath);
+        const isAddressField = /address|addr|recipient|sender|from/i.test(key);
 
         if (value && typeof value === 'object' && !Array.isArray(value)) {
             return (
@@ -236,14 +281,26 @@ const JsonFormEditor = ({ jsonValue, schema, validationErrors, onChange, onValid
             return (
                 <StyledField key={fieldPath}>
                     <StyledLabel htmlFor={fieldPath}>{formatMainTitle(key)}</StyledLabel>
-                    <StyledInput
-                        id={fieldPath}
-                        name={fieldPath}
-                        type="text"
-                        onChange={(e) => handleChange(fieldPath, e.target.value)}
-                        onBlur={handleBlur}
-                        value={value ?? ''}
-                    />
+                    <>
+                        <StyledInput
+                            id={fieldPath}
+                            name={fieldPath}
+                            type="text"
+                            onChange={(e) => handleChange(fieldPath, e.target.value)}
+                            onBlur={handleBlur}
+                            value={value ?? ''}
+                            style={isAddressField ? { paddingRight: '40px' } : {}}
+                        />
+                        {isAddressField && (
+                            <PasteButton 
+                                id={`paste-button-${fieldPath}`}
+                                onClick={() => handlePaste(fieldPath)}
+                                title="Paste from clipboard"
+                            >
+                                <IconWrapper icon={<Clipboard size={16} />} />
+                            </PasteButton>
+                        )}
+                    </>
                     {errors[fieldPath] && <StyledErrorText>{errors[fieldPath]}</StyledErrorText>}
                 </StyledField>
             );
