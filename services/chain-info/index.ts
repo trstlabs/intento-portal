@@ -23,12 +23,16 @@ export interface BaseQueryInputWithAddress {
   client: any
 }
 
-export const getBalanceForAcc = async ({ address, client }: BaseQueryInputWithAddress) => {
+export const getBalanceForAcc = async ({
+  address,
+  client,
+}: BaseQueryInputWithAddress) => {
   try {
-    const response: QueryAllBalancesResponse = await client.cosmos.bank.v1beta1.allBalances({
-      address,
-      pagination: undefined,
-    })
+    const response: QueryAllBalancesResponse =
+      await client.cosmos.bank.v1beta1.allBalances({
+        address,
+        pagination: undefined,
+      })
 
     return response
   } catch (e) {
@@ -138,12 +142,13 @@ export const getExpectedFlowFee = (
   denom: string,
   trustlessAgent?: any
 ) => {
-
   // Step 1: Base gas fee units (like the 'gasFeeAmount' in Go)
   const gasFeeUnits = (gasUsed * Number(intentParams.flowFlexFeeMul)) / 1000
 
   // Step 2: Find the gas fee coin price for the denom
-  const denomCoin = intentParams.gasFeeCoins.find((coin) => coin.denom === denom)
+  const denomCoin = intentParams.gasFeeCoins.find(
+    (coin) => coin.denom === denom
+  )
   if (!denomCoin) {
     console.warn(`Denom ${denom} not found in gasFeeCoins`)
     return 0
@@ -173,7 +178,9 @@ export const getExpectedFlowFee = (
 
     if (hostedFeeCoin) {
       const hostedFeeAmount = parseInt(hostedFeeCoin.amount || '0', 10) || 0
-      console.log(`Adding hosted account fee: ${hostedFeeAmount}${denom} per recurrence`)
+      console.log(
+        `Adding hosted account fee: ${hostedFeeAmount}${denom} per recurrence`
+      )
       totalFlowFeeInMicro += hostedFeeAmount * recurrences // Convert to micro units
     } else {
       console.log(`No hosted fee found for denom: ${denom}`)
@@ -315,15 +322,17 @@ async function getAnnualProvisions(client: any) {
 }
 
 export async function getFlowParams(client: any) {
-  const resp: QueryFlowParamsResponse =
-    await client.intento.intent.v1.params({})
+  const resp: QueryFlowParamsResponse = await client.intento.intent.v1.params(
+    {}
+  )
   return resp.params
 }
 
 async function getStakeProvisionPercent(client: any) {
   try {
-    const resp: QueryAllocParamsResponse =
-      await client.intento.alloc.v1.params({})
+    const resp: QueryAllocParamsResponse = await client.intento.alloc.v1.params(
+      {}
+    )
     console.log(resp.params.distributionProportions)
     const stakeProvision =
       1 -
@@ -341,7 +350,7 @@ async function getStakeProvisionPercent(client: any) {
 export const getTotalSupply = async ({ client }: BaseQueryInput) => {
   try {
     const response = await client.cosmos.bank.v1beta1.supplyOf({
-      denom: 'uinto'
+      denom: 'uinto',
     })
     return Number(response.amount.amount)
   } catch (e) {
@@ -354,14 +363,16 @@ export const getCommunityPool = async ({ client }: BaseQueryInput) => {
   try {
     const response = await client.cosmos.distribution.v1beta1.communityPool({})
     const intoCoin = response.pool.find((coin: any) => coin.denom === 'uinto')
-    return intoCoin ? Number(intoCoin.amount/1e18) : 0 //convert to nondec
+    return intoCoin ? Number(intoCoin.amount / 1e18) : 0 //convert to nondec
   } catch (e) {
     console.error('err(getCommunityPool):', e)
     return 0
   }
 }
 
-export const getChainAndTeamWalletsBalance = async ({ client }: BaseQueryInput) => {
+export const getChainAndTeamWalletsBalance = async ({
+  client,
+}: BaseQueryInput) => {
   try {
     // Team wallet addresses - these should be updated with actual addresses
     const chainAndTeamWallets = [
@@ -370,19 +381,22 @@ export const getChainAndTeamWalletsBalance = async ({ client }: BaseQueryInput) 
       'into1j7wtjwwtmyr79udlahcuxqgmw04tp58seu3uhv',
       'into1mw07rsryylskarzqlet98py8ckk3a9gw7q6qch',
     ]
-
-    let totalTeamBalance = 0
+    const communityPool = await getCommunityPool({ client })
+    let totalNonCirculating = 0
     for (const address of chainAndTeamWallets) {
       const response = await client.cosmos.bank.v1beta1.allBalances({
         address,
         pagination: undefined,
       })
-      const intoBalance = response.balances.find((coin: any) => coin.denom === 'uinto')
+      const intoBalance = response.balances.find(
+        (coin: any) => coin.denom === 'uinto'
+      )
       if (intoBalance) {
-        totalTeamBalance += Number(intoBalance.amount)
+        totalNonCirculating += Number(intoBalance.amount)
       }
     }
-    return totalTeamBalance
+    totalNonCirculating = totalNonCirculating + communityPool
+    return totalNonCirculating
   } catch (e) {
     console.error('err(getChainAndTeamWalletsBalance):', e)
     return 0

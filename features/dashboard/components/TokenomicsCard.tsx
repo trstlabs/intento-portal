@@ -793,7 +793,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 }}>
                   <TrendingUp size={20} color="white" />
                 </div>
-                <Tooltip label="The total amount of $INTO currently in circulation — calculated as the total supply minus tokens held in community pool and multisig wallets (grant program, strategic reserve, team).">
+                <Tooltip label="The total amount of $INTO currently in circulation — calculated as the total supply minus tokens held in non-circulating wallets or module accounts as well as airdrop tokens that are not circulating and to-be clawed back.">
                   <Text variant="legend" css={{ fontWeight: '600', color: '#10b981' }}>Circulating Supply</Text>
                 </Tooltip>
               </div>
