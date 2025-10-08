@@ -1,19 +1,18 @@
-import { SigningStargateClient } from '@cosmjs/stargate'
-
-import { Coin } from '@cosmjs/stargate'
-
-import { MsgGrant /* MsgRevoke */ } from 'cosmjs-types/cosmos/authz/v1beta1/tx'
-import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx'
-import { GenericAuthorization } from 'cosmjs-types/cosmos/authz/v1beta1/authz'
+import { SigningStargateClient } from "@cosmjs/stargate";
+import { Coin } from "@cosmjs/stargate";
+import { MsgGrant } from "cosmjs-types/cosmos/authz/v1beta1/tx";
+import { MsgSend } from "cosmjs-types/cosmos/bank/v1beta1/tx";
+import { GenericAuthorization } from "cosmjs-types/cosmos/authz/v1beta1/authz";
+import { EncodeObject } from "intentojs";
 
 type ExecuteCreateAuthzGrantArgs = {
-  granter: string
-  grantee: string
-  typeUrls: string[]
-  expirationDurationMs?: number
-  client: SigningStargateClient
-  coin?: Coin
-}
+  granter: string;
+  grantee: string;
+  typeUrls: string[];
+  expirationDurationMs?: number;
+  client: SigningStargateClient;
+  coin?: Coin;
+};
 
 export const executeCreateAuthzGrant = async ({
   client,
@@ -23,54 +22,68 @@ export const executeCreateAuthzGrant = async ({
   expirationDurationMs,
   coin,
 }: ExecuteCreateAuthzGrantArgs): Promise<any> => {
+  const useAmino = process.env.NEXT_PUBLIC_PREFERRED_SIGN_AMINO === "true";
 
-  const msgObjects = []
+  const msgObjects: EncodeObject[] = [];
 
-  // Calculate expiration timestamp if duration is provided
-  const expiration = expirationDurationMs ? {
-    seconds: BigInt(Math.floor((Date.now() / 1000 + expirationDurationMs / 1000))),
-    nanos: 0
-  } : undefined
+  const expirationMs = expirationDurationMs ? Date.now() + expirationDurationMs : undefined;
 
-  for (let typeUrl of typeUrls) {
-    const msgAuthzGrant = MsgGrant.fromPartial({
-      granter: granter,
-      grantee: grantee,
-      grant: {
-        authorization: {
-          typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
-          value: GenericAuthorization.encode(
-            GenericAuthorization.fromPartial({
+  for (const typeUrl of typeUrls) {
+    if (useAmino) {
+      // Amino path: expiration is Date, authorization is plain JS object
+      msgObjects.push({
+        typeUrl: "/cosmos.authz.v1beta1.MsgGrant",
+        value: {
+          granter,
+          grantee,
+          grant: {
+            authorization: {
+              "@type": "/cosmos.authz.v1beta1.GenericAuthorization",
               msg: typeUrl,
-            }),
-          ).finish(),
+            },
+            expiration: expirationMs ? new Date(expirationMs) : undefined,
+          },
         },
-        expiration: expiration,
-      },
-    })
+      });
+    } else {
+      // Protobuf path: expiration as { seconds, nanos }, authorization as encoded bytes
+      const protoExpiration = expirationMs
+        ? { seconds: BigInt(Math.floor(expirationMs / 1000)), nanos: 0 }
+        : undefined;
 
-    const MsgGrantAllowanceObject = {
-      typeUrl: '/cosmos.authz.v1beta1.MsgGrant',
-      value: msgAuthzGrant,
+      msgObjects.push({
+        typeUrl: "/cosmos.authz.v1beta1.MsgGrant",
+        value: MsgGrant.fromPartial({
+          granter,
+          grantee,
+          grant: {
+            authorization: {
+              typeUrl: "/cosmos.authz.v1beta1.GenericAuthorization",
+              value: GenericAuthorization.encode(GenericAuthorization.fromPartial({ msg: typeUrl })).finish(),
+            },
+            expiration: protoExpiration,
+          },
+        }),
+      });
     }
-
-    msgObjects.push(MsgGrantAllowanceObject)
   }
 
-
-
+  // Optional MsgSend
   if (coin && Number(coin.amount) > 0) {
-    let sendMsg = MsgSend.fromPartial({
-      fromAddress: granter,
-      toAddress: grantee,
-      amount: [coin],
-    })
-    const MsgSendObject = {
-      typeUrl: '/cosmos.bank.v1beta1.MsgSend',
-      value: sendMsg,
-    }
-    msgObjects.push(MsgSendObject)
+    msgObjects.push({
+      typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+      value: MsgSend.fromPartial({
+        fromAddress: granter,
+        toAddress: grantee,
+        amount: [coin],
+      }),
+    });
   }
 
-  return await client.signAndBroadcast(granter, msgObjects, { gas: msgObjects.length == 0 ? "100000" : "150000", amount: [] })
-}
+
+  return client.signAndBroadcast(
+    granter,
+    msgObjects,
+    { gas: msgObjects.length === 0 ? "100000" : "150000", amount: [] }
+  );
+};
