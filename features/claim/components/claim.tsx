@@ -348,7 +348,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      <strong>Ledger Users:</strong> You can also use <Link href="https://tokenstream.fun" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>tokenstream.fun</Link> — our Skip:Go-powered DeFi app for token streaming and DCA — it has Ledger support. Streaming a token on Osmosis or Cosmos Hub to any token on any chain there will complete the IBC flow task.
+                                      <strong>Ledger Users (updated):</strong> Unfortunately it's not possible to use Ledger to sign MsgGrant messages required for this action. Hence, this action can only be done without a ledger. We understand this is a limitation and we are working on a solution. 
                                     </Text>
                                   )}
                                   {index === 2 && (
