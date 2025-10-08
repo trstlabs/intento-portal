@@ -40,7 +40,7 @@ const getStyles = (isDarkMode: boolean) => ({
     margin: '0.5rem 0',
     border: isDarkMode ? '1px solid #4a5568' : '1px solid #e2e8f0'
   } as React.CSSProperties,
-  taskItem: {
+  actionItem: {
     background: isDarkMode ? '#2d3748' : '#f7fafc',
     borderRadius: '12px',
     padding: '1rem',
@@ -158,7 +158,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: '1.5rem' }}>
                 <PageHeader
                   title="Your Airdrop Journey"
-                  subtitle={"Complete tasks to unlock your full airdrop"}
+                  subtitle={"Complete actions to unlock your full airdrop"}
                 />
                 <Button
                   variant="ghost"
@@ -195,14 +195,14 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                             <div style={styles.progressFill(completionPercentage)} />
                           </div>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1.5rem' }}>
-                            {completedActions} of {totalActions} tasks completed ({Math.round(completionPercentage)}%)
+                            {completedActions} of {totalActions} actions completed ({Math.round(completionPercentage)}%)
                           </Text>
                         </div>
 
                         <div style={styles.statCard}>
                           <Text variant="subtitle" css={{ marginBottom: '0.5rem' }}>💡 How It Works</Text>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1rem', display: 'block' }}>
-                            Complete the tasks below to unlock your full airdrop of {totalClaimable} INTO. Each completed task rewards you with {perActionReward} INTO. For each task, 20% is added to your balance immediately, and the remainder vests over several days.
+                            Complete the actions below to unlock your full airdrop of {totalClaimable} INTO. Each completed action rewards you with {perActionReward} INTO. For each action, 20% is added to your balance immediately, and the remainder vests over several days.
                           </Text>
 
                           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
@@ -222,7 +222,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                         <div style={{ ...styles.statCard, background: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.2)' }}>
                           <Text variant="subtitle" css={{ marginBottom: '0.5rem' }}>⏰ Important</Text>
                           <Text variant="caption" css={{ color: '#a0aec0' }}>
-                            The claimable amount decreases over time. Complete tasks early to maximize your rewards. Unclaimed tokens will be returned to the community pool.
+                            The claimable amount decreases over time. Complete actions early to maximize your rewards. Unclaimed tokens will be returned to the community pool.
                           </Text>
                         </div>
                       </CardContent>
@@ -249,7 +249,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                 <div style={{ marginTop: '1rem' }}>
                   {Object.entries(claimRecord.status).map(([_, status], index) => {
                     const isCompleted = status.actionCompleted;
-                    const taskReward = convertMicroDenomToDenom(total / Object.keys(claimRecord.status).length, 6).toFixed(2);
+                    const actionReward = convertMicroDenomToDenom(total / Object.keys(claimRecord.status).length, 6).toFixed(2);
 
                     return (
                       <motion.div
@@ -257,7 +257,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        style={styles.taskItem}
+                        style={styles.actionItem}
                       >
                         <div
                           style={{
@@ -297,7 +297,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 {index + 1}. {ClaimFlow[index]}
                               </Text>
                               <Text variant="caption" style={{ color: '#a0aec0' }}>
-                                Reward: {taskReward} INTO
+                                Reward: {actionReward} INTO
                               </Text>
                             </div>
                           </div>
@@ -327,7 +327,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                             >
                               <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                 <Text variant="caption" style={{ marginBottom: '0.5rem', display: 'block' }}>
-                                  <strong>Status:</strong> {isCompleted ? 'Action completed successfully!' : 'Complete this task to earn your reward'}
+                                  <strong>Status:</strong> {isCompleted ? 'Action completed successfully!' : 'Complete this action to earn your reward'}
                                 </Text>
 
                                 <div style={{ marginTop: '1rem' }}>
@@ -430,7 +430,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                           size="small"
                                           style={{ marginTop: '1rem', width: '100%', textDecoration: 'none' }}
                                           onClick={() => {
-                                            console.log('Starting task:', ClaimFlow[index]);
+                                            console.log('Starting action:', ClaimFlow[index]);
                                           }}
                                         >
                                           Go to Build Page
