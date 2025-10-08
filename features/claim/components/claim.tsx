@@ -125,13 +125,13 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
     );
   }
 
-  const completedTasks = Object.values(claimRecord?.status || {}).filter(
+  const completedActions = Object.values(claimRecord?.status || {}).filter(
     status => status.actionCompleted
   ).length;
-  const totalTasks = Object.keys(claimRecord?.status || {}).length;
-  const completionPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+  const totalActions = Object.keys(claimRecord?.status || {}).length;
+  const completionPercentage = totalActions > 0 ? (completedActions / totalActions) * 100 : 0;
   const totalClaimable = convertMicroDenomToDenom(total, 6).toFixed(2);
-  const perTaskReward = totalTasks > 0 ? convertMicroDenomToDenom(total / totalTasks, 6).toFixed(2) : 0;
+  const perActionReward = totalActions > 0 ? convertMicroDenomToDenom(total / totalActions, 6).toFixed(2) : 0;
 
   const vestingInfo = [
     { name: 'Flow on Intento', duration: '4 days', cycles: '1-day cycles' },
@@ -195,25 +195,25 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                             <div style={styles.progressFill(completionPercentage)} />
                           </div>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1.5rem' }}>
-                            {completedTasks} of {totalTasks} tasks completed ({Math.round(completionPercentage)}%)
+                            {completedActions} of {totalActions} tasks completed ({Math.round(completionPercentage)}%)
                           </Text>
                         </div>
 
                         <div style={styles.statCard}>
                           <Text variant="subtitle" css={{ marginBottom: '0.5rem' }}>💡 How It Works</Text>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1rem', display: 'block' }}>
-                            Complete the tasks below to unlock your full airdrop of {totalClaimable} INTO. Each completed task rewards you with {perTaskReward} INTO. For each task, 20% is added to your balance immediately, and the remainder vests over several days.
+                            Complete the tasks below to unlock your full airdrop of {totalClaimable} INTO. Each completed task rewards you with {perActionReward} INTO. For each task, 20% is added to your balance immediately, and the remainder vests over several days.
                           </Text>
 
                           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                             <div style={{ flex: 1 }}>
                               <Text variant="caption" css={{ color: '#a0aec0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <Check size={16} color="#4CAF50" /> {completedTasks} Tasks Completed
+                                <Check size={16} color="#4CAF50" /> {completedActions} Actions Completed
                               </Text>
                             </div>
                             <div style={{ flex: 1 }}>
                               <Text variant="caption" css={{ color: '#a0aec0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <AlertTriangle size={16} color="#FF9800" /> {totalTasks - completedTasks} Tasks Remaining
+                                <AlertTriangle size={16} color="#FF9800" /> {totalActions - completedActions} Actions Remaining
                               </Text>
                             </div>
                           </div>
@@ -233,7 +233,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
 
               <div style={{ marginTop: '2.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                  <Text variant="header">Your Tasks</Text>
+                  <Text variant="header">Your Actions</Text>
                   <Button
                     variant="primary"
                     onClick={() => claimAll()}
@@ -327,7 +327,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                             >
                               <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
                                 <Text variant="caption" style={{ marginBottom: '0.5rem', display: 'block' }}>
-                                  <strong>Status:</strong> {isCompleted ? 'Task completed successfully!' : 'Complete this task to earn your reward'}
+                                  <strong>Status:</strong> {isCompleted ? 'Action completed successfully!' : 'Complete this task to earn your reward'}
                                 </Text>
 
                                 <div style={{ marginTop: '1rem' }}>
@@ -338,7 +338,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 0 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode (use at your own risk): <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Task 1 — a simple flow streaming to any address, including your own.
+                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode (use at your own risk): <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Action 1 — a simple flow streaming to any address, including your own.
                                     </Text>
                                   )}
                                   {index === 1 && (
