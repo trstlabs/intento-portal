@@ -22,6 +22,37 @@ import { particleState } from '../../../state/atoms/particlesAtoms'
 
 import { MsgUpdateFlowParams } from '../../../types/trstTypes'
 
+const validateFlowParameters = (params: MsgUpdateFlowParams) => {
+  // Only validate if the parameter is being updated
+  
+  // Check if interval is being set to 0 while startAt is set
+  if (params.interval !== undefined) {
+    if (params.interval < 0) {
+      throw new Error('Interval cannot be negative')
+    }
+    
+    // If interval is being set to 0, ensure startAt is not set
+    if (params.interval === 0 && params.startAt !== undefined && params.startAt > 0) {
+      throw new Error('Cannot have a start time when interval is set to 0')
+    }
+  }
+  
+  // Validate startAt if it's being updated
+  if (params.startAt !== undefined) {
+    const now = Math.floor(Date.now() / 1000) // Current time in seconds
+    
+    // Check if start time is in the past
+    if (params.startAt > 0 && params.startAt < now) {
+      throw new Error('Start time cannot be in the past')
+    }
+    
+    // If startAt is being set, ensure interval is also set and not 0
+    if (params.startAt > 0 && (params.interval === 0 || params.interval === undefined)) {
+      throw new Error('Cannot set a start time without a valid interval')
+    }
+  }
+}
+
 
 type UseUpdateFlowArgs = {
     flowParams: MsgUpdateFlowParams
@@ -46,6 +77,9 @@ export const useUpdateFlow = ({
             if (address !== flowParams.owner) {
                 throw new Error('This feature will only work for the owner: '+ flowParams.owner)
             }
+
+            // Validate flow parameters
+            validateFlowParameters(flowParams)
 
             return await executeUpdateFlow({
                 flowParams,

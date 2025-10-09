@@ -34,16 +34,30 @@ export const useSubmitFlow = ({ flowInput }: UseSubmitFlowArgs) => {
   const [_, popConfetti] = useRecoilState(particleState)
 
   const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`])
+  
+  const validateFlowParameters = (input: FlowInput) => {
+    // Check if interval is 0 but start time is set
+    if ((input.interval === 0 || input.interval === undefined) && input.startTime > 0) {
+      throw new Error('Cannot have a start time when interval is not set')
+    }
+    
+    // Check if start time is in the past
+    const now = Date.now()
+    if (input.startTime > 0 && input.startTime < now) {
+      throw new Error('Start time cannot be in the past')
+    }
+
+  }
+
   return useMutation(
     'submitFlow',
     async () => {
-     // console.log(status)
       if (status !== WalletStatusType.connected || client == null) {
         throw new Error('Please retry or connect your wallet.')
       }
-      // if (client == null) {
-      //   throw new Error('Please try reconnecting your wallet.')
-      // }
+
+      // Validate flow parameters
+      validateFlowParameters(flowInput)
 
       if (flowInput.configuration.walletFallback == false && flowInput.feeFunds?.amount == "0"){
         throw new Error('No funds attached and no fallback to owner balance, can not submit flow.')
