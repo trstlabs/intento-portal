@@ -353,7 +353,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 2 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      This requires a governance proposal to be active. Check the <Link href="https://explorer.intento.zone/intento-mainnet/gov/6" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governance proposal here</Link>. After voting, the action will be completed.
+                                      This requires a governance proposal to be active. Check the latest governance proposal <Link href="https://explorer.intento.zone/intento-mainnet/gov/8" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>here</Link> and check the forum on Discord for any upcoming proposals. After voting, the action will be completed.
                                     </Text>
                                   )}
                                   {index === 3 && (
