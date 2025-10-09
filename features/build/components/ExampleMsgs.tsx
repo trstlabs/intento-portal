@@ -143,11 +143,13 @@ export const generalExamples = [
     typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
     value: {
       sender: 'into1....',
-      receiver: 'into1....',
-      amount: '1000000',
-      denom: 'uinto',
+      receiver: 'cosmos1....',
+      token: {
+        amount: '1',
+        denom: 'uinto'
+      },
       sourcePort: 'transfer',
-      sourceChannel: 'channel-0',
+      sourceChannel: 'channel-1',
       timeoutHeight: {
         revisionNumber: "0", // 0 for current version
         revisionHeight: "0", // 0 for no timeout
