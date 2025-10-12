@@ -58,7 +58,7 @@ export const BuildComponent = ({
   const [denom, setDenom] = useState('uinto')
   const [chainName, setChainName] = useState('')
   const [chainSymbol, setChainSymbol] = useState('INTO')
-  const [chainId, setChainId] = useState(flowInput.chainId || process.env.NEXT_PUBLIC_INTO_CHAIN_ID)
+
   const [hasConnectionID, setHasConnectionID] = useState(false)
   const [chainHasIAModule, setChainHasIAModule] = useState(true)
 
@@ -70,7 +70,7 @@ export const BuildComponent = ({
   const [icaAddress, isIcaLoading] = useGetICA(flowInput.connectionId, '')
 
   const [icaBalance, isIcaBalanceLoading] = useICATokenBalance(
-    chainId,
+    flowInput?.chainId,
     icaAddress,
     hasConnectionID
   )
@@ -86,7 +86,6 @@ export const BuildComponent = ({
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance / ${denom} / ${icaAddress}`,
     `userAuthZGrants / ${icaAddress}`,
-    //`interchainAccount / ${ flowInput.connectionId }`,
   ])
 
 
@@ -147,7 +146,7 @@ export const BuildComponent = ({
 
   // ICA funds
   const { mutate: connectExternalWallet } = useConnectIBCWallet(
-    chainId,
+    flowInput.chainId,
     {
       onError(error) {
         console.log(error)
@@ -262,13 +261,12 @@ export const BuildComponent = ({
     });
 
     const hasConnectionId = Boolean(connectionId);
-
+    updatedFlowInput.chainId = newChainId;
     // Batch state updates to minimize re-renders
     Promise.resolve().then(() => {
       setDenom(newDenom);
       setChainName(name);
       setChainSymbol(chainSymbol);
-      setChainId(newChainId);
       setPrefix(newPrefix);
       setHasConnectionID(hasConnectionId);
       setChainHasIAModule(isIntoChain);
@@ -282,7 +280,7 @@ export const BuildComponent = ({
       try {
         await new Promise(resolve => setTimeout(resolve, 200));
         if (connectExternalWallet) {
-          console.log(chainId)
+          console.log(updatedFlowInput.chainId)
           connectExternalWallet(null);
         }
       } catch (e) {
@@ -293,7 +291,7 @@ export const BuildComponent = ({
 
   const prevDenomRef = useRef(denom);
   const prevIcaAddressRef = useRef(icaAddress);
-  const prevChainIdRef = useRef(chainId);
+  const prevChainIdRef = useRef(flowInput.chainId);
   const prevTrustlessAgentRef = useRef(trustlessAgent);
   const prevTrustlessAgentICARef = useRef(trustlessAgentICA);
 
@@ -307,13 +305,13 @@ export const BuildComponent = ({
   }, [denom, icaAddress, refetchICA]);
 
   useEffect(() => {
-    if (trustlessAgent && chainId &&
-      (trustlessAgent !== prevTrustlessAgentRef.current || chainId !== prevChainIdRef.current)) {
+    if (trustlessAgent && flowInput.chainId &&
+      (trustlessAgent !== prevTrustlessAgentRef.current || flowInput.chainId !== prevChainIdRef.current)) {
       refetchTrustlessAgentICA();
       prevTrustlessAgentRef.current = trustlessAgent;
-      prevChainIdRef.current = chainId;
+      prevChainIdRef.current = flowInput.chainId;
     }
-  }, [chainId, trustlessAgent, refetchTrustlessAgentICA]);
+  }, [flowInput.chainId, trustlessAgent, refetchTrustlessAgentICA]);
 
   useEffect(() => {
     if (trustlessAgentICA && trustlessAgentICA !== prevTrustlessAgentICARef.current) {
@@ -329,7 +327,7 @@ export const BuildComponent = ({
       newMsg = newMsg.replaceAll('into', prefix)
       let processedMsg: string
 
-      if (chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
+      if (flowInput.chainId === process.env.NEXT_PUBLIC_INTO_CHAIN_ID) {
         const newInput = processFlowInput({ ...flowInput, msgs: [newMsg] }, true)
         processedMsg = newInput.msgs[0]
       } else {
@@ -522,7 +520,7 @@ export const BuildComponent = ({
                         shouldDisableSendHostChainFundsButton
                       }
                       hostDenom={denom}
-                      chainId={chainId}
+                      chainId={flowInput.chainId}
                       flowInput={flowInput}
                       isExecutingSendFundsOnHost={isExecutingSendFundsOnHost}
                       setFeeFundsHostChain={(fees) =>
@@ -590,7 +588,7 @@ export const BuildComponent = ({
           handleSubmitFlowClick(flowInput)
         }
         trustlessAgent={trustlessAgent}
-        chainId={chainId}
+        chainId={flowInput.chainId}
       />
       <Column>
         <Inline css={{ margin: '$6', marginTop: '$16' }}>
