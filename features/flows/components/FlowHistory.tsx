@@ -228,7 +228,7 @@ export const FlowHistory = ({
                           >
                             Query Response: {(() => {
                               const str = JSON.stringify(queryResponse);
-                              return str && str.length > 60 ? "See comparisons or feedback loops for latest decoded response" : str;
+                              return str && str.length > 60 ? str.slice(0, 60) + '...' : str;
                             })()}
                           </Text>
                           <Button
