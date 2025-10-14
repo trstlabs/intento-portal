@@ -73,11 +73,11 @@ export const SubmitFlowDialog = ({
   const chainName = propChainName || chainInfo?.name || 'IBC' // fallback
 
   // Get authz grant info
-  const { 
-    grants: authzGrants, 
-    isLoading: isAuthzGrantsLoading, 
+  const {
+    grants: authzGrants,
+    isLoading: isAuthzGrantsLoading,
     error: authzError,
-    refetch: refetchAuthzGrants 
+    refetch: refetchAuthzGrants
   } = useAuthZMsgGrantInfoForUser(
     icaAddress,
     flowInput
@@ -262,10 +262,10 @@ export const SubmitFlowDialog = ({
                       label="Fee for execution of the flow by the Intent Engine + Trustless Agent if all succeeds."
                       aria-label="Fee for execution of the flow."
                     >
-                      <Text variant="body">Fee</Text>
+                      <Text variant="body">Total Fees</Text>
                     </Tooltip>
                     <Tooltip
-                      label={fees.map((fee, index) => fee.denom != 'uinto' && <> {"Or " + fee.amount} {resolveDenomSync(fee.denom, ibcAssetList)}{index < fees.length - 2 && ', '} </> || '')}
+                      label={fees.map((fee, index) => fee.denom != 'uinto' && <> {fee.amount} {resolveDenomSync(fee.denom, ibcAssetList)}{index < fees.length - 2 && ', '} </> || '')}
                       aria-label="Fee for execution of the flow."
                     >
 
@@ -282,7 +282,7 @@ export const SubmitFlowDialog = ({
                       label="If no wallet fallback set, attached fee funds will be returned after commission fee."
                       aria-label="Attached fee funds are returned after commission fee."
                     >
-                      <Text variant="body">Use wallet funds</Text>
+                      <Text variant="body">Wallet Fallback</Text>
                     </Tooltip>
                     <ToggleSwitch
                       id="deduct-fees"
