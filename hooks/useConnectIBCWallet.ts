@@ -122,12 +122,12 @@ export const useConnectIBCWallet = (
       // Wait for the wallet connection to be established
       // We'll try a few times to get the address
       let attempts = 0;
-      const maxAttempts = 10;
+      const maxAttempts = 7;
       let currentAddress = address;
 
       while (!currentAddress && attempts < maxAttempts) {
      // console.log(`Waiting for wallet address (attempt ${attempts + 1}/${maxAttempts})...`);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        await new Promise(resolve => setTimeout(resolve, 700));
 
         // Force refresh the address from the wallet
         try {
