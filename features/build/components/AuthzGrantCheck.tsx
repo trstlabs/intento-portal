@@ -61,19 +61,15 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   const [lastChecked, setLastChecked] = React.useState<Date | null>(null)
 
   // Use props if provided, otherwise fall back to hook
-  const { 
-    grants: authzGrants = [], 
-    isLoading: isAuthzGrantsLoading, 
-    error: authzError,
-    refetch 
-  } = propAuthzGrants !== undefined ?
-    { 
-      grants: propAuthzGrants || [], 
-      isLoading: propIsAuthzGrantsLoading, 
-      error: null,
-      refetch: propRefetchAuthzGrants 
-    } :
-    useAuthZMsgGrantInfoForUser(grantee, flowInput);
+  const { grants: authzGrants = [], isLoading: isAuthzGrantsLoading, refetch, error: authzError } = 
+    propAuthzGrants !== undefined 
+      ? { 
+          grants: propAuthzGrants || [], 
+          isLoading: propIsAuthzGrantsLoading, 
+          refetch: propRefetchAuthzGrants,
+          error: null
+        } 
+      : useAuthZMsgGrantInfoForUser(grantee, flowInput);
 
   // Use the shared grant validation hook
   const { allGrantsValid, expiredGrants, missingGrants } = useGrantValidation(
