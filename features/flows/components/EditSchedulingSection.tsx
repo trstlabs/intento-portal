@@ -150,10 +150,14 @@ export function EditSchedulingSection({
   }, [updatedFlowParams])
 
   const handleRightAwayClick = () => {
-
-    const tenMinutesFromNow = new Date(new Date().getTime() + (10 * 60 * 1000));
-    setStartAt(tenMinutesFromNow)
-    updateField('startAt', tenMinutesFromNow)
+    const now = new Date();
+    // Round down seconds to 0 and add 10 minutes
+    const tenMinutesFromNow = new Date(now);
+    tenMinutesFromNow.setMinutes(tenMinutesFromNow.getMinutes() + 10);
+    tenMinutesFromNow.setSeconds(0, 0);
+    
+    setStartAt(tenMinutesFromNow);
+    updateField('startAt', tenMinutesFromNow);
   }
 
   const handleNoneClick = () => {
