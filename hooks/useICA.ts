@@ -49,9 +49,9 @@ export const useGetICA = (connectionId: string, accAddr?: string) => {
     {
       enabled: Boolean(
         connectionId != undefined &&
-        rpcClient &&
-        !!accAddr &&
-        accAddr.length > 30
+          rpcClient &&
+          !!accAddr &&
+          accAddr.length > 30
       ),
       refetchOnMount: true,
       staleTime: 60000,
@@ -70,7 +70,9 @@ export const useGetTrustlessAgentICAByConnectionID = (connectionId: string) => {
       console.log(connectionId)
       const trustlessAgents = await getTrustlessAgents({ rpcClient })
       const trustlessAgent = trustlessAgents?.find(
-        (account) => account.icaConfig.connectionId == connectionId && process.env.NEXT_PUBLIC_AGENT_LIST.includes(account.agentAddress)
+        (account) =>
+          account.icaConfig.connectionId == connectionId &&
+          process.env.NEXT_PUBLIC_AGENT_LIST.includes(account.agentAddress)
       )
       return trustlessAgent
     },
@@ -85,8 +87,9 @@ export const useGetTrustlessAgentICAByConnectionID = (connectionId: string) => {
   return [ica, isLoading] as const
 }
 
-
-export const useGetTrustlessAgentICAByTrustlessAgentAddress = (address: string) => {
+export const useGetTrustlessAgentICAByTrustlessAgentAddress = (
+  address: string
+) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `trustlessAgentByAddress/${address}`,
@@ -130,7 +133,10 @@ export const useGetConnectionIDFromHostAddress = (address: string) => {
   return [connectionID, isLoading] as const
 }
 
-export const useGetTrustlessAgentICAAddress = (accAddr: string, connectionId: string) => {
+export const useGetTrustlessAgentICAAddress = (
+  accAddr: string,
+  connectionId: string
+) => {
   const rpcClient = useIntentoRpcClient()
   const { data: ica, isLoading } = useQuery(
     `hostInterchainAccount/${connectionId}/${accAddr}`,
@@ -146,9 +152,9 @@ export const useGetTrustlessAgentICAAddress = (accAddr: string, connectionId: st
     {
       enabled: Boolean(
         connectionId != undefined &&
-        rpcClient &&
-        !!accAddr &&
-        accAddr.length > 40
+          rpcClient &&
+          !!accAddr &&
+          accAddr.length > 40
       ),
       refetchOnMount: false,
       staleTime: 30000,
@@ -166,7 +172,12 @@ export const useICATokenBalance = (
 ) => {
   const chain = useChainInfoByChainID(chainId)
 
-  const enabled = !!ibcWalletAddress && !!chainId && !!isICAChain && !!chain?.rpc && !!chain?.denom
+  const enabled =
+    !!ibcWalletAddress &&
+    !!chainId &&
+    !!isICAChain &&
+    !!chain?.rpc &&
+    !!chain?.denom
 
   const { data, isLoading } = useQuery(
     [`icaTokenBalance`, chainId, ibcWalletAddress],
@@ -191,45 +202,66 @@ export const useICATokenBalance = (
   return [data, isLoading] as const
 }
 
+interface UseAuthZMsgGrantInfoResult {
+  grants: GrantResponse[]
+  isLoading: boolean
+  error: Error | null
+  refetch: () => Promise<void>
+}
 
 export const useAuthZMsgGrantInfoForUser = (
   grantee: string,
   flowInput?: FlowInput
-) => {
+): UseAuthZMsgGrantInfoResult => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(ibcState.chainId)
   const prevAddressRef = useRef(ibcState.address)
   const queryClient = useQueryClient()
 
   // Base query key without the status to invalidate all related queries
-  const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}`
+  const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}/${flowInput?.msgs}`
 
-  const { data, isLoading, refetch } = useQuery(
-    [baseQueryKey, ibcState.status], // Include status in the query key array
+  const { data, isLoading, error, refetch: queryRefetch } = useQuery<
+    GrantResponse[],
+    Error
+  >(
+    [baseQueryKey],
     async () => {
-      if (!ibcState.address || !grantee || !flowInput?.connectionId) {
+      if (!flowInput?.msgs?.length) {
         return []
       }
 
       let grants: GrantResponse[] = []
-      const granteeGrants = await getAuthZGrantsForGrantee({
-        grantee,
-        granter: ibcState.address,
-        rpc: chain.rpc,
-      })
+      let granteeGrants
 
-      if (!granteeGrants) return []
+      try {
+        granteeGrants = await getAuthZGrantsForGrantee({
+          grantee,
+          granter: ibcState.address,
+          rpc: chain.rpc,
+        }) || []
+      } catch (err) {
+        console.error('Error fetching grants:', err)
+        throw new Error(`Failed to fetch grants: ${err.message}`)
+      }
 
       for (const msg of flowInput.msgs) {
         try {
           const parsedMsg = JSON.parse(msg)
           const msgTypeUrl = parsedMsg.typeUrl
 
+          if (!msgTypeUrl) {
+            console.warn('Message missing typeUrl:', parsedMsg)
+            continue
+          }
+
           if (msgTypeUrl === '/cosmos.authz.v1beta1.MsgExec') {
             // Handle nested MsgExec
             const execMsgs = parsedMsg.value?.msgs || []
             for (const execMsg of execMsgs) {
               const execMsgTypeUrl = execMsg.typeUrl
+              if (!execMsgTypeUrl) continue
+              
               const grantMatch = granteeGrants.find(
                 (grant) => grant.msgTypeUrl === execMsgTypeUrl
               )
@@ -256,6 +288,7 @@ export const useAuthZMsgGrantInfoForUser = (
           }
         } catch (error) {
           console.error('Error processing message:', msg, error)
+          throw new Error(`Error processing message: ${error.message}`)
         }
       }
 
@@ -264,18 +297,21 @@ export const useAuthZMsgGrantInfoForUser = (
     {
       enabled: Boolean(
         ibcState.status === WalletStatusType.connected &&
-        ibcState.address &&
-        grantee &&
-        flowInput?.connectionId
+          ibcState.address &&
+          grantee &&
+          flowInput?.connectionId && 
+          flowInput?.msgs?.length > 0
       ),
       refetchOnMount: 'always',
       refetchOnWindowFocus: true,
-      refetchInterval: 10000, // Reduce refetch interval to 10 seconds
-      staleTime: 5000, // Reduce stale time to 5 seconds
-      cacheTime: 60000, // Cache for 1 minute
-      // Force refetch when wallet address changes
+      refetchInterval: 60000,
+      staleTime: 30000,
+      cacheTime: 60000,
       refetchOnReconnect: true,
-      notifyOnChangeProps: ['data', 'error']
+      notifyOnChangeProps: ['data', 'error'],
+      onError: (error) => {
+        console.error('Error in useAuthZMsgGrantInfoForUser:', error)
+      },
     }
   )
 
@@ -283,10 +319,21 @@ export const useAuthZMsgGrantInfoForUser = (
   useEffect(() => {
     if (ibcState.address && ibcState.address !== prevAddressRef.current) {
       prevAddressRef.current = ibcState.address
-      // Invalidate all queries for this grantee/address combination
-      queryClient.invalidateQueries(baseQueryKey, { refetchActive: true, refetchInactive: true })
+      queryClient.invalidateQueries(baseQueryKey, {
+        refetchActive: true,
+        refetchInactive: true,
+      })
     }
   }, [ibcState.address, queryClient, baseQueryKey])
+
+  const refetch = async () => {
+    try {
+      await queryRefetch()
+    } catch (err) {
+      console.error('Error refetching grants:', err)
+      throw err
+    }
+  }
 
   // Also refetch when the wallet status changes to connected
   useEffect(() => {
@@ -295,7 +342,12 @@ export const useAuthZMsgGrantInfoForUser = (
     }
   }, [ibcState.status, refetch])
 
-  return { grants: data || [], isLoading, refetch }
+  return { 
+    grants: data || [], 
+    isLoading, 
+    error: error || null,
+    refetch 
+  }
 }
 
 export const useFeeGrantAllowanceForUser = (granter: string) => {
@@ -315,9 +367,9 @@ export const useFeeGrantAllowanceForUser = (granter: string) => {
     {
       enabled: Boolean(
         granter != '' &&
-        status === WalletStatusType.connected &&
-        client &&
-        address
+          status === WalletStatusType.connected &&
+          client &&
+          address
       ),
       refetchOnMount: 'always',
       refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,

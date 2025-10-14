@@ -126,7 +126,7 @@ export function EditSchedulingSection({
 
     setEndTimeInterval(value)
 
-    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + interval
+    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + 60000*5
 
     const newEndTime = new Date(start + value)
     setEndTime(newEndTime)

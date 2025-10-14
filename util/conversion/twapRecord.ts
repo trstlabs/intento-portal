@@ -326,13 +326,11 @@ export const TwapRecord = {
     return writer
   },
   decode(input: BinaryReader | Uint8Array, length?: number): TwapRecord {
-    console.log(input)
     const reader =
       input instanceof BinaryReader ? input : new BinaryReader(input)
     let end = length === undefined ? reader.len : reader.pos + length
     const message = createBaseTwapRecord()
     while (reader.pos < end) {
-      console.log(reader)
       const tag = reader.uint32()
       switch (tag >>> 3) {
         case 1:

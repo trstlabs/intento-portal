@@ -17,7 +17,6 @@ import {
 
   convertDenomToMicroDenom,
   Card,
-  CardContent,
   ToggleSwitch,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
@@ -32,7 +31,11 @@ import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
 import { useChainInfoByChainID } from '../../../hooks/useChainList'
 import { TrustlessAgent } from 'intentojs/dist/codegen/intento/intent/v1/trustless_agent'
 import { EditSchedulingSection } from '../../flows/components/EditSchedulingSection'
-import { FlowSummary } from './FlowSummary'
+
+import { formatTimeDisplay } from '../../../util/conversion'
+import { AuthzGrantCheck } from './AuthzGrantCheck'
+import { ConditionsSummary } from './Conditions/ConditionsSummary'
+
 
 interface SubmitFlowDialogProps {
   isDialogShowing: boolean
@@ -103,7 +106,7 @@ export const SubmitFlowDialog = ({
   // Calculate duration based on whether we have a future start time
   const now = Date.now()
   const startTime = executionParams.startAt !== 0 ? executionParams.startAt : now
-  const duration = executionParams.endTime - startTime
+  const duration = executionParams.interval > 0 ? executionParams.endTime - startTime - executionParams.interval : executionParams.endTime - startTime
   const interval = executionParams.interval
 
 
@@ -181,24 +184,29 @@ export const SubmitFlowDialog = ({
     });
   }
 
+  let recurrences = interval > 0 ? Math.floor(duration / interval) : 1
+  if (startTime > 0) {
+    recurrences++
+  }
   return (
     <Dialog isShowing={isDialogShowing} onRequestClose={onRequestClose}>
       <DialogHeader paddingBottom={canSchedule ? '$4' : '6'}>
-        <Text variant="header">Build Flow</Text>
+        <Text variant="header" color="secondary" css={{ fontFamily: 'Oceanwide, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif', fontWeight: 700, fontSize: 24 }}>Submit Flow</Text>
       </DialogHeader>
 
       <DialogContent>
         <StyledDivForInputs>
           <Column
             justifyContent="space-between"
-            css={{ padding: '$2 $4', width: '100%' }}
+            css={{ width: '100%', gap: '$8', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }}
+
           >
-            {duration && (
+            {/* {(
               <FlowSummary
                 flowInput={{
                   ...flowInput,
                   label: flowLabel,
-                  startTime:executionParams.startAt !== 0 ? executionParams.startAt - now : 0,
+                  startTime: executionParams.startAt !== 0 ? executionParams.startAt - now : 0,
                   duration,
                   interval
                 }}
@@ -212,86 +220,111 @@ export const SubmitFlowDialog = ({
                 refetchAuthzGrants={refetchAuthzGrants}
                 chainName={chainName}
               />
-            )}
-            <Card
-              css={{ margin: '$3', borderRadius: '8px' }}
-              variant="secondary" disabled
-            >
+            )} */}
 
+
+            {/* Conditions Summary */}
+            {(flowInput.conditions || flowInput.configuration) && (
+              <ConditionsSummary
+                conditions={flowInput.conditions}
+                configuration={flowInput.configuration}
+              />
+            )}
+
+            <Card variant="secondary" disabled>
               <EditSchedulingSection
                 updatedFlowParams={executionParams}
                 setUpdateFlow={setUpdateExecutionParams}
               />
 
             </Card>
-
             <>
-              <CardContent size="large" css={{ padding: '$3' }}>
+              {/* Authorization Check */}
+              {flowInput.msgs && flowInput.msgs.length > 0 && flowInput.connectionId && (
+
+                <AuthzGrantCheck
+                  flowInput={flowInput}
+                  chainId={chainId}
+                  grantee={icaAddress}
+                  authzGrants={authzGrants}
+                  isAuthzGrantsLoading={isAuthzGrantsLoading}
+                  refetchAuthzGrants={refetchAuthzGrants}
+                  chainName={chainName}
+                />
+
+              )}
 
 
-                <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
-                  <Tooltip
-                    label="Funds to set aside for execution to the flow account. Fee funds are returned after commission fee."
-                    aria-label="Fund Flow - Intento (Optional)"
-                  >
-                    <Text align="center" variant="body" css={{ fontWeight: 'bold' }}>
-                      Fee Funds
+              <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
+                <Column css={{ padding: '$2', gap: '$4' }}>
+                  <Inline justifyContent="space-between">
+                    <Tooltip
+                      label="Fee for execution of the flow by the Intent Engine + Trustless Agent if all succeeds."
+                      aria-label="Fee for execution of the flow."
+                    >
+                      <Text variant="body">Fee</Text>
+                    </Tooltip>
+                    <Text variant="body" color="tertiary" css={{ fontSize: '12px' }}>
+                      ~ {suggestedFunds} {feeFundsSymbol}
                     </Text>
-                  </Tooltip>
-
-                  <Column css={{ padding: '$2', gap: '$4' }}>
-                    <Inline justifyContent="space-between" >
+                  </Inline>
+                  <Inline justifyContent="space-between" >
+                    <Tooltip
+                      label="If no wallet fallback set, attached fee funds will be returned after commission fee."
+                      aria-label="Attached fee funds are returned after commission fee."
+                    >
                       <Text variant="body">Use wallet funds</Text>
-                      <ToggleSwitch
-                        id="deduct-fees"
-                        name="deduct-fees"
-                        checked={checkedFeeAcc}
-                        onChange={handleChangeFeeAcc}
-                        optionLabels={['Use wallet funds', 'Attach to flow']}
+                    </Tooltip>
+                    <ToggleSwitch
+                      id="deduct-fees"
+                      name="deduct-fees"
+                      checked={checkedFeeAcc}
+                      onChange={handleChangeFeeAcc}
+                      optionLabels={['Use wallet funds', 'Attach to flow']}
+                    />
+                  </Inline>
+
+                  {!checkedFeeAcc && (
+                    <>
+                      <TokenSelector
+                        tokenSymbol={feeFundsSymbol}
+                        onChange={(updateToken) => {
+                          setFeeFundsSymbol(updateToken.tokenSymbol)
+                        }}
+                        disabled={false}
+                        size={'large'}
                       />
-                    </Inline>
+                      <Inline justifyContent="space-between" >
+                        <Text variant="body">Amount to attach</Text>
+                        <Inline>
+                          <Text variant="body" color="tertiary">
+                            <StyledInput
+                              step=".01"
+                              placeholder="0.00"
+                              type="number"
+                              value={feeFunds}
+                              onChange={({ target: { value } }) =>
+                                setFeeAmount(Number(value))
+                              }
+                              css={{ textAlign: 'right', width: '100px' }}
+                            />
 
-                    {!checkedFeeAcc && (
-                      <>
-                        <TokenSelector
-                          tokenSymbol={feeFundsSymbol}
-                          onChange={(updateToken) => {
-                            setFeeFundsSymbol(updateToken.tokenSymbol)
-                          }}
-                          disabled={false}
-                          size={'large'}
-                        />
-                        <Inline justifyContent="space-between" >
-                          <Text variant="body">Amount to attach</Text>
-                          <Inline>
-                            <Text variant="body" color="tertiary">
-                              <StyledInput
-                                step=".01"
-                                placeholder="0.00"
-                                type="number"
-                                value={feeFunds}
-                                onChange={({ target: { value } }) =>
-                                  setFeeAmount(Number(value))
-                                }
-                                css={{ textAlign: 'right', width: '100px' }}
-                              />
-
-                              {feeFundsSymbol}
-                            </Text>
-                          </Inline>
+                            {feeFundsSymbol}
+                          </Text>
                         </Inline>
-                      </>
-                    )}
-                  </Column>
+                      </Inline>
+                    </>
+                  )}
                 </Column>
-              </CardContent></>
+              </Column>
+
+            </>
 
 
-            <Inline justifyContent="space-between" align="center">
+            <Inline justifyContent="space-between" align="center" css={{ paddingRight: '$5', paddingLeft: '$2' }}>
               <Tooltip
                 label="Name your flow so you can find it back later by name"
-                aria-label="Fund Flow - INTO (Optional)"
-              >
+                aria-label="Fund Flow - INTO (Optional)">
                 <Text color="disabled" wrap={false} variant="legend">
                   Label
                 </Text>
@@ -303,6 +336,34 @@ export const SubmitFlowDialog = ({
                   onChange={({ target: { value } }) => setLabel(value)}
                 />
               </Text>
+            </Inline>
+            <Inline justifyContent="space-between" css={{ width: '100%' }}>
+              {executionParams.interval > 0 ? (
+                <Text 
+                  variant="body" 
+                  color={recurrences === 0 || recurrences > 1000 || (executionParams.startAt > 0 && executionParams.startAt - now < 0) ? 'error' : 'tertiary'} 
+                  css={{ 
+                    fontSize: '12px',
+                    fontWeight: recurrences === 0 || recurrences > 1000 || (executionParams.startAt > 0 && executionParams.startAt - now < 0) ? 'bold' : 'normal'
+                  }}
+                >
+                  Starting in {formatTimeDisplay(executionParams.startAt - now !== 0 && Number(executionParams.startAt) ? executionParams.startAt - now : executionParams.interval)}
+                  {" "}every {formatTimeDisplay(executionParams.interval, true)}
+                  {" "}for {formatTimeDisplay(executionParams.startAt - now > 0 ? executionParams.endTime - executionParams.startAt : executionParams.endTime - now)}
+                  {" "}(running {recurrences} time{recurrences !== 1 && "s"})
+                  {recurrences === 0 && " - No executions will occur with current settings"}
+                  {recurrences > 1000 && " - High number of executions, consider reducing duration or increasing interval"}
+                  {executionParams.startAt > 0 && executionParams.startAt - now < 0 && " - Start time is in the past"}
+                </Text>
+
+              ) : (
+                <Text variant="body" color="tertiary" css={{ fontSize: '12px' }}>
+                  One-time execution at {new Date(executionParams.endTime).toLocaleString()}
+                </Text>
+
+              )}
+
+
             </Inline>
           </Column>
         </StyledDivForInputs>
@@ -344,8 +405,9 @@ const StyledInput = styled('input', {
 const StyledInputWithBorder = styled('input', {
   fontSize: '12px',
   color: 'inherit',
-  borderRadius: '$2',
-  border: '1px solid $borderColors$inactive',
-  padding: '$3',
+  padding: '$5',
   margin: '$2',
+  background: '$colors$dark5',
+  borderRadius: '5px',
+  minWidth: '240px',
 })

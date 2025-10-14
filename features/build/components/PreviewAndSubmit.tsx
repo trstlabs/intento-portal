@@ -263,7 +263,7 @@ import {
     const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.trustlessAgent?.agentAddress || "")
     const [trustlessAgentICA, _istrustlessAgentICALoading] = useGetTrustlessAgentICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId || "")
   
-    const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+    const { grants: authzGrants, isLoading: _isAuthzGrantsLoading, refetch: _refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
       trustlessAgentICA || icaAddress,
       flowInput
     )
@@ -690,11 +690,11 @@ import {
                 displaySymbol={feeSymbol}
                 expectedFee={feeDetails.amount}
                 useMsgExec={useMsgExec}
-                chainId={chainId}
-                grantee={trustlessAgentICA || icaAddress}
-                authzGrants={authzGrants}
-                isAuthzGrantsLoading={isAuthzGrantsLoading}
-                refetchAuthzGrants={refetchAuthzGrants}
+                // chainId={chainId}
+                // grantee={trustlessAgentICA || icaAddress}
+                // authzGrants={authzGrants}
+                // isAuthzGrantsLoading={isAuthzGrantsLoading}
+                // refetchAuthzGrants={refetchAuthzGrants}
               />
             </Column>
   

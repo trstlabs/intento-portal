@@ -52,28 +52,32 @@ export const formatDenom = (denom: string): string => {
 }
 
 interface IBCAssetInfo {
-  denom: string;
-  denom_local: string;
-  symbol: string;
-  [key: string]: any;
+  denom: string
+  denom_local: string
+  symbol: string
+  [key: string]: any
 }
 
-export function resolveDenomSync(denom: string, ibcAssets?: IBCAssetInfo[]): string {
-  if (!denom.toLowerCase().startsWith('ibc/')) return formatDenom(denom);
+export function resolveDenomSync(
+  denom: string,
+  ibcAssets?: IBCAssetInfo[]
+): string {
+  if (!denom.toLowerCase().startsWith('ibc/')) return formatDenom(denom)
   // If IBC assets list is provided, try to find a match
   if (ibcAssets?.length) {
     const matchingAsset = ibcAssets.find(
       (asset) =>
         asset.denom === denom ||
         asset.denom_local === denom ||
-        (denom.startsWith('ibc/') && asset.denom.endsWith(denom.split('/').pop()!))
-    );
+        (denom.startsWith('ibc/') &&
+          asset.denom.endsWith(denom.split('/').pop()!))
+    )
     if (matchingAsset) {
-      return matchingAsset.symbol;
+      return matchingAsset.symbol
     }
   }
   // Fallback to just formatting the denom if no match found
-  return formatDenom(denom);
+  return formatDenom(denom)
 }
 
 export async function resolveDenom(denom: string): Promise<string> {
@@ -124,7 +128,7 @@ export async function resolveDenom(denom: string): Promise<string> {
 }
 
 export function resolveDenoms(coins: Coin[]): Coin[] {
-  const ibcAssets = useIBCAssetList()[0] 
+  const ibcAssets = useIBCAssetList()[0]
   coins.map((coin) => (coin.denom = resolveDenomSync(coin.denom, ibcAssets)))
   return coins
 }
@@ -150,27 +154,59 @@ export function removeEmptyProperties(obj: any): any {
   return newObj
 }
 
-
 export const convertBigIntToString = (obj) => {
   if (typeof obj !== 'object' || obj === null) {
-      return obj;
+    return obj
   }
   if (Array.isArray(obj)) {
-      return obj.map(convertBigIntToString);
+    return obj.map(convertBigIntToString)
   }
 
   return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => {
-          if (typeof value === 'bigint') {
-              return [key, value.toString()];
-          }
+    Object.entries(obj).map(([key, value]) => {
+      if (typeof value === 'bigint') {
+        return [key, value.toString()]
+      }
 
-          // // Special handling to avoid wrapping amount/denom objects
-          // if (typeof value === 'object' && value !== null && 'denom' in value && 'amount' in value) {
-          //     return [key, { denom: String(value.denom), amount: String(value.amount) }];
-          // }
+      // // Special handling to avoid wrapping amount/denom objects
+      // if (typeof value === 'object' && value !== null && 'denom' in value && 'amount' in value) {
+      //     return [key, { denom: String(value.denom), amount: String(value.amount) }];
+      // }
 
-          return [key, convertBigIntToString(value)];
-      })
-  );
-};
+      return [key, convertBigIntToString(value)]
+    })
+  )
+}
+
+// Format time display
+export const formatTimeDisplay = (ms: number, hideOne?: boolean): string => {
+  if (ms === 0) return 'None'
+
+  const seconds = Math.floor(ms / 1000)
+
+  if (seconds < 60) {
+    return seconds === 1 ? hideOne ? 'second' : '1 second' : `${seconds} seconds`
+  } else if (seconds < 60 * 60) {
+    const minutes = Math.floor(seconds / 60)
+    return minutes === 1 ? hideOne ? 'minute' : '1 minute' : `${minutes} minutes`
+  } else if (seconds < 60 * 60 * 24 * 2) {
+    // Less than 2 days, show in hours
+    const hours = Math.floor(seconds / (60 * 60))
+    return hours === 1 ? hideOne ? 'hour' : '1 hour' : `${hours} hours`
+  } else if (seconds < 60 * 60 * 24 * 7) {
+    // Less than 1 week, show in days
+    const days = Math.floor(seconds / (60 * 60 * 24))
+    return days === 1 ? hideOne ? 'day' : '1 day' : `${days} days`
+  } else if (seconds < 60 * 60 * 24 * 30) {
+    // Less than 1 month, show in weeks
+    const weeks = Math.floor(seconds / (60 * 60 * 24 * 7))
+    return weeks === 1 ? hideOne ? 'week' : '1 week' : `${weeks} weeks`
+  } else if (seconds < 60 * 60 * 24 * 365) {
+    // Less than 1 year, show in months
+    const months = Math.floor(seconds / (60 * 60 * 24 * 30))
+    return months === 1 ? hideOne ? 'month' : '1 month' : `${months} months`
+  } else {
+    const years = Math.floor(seconds / (60 * 60 * 24 * 365))
+    return years === 1 ? hideOne ? 'year' : '1 year' : `${years} years`
+  }
+}

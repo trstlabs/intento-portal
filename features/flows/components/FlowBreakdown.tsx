@@ -22,9 +22,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { MsgUpdateFlowParams } from '../../../types/trstTypes'
-import { Flow, ExecutionConfiguration, Comparison, ICQConfig } from 'intentojs/dist/codegen/intento/intent/v1/flow'
-
-
+import { Flow, ExecutionConfiguration, Comparison } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { useConnectIBCWallet } from '../../../hooks/useConnectIBCWallet'
 
 import {
@@ -39,18 +37,18 @@ import { getDuration, getRelativeTime } from '../../../util/time'
 import { FlowHistory } from './FlowHistory'
 import { FlowTransformButton, transformFlowMsgs } from './FlowTransformButton'
 import { ComparisonForm, ComparisonOperatorLabels } from '../../build/components/Conditions/ComparisonForm'
-import { TimeoutPolicy } from 'intentojs/dist/codegen/stride/interchainquery/v1/genesis'
+
 import { Configuration } from '../../build/components/Conditions/Configuration'
 import { JsonFormWrapper } from '../../build/components/Editor/JsonFormWrapper'
 import JsonViewer from '../../build/components/Editor/JsonViewer'
 import { Alert } from '../../../icons/Alert'
 import { Share } from 'lucide-react'
 import { EditSchedulingSection } from './EditSchedulingSection'
-import { convertBigIntToString, convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
+import { convertMicroDenomToDenom, resolveDenomSync } from '../../../util/conversion'
 import { XTwitter } from '../../../icons/XTwitter'
 import { AuthzGrantCheck } from '../../build/components/AuthzGrantCheck'
 import { FeedbackLoopForm } from '../../build/components/Conditions/FeedbackLoopForm'
-import { TwapRecord } from '../../../util/conversion/twapRecord'
+import { ICQConfigView } from './icqConfig'
 
 
 type FlowBreakdownProps = {
@@ -1044,7 +1042,7 @@ export const FlowBreakdown = ({
                           <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Value Type</Text> {comparison.valueType}
                         </Text>
                       </>
-                      {comparison.icqConfig && icqConfig(comparison.icqConfig)}
+                      {comparison.icqConfig && <ICQConfigView icqConfig={comparison.icqConfig} />}
                     </>
                   )}
                 </>
@@ -1060,7 +1058,7 @@ export const FlowBreakdown = ({
 
           const handleSave = () => {
             const updatedConditions = { ...flow.conditions }
-            
+
             // Update the specific feedback loop
             const updatedFeedbackLoops = [...(updatedConditions.feedbackLoops || [])]
             updatedFeedbackLoops[index] = editedFeedbackLoop
@@ -1075,10 +1073,10 @@ export const FlowBreakdown = ({
                 feedbackLoops: updatedFeedbackLoops
               }
             }
-            
+
             // Update the local state
             setUpdatedFlowParams(updateParams)
-            
+
             // Trigger the update
             setRequestedUpdateFlow(true)
             setIsEditing(false)
@@ -1161,7 +1159,7 @@ export const FlowBreakdown = ({
                         <Text variant="body">
                           <Text variant="legend" color="secondary" align="left">Value Type</Text>   {feedbackLoop.valueType}
                         </Text>
-                        {feedbackLoop.icqConfig && (icqConfig(feedbackLoop.icqConfig))}
+                        {feedbackLoop.icqConfig && <ICQConfigView icqConfig={feedbackLoop.icqConfig} />}
                       </>
                     )}
                   </Column>
@@ -1477,47 +1475,6 @@ export const FlowBreakdown = ({
       </Column>
     </FlowBreakdownSection>
   }
-
-  function icqConfig(icqConfig: ICQConfig): React.ReactNode {
-    let response = null
-    if (icqConfig.queryType.includes("twap")) {
-      const twapRecord = TwapRecord.decode(icqConfig.response)
-      response = convertBigIntToString(twapRecord)
-      response = JSON.stringify(response, null, 2)
-    } else {
-      response = JSON.stringify(response, null, 2)
-    }
-    return <>
-      <Tooltip
-        label={"Perform an interchain query for conditions"}
-      >
-        <Text variant="body" style={{ fontSize: '14px', marginTop: '16px', fontWeight: '600' }} align="left">
-          Interchain Query
-        </Text>
-      </Tooltip>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Chain ID</Text>    {icqConfig.chainId}
-      </Text>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Connection ID</Text>      {icqConfig.connectionId}
-      </Text>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Type</Text>  {icqConfig.queryType}
-      </Text>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Query Key</Text>  {icqConfig.queryKey}
-      </Text>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout</Text>  {getDuration(Number(icqConfig.timeoutDuration.seconds))}
-      </Text>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Timeout Policy</Text>  {TimeoutPolicy[icqConfig.timeoutPolicy]}
-      </Text>
-      <Text variant="body">
-        <Text style={{ marginTop: '16px' }} variant="legend" color="secondary" align="left">Latest Response</Text>  {response}
-      </Text>
-    </>
-  }
 }
 
 function FlowBreakdownSection({ children, onClick, expandable = false, isExpanded = false }: { children: React.ReactNode; onClick?: () => void; expandable?: boolean; isExpanded?: boolean }) {
@@ -1574,12 +1531,3 @@ const StyledInput = styled('input', {
   margin: '$2',
 })
 
-
-// const StringifyBigints = (msg: any) => {
-//   const jsonString = JSON.stringify(msg, (_, value) =>
-//     typeof value === 'bigint' ? value.toString() : value, 2);
-
-//   return (
-//     <div>{jsonString}</div>
-//   );
-// };

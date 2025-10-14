@@ -61,8 +61,18 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   const [lastChecked, setLastChecked] = React.useState<Date | null>(null)
 
   // Use props if provided, otherwise fall back to hook
-  const { grants: authzGrants = [], isLoading: isAuthzGrantsLoading, refetch } = propAuthzGrants !== undefined ? 
-    { grants: propAuthzGrants || [], isLoading: propIsAuthzGrantsLoading, refetch: propRefetchAuthzGrants } :
+  const { 
+    grants: authzGrants = [], 
+    isLoading: isAuthzGrantsLoading, 
+    error: authzError,
+    refetch 
+  } = propAuthzGrants !== undefined ?
+    { 
+      grants: propAuthzGrants || [], 
+      isLoading: propIsAuthzGrantsLoading, 
+      error: null,
+      refetch: propRefetchAuthzGrants 
+    } :
     useAuthZMsgGrantInfoForUser(grantee, flowInput);
 
   // Use the shared grant validation hook
@@ -94,6 +104,32 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
       refetch?.()
     },
   })
+
+  // Show error if there was an issue fetching grants
+  if (authzError) {
+    return (
+      <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
+        <Inline justifyContent="space-between" css={{ alignItems: 'center' }}>
+          <Text variant="primary" color="error" css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+            <AlertTriangle size={16} />
+            Error checking authorizations
+          </Text>
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={handleCheckPermissions}
+            disabled={isChecking || isExecutingAuthzGrant}
+            css={{ minWidth: '120px' }}
+          >
+            {isChecking ? <Spinner size={16} /> : 'Try Again'}
+          </Button>
+        </Inline>
+        <Text variant="caption" color="error">
+          {authzError.message || 'Failed to check authorizations. Please try again.'}
+        </Text>
+      </Column>
+    )
+  }
 
   // Show connection UI if not connected
   if (!ibcState.address || ibcState.status !== WalletStatusType.connecting && ibcState.status !== WalletStatusType.connected || !grantee) {
@@ -127,6 +163,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
     )
   }
 
+  // Show loading state
   if (isAuthzGrantsLoading) {
     return (
       <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
@@ -134,13 +171,25 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
           <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>Checking authorizations...</Text>
           <Spinner size={16} />
         </Inline>
+        {lastChecked && (
+          <Text variant="caption" color="tertiary">
+            Last checked: {lastChecked.toLocaleTimeString()}
+          </Text>
+        )}
       </Column>
     )
   }
 
-  if (!authzGrants || authzGrants.length === 0) {
-    return null
-  }
+  // if (!authzGrants || authzGrants.length === 0) {
+  //   return (
+  //     <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
+  //       <Inline justifyContent="space-between">
+  //         <Text variant="primary" css={{ fontWeight: 'medium', fontSize: '14px' }}>No authorizations found</Text>
+
+  //       </Inline>
+  //     </Column>
+  //   )
+  // }
 
   return (
     <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
@@ -162,8 +211,8 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
               </Text>
             )}
           </Button>
-          
-          {allGrantsValid ? (
+
+          {allGrantsValid && authzGrants.length > 0 ? (
             <Inline css={{ gap: '$2', alignItems: 'center' }}>
               <CheckCircle size={16} color="#00C851" />
               <Text variant="body" color="valid" css={{ fontSize: '12px' }}>
