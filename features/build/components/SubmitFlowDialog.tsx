@@ -18,21 +18,22 @@ import {
   convertDenomToMicroDenom,
   Card,
   ToggleSwitch,
+  Info,
 } from 'junoblocks'
 import { toast } from 'react-hot-toast'
 import { useState, useEffect } from 'react'
-import { useGetExpectedFlowFee } from '../../../hooks/useChainInfo'
+import { useGetExpectedFlowFees } from '../../../hooks/useChainInfo'
 import { FlowInput } from '../../../types/trstTypes'
 
 import { useAuthZMsgGrantInfoForUser } from '../../../hooks/useICA'
 
 import { TokenSelector } from '../../send/components/TokenSelector'
 import { useIBCAssetInfo } from '../../../hooks/useIBCAssetInfo'
-import { useChainInfoByChainID } from '../../../hooks/useChainList'
+import { useChainInfoByChainID, useIBCAssetList } from '../../../hooks/useChainList'
 import { TrustlessAgent } from 'intentojs/dist/codegen/intento/intent/v1/trustless_agent'
 import { EditSchedulingSection } from '../../flows/components/EditSchedulingSection'
 
-import { formatTimeDisplay } from '../../../util/conversion'
+import { formatTimeDisplay, resolveDenomSync } from '../../../util/conversion'
 import { AuthzGrantCheck } from './AuthzGrantCheck'
 import { ConditionsSummary } from './Conditions/ConditionsSummary'
 
@@ -89,6 +90,7 @@ export const SubmitFlowDialog = ({
     setExecutionParams((prev) => ({ ...prev, ...params }))
   }
 
+  const [ibcAssetList] = useIBCAssetList()
 
 
   const [feeFunds, setFeeAmount] = useState(0)
@@ -118,12 +120,9 @@ export const SubmitFlowDialog = ({
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
-  const feeDenom = checkedFeeAcc ? "uinto" : denom_local
-
-  const [suggestedFunds, _isSuggestedFundsLoading] = useGetExpectedFlowFee(
+  const { fees, isLoading: _isSuggestedFundsLoading } = useGetExpectedFlowFees(
     duration / 1000,
     flowInput,
-    feeDenom,
     interval / 1000,
     trustlessAgent
   );
@@ -264,9 +263,18 @@ export const SubmitFlowDialog = ({
                     >
                       <Text variant="body">Fee</Text>
                     </Tooltip>
-                    <Text variant="body" color="tertiary" css={{ fontSize: '12px' }}>
-                      ~ {suggestedFunds} {feeFundsSymbol}
-                    </Text>
+                    <Tooltip
+                      label={fees.map((fee, index) => fee.denom != 'uinto' && <> {"Or " + fee.amount} {resolveDenomSync(fee.denom, ibcAssetList)}{index < fees.length - 2 && ', '} </> || '')}
+                      aria-label="Fee for execution of the flow."
+                    >
+
+                      <Inline>
+                        <Text variant="body" color="tertiary" css={{ fontSize: '12px' }}>
+                          ~ {fees.find((fee) => fee.denom === "uinto")?.amount}  {feeFundsSymbol}
+                        </Text>
+                        <IconWrapper icon={<Info />} color="tertiary" />
+                      </Inline>
+                    </Tooltip>
                   </Inline>
                   <Inline justifyContent="space-between" >
                     <Tooltip
@@ -339,10 +347,10 @@ export const SubmitFlowDialog = ({
             </Inline>
             <Inline justifyContent="space-between" css={{ width: '100%' }}>
               {executionParams.interval > 0 ? (
-                <Text 
-                  variant="body" 
-                  color={recurrences === 0 || recurrences > 1000 || (executionParams.startAt > 0 && executionParams.startAt - now < 0) ? 'error' : 'tertiary'} 
-                  css={{ 
+                <Text
+                  variant="body"
+                  color={recurrences === 0 || recurrences > 1000 || (executionParams.startAt > 0 && executionParams.startAt - now < 0) ? 'error' : 'tertiary'}
+                  css={{
                     fontSize: '12px',
                     fontWeight: recurrences === 0 || recurrences > 1000 || (executionParams.startAt > 0 && executionParams.startAt - now < 0) ? 'bold' : 'normal'
                   }}

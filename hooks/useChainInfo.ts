@@ -50,6 +50,112 @@ export const useIBCChainInfo = (chainId: string) => {
 
 
 
+
+
+export const useGetExpectedFlowFees = (
+  durationSeconds: number,
+  flowInput: FlowInput,
+  intervalSeconds?: number,
+  trustlessAgent?: any
+) => {
+  const [intentModuleParams, setTriggerModuleData] = useRecoilState(
+    intentModuleParamsAtom
+  )
+  const client = useIntentoRpcClient()
+
+  // Calculate recurrences based on interval and duration
+  let recurrences =
+    intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
+      ? Math.floor(durationSeconds / intervalSeconds)
+      : 1
+  
+  // Add extra recurrence if there's a startTime
+  if (flowInput.startTime && flowInput.startTime > 0) {
+    recurrences++
+  }
+
+  const stableQueryKey = useMemo(
+    () => [
+      'expectedFlowFees',
+      recurrences,
+      flowInput.msgs?.length || 0,
+      trustlessAgent?.address ?? null,
+      intentModuleParams?.gasFeeCoins?.map(coin => coin.denom).join(',') || ''
+    ],
+    [recurrences, flowInput.msgs, trustlessAgent?.address, intentModuleParams?.gasFeeCoins]
+  )
+
+  const { data, isLoading, error } = useQuery(
+    stableQueryKey,
+    async () => {
+      console.log(intentModuleParams)
+      if (!intentModuleParams) {
+        try {
+          const params = await getFlowParams(client)
+          setTriggerModuleData(params)
+          return []
+        } catch (error) {
+          console.error('Error getting flow params:', error)
+          return []
+        }
+      }
+
+      if (!flowInput.msgs || flowInput.msgs.length === 0) {
+        console.warn('No messages in flowInput')
+        return []
+      }
+
+      if (!intentModuleParams.gasFeeCoins?.length) {
+        console.warn('No supported denoms found in gasFeeCoins')
+        return []
+      }
+
+      // Calculate fees for all supported denoms
+      const fees = []
+      
+      for (const coin of intentModuleParams.gasFeeCoins) {
+        try {
+          const amount = getExpectedFlowFee(
+            intentModuleParams,
+            200000, // Default gas used
+            flowInput.msgs.length,
+            recurrences,
+            coin.denom,
+            trustlessAgent
+          )
+          console.log(amount)
+          if (amount > 0) {
+            fees.push({
+              amount: amount.toString(),
+              denom: coin.denom
+            })
+          }
+        } catch (err) {
+          console.error(`Error calculating fee for denom ${coin.denom}:`, err)
+        }
+      }
+
+      return fees
+    },
+    {
+      enabled: Boolean(
+        client?.intento &&
+        flowInput?.msgs?.length > 0 
+      ),
+      refetchOnWindowFocus: false,
+      staleTime: 30000, // 30 seconds
+      cacheTime: 60000, // 1 minute
+    }
+  )
+
+  return {
+    fees: data || [],
+    isLoading,
+    error,
+    refetch: () => queryClient.invalidateQueries(stableQueryKey[0] as string)
+  }
+}
+
 export const useGetExpectedFlowFee = (
   durationSeconds: number,
   flowInput: FlowInput,
