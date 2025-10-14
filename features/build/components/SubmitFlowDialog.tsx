@@ -242,7 +242,9 @@ export const SubmitFlowDialog = ({
 
             </Card>
             <>
-              {/* Authorization Check - Always render but show error state if needed */}
+            {/* Authorization Check - Always render but show error state if needed */}
+            {chainId != process.env.NEXT_PUBLIC_INTO_CHAIN_ID && (
+   
               <AuthzGrantCheck
                 flowInput={flowInput}
                 chainId={chainId}
@@ -252,7 +254,7 @@ export const SubmitFlowDialog = ({
                 isAuthzGrantsLoading={isAuthzGrantsLoading}
                 authzError={authzError}
               />
-
+            )}
               <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
                 <Column css={{ padding: '$2', gap: '$4' }}>
                   <Inline justifyContent="space-between">
