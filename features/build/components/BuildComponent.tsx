@@ -85,7 +85,7 @@ export const BuildComponent = ({
   )
   const refetchICA = useRefetchQueries([
     `ibcTokenBalance / ${denom} / ${icaAddress}`,
-    `userAuthZGrants / ${icaAddress}`,
+    `userAuthZGrants / ${icaAddress}/${icaAddress}/${flowInput?.msgs?.length}`,
   ])
 
 

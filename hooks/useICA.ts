@@ -219,7 +219,7 @@ export const useAuthZMsgGrantInfoForUser = (
   const queryClient = useQueryClient()
 
   // Base query key without the status to invalidate all related queries
-  const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}/${flowInput?.msgs}`
+  const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}/${flowInput?.msgs?.length}`
 
   const { data, isLoading, error, refetch: queryRefetch } = useQuery<
     GrantResponse[],
@@ -297,18 +297,16 @@ export const useAuthZMsgGrantInfoForUser = (
     {
       enabled: Boolean(
         ibcState.status === WalletStatusType.connected &&
-          ibcState.address &&
-          grantee &&
-          flowInput?.connectionId && 
-          flowInput?.msgs?.length > 0
+        ibcState.address &&
+        grantee &&
+        flowInput?.connectionId && 
+        flowInput?.msgs?.length > 0
       ),
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      refetchInterval: 60000,
-      staleTime: 30000,
-      cacheTime: 60000,
-      refetchOnReconnect: true,
-      notifyOnChangeProps: ['data', 'error'],
+      refetchOnMount: false, // don’t refetch if data is cached
+      refetchOnWindowFocus: false, // don’t spam when tab focus changes
+      refetchInterval: false, // disable auto-polling
+      staleTime: 5 * 60 * 1000, // data is fresh for 5 min
+      cacheTime: 10 * 60 * 1000, // keep it cached for 10 min
       onError: (error) => {
         console.error('Error in useAuthZMsgGrantInfoForUser:', error)
       },

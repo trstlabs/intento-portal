@@ -38,7 +38,7 @@ export const useCreateAuthzGrant = ({
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
 
-  const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`, `userAuthZGrants/${grantee}`])
+  const refetchQueries = useRefetchQueries([`tokenBalance/INTO/${address}`, `userAuthZGrants/${grantee}/${address}/${grantInfos.length}`])
 
   let typeUrls = []
   for (const grant of grantInfos) {

@@ -298,7 +298,7 @@ import {
     )
     const refetchICA = useRefetchQueries([
       `ibcTokenBalance / ${denom} / ${icaAddress}`,
-      `userAuthZGrants / ${icaAddress}`,
+      `userAuthZGrants / ${icaAddress}/${icaAddress}/${flowInput?.msgs?.length}`,
       //`interchainAccount / ${ flowInput.connectionId }`,
     ])
   
