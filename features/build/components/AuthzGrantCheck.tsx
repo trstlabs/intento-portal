@@ -26,6 +26,7 @@ interface AuthzGrantCheckProps {
   authzGrants?: GrantResponse[]
   isAuthzGrantsLoading: boolean
   refetchAuthzGrants: () => void
+  authzError?: Error | null
   chainName?: string // Optional chain name
 }
 
@@ -36,6 +37,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   authzGrants: propAuthzGrants,
   isAuthzGrantsLoading: propIsAuthzGrantsLoading,
   refetchAuthzGrants: propRefetchAuthzGrants,
+  authzError: propAuthzError,
   chainName,
 }) => {
   // Get wallet state and connection
@@ -61,15 +63,22 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   const [lastChecked, setLastChecked] = React.useState<Date | null>(null)
 
   // Use props if provided, otherwise fall back to hook
-  const { grants: authzGrants = [], isLoading: isAuthzGrantsLoading, refetch, error: authzError } = 
-    propAuthzGrants !== undefined 
-      ? { 
-          grants: propAuthzGrants || [], 
-          isLoading: propIsAuthzGrantsLoading, 
-          refetch: propRefetchAuthzGrants,
-          error: null
-        } 
-      : useAuthZMsgGrantInfoForUser(grantee, flowInput);
+  const { 
+    grants: authzGrants = [], 
+    isLoading: isAuthzGrantsLoading, 
+    refetch, 
+    error: hookError 
+  } = propAuthzGrants !== undefined 
+    ? { 
+        grants: propAuthzGrants || [], 
+        isLoading: propIsAuthzGrantsLoading, 
+        refetch: propRefetchAuthzGrants,
+        error: null
+      } 
+    : useAuthZMsgGrantInfoForUser(grantee, flowInput);
+
+  // Use prop error if provided, otherwise use hook error
+  const authzError = propAuthzError || hookError;
 
   // Use the shared grant validation hook
   const { allGrantsValid, expiredGrants, missingGrants } = useGrantValidation(
@@ -102,6 +111,32 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   })
 
   // Show error if there was an issue fetching grants
+  if (authzError) {
+    return (
+      <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
+        <Inline justifyContent="space-between" css={{ alignItems: 'center' }}>
+          <Text variant="primary" color="error" css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+            <AlertTriangle size={16} />
+            Error checking authorizations
+          </Text>
+          <Button
+            variant="ghost"
+            size="small"
+            onClick={handleCheckPermissions}
+            disabled={isChecking || isExecutingAuthzGrant}
+            css={{ minWidth: '120px' }}
+          >
+            {isChecking ? <Spinner size={16} /> : 'Try Again'}
+          </Button>
+        </Inline>
+        <Text variant="caption" color="error">
+          {authzError.message || 'Failed to check authorizations. Please try again.'}
+        </Text>
+      </Column>
+    )
+  }
+
+  // Show error state if there was an error
   if (authzError) {
     return (
       <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>

@@ -73,7 +73,12 @@ export const SubmitFlowDialog = ({
   const chainName = propChainName || chainInfo?.name || 'IBC' // fallback
 
   // Get authz grant info
-  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+  const { 
+    grants: authzGrants, 
+    isLoading: isAuthzGrantsLoading, 
+    error: authzError,
+    refetch: refetchAuthzGrants 
+  } = useAuthZMsgGrantInfoForUser(
     icaAddress,
     flowInput
   )
@@ -238,21 +243,17 @@ export const SubmitFlowDialog = ({
 
             </Card>
             <>
-              {/* Authorization Check */}
-              {flowInput.msgs && flowInput.msgs.length > 0 && flowInput.connectionId && (
-
-                <AuthzGrantCheck
-                  flowInput={flowInput}
-                  chainId={chainId}
-                  grantee={icaAddress}
-                  authzGrants={authzGrants}
-                  isAuthzGrantsLoading={isAuthzGrantsLoading}
-                  refetchAuthzGrants={refetchAuthzGrants}
-                  chainName={chainName}
-                />
-
-              )}
-
+              {/* Authorization Check - Always render but show error state if needed */}
+              <AuthzGrantCheck
+                flowInput={flowInput}
+                chainId={chainId}
+                grantee={icaAddress}
+                chainName={chainName}
+                authzGrants={authzGrants}
+                isAuthzGrantsLoading={isAuthzGrantsLoading}
+                refetchAuthzGrants={refetchAuthzGrants}
+                authzError={authzError}
+              />
 
               <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
                 <Column css={{ padding: '$2', gap: '$4' }}>
