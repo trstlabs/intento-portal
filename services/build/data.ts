@@ -6,6 +6,7 @@ import {
 } from 'intentojs/dist/codegen/intento/intent/v1/query'
 import { cosmos } from 'intentojs'
 import { QueryGranterGrantsRequest } from 'cosmjs-types/cosmos/authz/v1beta1/query'
+import { useCosmosRpcClient } from '../../hooks/useRPCClient'
 
 export interface ICAQueryInput {
   owner: string
@@ -63,8 +64,7 @@ export const getTrustlessAgent = async ({ rpcClient, address }) => {
 export interface GrantQueryInput {
   grantee: string
   granter: string
-  rpc: string
-  msgTypeUrl?: string
+  client: any
 }
 
 export interface GrantQueryResponse {
@@ -75,17 +75,14 @@ export interface GrantQueryResponse {
 export const getAuthZGrantsForGrantee = async ({
   grantee,
   granter,
-  rpc,
+  client,
 }: GrantQueryInput) => {
   try {
-    const cosmosClient = await cosmos.ClientFactory.createRPCQueryClient({
-      rpcEndpoint: rpc,
-    })
     const req = QueryGranterGrantsRequest.fromPartial({
       granter,
       pagination: undefined,
     })
-    const resp = await cosmosClient.cosmos.authz.v1beta1.granterGrants(req)
+    const resp = await client.cosmos.authz.v1beta1.granterGrants(req)
 
     let granterGrants: GrantResponse[] = []
     for (const grant of resp.grants) {

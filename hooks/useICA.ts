@@ -1,6 +1,5 @@
-import { useQuery, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 import { useRecoilValue } from 'recoil'
-import { useEffect, useRef } from 'react'
 
 import {
   ibcWalletState,
@@ -23,6 +22,7 @@ import { convertMicroDenomToDenom } from 'junoblocks'
 import { useIntentoRpcClient } from './useRPCClient'
 import { FlowInput } from '../types/trstTypes'
 import { useChainInfoByChainID } from './useChainList'
+import { cosmos } from 'intentojs'
 
 export const useGetICA = (connectionId: string, accAddr?: string) => {
   const { address } = useRecoilValue(walletState)
@@ -206,7 +206,6 @@ interface UseAuthZMsgGrantInfoResult {
   grants: GrantResponse[]
   isLoading: boolean
   error: Error | null
-  refetch: () => Promise<void>
 }
 
 export const useAuthZMsgGrantInfoForUser = (
@@ -215,16 +214,11 @@ export const useAuthZMsgGrantInfoForUser = (
 ): UseAuthZMsgGrantInfoResult => {
   const ibcState = useRecoilValue(ibcWalletState)
   const chain = useChainInfoByChainID(ibcState.chainId)
-  const prevAddressRef = useRef(ibcState.address)
-  const queryClient = useQueryClient()
 
   // Base query key without the status to invalidate all related queries
   const baseQueryKey = `userAuthZGrants/${grantee}/${ibcState.address}/${flowInput?.msgs?.length}`
 
-  const { data, isLoading, error, refetch: queryRefetch } = useQuery<
-    GrantResponse[],
-    Error
-  >(
+  const { data, isLoading, error } = useQuery<GrantResponse[], Error>(
     [baseQueryKey],
     async () => {
       if (!flowInput?.msgs?.length) {
@@ -233,13 +227,16 @@ export const useAuthZMsgGrantInfoForUser = (
 
       let grants: GrantResponse[] = []
       let granteeGrants
-
+      const client = await cosmos.ClientFactory.createRPCQueryClient({
+        rpcEndpoint: chain.rpc,
+      })
       try {
-        granteeGrants = await getAuthZGrantsForGrantee({
-          grantee,
-          granter: ibcState.address,
-          rpc: chain.rpc,
-        }) || []
+        granteeGrants =
+          (await getAuthZGrantsForGrantee({
+            grantee,
+            granter: ibcState.address,
+            client
+          })) || []
       } catch (err) {
         console.error('Error fetching grants:', err)
         throw new Error(`Failed to fetch grants: ${err.message}`)
@@ -261,7 +258,7 @@ export const useAuthZMsgGrantInfoForUser = (
             for (const execMsg of execMsgs) {
               const execMsgTypeUrl = execMsg.typeUrl
               if (!execMsgTypeUrl) continue
-              
+
               const grantMatch = granteeGrants.find(
                 (grant) => grant.msgTypeUrl === execMsgTypeUrl
               )
@@ -297,10 +294,10 @@ export const useAuthZMsgGrantInfoForUser = (
     {
       enabled: Boolean(
         ibcState.status === WalletStatusType.connected &&
-        ibcState.address &&
-        grantee &&
-        flowInput?.connectionId && 
-        flowInput?.msgs?.length > 0
+          ibcState.address &&
+          grantee &&
+          flowInput?.connectionId &&
+          flowInput?.msgs?.length > 0
       ),
       refetchOnMount: false, // don’t refetch if data is cached
       refetchOnWindowFocus: false, // don’t spam when tab focus changes
@@ -313,38 +310,10 @@ export const useAuthZMsgGrantInfoForUser = (
     }
   )
 
-  // Invalidate and refetch when wallet address changes
-  useEffect(() => {
-    if (ibcState.address && ibcState.address !== prevAddressRef.current) {
-      prevAddressRef.current = ibcState.address
-      queryClient.invalidateQueries(baseQueryKey, {
-        refetchActive: true,
-        refetchInactive: true,
-      })
-    }
-  }, [ibcState.address, queryClient, baseQueryKey])
-
-  const refetch = async () => {
-    try {
-      await queryRefetch()
-    } catch (err) {
-      console.error('Error refetching grants:', err)
-      throw err
-    }
-  }
-
-  // Also refetch when the wallet status changes to connected
-  useEffect(() => {
-    if (ibcState.status === WalletStatusType.connected) {
-      refetch()
-    }
-  }, [ibcState.status, refetch])
-
-  return { 
-    grants: data || [], 
-    isLoading, 
+  return {
+    grants: data || [],
+    isLoading,
     error: error || null,
-    refetch 
   }
 }
 

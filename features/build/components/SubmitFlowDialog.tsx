@@ -37,7 +37,6 @@ import { formatTimeDisplay, resolveDenomSync } from '../../../util/conversion'
 import { AuthzGrantCheck } from './AuthzGrantCheck'
 import { ConditionsSummary } from './Conditions/ConditionsSummary'
 
-
 interface SubmitFlowDialogProps {
   isDialogShowing: boolean
   icaAddress?: string
@@ -77,7 +76,6 @@ export const SubmitFlowDialog = ({
     grants: authzGrants,
     isLoading: isAuthzGrantsLoading,
     error: authzError,
-    refetch: refetchAuthzGrants
   } = useAuthZMsgGrantInfoForUser(
     icaAddress,
     flowInput
@@ -125,6 +123,7 @@ export const SubmitFlowDialog = ({
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
+ 
   const { fees, isLoading: _isSuggestedFundsLoading } = useGetExpectedFlowFees(
     duration / 1000,
     flowInput,
@@ -251,7 +250,6 @@ export const SubmitFlowDialog = ({
                 chainName={chainName}
                 authzGrants={authzGrants}
                 isAuthzGrantsLoading={isAuthzGrantsLoading}
-                refetchAuthzGrants={refetchAuthzGrants}
                 authzError={authzError}
               />
 

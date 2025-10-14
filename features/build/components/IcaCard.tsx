@@ -61,10 +61,11 @@ export const IcaCard = ({
     },
     false
   )
+  
 
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
   const [requestedSendAndAuthzGrant, setRequestedSendAndAuthzGrant] = useState(false)
-  const { grants: icaAuthzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+  const { grants: icaAuthzGrants, isLoading: isAuthzGrantsLoading } = useAuthZMsgGrantInfoForUser(
     icaAddress,
     flowInput
   )
@@ -80,9 +81,6 @@ export const IcaCard = ({
           amount: convertDenomToMicroDenom(feeFundsHostChain, 6).toString(),
         }
         : undefined,
-      onSuccess: () => {
-        refetchAuthzGrants()
-      },
     })
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
     if (shouldTrigger) {

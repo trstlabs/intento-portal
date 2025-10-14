@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query'
-import { cosmos } from 'intentojs'
 import { useIBCAssetInfo } from './useIBCAssetInfo'
 import { IBCAssetInfo } from './useChainList'
 import { ibcWalletState, walletState, WalletStatusType } from '../state/atoms/walletAtoms'
 import { useRecoilValue } from 'recoil'
+import { cosmos } from 'intentojs'
 
 export const useValidators = (chainSymbol: string) => {
     // Get the IBC asset info for the chain
@@ -41,8 +41,7 @@ export const useValidators = (chainSymbol: string) => {
         {
             enabled: Boolean(assetInfo && rpcEndpoint && address && (intoStatus === WalletStatusType.connected || ibcStatus === WalletStatusType.connected)),
             refetchOnMount: 'always',
-            refetchInterval: 30000,
-            refetchIntervalInBackground: true
+            refetchInterval: 60000,
         }
     )
 

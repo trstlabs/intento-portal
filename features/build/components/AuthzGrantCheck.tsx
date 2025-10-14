@@ -25,7 +25,6 @@ interface AuthzGrantCheckProps {
   grantee: string
   authzGrants?: GrantResponse[]
   isAuthzGrantsLoading: boolean
-  refetchAuthzGrants: () => void
   authzError?: Error | null
   chainName?: string // Optional chain name
 }
@@ -36,7 +35,6 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   grantee,
   authzGrants: propAuthzGrants,
   isAuthzGrantsLoading: propIsAuthzGrantsLoading,
-  refetchAuthzGrants: propRefetchAuthzGrants,
   authzError: propAuthzError,
   chainName,
 }) => {
@@ -57,7 +55,6 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   )
 
 
-
   // State for manual refresh
   const [isChecking, setIsChecking] = React.useState(false)
   const [lastChecked, setLastChecked] = React.useState<Date | null>(null)
@@ -65,14 +62,12 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   // Use props if provided, otherwise fall back to hook
   const { 
     grants: authzGrants = [], 
-    isLoading: isAuthzGrantsLoading, 
-    refetch, 
+    isLoading: isAuthzGrantsLoading,
     error: hookError 
   } = propAuthzGrants !== undefined 
     ? { 
         grants: propAuthzGrants || [], 
-        isLoading: propIsAuthzGrantsLoading, 
-        refetch: propRefetchAuthzGrants,
+        isLoading: propIsAuthzGrantsLoading,
         error: null
       } 
     : useAuthZMsgGrantInfoForUser(grantee, flowInput);
@@ -90,7 +85,6 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   const handleCheckPermissions = async () => {
     try {
       setIsChecking(true)
-      await refetch?.()
       setLastChecked(new Date())
     } catch (error) {
       console.error('Error checking permissions:', error)
@@ -105,9 +99,6 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
     grantInfos: [...(missingGrants || []), ...(expiredGrants || [])],
     expirationDurationMs: (flowInput.startTime && flowInput.startTime > Date.now() ? flowInput.startTime - Date.now() : 0) + (flowInput.duration || 0) + 86400000,
     coin: { denom: 'uinto', amount: '0' } as Coin,
-    onSuccess: () => {
-      refetch?.()
-    },
   })
 
   // Show error if there was an issue fetching grants
