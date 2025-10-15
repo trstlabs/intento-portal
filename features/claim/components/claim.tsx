@@ -202,7 +202,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                         <div style={styles.statCard}>
                           <Text variant="subtitle" css={{ marginBottom: '0.5rem' }}>💡 How It Works</Text>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1rem', display: 'block' }}>
-                            Complete the actions below to unlock your full airdrop of {totalClaimable} INTO. Each completed action rewards you with {perActionReward} INTO. For each action, 20% is added to your balance immediately, and the remainder vests over several days.
+                            Complete the actions below to unlock your full airdrop of {totalClaimable} INTO. Each completed action rewards you with {perActionReward} INTO. For each action, 20% is added to your balance immediately, and the remainder vests over several days. Stake 67%+ of the tokens you receive to claim vested tokens.
                           </Text>
 
                           <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
@@ -338,7 +338,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 0 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode (use at your own risk): <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Action 1 — a simple flow streaming to any address, including your own.
+                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Action 1 — a simple flow streaming to any address, including your own.
                                     </Text>
                                   )}
                                   {index === 1 && (
@@ -348,7 +348,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode (use at your own risk): <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own.
+                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own. 
                                     </Text>
                                   )}
                                   {index === 2 && (
