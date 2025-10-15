@@ -1327,7 +1327,6 @@ export const FlowBreakdown = ({
           }}
           grantee={icaAddress}
           chainId={chainId}
-          refetchAuthzGrants={() => { }}
           isAuthzGrantsLoading={false}
         />
         }

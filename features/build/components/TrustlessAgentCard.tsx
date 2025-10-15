@@ -32,7 +32,7 @@ export const TrustlessAgentCard = ({
 
   const [requestedAuthzGrant, setRequestedCreateAuthzGrant] = useState(false)
 
-  const { grants: authzGrants, isLoading: isAuthzGrantsLoading, refetch: refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+  const { grants: authzGrants, isLoading: isAuthzGrantsLoading } = useAuthZMsgGrantInfoForUser(
     trustlessAgentICAAddress,
     flowInput
   )
@@ -42,10 +42,7 @@ export const TrustlessAgentCard = ({
       grantInfos: authzGrants
         ? authzGrants.filter((grant) => !grant.hasGrant)
         : [],
-      coin: undefined,
-      onSuccess: () => {
-        refetchAuthzGrants()
-      },
+      coin: undefined
     }) || {};
   const handleTriggerEffect = (shouldTrigger, handler, resetStateSetter) => {
     if (shouldTrigger) {

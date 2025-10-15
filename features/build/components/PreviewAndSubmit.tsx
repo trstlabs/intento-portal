@@ -263,7 +263,7 @@ import {
     const [trustlessAgent, _istrustlessAgentLoading] = useGetTrustlessAgentICAByTrustlessAgentAddress(flowInput.trustlessAgent?.agentAddress || "")
     const [trustlessAgentICA, _istrustlessAgentICALoading] = useGetTrustlessAgentICAAddress(trustlessAgent?.agentAddress || "", flowInput.connectionId || "")
   
-    const { grants: authzGrants, isLoading: _isAuthzGrantsLoading, refetch: _refetchAuthzGrants } = useAuthZMsgGrantInfoForUser(
+    const { grants: authzGrants, isLoading: _isAuthzGrantsLoading } = useAuthZMsgGrantInfoForUser(
       trustlessAgentICA || icaAddress,
       flowInput
     )

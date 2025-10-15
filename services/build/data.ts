@@ -4,9 +4,7 @@ import {
   QueryTrustlessAgentsResponse,
   QueryInterchainAccountFromAddressResponse,
 } from 'intentojs/dist/codegen/intento/intent/v1/query'
-import { cosmos } from 'intentojs'
 import { QueryGranterGrantsRequest } from 'cosmjs-types/cosmos/authz/v1beta1/query'
-import { useCosmosRpcClient } from '../../hooks/useRPCClient'
 
 export interface ICAQueryInput {
   owner: string
@@ -29,9 +27,7 @@ export const getICA = async ({
   } catch (e) {
     if (e.message.includes('account found')) {
       return ''
-    } /* else {
-      console.error('err(getICA):', e)
-    } */
+    }
   }
 }
 
