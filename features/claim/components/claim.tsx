@@ -348,7 +348,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      <strong>Ledger Users (updated):</strong> Unfortunately it's not possible to use Ledger to sign MsgGrant messages required for this action. Hence, this action can only be done without a ledger. We understand this is a limitation and we are working on a solution. 
+                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode (use at your own risk): <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own.
                                     </Text>
                                   )}
                                   {index === 2 && (
