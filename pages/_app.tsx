@@ -156,6 +156,26 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
         <meta name="theme-color" content="#ffffff" />
+        
+        {/* Primary Meta Tags */}
+        <title>Intento Portal</title>
+        <meta name="title" content="Intento Portal" />
+        <meta name="description" content="The portal for on-chain intent-based workflows" />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://intento.zone/" />
+        <meta property="og:title" content="Intento Portal" />
+        <meta property="og:description" content="The portal for on-chain intent-based workflows" />
+        <meta property="og:image" content="https://intento.zone/assets/images/og-portal.png" />
+        
+        {/* Twitter */}
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:url" content="https://intento.zone/" />
+        <meta property="twitter:title" content="Intento Portal" />
+        <meta property="twitter:description" content="The portal for on-chain intent-based workflows" />
+        <meta property="twitter:image" content="https://intento.zone/assets/images/og-portal.png" />
+        
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
       </Head>
