@@ -34,6 +34,7 @@ import { wallets as ledgerWallets } from "@cosmos-kit/ledger";
 import { assets, chains } from 'chain-registry'
 import {
   getIntentoSigningClientOptions,
+  getSigningCosmosClientOptions,
 } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
@@ -137,8 +138,12 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
   }, [dataPushed])
 
   const signerOptions: SignerOptions = {
-    signingStargate: (_chain: any) => {
-      return getIntentoSigningClientOptions({ defaultTypes })
+    signingStargate: (chain: any) => {
+      if (chain.chain_name.toLowerCase().includes("intento")) {
+        return getIntentoSigningClientOptions({ defaultTypes })
+      } else {
+        return getSigningCosmosClientOptions()
+      }
     },
     preferredSignType: (_chain: any) => {
       // `preferredSignType` determines which signer is preferred for `getOfflineSigner` method. By default `amino`. It might affect the `OfflineSigner` used in `signingStargateClient` and `signingCosmwasmClient`. But if only one signer is provided, `getOfflineSigner` will always return this signer, `preferredSignType` won't affect anything.

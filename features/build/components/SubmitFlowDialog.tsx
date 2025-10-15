@@ -246,7 +246,10 @@ export const SubmitFlowDialog = ({
             {chainId != process.env.NEXT_PUBLIC_INTO_CHAIN_ID && (
    
               <AuthzGrantCheck
-                flowInput={flowInput}
+                flowInput={{
+                  ...flowInput,
+                  duration,
+                }}
                 chainId={chainId}
                 grantee={icaAddress}
                 chainName={chainName}

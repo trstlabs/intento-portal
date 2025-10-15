@@ -18,6 +18,8 @@ import { ibcWalletState, WalletStatusType } from 'state/atoms/walletAtoms'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 
 import { Coin } from '@cosmjs/stargate'
+import { useChain } from '@cosmos-kit/react'
+import { useChainInfoByChainID } from '../../../hooks/useChainList'
 
 type UseCreateAuthzGrantParams = {
   grantee: string
@@ -34,7 +36,10 @@ export const useCreateAuthzGrant = ({
   coin,
   onSuccess,
 }: UseCreateAuthzGrantParams) => {
-  const { address, client, status } = useRecoilValue(ibcWalletState)
+  const { address, status, chainId } = useRecoilValue(ibcWalletState)
+  const chainInfo = useChainInfoByChainID(chainId)
+  const { getSigningStargateClient } = useChain(chainInfo?.registry_name)
+
 
   const setTransactionState = useSetRecoilState(transactionStatusState)
 
@@ -51,7 +56,7 @@ export const useCreateAuthzGrant = ({
       if (status !== WalletStatusType.connected) {
         throw new Error('Please connect your wallet.')
       }
-
+      const client = await getSigningStargateClient()
       console.log(client)
       return await executeCreateAuthzGrant({
         client,
