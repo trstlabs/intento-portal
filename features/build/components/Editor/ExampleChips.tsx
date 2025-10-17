@@ -648,7 +648,7 @@ export function ExampleFlowChips({ chainSymbol, setAllMessages, index, flowInput
                         value: {
                           sender: `Your ${IBCAssetInfo.prefix} address`,
                           routes: [{ poolId: '1464', tokenOutDenom: 'uosmo' }, { poolId: '1265', tokenOutDenom: 'ATOM (transfer/channel-0)' }],
-                          tokenIn: { denom: 'USDC (transfer/channel-750)', amount: '1000000' },
+                          tokenIn: { denom: 'USDC (transfer/channel-750)', amount: '1' },
                           tokenOutMinAmount: '1',
                         },
                       }
