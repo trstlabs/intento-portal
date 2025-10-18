@@ -102,30 +102,30 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   })
 
   // Show error if there was an issue fetching grants
-  if (authzError) {
-    return (
-      <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
-        <Inline justifyContent="space-between" css={{ alignItems: 'center' }}>
-          <Text variant="primary" color="error" css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
-            <AlertTriangle size={16} />
-            Error checking authorizations
-          </Text>
-          <Button
-            variant="ghost"
-            size="small"
-            onClick={handleCheckPermissions}
-            disabled={isChecking || isExecutingAuthzGrant}
-            css={{ minWidth: '120px' }}
-          >
-            {isChecking ? <Spinner size={16} /> : 'Try Again'}
-          </Button>
-        </Inline>
-        <Text variant="caption" color="error">
-          {authzError.message || 'Failed to check authorizations. Please try again.'}
-        </Text>
-      </Column>
-    )
-  }
+  // if (authzError) {
+  //   return (
+  //     <Column css={{ gap: '$2', padding: '$3', background: '$colors$dark5', borderRadius: '8px' }}>
+  //       <Inline justifyContent="space-between" css={{ alignItems: 'center' }}>
+  //         <Text variant="primary" color="error" css={{ display: 'flex', alignItems: 'center', gap: '$2' }}>
+  //           <AlertTriangle size={16} />
+  //           Error checking authorizations
+  //         </Text>
+  //         <Button
+  //           variant="ghost"
+  //           size="small"
+  //           onClick={handleCheckPermissions}
+  //           disabled={isChecking || isExecutingAuthzGrant}
+  //           css={{ minWidth: '120px' }}
+  //         >
+  //           {isChecking ? <Spinner size={16} /> : 'Try Again'}
+  //         </Button>
+  //       </Inline>
+  //       <Text variant="caption" color="error">
+  //         {authzError.message || 'Failed to check authorizations. Please try again.'}
+  //       </Text>
+  //     </Column>
+  //   )
+  // }
 
   // Show error state if there was an error
   if (authzError) {
