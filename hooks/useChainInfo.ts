@@ -541,7 +541,7 @@ export const useGetCirculatingSupply = () => {
   const [chainAndTeamWallets, isChainAndTeamWalletsLoading] = useGetChainAndTeamWalletsBalance()
 
   const circulatingSupply = useMemo(() => {
-    if (totalSupply && communityPool && chainAndTeamWallets) {
+    if (totalSupply && communityPool && Number(totalSupply) && Number(communityPool) && Number(chainAndTeamWallets)) {
       return totalSupply - communityPool - chainAndTeamWallets
     }
     return null

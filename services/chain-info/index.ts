@@ -363,7 +363,7 @@ export const getCommunityPool = async ({ client }: BaseQueryInput) => {
   try {
     const response = await client.cosmos.distribution.v1beta1.communityPool({})
     const intoCoin = response.pool.find((coin: any) => coin.denom === 'uinto')
-    return intoCoin ? Number(intoCoin.amount / 1e18) : 0 //convert to nondec
+    return intoCoin ? Number(intoCoin.amount ) : 0 
   } catch (e) {
     console.error('err(getCommunityPool):', e)
     return 0
