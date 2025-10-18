@@ -34,7 +34,7 @@ import { wallets as ledgerWallets } from "@cosmos-kit/ledger";
 import { assets, chains } from 'chain-registry'
 import {
   getIntentoSigningClientOptions,
-  getSigningCosmosClientOptions,
+  getSigningCosmosClientOptions, GlobalDecoderRegistry,
 } from 'intentojs'
 import { defaultRegistryTypes as defaultTypes } from '@cosmjs/stargate'
 
@@ -46,7 +46,6 @@ import { useEffect, useState, Suspense } from 'react';
 import Head from 'next/head';
 import { IBCAssetInfo } from '../hooks/useChainList'
 import { InfoDialog } from '../components/InfoDialog'
-import { GlobalDecoderRegistry } from 'intentojs';
 
 
 // FOR AMINO SIGNING Workaround
