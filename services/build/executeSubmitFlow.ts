@@ -7,9 +7,9 @@ import { intento } from 'intentojs'
 import { validateTransactionSuccess } from '../../util/validateTx'
 import { FlowInput } from '../../types/trstTypes'
 import { Coin } from 'intentojs/dist/codegen/cosmos/base/v1beta1/coin'
-import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
-import { MsgExec } from 'cosmjs-types/cosmos/authz/v1beta1/tx'
-import { Any } from 'cosmjs-types/google/protobuf/any'
+import { MsgExecuteContract } from 'intentojs/dist/codegen/cosmwasm/wasm/v1/tx'
+import { MsgExec } from 'intentojs/dist/codegen/cosmos/authz/v1beta1/tx'
+import { Any } from 'intentojs/dist/codegen/google/protobuf/any'
 import { processDenomFields } from '../../features/build/utils/addressUtils'
 import { removeEmptyProperties } from '../../util/conversion'
 
@@ -45,7 +45,7 @@ export const executeSubmitFlow = async ({
   console.log('interval (s)', flowInput.interval / 1000)
   let duration = flowInput.duration + 'ms'
   let interval = flowInput.interval + 'ms'
-  let msgs: Any[] = []
+  let msgs: any[] = []
 
   // Process messages and replace any placeholder addresses
   const inputMsgs = Array.isArray(flowInput.msgs)
@@ -61,15 +61,25 @@ export const executeSubmitFlow = async ({
 
   console.log('Transformed messages:', msgs)
   if (flowInput.icaAddressForAuthZ && flowInput.icaAddressForAuthZ !== '') {
+    // wrap individually
     msgs = msgs.map((msg) => {
-      const execMsg = {
+      if (process.env.NEXT_PUBLIC_PREFERRED_SIGN_AMINO == 'true') {
+        return {
+          $typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+          typeUrl: '/cosmos.authz.v1beta1.MsgExec',
+          msgs: [msg], 
+        grantee: flowInput.icaAddressForAuthZ,
+      }
+    } else {
+      const execMsg = { 
         typeUrl: '/cosmos.authz.v1beta1.MsgExec',
         value: {
-          msgs: [msg], // wrap individually
-          grantee: flowInput.icaAddressForAuthZ,
-        },
+        grantee: flowInput.icaAddressForAuthZ,
+        msgs: [msg],
+        }
       }
       return client.registry.encodeAsAny(execMsg)
+    }
     })
   }
 
@@ -106,7 +116,6 @@ export const executeSubmitFlow = async ({
   if (process.env.NEXT_PUBLIC_PREFERRED_SIGN_AMINO == 'true') {
     msgSubmitFlow = removeEmptyProperties(msgSubmitFlow)
   }
-
 
   console.log('Submitting MsgSubmitFlow ⬇')
   console.log(msgSubmitFlow)
@@ -189,10 +198,14 @@ export function transformAndEncodeMsgs({
         const currentPath = path ? `${path}.${key}` : key
         if (typeof val === 'string' && key.toLowerCase().includes('address')) {
           if (val.length <= 30) {
-            throw new Error(`Address validation failed for ${currentPath}: must have more than 30 characters, got ${val.length}`)
+            throw new Error(
+              `Address validation failed for ${currentPath}: must have more than 30 characters, got ${val.length}`
+            )
           }
           if (!val.substring(0, 15).includes('1')) {
-            throw new Error(`Address validation failed for ${currentPath}: must include '1' in first 15 characters`)
+            throw new Error(
+              `Address validation failed for ${currentPath}: must include '1' in first 15 characters`
+            )
           }
         } else if (typeof val === 'object' && val !== null) {
           validateAddresses(val, currentPath)

@@ -54,7 +54,7 @@
     "formik": "^2.4.6",
     "framer-motion": "^12.23.12",
     "gsap": "^3.7.1",
-    "intentojs": "^1.0.4-proto.0-beta.1",
+    "intentojs": "^1.0.4-proto.0-beta.11",
     "jsonschema": "^1.4.1",
     "junoblocks": "0.2.93",
     "lucide-react": "^0.511.0",

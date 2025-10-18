@@ -46,6 +46,65 @@ import { useEffect, useState, Suspense } from 'react';
 import Head from 'next/head';
 import { IBCAssetInfo } from '../hooks/useChainList'
 import { InfoDialog } from '../components/InfoDialog'
+import { GlobalDecoderRegistry } from 'intentojs';
+
+
+// FOR AMINO SIGNING Workaround
+// Message type detection patterns
+const MESSAGE_PATTERNS = [
+  {
+    typeUrl: "/cosmos.authz.v1beta1.MsgExec",
+    detect: (obj: any) => obj.grantee && Array.isArray(obj.msgs)
+  },
+  {
+    typeUrl: "/cosmos.bank.v1beta1.MsgSend",
+    detect: (obj: any) => obj.fromAddress && obj.toAddress && Array.isArray(obj.amount)
+  },
+  {
+    typeUrl: "/cosmos.staking.v1beta1.MsgDelegate",
+    detect: (obj: any) => obj.delegatorAddress && obj.validatorAddress && obj.amount
+  },
+  {
+    typeUrl: "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
+    detect: (obj: any) => obj.delegatorAddress && obj.validatorAddress && !obj.amount
+  },
+  // Add more patterns as needed
+];
+
+function addTypeUrlIfMissing(obj: any): void {
+  if (!obj || typeof obj !== 'object' || obj.$typeUrl) {
+    return;
+  }
+  
+  for (const pattern of MESSAGE_PATTERNS) {
+    if (pattern.detect(obj)) {
+      obj.$typeUrl = pattern.typeUrl;
+      console.log(`Added $typeUrl: ${pattern.typeUrl}`);
+      
+      // Recursively handle nested msgs arrays
+      if (Array.isArray(obj.msgs)) {
+        obj.msgs.forEach(addTypeUrlIfMissing);
+      }
+      break;
+    }
+  }
+}
+
+// Patch fromPartial
+const originalFromPartial = GlobalDecoderRegistry.fromPartial;
+GlobalDecoderRegistry.fromPartial = function(object: any) {
+  addTypeUrlIfMissing(object);
+  return originalFromPartial.call(this, object);
+};
+
+// Patch getDecoderByInstance
+const originalGetDecoderByInstance = GlobalDecoderRegistry.getDecoderByInstance;
+GlobalDecoderRegistry.getDecoderByInstance = function(obj: any) {
+  addTypeUrlIfMissing(obj);
+  return originalGetDecoderByInstance.call(this, obj);
+};
+
+// END FOR AMINO SIGNING Workaround
 
 const toasterClassName = css({
   [media.sm]: {
