@@ -147,7 +147,7 @@ function IntentoPortalApp({ Component, pageProps }: AppProps) {
       })
 
       for (let asset of ibcAssetList) {
-        if (asset.registry_name.toLowerCase().includes("devnet")) {
+        if (asset.registry_name.toLowerCase().includes("dev")) {
 
           const { rpcEndpoint, apiEndpoint } = getEnvVarForSymbol(asset.symbol)
           chains.push({
