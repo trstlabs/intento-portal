@@ -99,7 +99,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
   const isDarkMode = themeController.theme.name === 'dark';
   const styles = getStyles(isDarkMode);
 
-  const [difference, setDifference] = useState<number>(0);
+  const [_difference, setDifference] = useState<number>(0);
 
 
   const rpcClient = useIntentoRpcClient();
@@ -195,7 +195,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                             </Button></Link>
                           </div> : <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', margin: '2rem 0' }}>
                             <Text variant="body" css={{ color: '#a0aec0', marginBottom: '2rem' }}>
-                              Claiming is not available yet.
+                              The initial claiming period has ended. Claiming will resume Thursday after the chain upgrade.
                             </Text>
                           </div>
                           }
@@ -214,7 +214,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               <Text>{convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO</Text>
                             </div>
 
-                            <div style={styles.statCard}>
+                            {/* <div style={styles.statCard}>
                               <Text variant="caption" css={{ color: '#a0aec0' }}>Tokens Claimed </Text>
                               <div style={{ height: '8px', background: isDarkMode ? '#ffffff' : '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
                                 <div style={{ width: `${difference}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '4px' }}></div>
@@ -225,7 +225,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               <Text variant="caption" css={{ display: 'block' }}>
                                 As it stands, {(100 - difference).toFixed(3)}% of the total airdrop will be clawed back to the community pool. These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
                               </Text>
-                            </div>
+                            </div> */}
                           </div>
 
                           <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
