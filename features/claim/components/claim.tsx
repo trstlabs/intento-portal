@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Link from 'next/link';
-import { Button, CardContent, convertMicroDenomToDenom, Text, useControlTheme } from "junoblocks";
+import { Button, CardContent, convertMicroDenomToDenom, Text, Tooltip, useControlTheme } from "junoblocks";
 import { motion, AnimatePresence } from 'framer-motion';
 import { Info, ChevronDown, ChevronUp, Check, AlertTriangle } from 'lucide-react';
 import { ClaimRecord } from "intentojs/dist/codegen/intento/claim/v1/claim";
@@ -234,287 +234,287 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
               <div style={{ marginTop: '2.5rem' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                   <Text variant="header">Your Actions</Text>
-                  <Button
-                    variant="primary"
-                    onClick={() => claimAll()}
-                    disabled={!claimRecord.status.some(status =>
-                      status.vestingPeriodsCompleted.some((completed, i) =>
-                        completed === true && status.vestingPeriodsClaimed[i] === false
-                      )
-                    )}
-                  >
-                    Claim Vested
-                  </Button>
+                  <Tooltip label="Claim vested tokens is disabled for now. Thursday it will be enabled again.">
+                    <Button
+                      variant="primary"
+                      onClick={() => claimAll()}
+                      disabled={true}
+                    >
+                      Claim Vested
+                    </Button>
+                     </Tooltip>
                 </div>
-                <div style={{ marginTop: '1rem' }}>
-                  {Object.entries(claimRecord.status).map(([_, status], index) => {
-                    const isCompleted = status.actionCompleted;
-                    const actionReward = convertMicroDenomToDenom(total / Object.keys(claimRecord.status).length, 6).toFixed(2);
+             
+              <div style={{ marginTop: '1rem' }}>
+                {Object.entries(claimRecord.status).map(([_, status], index) => {
+                  const isCompleted = status.actionCompleted;
+                  const actionReward = convertMicroDenomToDenom(total / Object.keys(claimRecord.status).length, 6).toFixed(2);
 
-                    return (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                        style={styles.actionItem}
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      style={styles.actionItem}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => toggleFlowExpand(index)}
                       >
-                        <div
-                          style={{
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <div style={{
+                            width: '24px',
+                            height: '24px',
+                            borderRadius: '50%',
+                            background: isCompleted
+                              ? 'linear-gradient(135deg, #10B981, #3B82F6)'
+                              : 'rgba(255, 255, 255, 0.1)',
                             display: 'flex',
-                            justifyContent: 'space-between',
                             alignItems: 'center',
-                            cursor: 'pointer'
-                          }}
-                          onClick={() => toggleFlowExpand(index)}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                            <div style={{
-                              width: '24px',
-                              height: '24px',
-                              borderRadius: '50%',
-                              background: isCompleted
-                                ? 'linear-gradient(135deg, #10B981, #3B82F6)'
-                                : 'rgba(255, 255, 255, 0.1)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              flexShrink: 0
-                            }}>
-                              {isCompleted ? (
-                                <Check size={16} color="white" />
-                              ) : (
-                                <div style={{
-                                  width: '8px',
-                                  height: '8px',
-                                  borderRadius: '50%',
-                                  background: 'rgba(255, 255, 255, 0.4)'
-                                }} />
-                              )}
-                            </div>
-                            <div>
-                              <Text variant="body" style={{ fontWeight: 600 }}>
-                                {index + 1}. {ClaimFlow[index]}
-                              </Text>
-                              <Text variant="caption" style={{ color: '#a0aec0' }}>
-                                Reward: {actionReward} INTO
-                              </Text>
-                            </div>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <Text variant="body" style={{
-                              color: isCompleted ? '#10B981' : '#F59E0B',
-                              fontWeight: 600
-                            }}>
-                              {isCompleted ? 'Completed' : 'Incomplete'}
-                            </Text>
-                            {expandedFlows[index] ? (
-                              <ChevronUp size={20} color="#a0aec0" />
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            {isCompleted ? (
+                              <Check size={16} color="white" />
                             ) : (
-                              <ChevronDown size={20} color="#a0aec0" />
+                              <div style={{
+                                width: '8px',
+                                height: '8px',
+                                borderRadius: '50%',
+                                background: 'rgba(255, 255, 255, 0.4)'
+                              }} />
                             )}
                           </div>
+                          <div>
+                            <Text variant="body" style={{ fontWeight: 600 }}>
+                              {index + 1}. {ClaimFlow[index]}
+                            </Text>
+                            <Text variant="caption" style={{ color: '#a0aec0' }}>
+                              Reward: {actionReward} INTO
+                            </Text>
+                          </div>
                         </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Text variant="body" style={{
+                            color: isCompleted ? '#10B981' : '#F59E0B',
+                            fontWeight: 600
+                          }}>
+                            {isCompleted ? 'Completed' : 'Incomplete'}
+                          </Text>
+                          {expandedFlows[index] ? (
+                            <ChevronUp size={20} color="#a0aec0" />
+                          ) : (
+                            <ChevronDown size={20} color="#a0aec0" />
+                          )}
+                        </div>
+                      </div>
 
-                        <AnimatePresence>
-                          {expandedFlows[index] && (
-                            <motion.div
-                              initial={{ opacity: 0, height: 0 }}
-                              animate={{ opacity: 1, height: 'auto' }}
-                              exit={{ opacity: 0, height: 0 }}
-                              transition={{ duration: 0.3 }}
-                              style={{ overflow: 'hidden' }}
-                            >
-                              <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                                <Text variant="caption" style={{ marginBottom: '0.5rem', display: 'block' }}>
-                                  <strong>Status:</strong> {isCompleted ? 'Action completed successfully!' : 'Complete this action to earn your reward'}
+                      <AnimatePresence>
+                        {expandedFlows[index] && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            style={{ overflow: 'hidden' }}
+                          >
+                            <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                              <Text variant="caption" style={{ marginBottom: '0.5rem', display: 'block' }}>
+                                <strong>Status:</strong> {isCompleted ? 'Action completed successfully!' : 'Complete this action to earn your reward'}
+                              </Text>
+
+                              <div style={{ marginTop: '1rem' }}>
+                                {index === 0 && (
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                    On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> set Intento as the chain and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow, the action will be completed.
+                                  </Text>
+                                )}
+                                {index === 0 && (
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Action 1 — a simple flow streaming to any address, including your own.
+                                  </Text>
+                                )}
+                                {index === 1 && (
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                    On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> select any chain other than Intento to execute over IBC via a Trustless Agent. Tip: use a template like "Stream ATOM" or "DCA into INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow on the target chain, the action will be completed.
+                                  </Text>
+                                )}
+                                {index === 1 && (
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own.
+                                  </Text>
+                                )}
+                                {index === 2 && (
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                    This requires a governance proposal to be active. Check the latest governance proposal <Link href="https://explorer.intento.zone/intento-mainnet/gov/8" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>here</Link> and check the forum on Discord for any upcoming proposals. After voting, the action will be completed.
+                                  </Text>
+                                )}
+                                {index === 3 && (
+                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
+                                    Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards. After staking, the action will be completed.
+                                  </Text>
+                                )}
+                                <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, marginTop: '1rem' }}>
+                                  Vesting Schedule ({status.vestingPeriodsClaimed.length} periods)
+                                </Text>
+                                <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.5rem 0' }}>
+                                  {status.vestingPeriodsClaimed.map((claimed, period) => (
+                                    <div
+                                      key={period}
+                                      style={{
+                                        width: '36px',
+                                        height: '36px',
+                                        borderRadius: '8px',
+                                        background: claimed
+                                          ? 'linear-gradient(135deg, #10B981, #3B82F6)'
+                                          : status.vestingPeriodsCompleted[period]
+                                            ? 'rgba(59, 130, 246, 0.2)'
+                                            : 'rgba(255, 255, 255, 0.05)',
+                                        border: claimed
+                                          ? 'none'
+                                          : status.vestingPeriodsCompleted[period]
+                                            ? '1px solid rgba(59, 130, 246, 0.3)'
+                                            : '1px solid rgba(255, 255, 255, 0.1)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        position: 'relative',
+                                        overflow: 'hidden'
+                                      }}
+                                    >
+                                      {claimed ? (
+                                        <Check size={16} color="white" />
+                                      ) : status.vestingPeriodsCompleted[period] ? (
+                                        <div style={{
+                                          position: 'absolute',
+                                          top: 0,
+                                          left: 0,
+                                          right: 0,
+                                          bottom: 0,
+                                          background: 'repeating-linear-gradient(45deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 6px)',
+                                          opacity: 0.3
+                                        }} />
+                                      ) : null}
+                                      <Text variant="caption" style={{
+                                        fontSize: '10px',
+                                        fontWeight: 600,
+                                        color: claimed ? 'white' : status.vestingPeriodsCompleted[period] ? '#4ade80' : 'rgba(255, 255, 255, 0.7)'
+                                      }}>
+                                        {period + 1}
+                                      </Text>
+                                    </div>
+                                  ))}
+                                </div>
+                                <Text variant="caption" style={{ color: '#a0aec0', marginTop: '0.5rem', display: 'block' }}>
+                                  {status.vestingPeriodsCompleted.filter(Boolean).length} of {status.vestingPeriodsCompleted.length} periods completed
                                 </Text>
 
-                                <div style={{ marginTop: '1rem' }}>
-                                  {index === 0 && (
-                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> set Intento as the chain and create a flow to claim tokens directly to your wallet. Tip: use a template like "Stream INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow, the action will be completed.
-                                    </Text>
-                                  )}
-                                  {index === 0 && (
-                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream INTO</strong> template here for Action 1 — a simple flow streaming to any address, including your own.
-                                    </Text>
-                                  )}
-                                  {index === 1 && (
-                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      On the <Link href="https://portal.intento.zone/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Build page</Link> select any chain other than Intento to execute over IBC via a Trustless Agent. Tip: use a template like "Stream ATOM" or "DCA into INTO". When created, it shows up under Your Flows on the <Link href="https://portal.intento.zone" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Dashboard</Link>. From there you can manage your flow and set alerts to the flow to be notified when the flow executes. After successful execution of a message in this flow on the target chain, the action will be completed.
-                                    </Text>
-                                  )}
-                                  {index === 1 && (
-                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own. 
-                                    </Text>
-                                  )}
-                                  {index === 2 && (
-                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      This requires a governance proposal to be active. Check the latest governance proposal <Link href="https://explorer.intento.zone/intento-mainnet/gov/8" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>here</Link> and check the forum on Discord for any upcoming proposals. After voting, the action will be completed.
-                                    </Text>
-                                  )}
-                                  {index === 3 && (
-                                    <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                      Stake your tokens with the <Link href="https://explorer.intento.zone/intento-mainnet/staking" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>governor validator</Link> to participate in network security and earn staking rewards. After staking, the action will be completed.
-                                    </Text>
-                                  )}
-                                  <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 600, marginTop: '1rem' }}>
-                                    Vesting Schedule ({status.vestingPeriodsClaimed.length} periods)
-                                  </Text>
-                                  <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', padding: '0.5rem 0' }}>
-                                    {status.vestingPeriodsClaimed.map((claimed, period) => (
-                                      <div
-                                        key={period}
-                                        style={{
-                                          width: '36px',
-                                          height: '36px',
-                                          borderRadius: '8px',
-                                          background: claimed
-                                            ? 'linear-gradient(135deg, #10B981, #3B82F6)'
-                                            : status.vestingPeriodsCompleted[period]
-                                              ? 'rgba(59, 130, 246, 0.2)'
-                                              : 'rgba(255, 255, 255, 0.05)',
-                                          border: claimed
-                                            ? 'none'
-                                            : status.vestingPeriodsCompleted[period]
-                                              ? '1px solid rgba(59, 130, 246, 0.3)'
-                                              : '1px solid rgba(255, 255, 255, 0.1)',
-                                          display: 'flex',
-                                          flexDirection: 'column',
-                                          alignItems: 'center',
-                                          justifyContent: 'center',
-                                          flexShrink: 0,
-                                          position: 'relative',
-                                          overflow: 'hidden'
+                              </div>
+
+                              {!isCompleted && (
+                                <div style={{ width: '100%' }}>
+                                  {index <= 1 ? (
+                                    <Link href="/build" passHref>
+                                      <Button
+                                        as="a"
+                                        variant="primary"
+                                        size="small"
+                                        style={{ marginTop: '1rem', width: '100%', textDecoration: 'none' }}
+                                        onClick={() => {
+                                          console.log('Starting action:', ClaimFlow[index]);
                                         }}
                                       >
-                                        {claimed ? (
-                                          <Check size={16} color="white" />
-                                        ) : status.vestingPeriodsCompleted[period] ? (
-                                          <div style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            background: 'repeating-linear-gradient(45deg, rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px, rgba(255, 255, 255, 0.2) 3px, rgba(255, 255, 255, 0.2) 6px)',
-                                            opacity: 0.3
-                                          }} />
-                                        ) : null}
-                                        <Text variant="caption" style={{
-                                          fontSize: '10px',
-                                          fontWeight: 600,
-                                          color: claimed ? 'white' : status.vestingPeriodsCompleted[period] ? '#4ade80' : 'rgba(255, 255, 255, 0.7)'
-                                        }}>
-                                          {period + 1}
-                                        </Text>
-                                      </div>
-                                    ))}
-                                  </div>
-                                  <Text variant="caption" style={{ color: '#a0aec0', marginTop: '0.5rem', display: 'block' }}>
-                                    {status.vestingPeriodsCompleted.filter(Boolean).length} of {status.vestingPeriodsCompleted.length} periods completed
-                                  </Text>
-
-                                </div>
-
-                                {!isCompleted && (
-                                  <div style={{ width: '100%' }}>
-                                    {index <= 1 ? (
-                                      <Link href="/build" passHref>
-                                        <Button
-                                          as="a"
-                                          variant="primary"
-                                          size="small"
-                                          style={{ marginTop: '1rem', width: '100%', textDecoration: 'none' }}
-                                          onClick={() => {
-                                            console.log('Starting action:', ClaimFlow[index]);
-                                          }}
-                                        >
-                                          Go to Build Page
-                                        </Button>
-                                      </Link>
-                                    ) : (
-                                      <a
-                                        href={index === 2
-                                          ? 'https://explorer.intento.zone/intento-mainnet/gov/6'
-                                          : 'https://explorer.intento.zone/intento-mainnet/staking'}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{ textDecoration: 'none' }}
+                                        Go to Build Page
+                                      </Button>
+                                    </Link>
+                                  ) : (
+                                    <a
+                                      href={index === 2
+                                        ? 'https://explorer.intento.zone/intento-mainnet/gov/6'
+                                        : 'https://explorer.intento.zone/intento-mainnet/staking'}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      style={{ textDecoration: 'none' }}
+                                    >
+                                      <Button
+                                        variant="primary"
+                                        size="small"
+                                        style={{ marginTop: '1rem', width: '100%' }}
                                       >
-                                        <Button
-                                          variant="primary"
-                                          size="small"
-                                          style={{ marginTop: '1rem', width: '100%' }}
-                                        >
-                                          {index === 2 ? 'View Proposals' : 'Stake Tokens'}
-                                        </Button>
-                                      </a>
-                                    )}
-                                  </div>
-                                )}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </motion.div>
-                    );
-                  })}
+                                        {index === 2 ? 'View Proposals' : 'Stake Tokens'}
+                                      </Button>
+                                    </a>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+            </div>
+      )
+      }
+      {/* Vesting Breakdown Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 2 }}
+      >
+        <div style={{
+          backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.5)' : 'rgba(226, 232, 240, 0.5)',
+          borderRadius: '12px',
+          padding: '1.25rem',
+          marginBottom: '1.5rem',
+          border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`
+        }}>
+          <Text variant="subtitle" style={{
+            marginBottom: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            color: isDarkMode ? '#e2e8f0' : '#1e293b',
+            fontWeight: 600
+          }}>
+            <Info size={18} />
+            Vesting Breakdown
+          </Text>
+          <div style={{ display: 'grid', gap: '0.75rem' }}>
+            {vestingInfo.map((item, index) => (
+              <div key={index} style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.5rem 0',
+                borderBottom: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
+                ...(index === vestingInfo.length - 1 && { borderBottom: 'none' })
+              }}>
+                <Text variant="body" style={{ color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>{item.name}</Text>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <Text variant="body" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>{item.duration}</Text>
+                  <Text variant="body" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>({item.cycles})</Text>
                 </div>
               </div>
-            </div>
-          )
-          }
-          {/* Vesting Breakdown Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 2 }}
-          >
-            <div style={{
-              backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.5)' : 'rgba(226, 232, 240, 0.5)',
-              borderRadius: '12px',
-              padding: '1.25rem',
-              marginBottom: '1.5rem',
-              border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`
-            }}>
-              <Text variant="subtitle" style={{
-                marginBottom: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                color: isDarkMode ? '#e2e8f0' : '#1e293b',
-                fontWeight: 600
-              }}>
-                <Info size={18} />
-                Vesting Breakdown
-              </Text>
-              <div style={{ display: 'grid', gap: '0.75rem' }}>
-                {vestingInfo.map((item, index) => (
-                  <div key={index} style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0.5rem 0',
-                    borderBottom: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)'}`,
-                    ...(index === vestingInfo.length - 1 && { borderBottom: 'none' })
-                  }}>
-                    <Text variant="body" style={{ color: isDarkMode ? '#e2e8f0' : '#1e293b' }}>{item.name}</Text>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                      <Text variant="body" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>{item.duration}</Text>
-                      <Text variant="body" style={{ color: isDarkMode ? '#94a3b8' : '#64748b' }}>({item.cycles})</Text>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
+            ))}
+          </div>
         </div>
-      )}
+      </motion.div>
     </div>
+  )
+}
+    </div >
   )
 }
 
