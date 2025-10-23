@@ -2,6 +2,7 @@ import { Inline, Text, Button, styled, useControlTheme } from 'junoblocks'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useState, useEffect } from 'react'
+import { __TEST_MODE__ } from '../../../util/constants'
 
 const StyledDatePicker = styled(DatePicker, {
   width: '165px',
@@ -53,8 +54,8 @@ const StyledDatePicker = styled(DatePicker, {
 
 const intervalOptions = [
   { label: 'None', value: 0 },
-  { label: '30 minutes', value: 30 * 60 * 1000 },
-  { label: '1 hour', value: 60 * 60 * 1000 },
+  __TEST_MODE__ ?  { label: '1 minute', value: 60 * 1000 } : { label: '30 minutes', value: 30 * 60 * 1000 },
+  __TEST_MODE__ ?  { label: '2 minutes', value: 2 * 60 * 1000 } : { label: '1 hour', value: 60 * 60 * 1000 },
   { label: '2 hours', value: 2 * 60 * 60 * 1000 },
   { label: '3 hours', value: 3 * 60 * 60 * 1000 },
   { label: '4 hours', value: 4 * 60 * 60 * 1000 },
@@ -126,7 +127,7 @@ export function EditSchedulingSection({
 
     setEndTimeInterval(value)
 
-    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + 60000*5
+    const start = startAt && startAt.getTime() > 0 ? startAt.getTime() : Date.now() + 60000 * 5
 
     const newEndTime = new Date(start + value)
     setEndTime(newEndTime)
@@ -155,7 +156,7 @@ export function EditSchedulingSection({
     const tenMinutesFromNow = new Date(now);
     tenMinutesFromNow.setMinutes(tenMinutesFromNow.getMinutes() + 10);
     tenMinutesFromNow.setSeconds(0, 0);
-    
+
     setStartAt(tenMinutesFromNow);
     updateField('startAt', tenMinutesFromNow);
   }

@@ -227,7 +227,7 @@ export const FlowHistory = ({
                             css={{ overflowWrap: 'anywhere', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}
                           >
                             Query Response: {(() => {
-                              const str = JSON.stringify(queryResponse);
+                              const str = Buffer.from(queryResponse, 'base64').toString('binary');
                               return str && str.length > 60 ? str.slice(0, 60) + '...' : str;
                             })()}
                           </Text>
@@ -236,7 +236,7 @@ export const FlowHistory = ({
                             size="small"
                             onClick={() => setOpenQueryIdx(openQueryIdx === i ? null : i)}
                           >
-                            {openQueryIdx === i ? 'Hide' : 'Show full'}
+                            {openQueryIdx === i ? 'Hide Encoded' : 'Show Encoded'}
                           </Button>
                           <Button
                             variant="ghost"

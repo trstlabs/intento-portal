@@ -23,7 +23,7 @@ export function ICQConfigView({ icqConfig }: { icqConfig: ICQConfig }) {
             const twapRecord = TwapRecord.decode(icqConfig.response)
             return JSON.stringify(convertBigIntToString(twapRecord), null, 2)
         }
-        return JSON.stringify(null, null, 2)
+        return Buffer.from(icqConfig.response).toString('utf-8')
     }, [icqConfig])
 
     return <>
