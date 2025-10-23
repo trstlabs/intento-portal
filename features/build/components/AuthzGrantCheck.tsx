@@ -35,7 +35,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   grantee,
   authzGrants: propAuthzGrants,
   isAuthzGrantsLoading: propIsAuthzGrantsLoading,
-  authzError: propAuthzError,
+  authzError: _propAuthzError,
   chainName,
 }) => {
   // Get wallet state and connection
@@ -63,7 +63,7 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
   const { 
     grants: authzGrants = [], 
     isLoading: isAuthzGrantsLoading,
-    error: hookError 
+    error: _authzError 
   } = propAuthzGrants !== undefined 
     ? { 
         grants: propAuthzGrants || [], 
@@ -72,8 +72,6 @@ export const AuthzGrantCheck: React.FC<AuthzGrantCheckProps> = ({
       } 
     : useAuthZMsgGrantInfoForUser(grantee, flowInput);
 
-  // Use prop error if provided, otherwise use hook error
-  const authzError = propAuthzError || hookError;
 
   // Use the shared grant validation hook
   const { allGrantsValid, expiredGrants, missingGrants } = useGrantValidation(
