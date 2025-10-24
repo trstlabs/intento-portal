@@ -224,4 +224,5 @@ declare module 'lucide-react' {
   export const BarChart2: FC<IconProps>;
   export const PieChart: FC<IconProps>;
   export const LineChart: FC<IconProps>;
+  export const Flame: FC<IconProps>;
 }

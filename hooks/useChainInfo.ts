@@ -2,7 +2,13 @@ import { ChainInfo } from '@keplr-wallet/types'
 import { useQuery } from 'react-query'
 import { queryClient } from '../services/queryClient'
 
-import { getExpectedFlowFee, getFlowParams, getStakeBalanceForAcc, getAPR, getModuleParams } from '../services/chain-info'
+import {
+  getExpectedFlowFee,
+  getFlowParams,
+  getStakeBalanceForAcc,
+  getAPR,
+  getModuleParams,
+} from '../services/chain-info'
 import { convertMicroDenomToDenom } from '../util/conversion'
 import { cosmos } from 'intentojs'
 import {
@@ -29,8 +35,8 @@ const chainInfoQueryKey = '@chain-info'
 
 export const unsafelyReadChainInfoCache = () =>
   queryClient.getQueryCache().find(chainInfoQueryKey)?.state?.data as
-  | ChainInfo
-  | undefined
+    | ChainInfo
+    | undefined
 
 export const useIBCChainInfo = (chainId: string) => {
   const { data, isLoading } = useQuery<ChainInfo>(
@@ -48,10 +54,6 @@ export const useIBCChainInfo = (chainId: string) => {
   return [data, isLoading] as const
 }
 
-
-
-
-
 export const useGetExpectedFlowFees = (
   durationSeconds: number,
   flowInput: FlowInput,
@@ -68,7 +70,7 @@ export const useGetExpectedFlowFees = (
     intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
       ? Math.floor(durationSeconds / intervalSeconds)
       : 1
-  
+
   // Add extra recurrence if there's a startTime
   if (flowInput.startTime && flowInput.startTime > 0) {
     recurrences++
@@ -80,9 +82,15 @@ export const useGetExpectedFlowFees = (
       recurrences,
       flowInput.msgs?.length || 0,
       trustlessAgent?.address ?? null,
-      intentModuleParams?.gasFeeCoins?.map(coin => coin.denom).join(',') || ''
+      intentModuleParams?.gasFeeCoins?.map((coin) => coin.denom).join(',') ||
+        '',
     ],
-    [recurrences, flowInput.msgs, trustlessAgent?.address, intentModuleParams?.gasFeeCoins]
+    [
+      recurrences,
+      flowInput.msgs,
+      trustlessAgent?.address,
+      intentModuleParams?.gasFeeCoins,
+    ]
   )
 
   const { data, isLoading, error } = useQuery(
@@ -112,7 +120,7 @@ export const useGetExpectedFlowFees = (
 
       // Calculate fees for all supported denoms
       const fees = []
-      
+
       for (const coin of intentModuleParams.gasFeeCoins) {
         try {
           const amount = getExpectedFlowFee(
@@ -127,7 +135,7 @@ export const useGetExpectedFlowFees = (
           if (amount > 0) {
             fees.push({
               amount: amount.toString(),
-              denom: coin.denom
+              denom: coin.denom,
             })
           }
         } catch (err) {
@@ -138,10 +146,7 @@ export const useGetExpectedFlowFees = (
       return fees
     },
     {
-      enabled: Boolean(
-        client?.intento &&
-        flowInput?.msgs?.length > 0 
-      ),
+      enabled: Boolean(client?.intento && flowInput?.msgs?.length > 0),
       refetchOnWindowFocus: false,
       staleTime: 30000, // 30 seconds
       cacheTime: 60000, // 1 minute
@@ -152,7 +157,7 @@ export const useGetExpectedFlowFees = (
     fees: data || [],
     isLoading,
     error,
-    refetch: () => queryClient.invalidateQueries(stableQueryKey[0] as string)
+    refetch: () => queryClient.invalidateQueries(stableQueryKey[0] as string),
   }
 }
 
@@ -171,20 +176,23 @@ export const useGetExpectedFlowFee = (
     intervalSeconds && intervalSeconds > 0 && intervalSeconds < durationSeconds
       ? Math.floor(durationSeconds / intervalSeconds)
       : 1
-  
+
   // Add extra recurrence if there's a startTime
   if (flowInput.startTime && flowInput.startTime > 0) {
     recurrences++
   }
   const client = useIntentoRpcClient()
 
-  const stableQueryKey = useMemo(() => [
-    'expectedFlowFee',
-    recurrences,
-    denom,
-    flowInput.msgs?.length || 0,
-    trustlessAgent?.address ?? null
-  ], [recurrences, denom, flowInput.msgs, trustlessAgent?.address])
+  const stableQueryKey = useMemo(
+    () => [
+      'expectedFlowFee',
+      recurrences,
+      denom,
+      flowInput.msgs?.length || 0,
+      trustlessAgent?.address ?? null,
+    ],
+    [recurrences, denom, flowInput.msgs, trustlessAgent?.address]
+  )
 
   const { data, isLoading } = useQuery(
     stableQueryKey,
@@ -211,8 +219,6 @@ export const useGetExpectedFlowFee = (
         return { fee: 0, symbol: denom }
       }
 
-
-
       try {
         // Ensure we have valid parameters before calling getExpectedFlowFee
         if (!intentModuleParams || !denom) {
@@ -230,7 +236,7 @@ export const useGetExpectedFlowFee = (
           denom,
           recurrences,
           lenMsgs: flowInput.msgs.length,
-          trustlessAgent
+          trustlessAgent,
         })
 
         // First try with the actual denom (denom_local)
@@ -258,7 +264,10 @@ export const useGetExpectedFlowFee = (
         // If fee is 0 but intoFee is not, it means the provided denom isn't supported
         // In this case, use the intoFee but keep the original symbol for display
         if (fee === 0 && intoFee > 0) {
-          console.log(`No fee found for ${denom}, using INTO fee instead:`, intoFee)
+          console.log(
+            `No fee found for ${denom}, using INTO fee instead:`,
+            intoFee
+          )
           fee = intoFee
           denom = 'uinto'
         }
@@ -272,18 +281,52 @@ export const useGetExpectedFlowFee = (
       }
     },
     {
-      enabled: Boolean(durationSeconds && flowInput.msgs && flowInput.msgs.length > 0 && denom && client),
+      enabled: Boolean(
+        durationSeconds &&
+          flowInput.msgs &&
+          flowInput.msgs.length > 0 &&
+          denom &&
+          client
+      ),
       refetchOnMount: true,
       staleTime: 10000, // Consider data stale after 10 seconds
       cacheTime: 30000, // Keep in cache for 30 seconds
       retry: 1, // Limit retries to avoid excessive error messages
       onError: (error) => {
         console.error('Error calculating expected fee:', error)
-      }
+      },
     }
   )
 
   return [data?.fee || 0, isLoading, data?.symbol || denom] as const
+}
+
+export const useGetTotalBurned = () => {
+  const client = useIntentoRpcClient()
+  const { data, isLoading } = useQuery(
+    'useGetTotalBurned',
+    async () => {
+      //base value is approximate from total flow message executions pre block 3455000
+      if (!client) return 200000000 // Default base value
+
+      try {
+        // Call the totalBurnt query from the intent module
+        const response = await client.intento.intent.v1.totalBurnt({})
+
+        // The response should have an amount field with the total burned tokens in microunits
+        return Number(response.totalBurnt.amount) + 200000000
+      } catch (e) {
+        console.error('Error getting total burned tokens:', e)
+        return 200000000 // Fallback to base value if there's an error
+      }
+    },
+    {
+      enabled: Boolean(client?.intento?.intent?.v1?.totalBurnt),
+      refetchInterval: DEFAULT_LONG_REFETCH_INTERVAL,
+      refetchOnMount: 'always',
+    }
+  )
+  return [data || 1043 * 10000, isLoading] as const
 }
 
 export const useGetAllValidators = () => {
@@ -411,7 +454,9 @@ export const useGetAPYWithFees = (
 
       // Calculate the APY percentage first (same as useGetAPY)
       const periodsPerYear = (60 * 60 * 24 * 365) / interval
-      const baseAPY = ((1 + APR.estimatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) * 100
+      const baseAPY =
+        ((1 + APR.estimatedApr / 100 / periodsPerYear) ** periodsPerYear - 1) *
+        100
 
       // Calculate fees for the entire period
       const expectedFees = getExpectedFlowFee(
@@ -427,7 +472,8 @@ export const useGetAPYWithFees = (
 
       // Calculate the effective APY by reducing the staking rewards by the fees
       // This is a simplified calculation - in reality, fees would be deducted periodically
-      const feesAsPercentageOfStakingBalance = (feesInINTO / stakingBalance) * 100
+      const feesAsPercentageOfStakingBalance =
+        (feesInINTO / stakingBalance) * 100
 
       // Reduce the APY by the fee percentage
       return Math.max(0, baseAPY - feesAsPercentageOfStakingBalance)
@@ -451,7 +497,7 @@ export const useGetAPY = (intervalSeconds: number) => {
   const { client } = useRecoilValue(walletState)
   const paramsState = useRecoilValue(paramsStateAtom)
 
-  // Use useAPR instead of getAPY
+  // Use useAPR instead of getAPR
   const [APR, isLoadingAPR] = useGetAPR()
 
   const { data, isLoading } = useQuery(
@@ -521,7 +567,9 @@ export const useGetChainAndTeamWalletsBalance = () => {
   const { data, isLoading } = useQuery(
     'getChainAndTeamWalletsBalance',
     async () => {
-      const { getChainAndTeamWalletsBalance } = await import('../services/chain-info')
+      const { getChainAndTeamWalletsBalance } = await import(
+        '../services/chain-info'
+      )
       return getChainAndTeamWalletsBalance({ client })
     },
     {
@@ -538,16 +586,26 @@ export const useGetChainAndTeamWalletsBalance = () => {
 export const useGetCirculatingSupply = () => {
   const [totalSupply, isTotalSupplyLoading] = useGetTotalSupply()
   const [communityPool, isCommunityPoolLoading] = useGetCommunityPool()
-  const [chainAndTeamWallets, isChainAndTeamWalletsLoading] = useGetChainAndTeamWalletsBalance()
+  const [chainAndTeamWallets, isChainAndTeamWalletsLoading] =
+    useGetChainAndTeamWalletsBalance()
 
   const circulatingSupply = useMemo(() => {
-    if (totalSupply && communityPool && Number(totalSupply) && Number(communityPool) && Number(chainAndTeamWallets)) {
+    if (
+      totalSupply &&
+      communityPool &&
+      Number(totalSupply) &&
+      Number(communityPool) &&
+      Number(chainAndTeamWallets)
+    ) {
       return totalSupply - communityPool - chainAndTeamWallets
     }
     return null
   }, [totalSupply, communityPool, chainAndTeamWallets])
 
-  const isLoading = isTotalSupplyLoading || isCommunityPoolLoading || isChainAndTeamWalletsLoading
+  const isLoading =
+    isTotalSupplyLoading ||
+    isCommunityPoolLoading ||
+    isChainAndTeamWalletsLoading
 
   return [circulatingSupply, isLoading] as const
 }
@@ -566,7 +624,7 @@ export const useGetAirdropClawback = () => {
 
         const coin = await client.cosmos.bank.v1beta1.balance({
           address: moduleAccAddress,
-          denom: 'uinto'
+          denom: 'uinto',
         })
 
         if (coin?.balance) {
@@ -574,7 +632,7 @@ export const useGetAirdropClawback = () => {
           const percentage = (diff / initialModuleBalance) * 100
           return {
             percentage: Number(percentage.toFixed(3)),
-            amount: diff
+            amount: diff,
           }
         }
         return { percentage: 0, amount: 0 }
