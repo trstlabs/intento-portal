@@ -189,10 +189,10 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                       <CardContent style={{ padding: '2rem' }}>
                         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
                           <Text variant="header" css={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
-                            You can claim up to {convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO. 
+                            You can claim up to {convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO.
                           </Text>
                           <Text variant="caption" css={{ color: '#a0aec0', marginBottom: '1.5rem' }}>
-                            With decay, the total amount you can claim is { (Number(total) / Number(claimRecord.maximumClaimableAmount?.amount) * 100).toFixed(1)}% of the total claimable amount.
+                            With decay, the total amount you can claim is {(Number(total) / Number(claimRecord.maximumClaimableAmount?.amount) * 100).toFixed(1)}% of the total claimable amount.
                           </Text>
                           <div style={styles.progressBar}>
                             <div style={styles.progressFill(completionPercentage)} />
@@ -252,7 +252,6 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                 <div style={{ marginTop: '1rem' }}>
                   {Object.entries(claimRecord.status).map(([_, status], index) => {
                     const isCompleted = status.actionCompleted;
-                    const actionReward = convertMicroDenomToDenom(total / Object.keys(claimRecord.status).length, 6).toFixed(2);
 
                     return (
                       <motion.div
@@ -300,11 +299,21 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                 {index + 1}. {ClaimFlow[index]}
                               </Text>
                               <Text variant="caption" style={{ color: '#a0aec0' }}>
-                                Rewards outstanding: {(
-                                  (isCompleted ? 0 : Number(actionReward) * 0.2) + // Initial 20% if not completed
-                                  (Number(actionReward) * 0.8 * (1 - (Number(claimRecord.status[index].vestingPeriodsClaimed.filter(claim => claim === true).length) / claimRecord.status[index].vestingPeriodsCompleted.length)))
+                                Unclaimed: {(
+                                  (isCompleted ? 0 : Number(perActionReward) * 0.2) + // Initial 20% if not completed
+                                  (Number(perActionReward) * 0.8 * (1 - (Number(claimRecord.status[index].vestingPeriodsClaimed.filter(claim => claim === true).length) / claimRecord.status[index].vestingPeriodsCompleted.length)))
                                 ).toFixed(2)} INTO
                               </Text>
+                              {claimRecord.status[index].vestingPeriodsCompleted.filter(completed => completed === true).length > 0 && (
+                                <Text variant="caption" style={{ color: '#a0aec0' }}>
+                                  Claimable Now: {(
+                                    (claimRecord.status[index].vestingPeriodsCompleted
+                                      .filter((completed, i) => completed && !claimRecord.status[index].vestingPeriodsClaimed[i])
+                                      .length / (claimRecord.status[index].vestingPeriodsCompleted.length + 1)) *
+                                    Number(perActionReward)
+                                  ).toFixed(2)} INTO
+                                </Text>
+                              )}
                             </div>
                           </div>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -354,7 +363,7 @@ const ClaimAirdrop: React.FC<ClaimAirdropProps> = ({ claimRecord, total, claimRe
                                   )}
                                   {index === 1 && (
                                     <Text variant="caption" style={{ display: 'block', marginBottom: '0.75rem', color: '#a0aec0' }}>
-                                    <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own. 
+                                      <strong>Ledger Users:</strong> Ledger still relies on legacy Amino signing, which most tooling doesn’t handle well. We’ve put together a fallback interface with that signing mode: <Link href="https://intento-portal-sign-amino.netlify.app/build" target="_blank" rel="noopener noreferrer" style={{ color: '#3b82f6', textDecoration: 'underline' }}>Amino Builder</Link>. You can try the <strong>Stream ATOM or Stream OSMO</strong> templates here for this action — a simple flow streaming to any address, including your own.
                                     </Text>
                                   )}
                                   {index === 2 && (

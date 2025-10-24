@@ -116,10 +116,11 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
 
         // Get the balance (replace 'uinto' with the actual denom if different)
         const coin = await rpcClient?.cosmos.bank.v1beta1?.balance({ address: moduleAccAddress, denom: 'uinto' });
-        console.log("coin", coin);
+        const airdropAllocation = Number(coin.balance.amount)// + 30053898865877 + 23031804000000 + 33000000000000;
+
         if (coin) {
           // Calculate the difference from target amount
-          const diff = initialModuleBalance - Number(coin.balance.amount);
+          const diff = initialModuleBalance - airdropAllocation;
           const percentage = ((diff / initialModuleBalance) * 100).toFixed(3);
           setDifference(Number(percentage));
         }
@@ -214,7 +215,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               <Text>{convertMicroDenomToDenom(claimRecord.maximumClaimableAmount?.amount, 6).toFixed(2)} INTO</Text>
                             </div>
 
-                            <div style={styles.statCard}>
+                            {process.env.NEXT_PUBLIC_CLAWBACK_ENABLED == "true" && <div style={styles.statCard}>
                               <Text variant="caption" css={{ color: '#a0aec0' }}>Tokens Claimed </Text>
                               <div style={{ height: '8px', background: isDarkMode ? '#ffffff' : '#2d3748', borderRadius: '4px', margin: '0.5rem 0' }}>
                                 <div style={{ width: `${difference}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #8b5cf6)', borderRadius: '4px' }}></div>
@@ -225,7 +226,7 @@ const ViewAirdropEligibility = ({ claimRecord }: ViewAirdropEligibilityProps) =>
                               <Text variant="caption" css={{ display: 'block' }}>
                                 As it stands, {(100 - difference).toFixed(3)}% of the total airdrop will be clawed back to the community pool. These tokens may be used for growth initiatives or burned, increasing the scarcity of INTO.
                               </Text>
-                            </div>
+                            </div>}
                           </div>
 
                           <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>

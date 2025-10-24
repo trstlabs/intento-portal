@@ -27,6 +27,7 @@ import {
   useGetTotalSupply,
   useGetCirculatingSupply,
   useGetAirdropClawback,
+  useGetTotalBurned,
 } from '../../../hooks/useChainInfo'
 import { useFlowStats } from '../../../hooks/useFlowStats'
 import { useTokenBalance } from '../../../hooks/useTokenBalance'
@@ -37,7 +38,7 @@ import { FlowInput } from '../../../types/trstTypes'
 import { __TEST_MODE__ } from '../../../util/constants'
 
 // Import icons for visual enhancement
-import { Database, TrendingUp, Clock, DollarSign, Info, Compass } from 'lucide-react'
+import { Database, TrendingUp, Clock, DollarSign, Info, Compass, Flame } from 'lucide-react'
 import { FeedbackLoop } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { useINTOPrice } from '../../../hooks/useINTOPrice'
 
@@ -86,6 +87,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
   const [totalSupply, isTotalSupplyLoading] = useGetTotalSupply()
   const [circulatingSupply, isCirculatingSupplyLoading] = useGetCirculatingSupply()
   const [airdropClawback, isAirdropClawbackLoading] = useGetAirdropClawback()
+  const [totalBurned, isTotalBurnedLoading] = useGetTotalBurned()
 
   const { balance, isLoading } = useTokenBalance('INTO')
   const [ibcAssetList] = useIBCAssetList()
@@ -132,7 +134,8 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
         responseIndex: 0,
         responseKey: "Amount.[-1]",
         valueType: 'sdk.Coin',
-        flowId: BigInt(0)
+        flowId: BigInt(0),
+        differenceMode: false,
       }
       feedbackLoops.push(feedbackLoop)
     }
@@ -705,6 +708,53 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                   </div>
                 </>
               </Card>
+              {/* INTO Burned Card */}
+              <Card css={{
+                padding: '$12',
+                margin: '$4',
+                position: 'relative',
+                overflow: 'hidden',
+                background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%)',
+                border: '1px solid rgba(239, 68, 68, 0.2)',
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 8px 25px rgba(239, 68, 68, 0.15)',
+                  borderColor: 'rgba(239, 68, 68, 0.4)',
+                }
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #ef4444, #dc2626)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(239, 68, 68, 0.3)'
+                  }}>
+                    <Flame size={20} color="white" />
+                  </div>
+                  <div>
+                    <Text variant="legend" css={{ fontWeight: '600', color: '#ef4444' }}>INTO Burned</Text>
+                  </div>
+                </div>
+                <Text css={{
+                  padding: '$8',
+                  fontSize: '1.75rem',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #f87171, #ef4444)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent'
+                }} variant="title">
+                  {!isTotalBurnedLoading ?
+                    convertMicroDenomToDenom(totalBurned, 6) + " INTO"
+                    : <Spinner size={24} />
+                  }
+                </Text>
+
+              </Card>
             </Column>
           )}</Column>
         {process.env.NEXT_PUBLIC_SHOW_DISTRIBUTION && params && (
@@ -812,7 +862,6 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 <span style={{ fontSize: '1rem' }}> {" "}INTO</span>
               </Text>
             </Card>
-
             <Card css={{
               padding: '$12',
               margin: '$4',
@@ -866,7 +915,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
               </Text>
             </Card>
 
-            <Card css={{
+            {process.env.NEXT_PUBLIC_CLAWBACK_ENABLED === 'true' && <Card css={{
               padding: '$12',
               margin: '$4',
               position: 'relative',
@@ -880,21 +929,21 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 borderColor: 'rgba(245, 158, 11, 0.4)',
               }
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '12px',
-                  background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
-                }}>
-                  <Clock size={20} color="white" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div style={{
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '12px',
+                    background: 'linear-gradient(135deg, #f59e0b, #fbbf24)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)'
+                  }}>
+                    <Clock size={20} color="white" />
+                  </div>
+                  <Text variant="legend" css={{ fontWeight: '600', color: '#f59e0b' }}>Airdrop Clawback</Text>
                 </div>
-                <Text variant="legend" css={{ fontWeight: '600', color: '#f59e0b' }}>Airdrop Clawback</Text>
-              </div>
               {!isAirdropClawbackLoading && airdropClawback ? (
                 <>
                   <div style={{
@@ -962,6 +1011,7 @@ export const TokenomicsCard = ({ shouldShowAutoCompound }: TokenomicsCardProps) 
                 </Text>
               )}
             </Card>
+            }
             <Card css={{
               padding: '$12',
               margin: '$4',
