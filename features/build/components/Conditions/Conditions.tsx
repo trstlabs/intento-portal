@@ -86,6 +86,7 @@ export const Conditions = ({
       valueType: "string",
       msgsIndex: 0,
       msgKey: "",
+      differenceMode: false,
     }
 
     // Create a new conditions object with the updated feedbackLoops array
@@ -105,6 +106,7 @@ export const Conditions = ({
       valueType: "string",
       operator: -1,
       operand: "",
+      differenceMode: false,
     }
 
     // Create a new conditions object with the updated comparisons array
