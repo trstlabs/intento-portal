@@ -145,6 +145,11 @@ export const ConditionsSummary: React.FC<ConditionsSummaryProps> = ({ conditions
              {conditions.useAndForComparisons ? <Text variant="body" color="tertiary" css={{ fontWeight: 'medium', fontSize: '12px' }}>  • Use AND for comparisons </Text> : <Text variant="body" color="tertiary" css={{ fontWeight: 'medium', fontSize: '12px' }}>  • Use OR for comparisons </Text>}
             </Inline>
           )}
+          {conditions.comparisons?.find((comp) => comp.differenceMode) && (
+            <Inline css={{ paddingLeft: '$4' }}>
+             {conditions.comparisons?.find((comp) => comp.differenceMode) ? <Text variant="body" color="tertiary" css={{ fontWeight: 'medium', fontSize: '12px' }}>  • Use difference mode </Text> : <Text variant="body" color="tertiary" css={{ fontWeight: 'medium', fontSize: '12px' }}>  • Use static mode </Text>}
+            </Inline>
+          )}
         </Column>
       )}
 

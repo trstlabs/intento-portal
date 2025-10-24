@@ -1,4 +1,4 @@
-import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper } from "junoblocks"
+import { Card, Text, Tooltip, Button, UnionIcon, ChevronIcon, Chevron, IconWrapper, ToggleSwitch } from "junoblocks"
 import { Field } from "./Fields"
 import { ComparisonOperator, Comparison } from "intentojs/dist/codegen/intento/intent/v1/flow"
 import ConditionDropdown from "./ConditionDropdown"
@@ -95,6 +95,23 @@ export const ComparisonForm = ({ comparison, onChange, setDisabled }: Comparison
         onChange={(e) => handleFieldChange('operand', e.target.value)}
 
       />
+      <Button
+        variant="ghost"
+        size="large"
+        css={{ columnGap: '$4', margin: '$2' }}
+        onClick={() => handleFieldChange('differenceMode', !comparison?.differenceMode)}
+        iconLeft={
+          <ToggleSwitch
+            id="and"
+            name="and"
+            onChange={() => handleFieldChange('differenceMode', !comparison?.differenceMode)}
+            checked={comparison?.differenceMode}
+            optionLabels={['difference', 'static']}
+          />
+        }
+      >
+        Difference Mode
+      </Button>
       <Field
         label="Flow ID (optional)"
         tooltip="Flow to get the latest response value from, optional"
