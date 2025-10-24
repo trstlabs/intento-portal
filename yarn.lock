@@ -7322,10 +7322,10 @@ inline-style-prefixer@^7.0.0:
     css-in-js-utils "^3.1.0"
     fast-loops "^1.1.3"
 
-intentojs@^1.0.4-proto.0-beta.11:
-  version "1.0.4-proto.0-beta.11"
-  resolved "https://registry.npmjs.org/intentojs/-/intentojs-1.0.4-proto.0-beta.11.tgz"
-  integrity sha512-GKDUtg5geKGEnJIGgU43PWG50FZQAQKP/KCLMtCmKftm0vsp8uiL1ZFNg+niNWIrUtyI/ioIBebHFT+WyFsAmw==
+intentojs@^1.0.5-proto.0:
+  version "1.0.5-proto.0"
+  resolved "https://registry.npmjs.org/intentojs/-/intentojs-1.0.5-proto.0.tgz"
+  integrity sha512-G1OkN4dHeXb7B2IIuVH6IBRmiAlvsa5uOpA3Vlbs5Lrma5AdZ2pSnxOmVFiZbc8tE97nh2jd9agxPkZ0M0zTsA==
   dependencies:
     "@cosmjs/amino" "^0.32.4"
     "@cosmjs/proto-signing" "^0.32.4"
