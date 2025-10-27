@@ -70,6 +70,7 @@ export const SubmitFlowDialog = ({
   // Lookup chain name if not provided
   const chainInfo = useChainInfoByChainID(chainId)
   const chainName = propChainName || chainInfo?.name || 'IBC' // fallback
+  const disableRecurring = chainId !== process.env.NEXT_PUBLIC_INTO_CHAIN_ID 
 
   // Get authz grant info
   const {
@@ -111,7 +112,7 @@ export const SubmitFlowDialog = ({
   // Calculate duration based on whether we have a future start time
   const now = Date.now()
   const startTime = executionParams.startAt !== 0 ? executionParams.startAt : now
-  const duration = executionParams.interval > 0 ? executionParams.endTime - startTime - executionParams.interval : executionParams.endTime - startTime
+  const duration = executionParams.endTime - startTime
   const interval = executionParams.interval
 
 
@@ -123,7 +124,7 @@ export const SubmitFlowDialog = ({
     setCheckedFeeAcc(!checkedFeeAcc)
   }
 
- 
+
   const { fees, isLoading: _isSuggestedFundsLoading } = useGetExpectedFlowFees(
     duration / 1000,
     flowInput,
@@ -188,7 +189,7 @@ export const SubmitFlowDialog = ({
   }
 
   let recurrences = interval > 0 ? Math.floor(duration / interval) : 1
-  if (startTime > 0) {
+  if (executionParams.startAt > 0) {
     recurrences++
   }
   return (
@@ -234,30 +235,36 @@ export const SubmitFlowDialog = ({
               />
             )}
 
+            {disableRecurring && (
+              <Text variant="caption" color="tertiary" css={{ marginBottom: '$2' }}>
+                Recurring flows for this type is temporarily paused pending v1.0.7 activation.
+              </Text>
+            )}
             <Card variant="secondary" disabled>
               <EditSchedulingSection
                 updatedFlowParams={executionParams}
                 setUpdateFlow={setUpdateExecutionParams}
+                disableRecurring={disableRecurring}
               />
 
             </Card>
             <>
-            {/* Authorization Check - Always render but show error state if needed */}
-            {chainId != process.env.NEXT_PUBLIC_INTO_CHAIN_ID && (
-   
-              <AuthzGrantCheck
-                flowInput={{
-                  ...flowInput,
-                  duration,
-                }}
-                chainId={chainId}
-                grantee={icaAddress}
-                chainName={chainName}
-                authzGrants={authzGrants}
-                isAuthzGrantsLoading={isAuthzGrantsLoading}
-                authzError={authzError}
-              />
-            )}
+              {/* Authorization Check - Always render but show error state if needed */}
+              {chainId != process.env.NEXT_PUBLIC_INTO_CHAIN_ID && (
+
+                <AuthzGrantCheck
+                  flowInput={{
+                    ...flowInput,
+                    duration,
+                  }}
+                  chainId={chainId}
+                  grantee={icaAddress}
+                  chainName={chainName}
+                  authzGrants={authzGrants}
+                  isAuthzGrantsLoading={isAuthzGrantsLoading}
+                  authzError={authzError}
+                />
+              )}
               <Column css={{ gap: '$4', background: '$colors$dark5', borderRadius: '8px', padding: '$4' }} >
                 <Column css={{ padding: '$2', gap: '$4' }}>
                   <Inline justifyContent="space-between">

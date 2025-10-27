@@ -54,8 +54,8 @@ const StyledDatePicker = styled(DatePicker, {
 
 const intervalOptions = [
   { label: 'None', value: 0 },
-  __TEST_MODE__ ?  { label: '1 minute', value: 60 * 1000 } : { label: '30 minutes', value: 30 * 60 * 1000 },
-  __TEST_MODE__ ?  { label: '2 minutes', value: 2 * 60 * 1000 } : { label: '1 hour', value: 60 * 60 * 1000 },
+  __TEST_MODE__ ? { label: '1 minute', value: 60 * 1000 } : { label: '30 minutes', value: 30 * 60 * 1000 },
+  __TEST_MODE__ ? { label: '2 minutes', value: 2 * 60 * 1000 } : { label: '1 hour', value: 60 * 60 * 1000 },
   { label: '2 hours', value: 2 * 60 * 60 * 1000 },
   { label: '3 hours', value: 3 * 60 * 60 * 1000 },
   { label: '4 hours', value: 4 * 60 * 60 * 1000 },
@@ -89,6 +89,7 @@ type EditSchedulingSectionProps = {
   setUpdateFlow: (params: { startAt?: number | Date; interval?: number; endTime?: number | Date }) => void
   isExecutingUpdateFlow?: boolean
   updateOnButtonClick?: boolean
+  disableRecurring?: boolean
 }
 
 export function EditSchedulingSection({
@@ -96,6 +97,7 @@ export function EditSchedulingSection({
   setUpdateFlow,
   isExecutingUpdateFlow,
   updateOnButtonClick = false,
+  disableRecurring = false,
 }: EditSchedulingSectionProps) {
 
   const StyledDiv = styled('div', {
@@ -139,7 +141,11 @@ export function EditSchedulingSection({
     if (updatedFlowParams.startAt) {
       setStartAt(new Date(updatedFlowParams.startAt))
     }
-    if (updatedFlowParams.interval) {
+    if (disableRecurring && updatedFlowParams.interval !== undefined) {
+      setInterval(0)
+      setStartAt(null)
+
+    } else if (updatedFlowParams.interval !== undefined) {
       setInterval(updatedFlowParams.interval)
     }
     if (updatedFlowParams.endTime) {
@@ -182,9 +188,9 @@ export function EditSchedulingSection({
   return (
     <StyledDiv>
       <StyledGrid>
-        <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
+         {!disableRecurring && <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
           <Text variant="caption" style={{ minWidth: '45px' }}>Start</Text>
-          <Inline gap={1}>
+         <Inline gap={1}>
             <StyledDatePicker
               selected={startAt}
               onChange={(date: Date) => {
@@ -220,17 +226,19 @@ export function EditSchedulingSection({
               None
             </Button>
           </Inline>
-        </Inline>
+        </Inline>}
 
         <Inline gap={2} align="center" style={{ marginBottom: '$4' }}>
           <Text variant="caption" style={{ minWidth: '45px' }}>Interval</Text>
           <select
-            value={interval}
+            value={disableRecurring ? 0 : interval}
             onChange={e => {
+              if (disableRecurring) return
               const value = Number(e.target.value)
               setInterval(value)
               updateField('interval', value)
             }}
+            disabled={disableRecurring}
             style={{
               width: '165px',
               padding: '6px 12px',
@@ -241,7 +249,7 @@ export function EditSchedulingSection({
               backgroundColor: themeController?.theme.name === 'dark' ? '#1f1f1f' : '#ffffff',
             }}
           >
-            {intervalOptions.map(option => (
+            {!disableRecurring  && intervalOptions.map(option => (
               <option
                 key={option.value}
                 value={option.value}
@@ -292,7 +300,6 @@ export function EditSchedulingSection({
               </option>
             ))}
           </select>
-
         </Inline>
 
       </StyledGrid>
