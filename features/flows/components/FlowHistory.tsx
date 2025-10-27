@@ -12,7 +12,7 @@ import {
 import React from 'react'
 
 import { GlobalDecoderRegistry } from 'intentojs'
-import { convertMicroDenomToDenom, resolveDenomSync } from 'util/conversion'
+import { convertBigIntToString, convertMicroDenomToDenom, resolveDenomSync } from 'util/conversion'
 import { useFlowHistory } from '../../../hooks/useFlow'
 import { useRefetchQueries } from '../../../hooks/useRefetchQueries'
 import { getRelativeTime } from '../../../util/time'
@@ -21,6 +21,9 @@ import { __TEST_MODE__ } from '../../../util/constants'
 import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { Link } from '@interchain-ui/react'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
+
+import { bytesFromBase64 } from 'intentojs/dist/codegen/helpers'
+import { TwapRecord } from '../../../util/conversion/twapRecord'
 
 type FlowHistoryProps = {
   id: string
@@ -226,9 +229,20 @@ export const FlowHistory = ({
                             variant="caption"
                             css={{ overflowWrap: 'anywhere', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}
                           >
-                            Query Response: {(() => {
-                              const str = Buffer.from(queryResponse, 'base64').toString('binary');
-                              return str && str.length > 60 ? str.slice(0, 60) + '...' : str;
+                            Query Response:  {(() => {
+                              if (queryResponse.length > 120) {
+                                const buffer = Buffer.from(queryResponse, 'base64')
+
+
+                                const responseBytes = new Uint8Array(buffer)
+
+
+                                const twapRecord = TwapRecord.decode(responseBytes)
+                                return JSON.stringify(convertBigIntToString(twapRecord), null, 2)
+                              } else {
+                                const str = Buffer.from(queryResponse, 'base64').toString('binary');
+                                return str && str.length > 60 ? str.slice(0, 60) + '...' : str;
+                              }
                             })()}
                           </Text>
                           <Button
