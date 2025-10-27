@@ -22,7 +22,6 @@ import { FlowHistoryEntry } from 'intentojs/dist/codegen/intento/intent/v1/flow'
 import { Link } from '@interchain-ui/react'
 import { IBCAssetInfo } from '../../../hooks/useChainList'
 
-import { bytesFromBase64 } from 'intentojs/dist/codegen/helpers'
 import { TwapRecord } from '../../../util/conversion/twapRecord'
 
 type FlowHistoryProps = {
