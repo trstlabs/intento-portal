@@ -85,6 +85,14 @@ export const useCreateAuthzGrant = ({
       onError(e) {
         const errorMessage = formatSdkErrorMessage(e)
         console.log(errorMessage)
+        // Optional prompt to reload on RPC/signer-related errors
+        if (errorMessage.includes('from signer')) {
+          const shouldReload = window.confirm(`RPC error: ${errorMessage}\n\nReload the page now?`)
+          if (shouldReload) {
+            window.location.reload()
+            return
+          }
+        }
         if (!errorMessage.includes('invalid granter address')) {
           toast.custom((t) => (
             <Toast
