@@ -73,7 +73,7 @@ export const FlowCard = ({ flow }: flowWithDetails) => {
   const isActive = endTime && execTime &&
     endTime >= execTime &&
     endTime > now &&
-    execTime > now;
+    execTime > now - 100000; // added space for processing IBC acknowledgement
 
   const hasEnded = endTime && endTime <= now;
   const notStarted = execTime && execTime > now;

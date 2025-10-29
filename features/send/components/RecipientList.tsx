@@ -65,7 +65,7 @@ export const RecipientList = ({
   const initConfig: ExecutionConfiguration = {
     saveResponses: false,
     updatingDisabled: false,
-    stopOnFailure: true,
+    stopOnFailure: false,
     stopOnSuccess: false,
     stopOnTimeout: false,
     walletFallback: true,

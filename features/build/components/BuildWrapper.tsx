@@ -24,7 +24,7 @@ export const BuildWrapper = ({
   const initConfig = {
     saveResponses: true,
     updatingDisabled: false,
-    stopOnFailure: true,
+    stopOnFailure: false,
     stopOnSuccess: false,
     stopOnTimeout: false,
     walletFallback: true,
