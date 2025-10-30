@@ -70,7 +70,7 @@ export const SubmitFlowDialog = ({
   // Lookup chain name if not provided
   const chainInfo = useChainInfoByChainID(chainId)
   const chainName = propChainName || chainInfo?.name || 'IBC' // fallback
-  const disableRecurring = chainId !== process.env.NEXT_PUBLIC_INTO_CHAIN_ID 
+  const disableRecurring = false
 
   // Get authz grant info
   const {
@@ -235,11 +235,6 @@ export const SubmitFlowDialog = ({
               />
             )}
 
-            {disableRecurring && (
-              <Text variant="caption" color="tertiary" css={{ marginBottom: '$2' }}>
-                Recurring flows for this type is temporarily paused pending v1.0.7 activation.
-              </Text>
-            )}
             <Card variant="secondary" disabled>
               <EditSchedulingSection
                 updatedFlowParams={executionParams}
