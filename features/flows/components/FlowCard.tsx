@@ -80,7 +80,7 @@ export const FlowCard = ({ flow }: flowWithDetails) => {
 
   return (
     <Link href={`/flows/${flow.id.toString()}`} passHref>
-      <Card variant="secondary" active={isActive} css={{ minHeight: '240px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Card variant="secondary" active={isActive} css={{ minWidth: '240px', minHeight: '240px', height: '100%', display: 'flex', flexDirection: 'column', flex: '0 0 auto' }}>
         <CardContent size="medium" css={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           <Column align="center" css={{ flex: 1 }}>
             <StyledDivForTokenLogos css={{ paddingTop: '$16', paddingBottom: '$8' }}>
